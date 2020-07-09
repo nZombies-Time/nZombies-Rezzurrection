@@ -1,0 +1,12 @@
+"SpriteCard"
+{
+	$basetexture 		"particle/astrowave.vtf"
+	
+	$blendframes 		1
+
+	$overbrightfactor	2
+	$depthblend 		1
+	$depthblendscale 	4
+	
+	$additive 			1
+}

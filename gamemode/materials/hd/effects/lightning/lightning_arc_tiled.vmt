@@ -1,0 +1,13 @@
+"SpriteCard"
+{
+	"$basetexture" "hd/effects/lightning/lightning_arc_tiled"
+	"$additive" "1"
+	"$vertexcolor" "1"
+	"$vertexalpha" "1"
+	
+	$POWERFUNCTION "[0.8 2.5 5]"
+	$OVERBRIGHTFACTOR 2
+	$DEPTHBLEND 1
+	$MAXSIZE .25
+	$BLENDFRAMES 1
+}

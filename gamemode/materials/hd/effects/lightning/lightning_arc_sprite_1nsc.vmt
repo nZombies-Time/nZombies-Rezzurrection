@@ -1,0 +1,8 @@
+"UnlitGeneric"
+{
+	"$basetexture" "hd/effects/lightning/lightning_arc_sprite_1"
+	"$additive" "1"
+	$DEPTHBLEND 1
+	"$vertexcolor" "1"
+	"$vertexalpha" "1"
+}

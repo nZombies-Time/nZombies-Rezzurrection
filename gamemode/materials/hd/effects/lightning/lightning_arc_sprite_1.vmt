@@ -1,0 +1,10 @@
+"SpriteCard"
+{
+	"$basetexture" "hd/effects/lightning/lightning_arc_sprite_1"
+	"$additive" "1"
+	$POWERFUNCTION "[0.8 2.5 5]"
+	$OVERBRIGHTFACTOR 2
+	$DEPTHBLEND 1
+	"$vertexcolor" "1"
+	"$vertexalpha" "1"
+}

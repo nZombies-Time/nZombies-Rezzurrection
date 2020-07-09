@@ -1,0 +1,10 @@
+"SpriteCard"
+{
+	$basetexture 		"particle/mangler_electric"
+
+	$depthblend 		1
+	$depthblendscale 	4
+
+	$additive 			1
+	$translucent 		1
+}

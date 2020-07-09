@@ -1,0 +1,8 @@
+SpriteCard
+{
+$basetexture "particle/electrical_beam"
+$addself 2
+$splinetype 1
+$depthblend 0
+$overbrightfactor 6
+}

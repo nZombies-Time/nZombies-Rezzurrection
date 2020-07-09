@@ -1,0 +1,7 @@
+"Sprite"
+{
+	$basetexture 	"particle/doom/lightning3"
+	$additive 		1
+	$spriterendermode 	5
+	$overbrightfactor 	1.2
+}

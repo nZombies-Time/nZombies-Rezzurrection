@@ -1,0 +1,22 @@
+"Sprite" // "SpriteCard"
+{
+	$basetexture 		"particle/cobweb_trail.vtf"
+//	$minsize 			0.1
+//	$maxsize 			0.8
+//	$minfadesize 		0.1
+//	$maxfadesize 		0.8
+//	$maxdistance 		1024
+//	$farfadeinterval 	0.5
+//	$blendframes 		0
+//	$overbrightfactor 	1
+//	$depthblend 		0.5
+//	$depthblendscale 	0.25
+	
+	$translucent 		1
+	$alpha 				1
+//	$additive 			0
+
+	$vertexcolor 		1
+	$vertexalpha 		1
+	$spriterendermode 	2
+}

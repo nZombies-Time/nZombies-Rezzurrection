@@ -213,7 +213,7 @@ if SERVER then
 		end
 		if !wep then wep = weapons.Get(self.WeaponGive) end
 		if !wep then return end
-		local ammo_type = IsValid(wep) and wep:GetPrimaryAmmoType() or wep.Primary.Ammo
+		local ammo_type = wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() or wep.Primary.Ammo
 
 		local ammo_price = math.ceil((price - (price % 10))/2)
 		local ammo_price_pap = 4500

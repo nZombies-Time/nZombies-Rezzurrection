@@ -1,0 +1,34 @@
+"Sprite"
+{
+	$basetexture 		"effects/beam_nocolor"
+	$spriteorientation		"parallel_upright"
+	$spriteorigin		"[ 0.50 0.50 ]"
+	$spriterendermode 		5
+	$transculent		1
+
+	$additive			1
+
+	$fbtexture 		"_rt_FullFrameFB"
+	$blurtexture		"_rt_SmallHDR0"	
+
+	$linearread_basetexture 	1
+	$linearwrite		1
+
+	$c0_x			2 	//engine bloomamount pass
+
+	$PIXSHADER		 "bloomadd_ps20"
+
+	"Proxies"
+	{
+		"BloomAdd"
+		{
+		}
+
+	}
+
+	"screenspace_general_dx8"
+	{
+		$PIXSHADER "bloomadd_ps11"
+	}
+}
+
