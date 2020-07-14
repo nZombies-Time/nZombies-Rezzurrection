@@ -36,7 +36,7 @@ nzTools:CreateTool("settings", {
 		valz["Row8"] = data.bosstype or "Panzer"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
-		valz["ACRow2"] = data.acwarn == nil and false or data.acwarn
+		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
 		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
 
