@@ -35,6 +35,10 @@ nzTools:CreateTool("settings", {
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
+		valz["ACRow1"] = data.ac == nil and false or data.ac
+		valz["ACRow2"] = data.acwarn == nil and false or data.acwarn
+		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
+		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
 
 		local sheet = vgui.Create( "DPropertySheet", frame )
 		sheet:SetSize( 280, 250 )
@@ -43,7 +47,7 @@ nzTools:CreateTool("settings", {
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
 		DProperties:SetSize( 280, 250 )
 		DProperties:SetPos( 0, 0 )
-		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Allows you to set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
+		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
 
 		local Row1 = DProperties:CreateRow( "Map Settings", "Starting Weapon" )
 		Row1:Setup( "Combo" )
@@ -78,7 +82,7 @@ nzTools:CreateTool("settings", {
 		Row3:SetValue( valz["Row3"] )
 		Row3.DataChanged = function( _, val ) valz["Row3"] = val end
 		Row3:SetTooltip("Add a link to a SoundCloud track to play this when all easter eggs have been found")
-		
+
 		if nzTools.Advanced then
 			local Row4 = DProperties:CreateRow( "Map Settings", "Includes Map Script?" )
 			Row4:Setup( "Boolean" )
@@ -129,7 +133,7 @@ nzTools:CreateTool("settings", {
 			Row8:SetTooltip("Sets what type of boss will appear.")
 			
 		end
-		
+
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
 			if !weapons.Get( valz["Row1"] ) then data.startwep = nil else data.startwep = valz["Row1"] end
 			if !tonumber(valz["Row2"]) then data.startpoints = 500 else data.startpoints = tonumber(valz["Row2"]) end
@@ -141,6 +145,10 @@ nzTools:CreateTool("settings", {
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
+			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
+			if valz["ACRow2"] == nil then data.acwarn = true else data.acwarn = tobool(valz["ACRow2"]) end
+			if valz["ACRow3"] == nil then data.acsavespot = true else data.acsavespot = tobool(valz["ACRow3"]) end
+			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 			PrintTable(data)
 
 			nzMapping:SendMapData( data )
@@ -152,12 +160,49 @@ nzTools:CreateTool("settings", {
 		DermaButton:SetSize( 260, 30 )
 		DermaButton.DoClick = UpdateData
 
+		local acPanel = vgui.Create("DPanel", sheet)
+		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
+		local acProps = vgui.Create("DProperties", acPanel)
+		local acheight, acwidth = sheet:GetSize()
+		acProps:SetSize(acwidth, acwidth - 50)
+		
+		local DermaButton3 = vgui.Create( "DButton", acPanel )
+		DermaButton3:SetText( "Submit" )
+		DermaButton3:SetPos( 0, 185 )
+		DermaButton3:SetSize( 260, 30 )
+		DermaButton3.DoClick = UpdateData
+
+		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
+		ACRow1:Setup("Boolean")
+		ACRow1:SetValue(valz["ACRow1"])
+		ACRow1.DataChanged = function( _, val ) valz["ACRow1"] = val end
+
+		if nzTools.Advanced then
+			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
+			ACRow2:Setup("Boolean")
+			ACRow2:SetValue(valz["ACRow2"])
+			ACRow2:SetTooltip("Shows on a player's screen to \"Return to map!\" with a countdown")
+			ACRow2.DataChanged = function(_, val) valz["ACRow2"] = val end
+
+			local ACRow3 = acProps:CreateRow("Anti-Cheat Settings", "Save Last Spots?")
+			ACRow3:Setup("Boolean")
+			ACRow3:SetValue(valz["ACRow3"])
+			ACRow3:SetTooltip("Remembers the last spot a player was at before they are detected. (Uses more performance)")
+			ACRow3.DataChanged = function(_, val) valz["ACRow3"] = val end
+
+			local ACRow4 = acProps:CreateRow("Anti-Cheat Settings", "Seconds for TP")
+			ACRow4:Setup("Integer")
+			ACRow4:SetValue(valz["ACRow4"])
+			ACRow4:SetTooltip("Amount of seconds before a cheating player is teleported.")
+			ACRow4.DataChanged = function(_, val) valz["ACRow4"] = val end
+		end
+
 		if nzTools.Advanced then
 			local weplist = {}
 			local numweplist = 0
 
 			local rboxpanel = vgui.Create("DPanel", sheet)
-			sheet:AddSheet( "Random Box Weapons", rboxpanel, "icon16/box.png", false, false, "Allows you to set which weapons appear in the Random Box.")
+			sheet:AddSheet( "Random Box Weapons", rboxpanel, "icon16/box.png", false, false, "Set which weapons appear in the Random Box.")
 			rboxpanel.Paint = function() return end
 
 			local rbweplist = vgui.Create("DScrollPanel", rboxpanel)
@@ -473,7 +518,7 @@ nzTools:CreateTool("settings", {
 			local perklist = {}
 
 			local perkpanel = vgui.Create("DPanel", sheet)
-			sheet:AddSheet( "Wunderfizz Perks", perkpanel, "icon16/drink.png", false, false, "Allows you to set which perks appears in Der Wunderfizz.")
+			sheet:AddSheet( "Wunderfizz Perks", perkpanel, "icon16/drink.png", false, false, "Set which perks appears in Der Wunderfizz.")
 			perkpanel.Paint = function() return end
 
 			local perklistpnl = vgui.Create("DScrollPanel", perkpanel)

@@ -17,7 +17,7 @@ surface.CreateFont("AntiCheatWarningFont", {
 })
 
 net.Receive("AntiCheatWarning", function() -- We are about to be teleported by the Anti-Cheat, we should move!
-    if (GetConVar("nz_anticheat_warning") and GetConVar("nz_anticheat_warning"):GetInt() < 1) then return end
+    if (!nzMapping.Settings.acwarn) then return end
     
     local alpha = 0
     local fadeInTime = 0
@@ -26,7 +26,7 @@ net.Receive("AntiCheatWarning", function() -- We are about to be teleported by t
     local seconds = 6
     local secTime = 0
 
-    if (ConVarExists("nz_anticheat_tp_time")) then seconds = GetConVar("nz_anticheat_tp_time"):GetInt() + 1 end
+    if (nzMapping.Settings.actptime) then seconds = nzMapping.Settings.actptime + 1 end
 
     hook.Add("HUDPaint", "NZAntiCheatMessage", function()
         if !fadeoutTime then fadeoutTime = CurTime() + (seconds - 2) end 

@@ -1,5 +1,15 @@
 util.AddNetworkString("AntiCheatWarning")
 
+CreateConVar("nz_anticheat_delay", 0.0, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NOTIFY}, 
+"The time (0.1 would be 100ms) to scan for cheaters.")
+
+NZ_AntiCheat_Delay = GetConVar("nz_anticheat_delay"):GetInt()
+if (cvars.GetConVarCallbacks(cvarName) and #cvars.GetConVarCallbacks(cvarName) == 0) then
+    cvars.AddChangeCallback("nz_anticheat_delay", function()
+        NZ_AntiCheat_Delay = GetConVar("nz_anticheat_delay"):GetInt()
+    end)
+end
+
 local PLAYER = FindMetaTable("Player")
 local excludedClasses = { -- These are entities players can "cheat" on (They can cheat on parented props regardless)
     "func_tracktrain",
@@ -11,16 +21,17 @@ local excludedClasses = { -- These are entities players can "cheat" on (They can
 } 
 
 function PLAYER:ACSavePoint() -- Save the last position they were not cheating at for Anti-Cheat teleports
-    if (NZ_AntiCheat_Enabled < 1) then return end
-    if (NZ_AntiCheat_Save_Spots == 0) then return end -- Only allow save positions if ConVar allows it
-    
+    if (!nzMapping.Settings.ac || !nzMapping.Settings.acsavespot) then return end
+
     if (self.allowsavespot == nil) then 
         self.allowsavespot = true 
     end
 
-    if (self.allowsavespot and self.saveDelay == nil or CurTime() > self.saveDelay and self.allowsavespot) then
+    if self.saveDelay == nil then 
         self.saveDelay = CurTime() + (NZ_AntiCheat_Delay + 0.5) -- Optimization, don't need to save positions every tick
+    end
 
+    if (self.allowsavespot and self.saveDelay == nil or CurTime() > self.saveDelay and self.allowsavespot) then
         local navarea = navmesh.GetNavArea(self:GetPos(), 75)   
         if (!navarea || !IsValid(navarea)) then return end
         if (navarea:GetSizeX() >= 113 && navarea:GetSizeY() >= 113) then -- Player is on a big nav mesh
@@ -33,7 +44,7 @@ function PLAYER:ACSavePoint() -- Save the last position they were not cheating a
 end
 
 function PLAYER:WarnToMove() -- Give the player a chance to move before being teleported to spawn
-    if (NZ_AntiCheat_Enabled < 1) then return end
+    if (!nzMapping.Settings.ac) then return end
     if self.allowtp then -- They had their chance to get back in the map
         self:NZMoveCheater() 
     return end 
@@ -46,9 +57,7 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
 
     local warnedPos = self:GetPos() -- Where they were when they were warned
     
-    local secs = 5
-    if (GetConVar("nz_anticheat_tp_time")) then secs = GetConVar("nz_anticheat_tp_time"):GetInt() end
-    timer.Simple(secs, function()
+    timer.Simple(nzMapping.Settings.actptime or 5, function()
         if !IsValid(self) || !self:Alive() || !self:GetNotDowned() then return end
         if self:NZPlayerUnreachable() then -- They are still cheating, teleport them
             self:NZMoveCheater() -- We've given them a chance to move
@@ -114,7 +123,7 @@ function PLAYER:NZNotifyCheat(msg) -- Sends a message to victims of the NZ Anti-
 end
 
 function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
-    if (NZ_AntiCheat_Enabled < 1) then return end
+    if !nzMapping.Settings.ac then return end
     hook.Call("NZAntiCheatMovedPlayer", nil, self)
 
     if !self.Teleporting then
@@ -164,7 +173,7 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
 end
 
 hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
-    if (NZ_AntiCheat_Enabled < 1) then return end
+    if !nzMapping.Settings.ac then return end
     
     if (waittime == nil or CurTime() > waittime) then 
         if (NZ_AntiCheat_Delay != nil) then 
