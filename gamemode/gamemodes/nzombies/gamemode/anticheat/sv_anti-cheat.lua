@@ -1,4 +1,5 @@
 util.AddNetworkString("AntiCheatWarning")
+util.AddNetworkString("AntiCheatWarningCancel")
 
 CreateConVar("nz_anticheat_delay", 0.0, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NOTIFY}, 
 "The time (0.1 would be 100ms) to scan for cheaters.")
@@ -55,12 +56,24 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
     net.Start("AntiCheatWarning")
     net.Send(self)
 
+    -- Make sure the player's warning goes away if they aren't cheating
+    timer.Create("ACWarning" .. self:SteamID(), 3, math.Round(nzMapping.Settings.actptime / 3), function()
+        if !IsValid(self) then return end
+
+        if (!self:NZPlayerUnreachable()) then
+            net.Start("AntiCheatWarningCancel")
+            net.Send(self)
+            timer.Destroy("ACWarning" .. self:SteamID())
+        end
+    end)
+
     local warnedPos = self:GetPos() -- Where they were when they were warned
     
     timer.Simple(nzMapping.Settings.actptime or 5, function()
         if !IsValid(self) || !self:Alive() || !self:GetNotDowned() then return end
         if self:NZPlayerUnreachable() then -- They are still cheating, teleport them
             self:NZMoveCheater() -- We've given them a chance to move
+            timer.Destroy("ACWarning" .. self:SteamID())
         end
 
         self.allowtp = true

@@ -16,6 +16,7 @@ surface.CreateFont("AntiCheatWarningFont", {
 	outline = true,
 })
 
+local forcefade = false
 net.Receive("AntiCheatWarning", function() -- We are about to be teleported by the Anti-Cheat, we should move!
     if (!nzMapping.Settings.acwarn) then return end
     
@@ -28,6 +29,7 @@ net.Receive("AntiCheatWarning", function() -- We are about to be teleported by t
 
     if (nzMapping.Settings.actptime) then seconds = nzMapping.Settings.actptime + 1 end
 
+    forcefade = false
     hook.Add("HUDPaint", "NZAntiCheatMessage", function()
         if !fadeoutTime then fadeoutTime = CurTime() + (seconds - 2) end 
         if CurTime() > secTime then
@@ -35,12 +37,12 @@ net.Receive("AntiCheatWarning", function() -- We are about to be teleported by t
             seconds = seconds - 1
         end
         
-        if alpha < 200 and CurTime() > fadeInTime and CurTime() < fadeoutTime then -- Fade text in
+        if alpha < 200 and CurTime() > fadeInTime and CurTime() < fadeoutTime and !forcefade then -- Fade text in
             fadeInTime = CurTime() + 0.1
             alpha = alpha + 20 < 200 and alpha + 20 or 200
         end
 
-        if alpha > 0 and CurTime() > fadeoutTime then -- Fade text out
+        if alpha > 0 and forcefade or alpha > 0 and CurTime() > fadeoutTime then -- Fade text out
             if CurTime() > fadeout then
                 fadeout = CurTime() + 0.1
                 alpha = alpha - 20 >= 0 and alpha - 20 or 0
@@ -59,4 +61,8 @@ net.Receive("AntiCheatWarning", function() -- We are about to be teleported by t
     timer.Simple(seconds + 1, function() -- We don't need to show the warning anymore
         hook.Remove("HUDPaint", "NZAntiCheatMessage")
     end)
+end)
+
+net.Receive("AntiCheatWarningCancel", function() -- We aren't cheating anymore, hide warning
+    forcefade = true
 end)
