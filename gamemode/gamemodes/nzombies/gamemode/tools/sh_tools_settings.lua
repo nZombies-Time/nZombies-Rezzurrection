@@ -181,13 +181,13 @@ nzTools:CreateTool("settings", {
 			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
 			ACRow2:Setup("Boolean")
 			ACRow2:SetValue(valz["ACRow2"])
-			ACRow2:SetTooltip("Shows on a player's screen to \"Return to map!\" with a countdown")
+			ACRow2:SetTooltip("Shows \"Return to map!\" with a countdown on player's screens")
 			ACRow2.DataChanged = function(_, val) valz["ACRow2"] = val end
 
 			local ACRow3 = acProps:CreateRow("Anti-Cheat Settings", "Save Last Spots?")
 			ACRow3:Setup("Boolean")
 			ACRow3:SetValue(valz["ACRow3"])
-			ACRow3:SetTooltip("Remembers the last spot a player was at before they are detected. (Uses more performance)")
+			ACRow3:SetTooltip("Remembers the last spot a player was at before they were detected. (Uses more performance)")
 			ACRow3.DataChanged = function(_, val) valz["ACRow3"] = val end
 
 			local ACRow4 = acProps:CreateRow("Anti-Cheat Settings", "Seconds for TP")
