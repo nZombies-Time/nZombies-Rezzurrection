@@ -1,9 +1,6 @@
 util.AddNetworkString("AntiCheatWarning")
 util.AddNetworkString("AntiCheatWarningCancel")
 
-CreateConVar("nz_anticheat_delay", 0.0, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_NOTIFY}, 
-"The time (0.1 would be 100ms) to scan for cheaters.")
-
 NZ_AntiCheat_Delay = GetConVar("nz_anticheat_delay"):GetInt()
 if (cvars.GetConVarCallbacks(cvarName) and #cvars.GetConVarCallbacks(cvarName) == 0) then
     cvars.AddChangeCallback("nz_anticheat_delay", function()
@@ -20,6 +17,42 @@ local excludedClasses = { -- These are entities players can "cheat" on (They can
     "func_brush",
     "func_door"
 } 
+
+-- Handle TP time continuously so players cannot reset it by simply leaving the spot:
+function PLAYER:GetTPSecs()
+    if self.tptimer == nil then self:ResetTPSecs() end
+    return self.tptimer
+end
+
+function PLAYER:StartTPDecrease()
+    if (!IsValid(self)) then return end
+
+    timer.Destroy("ACDecrease" .. self:SteamID())
+    timer.Create("ACDecrease" .. self:SteamID(), 1, 0, function()
+        if (!IsValid(self)) then return end
+        self.tptimer = self.tptimer - 1 > 0 and self.tptimer - 1 or 0
+        if (self.tptimer == 0) then
+            self:ResetTPSecs()
+        end
+    end)
+end
+
+function PLAYER:StopTPDecrease()
+    if (!IsValid(self)) then return end
+    timer.Destroy("ACDecrease" .. self:SteamID())
+    self:ResetTPSecs()
+end
+
+function PLAYER:ResetTPSecs()
+    self.tptimer = nzMapping.Settings.actptime and nzMapping.Settings.actptime or 5
+end
+-- function PLAYER:DecreaseTPSecs(amount)
+--     self.tptimer = self.tptimer - amount > 0 and self.tptimer - amount or 0
+--     if (self.tptimer == 0) then
+--         self:ResetTPSecs()
+--     end
+-- end
+-------------
 
 function PLAYER:ACSavePoint() -- Save the last position they were not cheating at for Anti-Cheat teleports
     if (!nzMapping.Settings.ac || !nzMapping.Settings.acsavespot) then return end
@@ -53,38 +86,66 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
     if self.warning then return end -- They still have time to move
     self.warning = true
     
-    net.Start("AntiCheatWarning")
+    net.Start("AntiCheatWarningCancel")
     net.Send(self)
+    net.Start("AntiCheatWarning")
+    net.WriteInt(self:GetTPSecs(), 13)
+    net.Send(self)
+    
+    self:StartTPDecrease()
 
     -- Make sure the player's warning goes away if they aren't cheating
-    timer.Create("ACWarning" .. self:SteamID(), 3, math.Round(nzMapping.Settings.actptime / 3), function()
+    timer.Create("ACWarning" .. self:SteamID(), 0.1, 0, function()
         if !IsValid(self) then return end
 
         if (!self:NZPlayerUnreachable()) then
             net.Start("AntiCheatWarningCancel")
             net.Send(self)
             timer.Destroy("ACWarning" .. self:SteamID())
+            self.warning = false
         end
     end)
 
-    local warnedPos = self:GetPos() -- Where they were when they were warned
-    
-    timer.Simple(nzMapping.Settings.actptime or 5, function()
+    timer.Create("ACTPTime" .. self:SteamID(), self:GetTPSecs(), 1, function()
         if !IsValid(self) || !self:Alive() || !self:GetNotDowned() then return end
+        self:StopTPDecrease() -- Their countdown finished, reset it
+       
         if self:NZPlayerUnreachable() then -- They are still cheating, teleport them
+            net.Start("AntiCheatWarningCancel")
+            net.Send(self)
             self:NZMoveCheater() -- We've given them a chance to move
-            timer.Destroy("ACWarning" .. self:SteamID())
         end
 
         self.allowtp = true
         self.warning = false
+        self.allowsavespot = false
 
-        timer.Simple(15, function() -- Give the Anti-Cheat enough time to detect them again
-            if !IsValid(self) then return end
+        timer.Destroy("ACWarning" .. self:SteamID())
+
+        timer.Simple(15, function()
             self.allowtp = false
             self.allowsavespot = true
         end)
     end)
+
+    local warnedPos = self:GetPos() -- Where they were when they were warned
+    
+    -- timer.Simple(nzMapping.Settings.actptime or 5, function()
+    --     if !IsValid(self) || !self:Alive() || !self:GetNotDowned() then return end
+    --     if self:NZPlayerUnreachable() then -- They are still cheating, teleport them
+    --         self:NZMoveCheater() -- We've given them a chance to move
+    --         timer.Destroy("ACWarning" .. self:SteamID())
+    --     end
+
+    --     self.allowtp = true
+    --     self.warning = false
+
+    --     -- timer.Simple(15, function() -- Give the Anti-Cheat enough time to detect them again
+    --     --     if !IsValid(self) then return end
+    --     --     self.allowtp = false
+    --     --     self.allowsavespot = true
+    --     -- end)
+    -- end)
 
     print("[NZ Anti-Cheat] Warning " .. self:Nick() .. " to move..")
 end
