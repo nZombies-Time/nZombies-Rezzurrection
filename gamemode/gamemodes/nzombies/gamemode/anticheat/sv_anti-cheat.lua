@@ -1,3 +1,4 @@
+local PLAYER = FindMetaTable("Player")
 util.AddNetworkString("AntiCheatWarning")
 util.AddNetworkString("AntiCheatWarningCancel")
 
@@ -8,8 +9,8 @@ if (cvars.GetConVarCallbacks(cvarName) and #cvars.GetConVarCallbacks(cvarName) =
     end)
 end
 
-local PLAYER = FindMetaTable("Player")
-local excludedClasses = { -- These are entities players can "cheat" on (They can cheat on parented props regardless)
+-- Add entities players can cheat on:
+local excludedClasses = { 
     "func_tracktrain",
     "func_tanktrain",
     "func_trackchange",
@@ -46,16 +47,9 @@ end
 function PLAYER:ResetTPSecs()
     self.tptimer = nzMapping.Settings.actptime and nzMapping.Settings.actptime or 5
 end
--- function PLAYER:DecreaseTPSecs(amount)
---     self.tptimer = self.tptimer - amount > 0 and self.tptimer - amount or 0
---     if (self.tptimer == 0) then
---         self:ResetTPSecs()
---     end
--- end
--------------
-
+-------------------------------------------------------------------------------------------
 function PLAYER:ACSavePoint() -- Save the last position they were not cheating at for Anti-Cheat teleports
-    if (!nzMapping.Settings.ac || !nzMapping.Settings.acsavespot) then return end
+    if (!nzMapping.Settings.ac and nzMapping.Settings.ac != nil || !nzMapping.Settings.acsavespot) then return end
 
     if (self.allowsavespot == nil) then 
         self.allowsavespot = true 
@@ -78,7 +72,7 @@ function PLAYER:ACSavePoint() -- Save the last position they were not cheating a
 end
 
 function PLAYER:WarnToMove() -- Give the player a chance to move before being teleported to spawn
-    if (!nzMapping.Settings.ac) then return end
+    if (!nzMapping.Settings.ac and nzMapping.Settings.ac != nil) then return end
     if self.allowtp then -- They had their chance to get back in the map
         self:NZMoveCheater() 
     return end 
@@ -129,34 +123,64 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
     end)
 
     local warnedPos = self:GetPos() -- Where they were when they were warned
-    
-    -- timer.Simple(nzMapping.Settings.actptime or 5, function()
-    --     if !IsValid(self) || !self:Alive() || !self:GetNotDowned() then return end
-    --     if self:NZPlayerUnreachable() then -- They are still cheating, teleport them
-    --         self:NZMoveCheater() -- We've given them a chance to move
-    --         timer.Destroy("ACWarning" .. self:SteamID())
-    --     end
-
-    --     self.allowtp = true
-    --     self.warning = false
-
-    --     -- timer.Simple(15, function() -- Give the Anti-Cheat enough time to detect them again
-    --     --     if !IsValid(self) then return end
-    --     --     self.allowtp = false
-    --     --     self.allowsavespot = true
-    --     -- end)
-    -- end)
-
     print("[NZ Anti-Cheat] Warning " .. self:Nick() .. " to move..")
 end
 
+function PLAYER:InACExclusionArea() -- Checks if a player is inside the bounds of an anticheat_exclude entity
+    local isinside = false
+
+    for k,v in pairs(ents.FindByClass("anticheat_exclude")) do
+        if (isinside) then break end
+
+        for a,b in pairs(ents.FindInBox(v:GetPos(), v:GetPos() + v:GetMaxBound())) do
+            if (b == self) then
+                isinside = true
+                break
+            end
+        end
+    end
+
+    return isinside
+end
+
 function PLAYER:CanBeCheater()
-    if self:InVehicle() then return false end -- Very unlikely but you are in the plane on MOTD
-    if self:GetNWBool("in_afterlife") then return false end -- Doesn't matter with Afterlife, they can't stay forever
-    if self:Health() < 100 or !self:GetNotDowned() then return false end -- If they are hurt or down then it doesn't matter if they are cheating
-    if self:GetMoveType() != MOVETYPE_WALK or !self:IsOnGround() then return false end -- Only tp them if they are on the floor and can walk
+    if self:InVehicle() then return false end -- They are inside a vehicle
+    if self:GetNWBool("in_afterlife") then return false end -- They are in Afterlife Mode
+    if self:Health() < 100 or !self:GetNotDowned() or !self:Alive() then return false end -- They are hurt, down or dead
+    if self:GetMoveType() != MOVETYPE_WALK or !self:IsOnGround() then return false end -- They cannot walk right now
+    if self:InACExclusionArea() then return false end -- They are inside an Anti-Cheat Exclusion Area
     return true
 end
+
+function PLAYER:GetClosestNavMesh()
+    return navmesh.GetNearestNavArea(self:GetPos(), false, 75, false, true)
+end
+
+------- Handle camping spots for possible undetected cheating spots players might be in
+-- AccessorFunc(PLAYER, "camping_spot", "CampingTime")
+-- AccessorFunc(PLAYER, "camping_spot", "CampingSpot")
+
+-- function StartCampingTimer(ply)
+--     timer.Create("ACCampingTimer" .. ply:SteamID(), 8, 1, function()
+--         if (IsValid(ply) and ply:CanBeCheater()) then
+--             ply:SetCampingSpot(ply:GetPos())
+--             timer.Create("ACCampingElapsed" .. ply:SteamID(), 1, 0, function()
+--                 ply:SetCampingTime(ply:GetCampingTime() + 1)
+--             end)
+--         end
+--     end)
+-- end
+
+-- function StopCampingTimer(ply)
+--     ply:SetCampingSpot(nil)
+--     ply:SetCampingTime(0)
+--     timer.Destroy("ACCampingTimer" .. ply:SteamID())
+--     timer.Destroy("ACCampingElapsed" .. ply:SteamID())
+-- end
+-- -------------------------------------------------------------------------------------
+-- function PLAYER:CanZombieReach() -- Checks if our Anti-Cheat Ghost (modified nz_zombie_walker) can reach the player
+--     if (!self:GetCampingSpot() or self:GetCampingTime() <= 3) then return end
+-- end
 
 function PLAYER:NZPlayerUnreachable()
     if !self:CanBeCheater() then return false end
@@ -178,7 +202,7 @@ function PLAYER:NZPlayerUnreachable()
     if tr.Hit and !table.HasValue(excludedClasses, tr.Entity:GetClass()) then -- If it hit something that can't move
         if !IsValid(tr.Entity:GetParent()) then -- Parented entities typically have the ability to move, don't tp people on them
             local hitPos = tr.HitPos
-            local navnear = navmesh.GetNearestNavArea(self:GetPos(), false, 75, false, true)
+            local navnear = self:GetClosestNavMesh()
             if !IsValid(navnear) then return true end -- No nav mesh close enough
         end
     end
@@ -197,7 +221,7 @@ function PLAYER:NZNotifyCheat(msg) -- Sends a message to victims of the NZ Anti-
 end
 
 function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
-    if !nzMapping.Settings.ac then return end
+    if !nzMapping.Settings.ac and nzMapping.Settings.ac != nil then return end
     hook.Call("NZAntiCheatMovedPlayer", nil, self)
 
     if !self.Teleporting then
@@ -247,7 +271,7 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
 end
 
 hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
-    if !nzMapping.Settings.ac then return end
+    if !nzMapping.Settings.ac and nzMapping.Settings.ac != nil then return end
     
     if (waittime == nil or CurTime() > waittime) then 
         if (NZ_AntiCheat_Delay != nil) then 
@@ -260,6 +284,7 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             waittime = CurTime()
         end
 
+        ply:CanZombieReach()
         if ply:NZPlayerUnreachable() then 
             ply.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
             ply:WarnToMove() 

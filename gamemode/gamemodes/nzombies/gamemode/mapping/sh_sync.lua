@@ -5,7 +5,6 @@ if SERVER then
 		local tbl = net.ReadTable()
 		PrintTable(tbl)
 		nzMapping:LoadMapSettings(tbl)
-		-- nzMapping.Settings = tbl
 	end
 	net.Receive( "nzMapping.SyncSettings", receiveMapData )
 

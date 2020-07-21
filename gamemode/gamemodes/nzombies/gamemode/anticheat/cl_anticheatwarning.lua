@@ -18,7 +18,7 @@ surface.CreateFont("AntiCheatWarningFont", {
 
 local forcefade = false
 net.Receive("AntiCheatWarning", function() -- We are about to be teleported by the Anti-Cheat, we should move!
-    if (!nzMapping.Settings.acwarn) then return end
+    if (!nzMapping.Settings.acwarn and nzMapping.Settings.acwarn != nil) then return end
     forcefade = false
     hook.Remove("HUDPaint", "NZAntiCheatMessage")
 

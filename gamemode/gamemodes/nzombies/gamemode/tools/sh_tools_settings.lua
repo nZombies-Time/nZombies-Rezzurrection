@@ -35,7 +35,8 @@ nzTools:CreateTool("settings", {
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
-		valz["ACRow1"] = data.ac == nil and false or data.ac
+		if data.ac == nil then print("WTF??") end
+		valz["ACRow1"] = data.ac == nil and true or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
 		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
@@ -145,9 +146,9 @@ nzTools:CreateTool("settings", {
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
-			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
-			if valz["ACRow2"] == nil then data.acwarn = true else data.acwarn = tobool(valz["ACRow2"]) end
-			if valz["ACRow3"] == nil then data.acsavespot = true else data.acsavespot = tobool(valz["ACRow3"]) end
+			if valz["ACRow1"] == nil then data.ac = nil else data.ac = tobool(valz["ACRow1"]) end
+			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
+			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 			PrintTable(data)
 
@@ -195,9 +196,7 @@ nzTools:CreateTool("settings", {
 			ACRow4:SetValue(valz["ACRow4"])
 			ACRow4:SetTooltip("Amount of seconds before a cheating player is teleported.")
 			ACRow4.DataChanged = function(_, val) valz["ACRow4"] = val end
-		end
 
-		if nzTools.Advanced then
 			local weplist = {}
 			local numweplist = 0
 
