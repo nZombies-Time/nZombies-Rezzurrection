@@ -356,6 +356,29 @@ function nzMapping:CreateInvisibleWall(vec1, vec2, ply)
 	return wall
 end
 
+function nzMapping:CreateInvisibleWallZombie(vec1, vec2, ply)
+	local wall = ents.Create( "invis_wall_zombie" )
+	wall:SetPos( vec1 ) -- Later we might make the position the center
+	--wall:SetAngles( ang )
+	--wall:SetMinBound(vec1) -- Just the position for now
+	wall:SetMaxBound(vec2)
+	wall:Spawn()
+	wall:PhysicsInitBox( Vector(0,0,0), vec2 )
+
+	local phys = wall:GetPhysicsObject()
+	if IsValid(phys) then
+		phys:EnableMotion(false)
+	end
+
+	if ply then
+		undo.Create( "Invis Zombie Wall" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( wall )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return wall
+end
+
 function nzMapping:CreateAntiCheatExclusion(vec1, vec2, ply)
 	local wall = ents.Create( "anticheat_exclude" )
 	wall:SetPos( vec1 ) -- Later we might make the position the center

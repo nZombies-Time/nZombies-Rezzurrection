@@ -429,6 +429,26 @@ nzMapping:AddSaveModule("InvisWalls", {
 	cleanents = {"invis_wall"},
 })
 
+nzMapping:AddSaveModule("InvisWallZombies", {
+	savefunc = function()
+		-- Store all invisible walls with their boundaries and angles
+		local invis_wall_zombies = {}
+		for _, v in pairs(ents.FindByClass("invis_wall_zombie")) do
+			table.insert(invis_wall_zombies, {
+				pos = v:GetPos(),
+				maxbound = v:GetMaxBound(),
+			})
+		end
+		return invis_wall_zombies
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:CreateInvisibleWallZombie(v.pos, v.maxbound)
+		end
+	end,
+	cleanents = {"invis_wall_zombie"},
+})
+
 nzMapping:AddSaveModule("CreateAntiCheatExclusions", {
 	savefunc = function()
 		-- Store all invisible walls with their boundaries and angles
