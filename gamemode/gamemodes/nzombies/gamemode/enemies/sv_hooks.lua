@@ -123,3 +123,88 @@ local function OnRagdollCreated( ent )
 	end
 end
 hook.Add("OnEntityCreated", "nzEnemies_OnEntityCreated", OnRagdollCreated)
+
+-- Allow/disallow players to go through zombies (Set by the zombie collision option in the menu)
+hook.Add("ShouldCollide", "NZSetCollisionGroupZombie", function(ent1, ent2)
+	if (nzMapping and nzMapping.Settings and !nzMapping.Settings.zombiecollisions) then   
+        if ent1.Type == "nextbot" && ent2.Type != "nextbot" then
+            if ent2.Type == "nextbot" then
+                ent1:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+				ent2:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+            return end
+
+            if ent2:GetClass() == "breakable_entry" && ent1.Type == "nextbot" then
+                ent1:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+
+                if ent1.fixingCol then return end 
+                ent1.fixingCol = true
+                timer.Simple(2, function() -- Let players pass through again
+                    if !IsValid(ent1) then return end
+                    ent1.fixingCol = false
+                    ent1:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+                end)
+            end
+
+            if !ent1.fixingCol then -- It shouldn't have collisions still yet it does..
+                ent1:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+            end
+        end
+
+        if ent2.Type == "nextbot" && ent1.Type != "nextbot" then
+            if ent1:GetClass() == "breakable_entry" && ent2.Type == "nextbot" then
+                ent2:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+
+                if ent2.fixingCol then return end 
+                ent2.fixingCol = true       
+                timer.Simple(2, function() -- Let players pass through again
+                    if !IsValid(ent2) then return end
+                    ent2.fixingCol = false
+                    ent2:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+                end)
+            end
+
+            if !ent2.fixingCol then -- It shouldn't have collisions still yet it does..
+                ent2:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+            end
+        end
+    end
+end)
+
+-- Increase max zombies alive per round
+hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
+	if (nzRound:GetNumber() == 1) then return end -- Game just begun
+
+	local perround = nzMapping.Settings.spawnperround != nil and nzMapping.Settings.spawnperround or 0
+
+	if (NZZombiesMaxAllowed == nil and nzMapping.Settings.startingspawns) then
+		NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+	end
+
+	if !nzMapping.Settings.startingspawns then
+		NZZombiesMaxAllowed = 35
+	end
+
+	local maxspawns = nzMapping.Settings.maxspawns
+	if (maxspawns == nil) then 
+		maxspawns = 35 
+	end
+
+	if (NZZombiesMaxAllowed + perround < maxspawns) then
+		NZZombiesMaxAllowed = NZZombiesMaxAllowed + perround
+		print("Max zombies allowed at once: " .. NZZombiesMaxAllowed)
+	else
+		if (NZZombiesMaxAllowed != maxspawns) then
+			print("Max zombies allowed at once capped at: " .. maxspawns)
+			NZZombiesMaxAllowed = maxspawns
+		end
+	end
+end)
+
+-- Reset max spawned zombies allowed on end of game
+hook.Add("OnRoundEnd", "NZResetSpawnedZombies", function()
+	if nzMapping.Settings.startingspawns then
+		NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+	else
+		NZZombiesMaxAllowed = 35
+	end
+end)

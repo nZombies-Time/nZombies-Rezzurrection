@@ -50,14 +50,39 @@ function nzMapping:LoadMapSettings(data)
 	if data.gamemodeentities then
 		nzMapping.Settings.gamemodeentities = data.gamemodeentities or nil
 	end
+
+	nzMapping.Settings.zombiecollisions = data.zombiecollisions == nil and true or data.zombiecollisions
+
+	-- Allow players to enable/disable zombie collisions realtime
+	if (nzMapping.Settings.zombiecollisions != nil) then
+		if (nzMapping.Settings.zombiecollisions == false) then
+			for k,v in pairs(ents.GetAll()) do
+				if (v:IsValidZombie()) then
+					v:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+				end
+			end
+		else
+			for k,v in pairs(ents.GetAll()) do
+				if (v:IsValidZombie()) then
+					v:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+				end
+			end
+		end
+	end
+
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
 	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
-	
-	nzMapping.Settings.ac = data.ac or true
+
+	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
+	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround
+	nzMapping.Settings.maxspawns = data.maxspawns == nil and 35 or data.maxspawns
+	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+
+	nzMapping.Settings.ac = data.ac == nil and true or data.ac
 	nzMapping.Settings.acwarn = data.acwarn == nil and true or data.acwarn
 	nzMapping.Settings.acsavespot = data.acsavespot == nil and true or data.acsavespot
 	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime

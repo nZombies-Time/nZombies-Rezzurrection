@@ -34,19 +34,22 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
+		valz["Row9"] = data.startingspawns == nil and 35 or data.startingspawns
+		valz["Row10"] = data.spawnperround == nil and 0 or data.spawnperround
+		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
+		valz["Row12"] = data.zombiecollisions == nil and true or data.zombiecollisions
 		valz["RBoxWeps"] = data.RBoxWeps or {}
-		if data.ac == nil then print("WTF??") end
 		valz["ACRow1"] = data.ac == nil and true or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
 		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
 
 		local sheet = vgui.Create( "DPropertySheet", frame )
-		sheet:SetSize( 280, 250 )
+		sheet:SetSize( 280, 220 )
 		sheet:SetPos( 10, 10 )
 
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
-		DProperties:SetSize( 280, 250 )
+		DProperties:SetSize( 280, 220 )
 		DProperties:SetPos( 0, 0 )
 		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
 
@@ -63,11 +66,13 @@ nzTools:CreateTool("settings", {
 		end
 		if data.startwep then
 			local wep = weapons.Get(data.startwep)
-			if !wep then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
-			if wep.Category and wep.Category != "" then
-				Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
-			else
-				Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.PrintName or wep.ClassName, wep.ClassName, false)
+			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
+			if wep != nil then  
+				if wep.Category and wep.Category != "" then
+					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
+				else
+					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.PrintName or wep.ClassName, wep.ClassName, false)
+				end
 			end
 		end
 
@@ -97,13 +102,19 @@ nzTools:CreateTool("settings", {
 			Row5.DataChanged = function( _, val ) valz["Row5"] = val end
 			Row5:SetTooltip("Sets the description displayed when attempting to load the script.")
 			
-			local Row6 = DProperties:CreateRow( "Map Settings", "Gamemode Extensions" )
-			Row6:Setup( "Boolean" )
+			local Row6 = DProperties:CreateRow( "Map Settings", "GM Extensions" )
+			Row6:Setup("Boolean")
 			Row6:SetValue( valz["Row6"] )
 			Row6.DataChanged = function( _, val ) valz["Row6"] = val end
 			Row6:SetTooltip("Sets whether the gamemode should spawn in map entities from other gamemodes, such as ZS.")
 			
-			local Row7 = DProperties:CreateRow( "Map Settings", "Special Round" )
+			local Row12 = DProperties:CreateRow("Map Settings", "Zombie Collisions?")
+			Row12:Setup("Boolean")
+			Row12:SetValue(valz["Row12"])
+			Row12:SetTooltip("Whether or not players collide with zombies. (Zombies will go through eachother no matter what)")
+			Row12.DataChanged = function( _, val ) valz["Row12"] = val end
+
+			local Row7 = DProperties:CreateRow("Map Settings", "Special Round")
 			Row7:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.SpecialData) do
@@ -133,6 +144,23 @@ nzTools:CreateTool("settings", {
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
 			
+			local Row9 = DProperties:CreateRow("Map Settings", "Starting Spawns")
+			Row9:Setup( "Integer" )
+			Row9:SetValue( valz["Row9"] )
+			Row9:SetTooltip("Allowed zombies alive at once, can be increased per round with Spawns Per Round")
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+
+			local Row10 = DProperties:CreateRow("Map Settings", "Spawns Per Round")
+			Row10:Setup( "Integer" )
+			Row10:SetValue( valz["Row10"] )
+			Row10:SetTooltip("Amount to increase spawns by each round (Cannot increase past Max Spawns)")
+			Row10.DataChanged = function( _, val ) valz["Row10"] = val end
+
+			local Row11 = DProperties:CreateRow("Map Settings", "Max Spawns")
+			Row11:Setup( "Integer" )
+			Row11:SetValue( valz["Row11"] )
+			Row11:SetTooltip("The max allowed zombies alive at any given time, it will NEVER go above this.")
+			Row11.DataChanged = function( _, val ) valz["Row11"] = val end
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -144,6 +172,10 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
+			if !tonumber(valz["Row9"]) then data.startingspawns = 35 else data.startingspawns = tonumber(valz["Row9"]) end
+			if !tonumber(valz["Row10"]) then data.spawnperround = 0 else data.spawnperround = tonumber(valz["Row10"]) end
+			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
+			if valz["Row12"] == nil then data.zombiecollisions = nil else data.zombiecollisions = tobool(valz["Row12"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 			if valz["ACRow1"] == nil then data.ac = nil else data.ac = tobool(valz["ACRow1"]) end
@@ -155,11 +187,16 @@ nzTools:CreateTool("settings", {
 			nzMapping:SendMapData( data )
 		end
 
-		local DermaButton = vgui.Create( "DButton", DProperties )
-		DermaButton:SetText( "Submit" )
-		DermaButton:SetPos( 0, 185 )
-		DermaButton:SetSize( 260, 30 )
-		DermaButton.DoClick = UpdateData
+		if (MapSDermaButton != nil) then
+			MapSDermaButton:Remove()
+		end
+
+		MapSDermaButton = vgui.Create( "DButton", frame )
+		MapSDermaButton:SetText( "Submit" )
+		MapSDermaButton:Dock(BOTTOM)
+	--	DermaButton:SetPos( 0, 185 )
+		MapSDermaButton:SetSize( 260, 30 )
+		MapSDermaButton.DoClick = UpdateData
 
 		local acPanel = vgui.Create("DPanel", sheet)
 		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
@@ -167,11 +204,11 @@ nzTools:CreateTool("settings", {
 		local acheight, acwidth = sheet:GetSize()
 		acProps:SetSize(acwidth, acwidth - 50)
 		
-		local DermaButton3 = vgui.Create( "DButton", acPanel )
-		DermaButton3:SetText( "Submit" )
-		DermaButton3:SetPos( 0, 185 )
-		DermaButton3:SetSize( 260, 30 )
-		DermaButton3.DoClick = UpdateData
+		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
+		-- DermaButton3:SetText( "Submit" )
+		-- DermaButton3:SetPos( 0, 185 )
+		-- DermaButton3:SetSize( 260, 30 )
+		-- DermaButton3.DoClick = UpdateData
 
 		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
 		ACRow1:Setup("Boolean")
@@ -508,11 +545,11 @@ nzTools:CreateTool("settings", {
 				end
 			end
 			
-			local DermaButton2 = vgui.Create( "DButton", rboxpanel )
-			DermaButton2:SetText( "Submit" )
-			DermaButton2:SetPos( 0, 185 )
-			DermaButton2:SetSize( 260, 30 )
-			DermaButton2.DoClick = UpdateData
+			-- local DermaButton2 = vgui.Create( "DButton", rboxpanel )
+			-- DermaButton2:SetText( "Submit" )
+			-- DermaButton2:SetPos( 0, 185 )
+			-- DermaButton2:SetSize( 260, 30 )
+			-- DermaButton2.DoClick = UpdateData
 			
 			local perklist = {}
 

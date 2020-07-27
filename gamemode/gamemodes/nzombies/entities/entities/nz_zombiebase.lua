@@ -155,6 +155,8 @@ function ENT:Initialize()
 	self:StatsInitialize()
 	self:SpecialInit()
 
+	self:SetCustomCollisionCheck(true)
+
 	if SERVER then
 		self.loco:SetDeathDropHeight( self.DeathDropHeight )
 		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
@@ -503,7 +505,7 @@ function ENT:TimeOut(time)
 end
 
 function ENT:OnPathTimeOut()
-
+	
 end
 
 function ENT:OnNoTarget()
@@ -576,6 +578,21 @@ function ENT:OnNavAreaChanged(old, new)
 end
 
 function ENT:OnContact( ent )
+	-- Let the zombies go through eachother:
+	if SERVER then
+		-- COLLISION_GROUP_INTERACTIVE players cannot go through, COLLISION_GROUP_DEBRIS they can
+		local collision = nzMapping.Settings.zombiecollisions and COLLISION_GROUP_INTERACTIVE or COLLISION_GROUP_DEBRIS 
+		if (nzMapping.Settings.zombiecollisions == nil) then collision = COLLISION_GROUP_INTERACTIVE end
+		local otherZombie = ent.Type == "nextbot" && self:Alive() && ent:Alive()
+		
+		if otherZombie && self:GetCollisionGroup() then
+			self:SetCollisionGroup(collision)
+			if ent.Type == "nextbot" then
+				ent:SetCollisionGroup(collision)
+			end
+		end
+	end
+
 	if nzConfig.ValidEnemies[ent:GetClass()] and nzConfig.ValidEnemies[self:GetClass()] then
 		--this is a poor approach to unstuck them when walking into each other
 		self.loco:Approach( self:GetPos() + Vector( math.Rand( -1, 1 ), math.Rand( -1, 1 ), 0 ) * 2000,1000)
