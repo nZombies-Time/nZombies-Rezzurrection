@@ -172,7 +172,8 @@ end)
 
 -- Increase max zombies alive per round
 hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
-	if (nzRound:GetNumber() == 1) then return end -- Game just begun
+	if (!nzRound or !nzRound:GetNumber()) then return end
+	if (nzRound:GetNumber() == 1 or nzRound:GetNumber() == -1) then return end -- Game just begun or it's round infinity
 
 	local perround = nzMapping.Settings.spawnperround != nil and nzMapping.Settings.spawnperround or 0
 
@@ -189,8 +190,8 @@ hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
 		maxspawns = 35 
 	end
 
-	if (NZZombiesMaxAllowed + perround < maxspawns) then
-		NZZombiesMaxAllowed = NZZombiesMaxAllowed + perround
+	if (nzRound:GetNumber() * perround < maxspawns) then
+		NZZombiesMaxAllowed = nzRound:GetNumber() * perround
 		print("Max zombies allowed at once: " .. NZZombiesMaxAllowed)
 	else
 		if (NZZombiesMaxAllowed != maxspawns) then
