@@ -181,8 +181,10 @@ hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
 		NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
 	end
 
+	local startSpawns = nzMapping.Settings.startingspawns
 	if !nzMapping.Settings.startingspawns then
 		NZZombiesMaxAllowed = 35
+		startSpawns = 35 
 	end
 
 	local maxspawns = nzMapping.Settings.maxspawns
@@ -190,8 +192,9 @@ hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
 		maxspawns = 35 
 	end
 
-	if (nzRound:GetNumber() * perround < maxspawns) then
-		NZZombiesMaxAllowed = nzRound:GetNumber() * perround
+	local newmax = startSpawns + (nzRound:GetNumber() * perround)
+	if (newmax < maxspawns) then
+		NZZombiesMaxAllowed = newmax
 		print("Max zombies allowed at once: " .. NZZombiesMaxAllowed)
 	else
 		if (NZZombiesMaxAllowed != maxspawns) then
