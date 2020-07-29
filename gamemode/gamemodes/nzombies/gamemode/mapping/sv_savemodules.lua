@@ -232,6 +232,26 @@ nzMapping:AddSaveModule("BlockSpawns", {
 	cleanents = {"wall_block"},
 })
 
+nzMapping:AddSaveModule("BlockSpawnsZombie", {
+	savefunc = function()
+		local block_spawns_zombies = {}
+		for _, v in pairs(ents.FindByClass("wall_block_zombie")) do
+			table.insert(block_spawns_zombies, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			model = v:GetModel(),
+			})
+		end
+		return block_spawns_zombies
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:BlockSpawnZombie(v.pos, v.angle, v.model)
+		end
+	end,
+	cleanents = {"wall_block_zombie"},
+})
+
 nzMapping:AddSaveModule("RandomBoxSpawns", {
 	savefunc = function()
 		local randombox_spawn = {}
