@@ -66,9 +66,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 	
 	-- Fix zombie invincibility
 	if (zombie:IsValidZombie()) then
-		local hpTooLow = zombie.Alive and zombie:Alive() and zombie:Health() < 0
-		local hpTooHigh = zombie:Health() != 75 and zombie:Health() > nzRound:GetZombieHealth() and zombie:Health() - nzRound:GetZombieHealth() > 200
-		if hpTooLow or hpTooHigh then zombie:Kill(dmginfo) end 
+		if zombie.Alive and zombie:Alive() and zombie:Health() <= 0 then zombie:Kill(dmginfo) end -- No zombie should ever have under 0 health
 	end
 	
 	local attacker = dmginfo:GetAttacker()
