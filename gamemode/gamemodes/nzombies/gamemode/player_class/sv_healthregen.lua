@@ -1,6 +1,6 @@
 local HealthRegen = {
 	Amount = 10,
-	Delay = 3,
+	Delay = 2.5,
 	Rate = 0.05
 }
 
