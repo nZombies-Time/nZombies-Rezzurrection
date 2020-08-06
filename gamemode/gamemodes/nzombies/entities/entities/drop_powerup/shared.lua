@@ -29,7 +29,7 @@ function ENT:Initialize()
 	else
 		self.NextParticle = CurTime()
 	end
-	self:UseTriggerBounds(true, 0)
+	self:UseTriggerBounds(true, 20)
 	self:SetMaterial("models/shiny.vtf")
 	self:SetColor( Color(255,200,0) )
 	--self:SetTrigger(true)
