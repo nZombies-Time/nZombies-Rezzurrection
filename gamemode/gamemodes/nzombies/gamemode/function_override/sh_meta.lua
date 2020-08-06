@@ -122,8 +122,8 @@ if SERVER then
 					--print(pct)
 					local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
 					local d = DamageInfo()
-					d:SetDamage( 100*pct )
-					d:SetDamageType( DMG_SHOCK )
+					d:SetDamage( 300*pct )
+					d:SetDamageType( DMG_BULLET )
 					d:SetAttacker(ply)
 					d:SetInflictor(ply)
 					
@@ -139,12 +139,12 @@ if SERVER then
 	
 	function GM:GetFallDamage( ply, speed )
 		local dmg = speed / 10
-		if ply:HasPerk("phd") and dmg >= 50 then
+		if ply:HasPerk("phd") and dmg >= 25 then
 			if ply:Crouching() then
-				local zombies = ents.FindInSphere(ply:GetPos(), 250)
+				local zombies = ents.FindInSphere(ply:GetPos(), 300)
 				for k,v in pairs(zombies) do
 					if nzConfig.ValidEnemies[v:GetClass()] then
-						v:TakeDamage(150, ply, ply)
+						v:TakeDamage(300, ply, ply)
 					end
 				end
 				local pos = ply:GetPos()
