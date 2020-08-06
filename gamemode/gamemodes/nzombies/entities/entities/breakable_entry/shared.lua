@@ -53,6 +53,7 @@ function ENT:RemovePlank()
 	if !IsValid(plank) and plank != nil then -- Not valid but not nil (NULL)
 		table.RemoveByValue(self.Planks, plank) -- Remove it from the table
 		self:RemovePlank() -- and try again
+		return
 	end
 	
 	if IsValid(plank) then
@@ -71,6 +72,7 @@ function ENT:RemovePlank()
 	
 	table.RemoveByValue(self.Planks, plank)
 	self:SetNumPlanks( self:GetNumPlanks() - 1 )
+    self.NextPlank = CurTime() + 2.5
 end
 
 function ENT:ResetPlanks(nosoundoverride)
@@ -91,6 +93,7 @@ function ENT:Use( activator, caller )
 		if self:GetHasPlanks() and self:GetNumPlanks() < GetConVar("nz_difficulty_barricade_planks_max"):GetInt() then
 			self:AddPlank()
                   activator:GivePoints(10)
+				  hook.Call("XPFromBarrier", nil, activator, self)
 				  activator:EmitSound("nz/effects/repair_ching.wav")
 			self.NextPlank = CurTime() + 1
 		end
@@ -117,14 +120,14 @@ function ENT:Touch(ent)
 end
 
 hook.Add("ShouldCollide", "zCollisionHook", function(ent1, ent2)
-	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent2:GetClass()] and !ent1:GetTriggerJumps() and ent1:GetNumPlanks() == 0 then
+	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent2:GetClass()] and !ent1:GetTriggerJumps() and ent1:GetNumPlanks() <= 0 then
 		if !ent1.CollisionResetTime then
 			ent1:SetSolid(SOLID_NONE)
 		end
 		ent1.CollisionResetTime = CurTime() + 0.1
 	end
 	
-	if IsValid(ent2) and ent2:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent1:GetClass()] and !ent2:GetTriggerJumps() and ent2:GetNumPlanks() == 0 then
+	if IsValid(ent2) and ent2:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent1:GetClass()] and !ent2:GetTriggerJumps() and ent2:GetNumPlanks() <= 0 then
 		if !ent2.CollisionResetTime then
 			ent2:SetSolid(SOLID_NONE)
 		end
@@ -146,3 +149,4 @@ else
 		end
 	end
 end
+
