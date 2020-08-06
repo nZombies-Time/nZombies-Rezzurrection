@@ -361,14 +361,14 @@ nzPerks:NewPerk("staminup", {
 	icon = Material("perk_icons/staminup.png", "smooth unlitgeneric"),
 	color = Color(200, 255, 100),
 	func = function(self, ply, machine)
-		ply:SetRunSpeed(350)
-		ply:SetMaxRunSpeed( 350 )
+		ply:SetRunSpeed(375)
+		ply:SetMaxRunSpeed( 375 )
 		ply:SetStamina( 200 )
 		ply:SetMaxStamina( 200 )
 	end,
 	lostfunc = function(self, ply)
-		ply:SetRunSpeed(300)
-		ply:SetMaxRunSpeed( 300 )
+		ply:SetRunSpeed(325)
+		ply:SetMaxRunSpeed( 325 )
 		ply:SetStamina( 100 )
 		ply:SetMaxStamina( 100 )
 	end,
