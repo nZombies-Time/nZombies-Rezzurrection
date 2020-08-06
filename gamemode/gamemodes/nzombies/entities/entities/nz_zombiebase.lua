@@ -24,8 +24,8 @@ ENT.AttackRange = 65
 ENT.RunSpeed = 200
 ENT.WalkSpeed = 100
 ENT.Acceleration = 400
-ENT.DamageLow = 35
-ENT.DamageHigh = 45
+ENT.DamageLow = 40
+ENT.DamageHigh = 40
 
 -- important for ent:IsZombie()
 ENT.bIsZombie = true
