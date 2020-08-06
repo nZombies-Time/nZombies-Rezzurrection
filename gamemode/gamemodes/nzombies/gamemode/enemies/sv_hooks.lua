@@ -64,7 +64,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 	-- Who's Who clones can't take damage!
 	if zombie:GetClass() == "whoswho_downed_clone" then return true end
 	
-	if zombie.Alive and zombie:Alive() and zombie:Health() < 0 then zombie:Kill(dmginfo) end
+	if zombie.Alive and zombie:Health() <= 0 then zombie:Kill(dmginfo) end -- No zombie should ever have under 0 health
 	
 	local attacker = dmginfo:GetAttacker()
 
@@ -87,14 +87,15 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 		elseif zombie:IsValidZombie() then
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end
 			local hitgroup = util.QuickTrace( dmginfo:GetDamagePosition( ), dmginfo:GetDamagePosition( ) ).HitGroup
-
+			
 			if nzPowerUps:IsPowerupActive("insta") then
-				zombie:Kill(dmginfo)
+				dmginfo:ScaleDamage(zombie:Health()) --zombie:Kill(dmginfo)
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
 
-
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if attacker:HasPerk("dtap2") and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
+			
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1.5) end
 
 			--  Pack-a-Punch doubles damage
 			if dmginfo:GetAttacker():GetActiveWeapon():HasNZModifier("pap") then dmginfo:ScaleDamage(2) end
