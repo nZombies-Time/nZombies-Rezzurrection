@@ -6,7 +6,7 @@ local PLAYER = {}
 -- See gamemodes/base/player_class/player_default.lua for all overridable variables
 --
 PLAYER.WalkSpeed 			= 200
-PLAYER.RunSpeed				= 300
+PLAYER.RunSpeed				= 325
 PLAYER.CanUseFlashlight     = true
 
 function PLAYER:SetupDataTables()
