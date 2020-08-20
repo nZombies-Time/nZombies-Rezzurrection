@@ -3,7 +3,7 @@ AddCSLuaFile( )
 ENT.Type = "anim"
  
 ENT.PrintName		= "invis_wall_zombie"
-ENT.Author			= "Zet0r (Modifed by Ethorbit)"
+ENT.Author			= "Ethorbit & Zet0r"
 ENT.Contact			= "youtube.com/Zet0r"
 ENT.Purpose			= "Block everything except zombies"
 ENT.Instructions	= ""
@@ -28,29 +28,25 @@ function ENT:Initialize()
 end
 
 function ENT:Touch(ent) -- Let zombies walk through us like it's nothing
-	local touchingents = ents.FindInBox(self:GetPos(), self:GetMaxBound())
-	
-	for k,v in pairs(touchingents) do
-		if (IsValid(v) and nzConfig.ValidEnemies[v:GetClass()]) then
-			if (v:GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER) then return end -- They already have this
-			v.prevCollision = v:GetCollisionGroup()
-			v:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-		end
-
-		v.touchingzombiewall = true
-		timer.Simple(0.1, function() 
-			if !IsValid(v) then return end
-			v.touchingzombiewall = false
-		end)
-
-		timer.Simple(0.3, function() -- Make sure they have their original collision again when they are passed
-			if !IsValid(v) then return end
-			if (!v.touchingzombiewall) then
-				if (!v.prevCollision) then return end
-				v:SetCollisionGroup(v.prevCollision)
-			end
-		end)
+	if (IsValid(ent) and nzConfig.ValidEnemies[ent:GetClass()]) then
+		if (ent:GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER) then return end -- They already have this
+		ent.prevCollision = ent:GetCollisionGroup()
+		ent:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
 	end
+
+	ent.touchingzombiewall = true
+	timer.Simple(0.1, function() 
+		if !IsValid(ent) then return end
+		ent.touchingzombiewall = false
+	end)
+
+	timer.Simple(0.3, function() -- Make sure they have their original collision again when they are passed
+		if !IsValid(ent) then return end
+		if (!ent.touchingzombiewall) then
+			if (!ent.prevCollision) then return end
+			ent:SetCollisionGroup(ent.prevCollision)
+		end
+	end)
 end
 
 local mat = Material("color")

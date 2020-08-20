@@ -214,3 +214,36 @@ hook.Add("OnRoundEnd", "NZResetSpawnedZombies", function()
 		NZZombiesMaxAllowed = 35
 	end
 end)
+
+local function GetBosses()
+	local bosses = {}
+
+	for k,v in pairs(nzRound.BossData) do
+		local class = v["class"]
+
+		if class != nil and type(class) == "string" then
+			table.insert(bosses, class)
+		end
+	end
+
+	return bosses
+end
+
+-- Allow bosses to pass through zombie walls
+hook.Add("ShouldCollide", "AllowBossesThroughZombieStuff", function(ent1, ent2)
+	if (SERVER) then
+		if (ent1:IsValid() and ent2:IsValid()) then
+			if (ent1:GetClass() == "invis_wall_zombie" then
+				if (table.HasValue(GetBosses(), ent2:GetClass())) then
+					return false
+				end
+			end
+			
+			if (ent2:GetClass() == "invis_wall_zombie" then
+				if (table.HasValue(GetBosses(), ent1:GetClass())) then
+					return false
+				end
+			end
+		end
+	end
+end)

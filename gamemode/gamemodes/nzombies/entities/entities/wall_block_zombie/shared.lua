@@ -49,8 +49,22 @@ function ENT:Initialize()
 	
 end
 
+local function GetBosses()
+	local bosses = {}
+
+	for k,v in pairs(nzRound.BossData) do
+		local class = v["class"]
+
+		if class != nil and type(class) == "string" then
+			table.insert(bosses, class)
+		end
+	end
+
+	return bosses
+end
+
 function ENT:Touch(ent)
-	if (IsValid(ent) and nzConfig.ValidEnemies[ent:GetClass()]) then
+	if (IsValid(ent) and nzConfig.ValidEnemies[ent:GetClass()] || IsValid(ent) and table.HasValue(GetBosses(), ent:GetClass())) then
 		if (ent:GetCollisionGroup() == COLLISION_GROUP_DEBRIS_TRIGGER) then return end -- They already have this
 		ent.prevCollision = ent:GetCollisionGroup()
 		ent:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
