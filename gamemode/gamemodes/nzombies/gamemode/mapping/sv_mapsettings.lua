@@ -87,6 +87,16 @@ function nzMapping:LoadMapSettings(data)
 	nzMapping.Settings.acsavespot = data.acsavespot == nil and true or data.acsavespot
 	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
 
+	-- More compact and less messy:
+	local dataSnds = { 
+		"roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "gameendsnd", -- main event sounds
+		"grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
+		"boxspinsnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxclosesnd" -- mystery box sounds
+	}
+	for k,v in pairs(dataSnds) do
+		nzMapping.Settings[v] = data[v] or {}
+	end
+
 	nzMapping:SendMapData()
 
 	timer.Simple(3, function()

@@ -44,6 +44,19 @@ nzTools:CreateTool("settings", {
 		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
 
+		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
+
+		-- More compact and less messy:
+		local dataSnds = { 
+			"roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "gameendsnd", -- main event sounds
+			"grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
+			"boxspinsnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxclosesnd" -- mystery box sounds
+		}
+
+		for k,v in pairs(dataSnds) do
+			valz["SndRow" .. k] = data[v] or {}
+		end
+
 		local sheet = vgui.Create( "DPropertySheet", frame )
 		sheet:SetSize( 280, 220 )
 		sheet:SetPos( 10, 10 )
@@ -182,6 +195,15 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
+
+			for k,v in pairs(dataSnds) do
+				if (valz["SndRow" .. k] == nil) then
+					data[v] = {}
+				else
+					data[v] = valz["SndRow" .. k]
+				end
+			end
+
 			PrintTable(data)
 
 			nzMapping:SendMapData( data )
@@ -203,7 +225,7 @@ nzTools:CreateTool("settings", {
 		local acProps = vgui.Create("DProperties", acPanel)
 		local acheight, acwidth = sheet:GetSize()
 		acProps:SetSize(acwidth, acwidth - 50)
-		
+
 		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
 		-- DermaButton3:SetText( "Submit" )
 		-- DermaButton3:SetPos( 0, 185 )
@@ -544,7 +566,299 @@ nzTools:CreateTool("settings", {
 					end
 				end
 			end
+
+			-- So we can create the elements in a loop
+			local SndMenuMain = { 
+				[1] = {
+					["Title"] = "Round Start",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow1"]
+				},
+				[2] = {
+					["Title"] = "Round End",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow2"]
+				},
+				[3] = {
+					["Title"] = "Special Round Start",
+					["ToolTip"] = "Eg. Dog Round",
+					["Bind"] = valz["SndRow3"]
+				},
+				[4] = {
+					["Title"] = "Special Round End",
+					["ToolTip"] = "Eg. Dog Round",
+					["Bind"] = valz["SndRow4"]
+				},
+				[5] = {
+					["Title"] = "Game Over",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow5"]
+				}
+			}
+
+			local SndMenuPowerUp = { 
+				[1] = {
+					["Title"] = "Grab",
+					["ToolTip"] = "When players get the powerup",
+					["Bind"] = valz["SndRow6"]
+				},
+				[2] = {
+					["Title"] = "Insta Kill",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow7"]
+				},
+				[3] = {
+					["Title"] = "Fire Sale",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow8"]
+				},
+				[4] = {
+					["Title"] = "Death Machine",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow9"]
+				},
+				[5] = {
+					["Title"] = "Carpenter",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow10"]
+				},
+				[6] = {
+					["Title"] = "Nuke",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow11"]
+				},
+				[7] = {
+					["Title"] = "Double Points",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow12"]
+				},
+				[8] = {
+					["Title"] = "Max Ammo",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow13"]
+				},
+				[9] = {
+					["Title"] = "Zombie Blood",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow14"]
+				}
+			}
+
+			local SndMenuBox = { 
+				[1] = {
+					["Title"] = "Shake",
+					["ToolTip"] = "When the teddy has appeared and the box starts shaking",
+					["Bind"] = valz["SndRow15"]
+				},
+				[2] = {
+					["Title"] = "Poof",
+					["ToolTip"] = "When the box moves to another destination",
+					["Bind"] = valz["SndRow16"]
+				},
+				[3] = {
+					["Title"] = "Laugh",
+					["ToolTip"] = "When the teddy appears",
+					["Bind"] = valz["SndRow17"]
+				},
+				[4] = {
+					["Title"] = "Bye Bye",
+					["ToolTip"] = "After the box shakes",
+					["Bind"] = valz["SndRow18"]
+				},
+				[5] = {
+					["Title"] = "Jingle",
+					["ToolTip"] = "When weapons are shuffling",
+					["Bind"] = valz["SndRow19"]
+				},
+				[6] = {
+					["Title"] = "Close",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow20"]
+				}
+			}
+
+			local sndPanel = vgui.Create("DPanel", sheet)
+			local sndheight, sndwidth = sheet:GetSize()
+			sndPanel:SetSize(sndheight, (sndwidth - 50))
+			sheet:AddSheet("Custom Sounds", sndPanel, "icon16/sound_add.png", false, false, "Customize the sounds that play for certain events.")
+
+			-- A modifiable list of all sounds bound to currently selected event:
+			local curSndList = vgui.Create("DListView", sndPanel)
+			curSndList:Dock(RIGHT)
+			curSndList:SetSize(110, 200)
+
 			
+			local curSndTbl = nil -- All sounds for currently selected Event Item
+			local function DeleteNewItem(text, line)
+				table.RemoveByValue(curSndTbl, text)
+				curSndList:RemoveLine(line)
+			end
+
+			local soundsPlayed = {}
+			curSndList.OnRowRightClick = function(lineID, line)
+				local file = curSndList:GetLine(line):GetColumnText(1)
+				local fileSubMenu = DermaMenu()	
+				local function StopPlayedSounds()
+					for k,v in pairs(soundsPlayed) do
+						LocalPlayer():StopSound(v)
+					end
+				end
+
+				fileSubMenu:AddOption("Play", function()
+					StopPlayedSounds()		
+					table.insert(soundsPlayed, file)	
+					curSound = CreateSound(LocalPlayer(), file)
+					curSound:Play()
+				end)
+
+				fileSubMenu:AddOption("Stop", function()
+					StopPlayedSounds()		
+				end)
+
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddOption("Remove", function()
+					DeleteNewItem(file, line)
+				end)
+
+				fileSubMenu:Open()
+			end
+
+			local newCol = curSndList:AddColumn("Assigned Sounds")
+			newCol:SetToolTip("A random sound from the list will play")
+			local theList = nil 
+			local function NewSelectedItem(list, tbl)
+				curSndTbl = tbl
+				theList = list
+				curSndList:Clear()
+				for k,v in pairs(tbl) do
+					local newline = curSndList:AddLine(v)
+					newline:SetToolTip(v)
+				end
+			end
+
+			local function AddNewItem(text)
+				table.insert(curSndTbl, text)
+				local newline = curSndList:AddLine(text)
+				newline:SetTooltip(text)
+			end
+			
+			local selectedData = {}
+			if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
+			sndFilePanel = nil -- We want to keep this reference so only 1 file menu exists at a time
+			local function ChooseSound() -- Menu to make selecting mounted sounds effortless
+				local eventItem = theList:GetLine(theList:GetSelectedLine())
+				if (!list || !eventItem) then return end
+
+				sndFilePanel = vgui.Create("DFrame", frame)
+				sndFilePanel:Dock(FILL)
+				sndFilePanel:SetTitle(eventItem:GetColumnText(1) .. " Sound")
+				sndFilePanel:SetDeleteOnClose(true)
+				sndFilePanel.OnClose = function()
+					sndFilePanel = nil
+				end
+
+				fileMenu = vgui.Create("DFileBrowser", sndFilePanel)
+				fileMenu:Dock(FILL)	
+				fileMenu:SetPath("GAME")
+				fileMenu:SetFileTypes("*.wav *.mp3 *.ogg")
+				fileMenu:SetBaseFolder("sound")
+				fileMenu:SetOpen(true)
+
+				local soundsPlayed = {}
+				function fileMenu:OnRightClick(filePath, selectedPnl)
+					if (SERVER) then return end
+					filePath = string.Replace(filePath, "sound/", "")
+					local fileSubMenu = DermaMenu()
+					
+					local function StopPlayedSounds()
+						for k,v in pairs(soundsPlayed) do
+							LocalPlayer():StopSound(v)
+						end
+					end
+
+					fileSubMenu:AddOption("Play", function()
+						StopPlayedSounds()		
+						table.insert(soundsPlayed, filePath)	
+						curSound = CreateSound(LocalPlayer(), filePath)
+						curSound:Play()
+					end)
+
+					fileSubMenu:AddOption("Stop", function()
+						StopPlayedSounds()		
+					end)
+
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddOption("Add", function()
+						AddNewItem(filePath)
+					end)
+
+					fileSubMenu:Open()
+				end
+			end
+
+			local catList = vgui.Create("DCategoryList", sndPanel)
+			catList:Dock(FILL)
+			catList:Center()
+
+			local addBtn = vgui.Create("DButton", curSndList)
+			addBtn:SetText("Add Sound")
+			addBtn:Dock(BOTTOM)
+			addBtn.DoClick = function()
+				ChooseSound()
+			end
+
+			-- Menu categories with Event Lists inside
+			local mainCat = catList:Add("Main")
+			local powerupCat = catList:Add("Powerups")
+			local boxCat = catList:Add("Mystery Box")
+			local mainSnds = vgui.Create("DListView", mainCat)
+			local powerUpSnds = vgui.Create("DListView", powerupCat)
+			local boxSnds = vgui.Create("DListView", boxCat)
+			
+			local function AddDList(listView)
+				listView:Dock(LEFT)
+				--listView:SetSize(sndheight, sndwidth / 2)
+				listView:AddColumn("Event")
+				--listView:AddColumn("Assigned Path")
+			end
+
+			AddDList(mainSnds)
+			AddDList(powerUpSnds)
+			AddDList(boxSnds)
+			mainCat:SetContents(mainSnds)
+			powerupCat:SetContents(powerUpSnds)
+			boxCat:SetContents(boxSnds)
+
+			local function AddContents(tbl, listView)
+				for k,v in ipairs(tbl) do
+					local newItem = listView:AddLine(v["Title"])
+					if (v["ToolTip"] != "") then newItem:SetTooltip(v["ToolTip"]) end
+
+					listView.OnRowSelected = function(panel, rowIndex, row) -- We need to update the editable list for the item we have selected
+						local tblSnds = tbl[rowIndex]["Bind"] -- The table of sounds that is saved along with the config
+						NewSelectedItem(listView, tblSnds)
+					end
+
+					listView:SetMultiSelect(false)
+				end
+			end
+
+			AddContents(SndMenuMain, mainSnds)
+			AddContents(SndMenuPowerUp, powerUpSnds)
+			AddContents(SndMenuBox, boxSnds)
+			mainSnds:SelectItem(mainSnds:GetLine(1))
+
+			-- local sndProps = vgui.Create("DProperties", sndPanel)
+			-- local sndheight, sndwidth = sheet:GetSize()
+			-- sndProps:SetSize(sndheight, sndwidth - 50)
+
+			-- local SndRow1 = sndProps:CreateRow("Custom Sounds", "Round Start")
+			-- SndRow1:Setup( "DButton" )
+
 			-- local DermaButton2 = vgui.Create( "DButton", rboxpanel )
 			-- DermaButton2:SetText( "Submit" )
 			-- DermaButton2:SetPos( 0, 185 )
