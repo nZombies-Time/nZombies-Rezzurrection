@@ -233,13 +233,13 @@ end
 hook.Add("ShouldCollide", "AllowBossesThroughZombieStuff", function(ent1, ent2)
 	if (SERVER) then
 		if (ent1:IsValid() and ent2:IsValid()) then
-			if (ent1:GetClass() == "invis_wall_zombie" then
+			if (ent1:GetClass() == "invis_wall_zombie") then
 				if (table.HasValue(GetBosses(), ent2:GetClass())) then
 					return false
 				end
 			end
 			
-			if (ent2:GetClass() == "invis_wall_zombie" then
+			if (ent2:GetClass() == "invis_wall_zombie") then
 				if (table.HasValue(GetBosses(), ent1:GetClass())) then
 					return false
 				end
