@@ -97,6 +97,7 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings[v] = data[v] or {}
 	end
 
+	nzSounds:RefreshSounds()
 	nzMapping:SendMapData()
 
 	timer.Simple(3, function()
