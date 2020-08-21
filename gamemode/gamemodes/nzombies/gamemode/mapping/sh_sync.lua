@@ -25,7 +25,7 @@ if CLIENT then
 
 	local function receiveMapData()
 		if ispanel(nzQMenu.Data.MainFrame) then -- New config was loaded, refresh config menu
-			nzQMenu.Data.MainFrame:Close()
+			nzQMenu.Data.MainFrame:Remove()
 		end
 	
 		local oldeeurl = nzMapping.Settings.eeurl or ""
