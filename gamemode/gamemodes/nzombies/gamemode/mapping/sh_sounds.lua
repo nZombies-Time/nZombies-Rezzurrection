@@ -89,11 +89,7 @@ function nzSounds:GetSound(event)
             snd = nzSounds:GetDefaultSound(event)
         end
 
-        if (snd == nil) then 
-            if (isstring(event)) then
-                ServerLog("[nZombies] There is no default sound for " .. event .. " Sound Event! This won't play.")
-            end
-        return end
+        if snd == nil then return end
 
         if (!file.Exists("sound/" .. snd, "GAME")) then
             ServerLog("[nZombies] Tried to play an invalid sound file (" .. snd .. ") for Event: " .. event .. "\n")
@@ -101,12 +97,6 @@ function nzSounds:GetSound(event)
     end
 
     if (CLIENT) then
-        if (snd == nil) then 
-            if (isstring(event)) then
-                print("[nZombies] There is no default sound for " .. event .. " Sound Event! This won't play.")
-            end
-        return end
-
         if (!nzSounds.Sounds.Default[event]) then 
             if (isstring(event)) then
                 print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
@@ -116,6 +106,8 @@ function nzSounds:GetSound(event)
 
             snd = nzSounds:GetDefaultSound(event)
         end  
+
+        if snd == nil then return end
 
         if (snd and !file.Exists("sound/" .. snd, "GAME")) then
             print("[nZombies] Tried to play a sound file you don't have! (" .. snd .. ") for Event: " .. event)
@@ -158,7 +150,9 @@ function nzSounds:Play(event, ply) -- Plays everywhere either for 1 or all playe
     end
 
     if (CLIENT) then
-        if (string.find(event, "Round") || event == "GameEnd") then -- Stop all main event sounds for this one
+        if (event == "GameEnd") then
+            nzSounds:StopAll()
+        elseif (string.find(event, "Round")) then -- Stop all main event sounds for this one
             for k,v in pairs(nzSounds.MainEvents) do
                 nzSounds:Stop(v)
             end
