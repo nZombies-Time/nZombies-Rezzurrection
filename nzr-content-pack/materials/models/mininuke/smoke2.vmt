@@ -1,0 +1,7 @@
+"SpriteCard"
+{
+"$baseTexture" "models/mininuke/smoke2"
+"$translucent" 1
+"$additive" 1
+"$overbrightfactor" 1
+}
