@@ -37,6 +37,7 @@ end
 net.Receive("nz_hellhoundround", function()
 	if net.ReadBool() then
 		hook.Call( "OnSpecialRoundStart" )
-		surface.PlaySound("nz/round/dog_start.wav")
+		--surface.PlaySound("nz/round/dog_start.wav")
+		nzSounds:Play("DogRound")
 	end
 end)

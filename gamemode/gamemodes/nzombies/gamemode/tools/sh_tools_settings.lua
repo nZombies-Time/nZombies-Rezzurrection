@@ -47,13 +47,7 @@ nzTools:CreateTool("settings", {
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
 
 		-- More compact and less messy:
-		local dataSnds = { 
-			"roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "gameendsnd", -- main event sounds
-			"grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
-			"boxspinsnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxclosesnd" -- mystery box sounds
-		}
-
-		for k,v in pairs(dataSnds) do
+		for k,v in pairs(nzSounds.struct) do
 			valz["SndRow" .. k] = data[v] or {}
 		end
 
@@ -196,7 +190,7 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 
-			for k,v in pairs(dataSnds) do
+			for k,v in pairs(nzSounds.struct) do
 				if (valz["SndRow" .. k] == nil) then
 					data[v] = {}
 				else
@@ -566,7 +560,7 @@ nzTools:CreateTool("settings", {
 					end
 				end
 			end
-
+			------------------Sound Chooser----------------------------
 			-- So we can create the elements in a loop
 			local SndMenuMain = { 
 				[1] = {
@@ -590,90 +584,105 @@ nzTools:CreateTool("settings", {
 					["Bind"] = valz["SndRow4"]
 				},
 				[5] = {
+					["Title"] = "Dog Round",
+					["ToolTip"] = "ONLY for dog rounds!",
+					["Bind"] = valz["SndRow5"]
+				},
+				[6] = {
 					["Title"] = "Game Over",
 					["ToolTip"] = "",
-					["Bind"] = valz["SndRow5"]
+					["Bind"] = valz["SndRow6"]
 				}
 			}
 
 			local SndMenuPowerUp = { 
 				[1] = {
-					["Title"] = "Grab",
-					["ToolTip"] = "When players get the powerup",
-					["Bind"] = valz["SndRow6"]
-				},
-				[2] = {
-					["Title"] = "Insta Kill",
-					["ToolTip"] = "",
+					["Title"] = "Spawn",
+					["ToolTip"] = "Played on the powerup itself when it spawns",
 					["Bind"] = valz["SndRow7"]
 				},
-				[3] = {
-					["Title"] = "Fire Sale",
-					["ToolTip"] = "",
+				[2] = {
+					["Title"] = "Grab",
+					["ToolTip"] = "When players get the powerup",
 					["Bind"] = valz["SndRow8"]
 				},
-				[4] = {
-					["Title"] = "Death Machine",
+				[3] = {
+					["Title"] = "Insta Kill",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow9"]
 				},
-				[5] = {
-					["Title"] = "Carpenter",
+				[4] = {
+					["Title"] = "Fire Sale",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow10"]
 				},
-				[6] = {
-					["Title"] = "Nuke",
+				[5] = {
+					["Title"] = "Death Machine",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow11"]
 				},
-				[7] = {
-					["Title"] = "Double Points",
+				[6] = {
+					["Title"] = "Carpenter",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow12"]
 				},
-				[8] = {
-					["Title"] = "Max Ammo",
+				[7] = {
+					["Title"] = "Nuke",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow13"]
 				},
-				[9] = {
-					["Title"] = "Zombie Blood",
+				[8] = {
+					["Title"] = "Double Points",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow14"]
+				},
+				[9] = {
+					["Title"] = "Max Ammo",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow15"]
+				},
+				[10] = {
+					["Title"] = "Zombie Blood",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow16"]
 				}
 			}
 
 			local SndMenuBox = { 
 				[1] = {
 					["Title"] = "Shake",
-					["ToolTip"] = "When the teddy has appeared and the box starts shaking",
-					["Bind"] = valz["SndRow15"]
+					["ToolTip"] = "When the teddy appears and the box starts hovering",
+					["Bind"] = valz["SndRow17"]
 				},
 				[2] = {
 					["Title"] = "Poof",
 					["ToolTip"] = "When the box moves to another destination",
-					["Bind"] = valz["SndRow16"]
+					["Bind"] = valz["SndRow18"]
 				},
 				[3] = {
 					["Title"] = "Laugh",
 					["ToolTip"] = "When the teddy appears",
-					["Bind"] = valz["SndRow17"]
+					["Bind"] = valz["SndRow19"]
 				},
 				[4] = {
 					["Title"] = "Bye Bye",
-					["ToolTip"] = "After the box shakes",
-					["Bind"] = valz["SndRow18"]
+					["ToolTip"] = "Plays along with Shake",
+					["Bind"] = valz["SndRow20"]
 				},
 				[5] = {
 					["Title"] = "Jingle",
 					["ToolTip"] = "When weapons are shuffling",
-					["Bind"] = valz["SndRow19"]
+					["Bind"] = valz["SndRow21"]
 				},
 				[6] = {
+					["Title"] = "Open",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow22"]
+				},
+				[7] = {
 					["Title"] = "Close",
 					["ToolTip"] = "",
-					["Bind"] = valz["SndRow20"]
+					["Bind"] = valz["SndRow23"]
 				}
 			}
 
@@ -686,8 +695,7 @@ nzTools:CreateTool("settings", {
 			local curSndList = vgui.Create("DListView", sndPanel)
 			curSndList:Dock(RIGHT)
 			curSndList:SetSize(110, 200)
-
-			
+		
 			local curSndTbl = nil -- All sounds for currently selected Event Item
 			local function DeleteNewItem(text, line)
 				table.RemoveByValue(curSndTbl, text)
@@ -814,16 +822,16 @@ nzTools:CreateTool("settings", {
 			-- Menu categories with Event Lists inside
 			local mainCat = catList:Add("Main")
 			local powerupCat = catList:Add("Powerups")
+			powerupCat:SetExpanded(false)
 			local boxCat = catList:Add("Mystery Box")
+			boxCat:SetExpanded(false)
 			local mainSnds = vgui.Create("DListView", mainCat)
 			local powerUpSnds = vgui.Create("DListView", powerupCat)
 			local boxSnds = vgui.Create("DListView", boxCat)
-			
+
 			local function AddDList(listView)
 				listView:Dock(LEFT)
-				--listView:SetSize(sndheight, sndwidth / 2)
 				listView:AddColumn("Event")
-				--listView:AddColumn("Assigned Path")
 			end
 
 			AddDList(mainSnds)
@@ -846,25 +854,37 @@ nzTools:CreateTool("settings", {
 					listView:SetMultiSelect(false)
 				end
 			end
-
 			AddContents(SndMenuMain, mainSnds)
 			AddContents(SndMenuPowerUp, powerUpSnds)
 			AddContents(SndMenuBox, boxSnds)
-			mainSnds:SelectItem(mainSnds:GetLine(1))
-
-			-- local sndProps = vgui.Create("DProperties", sndPanel)
-			-- local sndheight, sndwidth = sheet:GetSize()
-			-- sndProps:SetSize(sndheight, sndwidth - 50)
-
-			-- local SndRow1 = sndProps:CreateRow("Custom Sounds", "Round Start")
-			-- SndRow1:Setup( "DButton" )
-
-			-- local DermaButton2 = vgui.Create( "DButton", rboxpanel )
-			-- DermaButton2:SetText( "Submit" )
-			-- DermaButton2:SetPos( 0, 185 )
-			-- DermaButton2:SetSize( 260, 30 )
-			-- DermaButton2.DoClick = UpdateData
 			
+			mainSnds:SelectFirstItem() -- Since Main category is always expanded, let's make sure the first item is selected
+
+			local function AddCollapseCB(this) -- New category expanded, collapse all others & deselect their items
+				this.OnToggle = function()
+					if (this:GetExpanded()) then 
+						for k,v in pairs({mainCat, powerupCat, boxCat}) do
+							if (v != this) then
+								-- These categories are expanded, we cannot have more than 1 expanded so let's collapse these
+								if (v:GetExpanded()) then
+									v:Toggle()
+								end
+							else
+								-- This category is expanded, let's select the first Event Item
+								local listView = v:GetChild(1)
+								if (ispanel(listView)) then
+									listView:SelectFirstItem()
+								end
+							end
+						end
+					end
+				end
+			end
+			AddCollapseCB(mainCat)
+			AddCollapseCB(powerupCat)
+			AddCollapseCB(boxCat)		
+			------------------------------------------------------------------------
+			------------------------------------------------------------------------
 			local perklist = {}
 
 			local perkpanel = vgui.Create("DPanel", sheet)

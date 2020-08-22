@@ -88,17 +88,12 @@ function nzMapping:LoadMapSettings(data)
 	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
 
 	-- More compact and less messy:
-	local dataSnds = { 
-		"roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "gameendsnd", -- main event sounds
-		"grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
-		"boxspinsnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxclosesnd" -- mystery box sounds
-	}
-	for k,v in pairs(dataSnds) do
+	for k,v in pairs(nzSounds.struct) do
 		nzMapping.Settings[v] = data[v] or {}
 	end
 
-	nzSounds:RefreshSounds()
 	nzMapping:SendMapData()
+	nzSounds:RefreshSounds()
 
 	timer.Simple(3, function()
 		hook.Call("ConfigLoaded", nil, nil)
