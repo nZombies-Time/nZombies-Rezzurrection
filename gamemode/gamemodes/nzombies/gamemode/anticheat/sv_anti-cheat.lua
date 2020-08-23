@@ -164,32 +164,6 @@ function PLAYER:GetClosestNavMesh()
     return navmesh.GetNearestNavArea(self:GetPos(), false, 75, false, true)
 end
 
-------- Handle camping spots for possible undetected cheating spots players might be in
--- AccessorFunc(PLAYER, "camping_spot", "CampingTime")
--- AccessorFunc(PLAYER, "camping_spot", "CampingSpot")
-
--- function StartCampingTimer(ply)
---     timer.Create("ACCampingTimer" .. ply:SteamID(), 8, 1, function()
---         if (IsValid(ply) and ply:CanBeCheater()) then
---             ply:SetCampingSpot(ply:GetPos())
---             timer.Create("ACCampingElapsed" .. ply:SteamID(), 1, 0, function()
---                 ply:SetCampingTime(ply:GetCampingTime() + 1)
---             end)
---         end
---     end)
--- end
-
--- function StopCampingTimer(ply)
---     ply:SetCampingSpot(nil)
---     ply:SetCampingTime(0)
---     timer.Destroy("ACCampingTimer" .. ply:SteamID())
---     timer.Destroy("ACCampingElapsed" .. ply:SteamID())
--- end
--- -------------------------------------------------------------------------------------
--- function PLAYER:CanZombieReach() -- Checks if our Anti-Cheat Ghost (modified nz_zombie_walker) can reach the player
---     if (!self:GetCampingSpot() or self:GetCampingTime() <= 3) then return end
--- end
-
 function PLAYER:NZPlayerUnreachable()
     if !self:CanBeCheater() then return false end
 
@@ -296,12 +270,6 @@ end
 function PLAYER:OnCheating()
     self.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
     self:WarnToMove() 
-
-    -- if (isvector(self.undetectedSpot)) then
-    
-    -- else
-
-    -- end
 end
 
 hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
@@ -318,9 +286,14 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             waittime = CurTime()
         end
 
-        --ply:CanZombieReach()
         if ply:NZPlayerUnreachable() then 
             ply:OnCheating()
+        end
+
+        if (nzMapping.Settings.acpreventboost) then -- Stop boosting
+            if (ply:GetVelocity()[3] >= ply:GetJumpPower()) then
+                ply:SetVelocity(Vector(0, 0, math.abs(ply:GetVelocity()[3])) * -1) -- Cancel out their speed
+            end
         end
     end
 end)
