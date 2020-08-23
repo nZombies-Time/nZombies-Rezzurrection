@@ -57,5 +57,11 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
 
+	nzMapping.Settings.ac = data.ac == nil and true or data.ac
+	nzMapping.Settings.acwarn = data.acwarn == nil and true or data.acwarn
+	nzMapping.Settings.acsavespot = data.acsavespot == nil and true or data.acsavespot
+	nzMapping.Settings.acpreventboost = data.acpreventboost == nil and true or data.acpreventboost
+	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
+
 	nzMapping:SendMapData()
 end
