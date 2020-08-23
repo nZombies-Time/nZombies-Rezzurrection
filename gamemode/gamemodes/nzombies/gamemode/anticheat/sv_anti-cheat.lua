@@ -22,17 +22,17 @@ local excludedClasses = {
 -- Handle TP time continuously so players cannot reset it by simply leaving the spot:
 function PLAYER:GetTPSecs()
     if self.tptimer == nil then self:ResetTPSecs() end
-    return self.tptimer
+    return self.tptimer + 1
 end
 
 function PLAYER:StartTPDecrease()
     if (!IsValid(self)) then return end
-
+    if (timer.Exists("ACDecrease" .. self:SteamID())) then return end -- We're already counting down..
     timer.Destroy("ACDecrease" .. self:SteamID())
     timer.Create("ACDecrease" .. self:SteamID(), 1, 0, function()
         if (!IsValid(self)) then return end
         self.tptimer = self.tptimer - 1 > 0 and self.tptimer - 1 or 0
-        if (self.tptimer == 0) then
+        if (self.tptimer < 0) then
             self:ResetTPSecs()
         end
     end)
@@ -48,8 +48,14 @@ function PLAYER:ResetTPSecs()
     self.tptimer = nzMapping.Settings.actptime and nzMapping.Settings.actptime or 5
 end
 -------------------------------------------------------------------------------------------
+function PLAYER:NearUndetectedSpot() -- Undetected spots are spots the Anti-Cheat is unaware of that the AC Zombies mark as unreachable
+    if (!isvector(self.undetectedSpot)) then return false end
+    return (self:GetPos():DistToSqr(self.undetectedSpot) <= 12000) 
+end
+
 function PLAYER:ACSavePoint() -- Save the last position they were not cheating at for Anti-Cheat teleports
     if (!nzMapping.Settings.ac and nzMapping.Settings.ac != nil || !nzMapping.Settings.acsavespot) then return end
+    if (self:NearUndetectedSpot()) then return end
 
     if (self.allowsavespot == nil) then 
         self.allowsavespot = true 
@@ -73,8 +79,9 @@ end
 
 function PLAYER:WarnToMove() -- Give the player a chance to move before being teleported to spawn
     if (!nzMapping.Settings.ac and nzMapping.Settings.ac != nil) then return end
-    if self.allowtp then -- They had their chance to get back in the map
+    if (self.allowtp || self:GetTPSecs() <= 1) then -- They had their chance to get back in the map
         self:NZMoveCheater() 
+        self.undetectedSpot = nil
     return end 
 
     if self.warning then return end -- They still have time to move
@@ -92,7 +99,7 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
     timer.Create("ACWarning" .. self:SteamID(), 0.1, 0, function()
         if !IsValid(self) then return end
 
-        if (!self:NZPlayerUnreachable()) then
+        if (!self:GetIsJumping() and !self:NearUndetectedSpot() and !self:NZPlayerUnreachable()) then
             net.Start("AntiCheatWarningCancel")
             net.Send(self)
             timer.Destroy("ACWarning" .. self:SteamID())
@@ -113,6 +120,7 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
         self.allowtp = true
         self.warning = false
         self.allowsavespot = false
+        self.undetectedSpot = nil
 
         timer.Destroy("ACWarning" .. self:SteamID())
 
@@ -198,7 +206,8 @@ function PLAYER:NZPlayerUnreachable()
         collisiongroup = COLLISION_GROUP_PLAYER,
         filter = function(ent) return !ent:IsPlayer() end
     })
-   
+
+    --if (self:NearUndetectedSpot()) then print("THAT's WHY") return true end
     if tr.Hit and !table.HasValue(excludedClasses, tr.Entity:GetClass()) then -- If it hit something that can't move
         if !IsValid(tr.Entity:GetParent()) then -- Parented entities typically have the ability to move, don't tp people on them
             local hitPos = tr.HitPos
@@ -258,7 +267,21 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
                     end              
                 end
 
-                nzPowerUps:SpawnPowerUp(self:GetPos(), "zombieblood") -- They are going to be tp'd far away, don't let them die by a crowd
+                -- Prevent zombies from immediately targetting, so they don't instantly die on AC teleport:
+                if (self.aczblood == nil or self.aczblood) then 
+                    self.aczblood = false -- Don't allow again for 10 minutes
+                    nzPowerUps:SpawnPowerUp(self:GetPos(), "zombieblood") -- They are going to be tp'd far away, don't let them die by a crowd
+                    timer.Create("ACZombieBloodCD" .. self:SteamID(), 600, 1, function()
+                        if IsValid(self) then self.aczblood = true end
+                    end)
+                else -- No available zombie blood for them, just make them untargetable for 5 seconds
+                    if (self:GetTargetPriority() == TARGET_PRIORITY_NONE) then return end
+                    self:SetTargetPriority(TARGET_PRIORITY_NONE)
+                    timer.Simple(5, function()
+                        if !IsValid(self) then return end
+                        self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+                    end)
+                end
             end
 
             self.allowsavespot = true
@@ -268,6 +291,17 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
         PrintMessage(HUD_PRINTTALK, "[NZ] " .. self:Nick() .. " was teleported by the Anti-Cheat.")
         timer.Simple(5, function() self.Teleporting = false end)
     end
+end
+
+function PLAYER:OnCheating()
+    self.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
+    self:WarnToMove() 
+
+    -- if (isvector(self.undetectedSpot)) then
+    
+    -- else
+
+    -- end
 end
 
 hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
@@ -284,10 +318,9 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             waittime = CurTime()
         end
 
-        ply:CanZombieReach()
+        --ply:CanZombieReach()
         if ply:NZPlayerUnreachable() then 
-            ply.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
-            ply:WarnToMove() 
+            ply:OnCheating()
         end
     end
 end)
