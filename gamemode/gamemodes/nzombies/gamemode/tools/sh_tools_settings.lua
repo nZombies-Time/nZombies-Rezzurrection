@@ -43,6 +43,7 @@ nzTools:CreateTool("settings", {
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
 		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
+		valz["ACRow5"] = data.acpreventboost == nil and true or data.acpreventboost
 
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
 
@@ -189,6 +190,7 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
+			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = valz["ACRow5"] end
 
 			for k,v in pairs(nzSounds.struct) do
 				if (valz["SndRow" .. k] == nil) then
@@ -243,6 +245,12 @@ nzTools:CreateTool("settings", {
 			ACRow3:SetValue(valz["ACRow3"])
 			ACRow3:SetTooltip("Remembers the last spot a player was at before they were detected. (Uses more performance)")
 			ACRow3.DataChanged = function(_, val) valz["ACRow3"] = val end
+
+			local ACRow5 = acProps:CreateRow("Anti-Cheat Settings", "Prevent boosting?")
+			ACRow5:Setup("Boolean")
+			ACRow5:SetValue(valz["ACRow5"])
+			ACRow5:SetTooltip("Cancels out vertical velocity when players boost up")
+			ACRow5.DataChanged = function(_, val) valz["ACRow5"] = val end
 
 			local ACRow4 = acProps:CreateRow("Anti-Cheat Settings", "Seconds for TP")
 			ACRow4:Setup("Integer")
