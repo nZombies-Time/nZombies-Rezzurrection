@@ -50,6 +50,7 @@ function nzMapping:LoadMapSettings(data)
 	if data.gamemodeentities then
 		nzMapping.Settings.gamemodeentities = data.gamemodeentities or nil
 	end
+
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
 	end
@@ -57,5 +58,11 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
 
+	-- More compact and less messy:
+	for k,v in pairs(nzSounds.struct) do
+		nzMapping.Settings[v] = data[v] or {}
+	end
+
 	nzMapping:SendMapData()
+	nzSounds:RefreshSounds()
 end
