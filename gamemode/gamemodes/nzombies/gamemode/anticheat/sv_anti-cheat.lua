@@ -268,12 +268,14 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
 end
 
 function PLAYER:OnCheating()
-    self.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
-    self:WarnToMove() 
+    if (nzMapping.Settings.ac) then
+        self.allowsavespot = false -- Prevents possibly adding a save point outside the map for cheaters (just until the warning time resets)
+        self:WarnToMove() 
+    end
 end
 
 hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
-    if !nzMapping.Settings.ac and nzMapping.Settings.ac != nil then return end
+    if !nzMapping.Settings.ac then return end
     
     if (waittime == nil or CurTime() > waittime) then 
         if (NZ_AntiCheat_Delay != nil) then 
@@ -290,7 +292,7 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             ply:OnCheating()
         end
 
-        if (nzMapping.Settings.acpreventboost) then -- Stop boosting
+        if (nzMapping.Settings.ac and nzMapping.Settings.acpreventboost) then -- Stop boosting
             if (ply:GetVelocity()[3] >= ply:GetJumpPower()) then
                 ply:SetVelocity(Vector(0, 0, math.abs(ply:GetVelocity()[3])) * -1) -- Cancel out their speed
             end

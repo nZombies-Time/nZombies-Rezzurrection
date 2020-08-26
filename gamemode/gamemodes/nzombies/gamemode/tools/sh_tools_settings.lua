@@ -37,16 +37,17 @@ nzTools:CreateTool("settings", {
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
-		valz["ACRow3"] = data.acsavespot == nil and true or data.acsavespot
+		valz["ACRow3"] = data.acsavespot == nil and true or tobool(data.acsavespot)
 		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
-		valz["ACRow5"] = data.acpreventboost == nil and true or data.acpreventboost
+		valz["ACRow5"] = data.acpreventboost == nil and true or tobool(data.acpreventboost)
+		valz["ACRow6"] = data.acpreventcjump == nil and false or tobool(data.acpreventcjump)
 
 		local sheet = vgui.Create( "DPropertySheet", frame )
-		sheet:SetSize( 280, 250 )
+		sheet:SetSize( 280, 220 )
 		sheet:SetPos( 10, 10 )
 
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
-		DProperties:SetSize( 280, 250 )
+		DProperties:SetSize( 280, 220 )
 		DProperties:SetPos( 0, 0 )
 		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Allows you to set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
 
@@ -146,11 +147,12 @@ nzTools:CreateTool("settings", {
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
-			if valz["ACRow1"] == nil then data.ac = nil else data.ac = tobool(valz["ACRow1"]) end
+			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
-			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = valz["ACRow5"] end
+			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = tobool(valz["ACRow5"]) end
+			if valz["ACRow6"] == nil then data.acpreventcjump = false else data.acpreventcjump = tobool(valz["ACRow6"]) end
 			PrintTable(data)
 
 			nzMapping:SendMapData( data )
@@ -194,8 +196,14 @@ nzTools:CreateTool("settings", {
 			local ACRow5 = acProps:CreateRow("Anti-Cheat Settings", "Prevent boosting?")
 			ACRow5:Setup("Boolean")
 			ACRow5:SetValue(valz["ACRow5"])
-			ACRow5:SetTooltip("Cancels out vertical velocity when players boost up")
+			ACRow5:SetTooltip("Cancels out vertical velocity when players boost up faster than jump speed")
 			ACRow5.DataChanged = function(_, val) valz["ACRow5"] = val end
+
+			local ACRow6 = acProps:CreateRow("Anti-Cheat Settings", "No Crouch Jump?")
+			ACRow6:Setup("Boolean")
+			ACRow6:SetValue(valz["ACRow6"])
+			ACRow6:SetTooltip("Turns crouch jumps into normal jumps to make climbing on stuff harder")
+			ACRow6.DataChanged = function(_, val) valz["ACRow6"] = val end
 
 			local ACRow4 = acProps:CreateRow("Anti-Cheat Settings", "Seconds for TP")
 			ACRow4:Setup("Integer")
@@ -514,11 +522,6 @@ nzTools:CreateTool("settings", {
 				end
 			end
 			
-			local DermaButton2 = vgui.Create( "DButton", rboxpanel )
-			DermaButton2:SetText( "Submit" )
-			DermaButton2:SetPos( 0, 185 )
-			DermaButton2:SetSize( 260, 30 )
-			DermaButton2.DoClick = UpdateData
 			
 			local perklist = {}
 
