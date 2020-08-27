@@ -7,9 +7,9 @@ ENT.Author = "Laby"
 
 ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
 
-ENT.AttackRange = 175
-ENT.DamageLow = 75
-ENT.DamageHigh = 90
+ENT.AttackRange = 250
+ENT.DamageLow = 30
+ENT.DamageHigh = 32
 
 
 ENT.AttackSequences = {
@@ -25,11 +25,18 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-	"bo1_overhaul/son/charge.mp3",
+	"physics/flesh/flesh_impact_bullet1.wav",
+	"physics/flesh/flesh_impact_bullet2.wav",
+	"physics/flesh/flesh_impact_bullet3.wav",
+	"physics/flesh/flesh_impact_bullet4.wav",
+	"physics/flesh/flesh_impact_bullet5.wav"
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/thrasher/bite_04.mp3"
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
 }
 
 
@@ -129,6 +136,7 @@ function ENT:StatsInitialize()
 		self:SetRunSpeed(500)
 		self:SetHealth(350)
 		self:SetMaxHealth(1000)
+		screaming = false
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -272,14 +280,14 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
-self:EmitSound("bo1_overhaul/son/charge.mp3")
 local atkData = {}
-    
-    self:Attack( atkData )
-	self:PlaySequenceAndWait("shriek"..math.random(3), 1, self.FaceEnemy)
-		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
-	
+atkData.dmglow = 1
+    atkData.dmghigh = 1
+    atkData.dmgforce = Vector( 0, 0, 0 )
+	atkData.dmgdelay = 1
+		self:Attack( atkData )
+		screaming = false
+		self.loco:SetDesiredSpeed(300)
 	
 end
 
@@ -422,6 +430,31 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
+ if self:IsAttacking() then
+ 	self.loco:SetDesiredSpeed(0)
+	if !screaming then
+
+	screaming = true
+		timer.Simple(0.6,function() 
+			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
+						if v:IsPlayer() then
+						local walk = v:GetWalkSpeed()
+						local run = v:GetRunSpeed()
+						v:SetDSP(34, false)
+							v:SetRunSpeed(25)
+							v:SetWalkSpeed(25)
+							timer.Simple(1.5,function()
+								v:SetRunSpeed(run)
+							v:SetWalkSpeed(walk)
+							end)
+						end
+	end
+		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,55)),Angle(0,0,0),nil)
+		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
+			end)
+	end
+	
+ end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

@@ -45,6 +45,9 @@ function GM:PlayerBindPress( ply, bind, pressed )
 			if slot == 3 then
 				for k,v in pairs( ply:GetWeapons() ) do
 					if v:GetNWInt( "SwitchSlot" ) == slot then
+					if ply:HasPerk("politan") and !v:HasNZModifier("rando") then
+					v:ApplyNZModifier("rando")
+					end
 						ply:SelectWeapon( v:GetClass() )
 						return true
 					end
@@ -52,6 +55,9 @@ function GM:PlayerBindPress( ply, bind, pressed )
 				slot = 1
 				for k,v in pairs( ply:GetWeapons() ) do
 					if v:GetNWInt( "SwitchSlot" ) == slot then
+					if ply:HasPerk("politan") and !v:HasNZModifier("rando") then
+					v:ApplyNZModifier("rando")
+					end
 						ply:SelectWeapon( v:GetClass() )
 						return true
 					end
@@ -59,6 +65,9 @@ function GM:PlayerBindPress( ply, bind, pressed )
 			else
 				for k,v in pairs( ply:GetWeapons() ) do
 					if v:GetNWInt( "SwitchSlot" ) == slot then
+					if ply:HasPerk("politan") and !v:HasNZModifier("rando") then
+					v:ApplyNZModifier("rando")
+					end
 						ply:SelectWeapon( v:GetClass() )
 						return true
 					end

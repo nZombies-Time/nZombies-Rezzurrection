@@ -1,64 +1,70 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Napalm_Zombie"
+ENT.PrintName = "Mangler"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
+ENT.Models = { "models/roach/blackops3/manglerraz.mdl" }
 
-ENT.AttackRange = 200
-ENT.DamageLow = 0
-ENT.DamageHigh = 0
+ENT.AttackRange = 115
+ENT.DamageLow = 65
+ENT.DamageHigh = 70
 
 
 ENT.AttackSequences = {
-	{seq = "suicide1"},
-	{seq = "suicide2"},
-	{seq = "suicide3"}
+	{seq = "melee1"},
+	{seq = "melee2"},
+	{seq = "melee3"},
+	{seq = "melee_uppercut"}
 }
 
 ENT.DeathSequences = {
-	"death2"
+	"death"
 }
 
 ENT.AttackSounds = {
-	"bo1_overhaul/nap/spawn.mp3",
-}
+	"roach/bo3/raz/vox_plr_1_exert_melee_01.mp3",
+	"roach/bo3/raz/vox_plr_1_exert_melee_02.mp3",
+	"roach/bo3/raz/vox_plr_1_exert_melee_03.mp3",
+	"roach/bo3/raz/vox_plr_1_exert_melee_04.mp3"
 
-ENT.AttackHitSounds = {
-	"bo1_overhaul/nap/step3.mp3"
 }
 
 ENT.PainSounds = {
-	"bo1_overhaul/nap/charge.mp3"
+		"physics/flesh/flesh_impact_bullet1.wav",
+	"physics/flesh/flesh_impact_bullet2.wav",
+	"physics/flesh/flesh_impact_bullet3.wav",
+	"physics/flesh/flesh_impact_bullet4.wav",
+	"physics/flesh/flesh_impact_bullet5.wav"
+
+}
+
+ENT.AttackHitSounds = {
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
+	
+	
 }
 
 ENT.WalkSounds = {
-	"bo1_overhaul/nap/amb1.mp3",
-	"bo1_overhaul/nap/amb2.mp3",
-	"bo1_overhaul/nap/step1.mp3",
-	"bo1_overhaul/nap/step2.mp3",
-	"bo1_overhaul/nap/step3.mp3",
-	"bo1_overhaul/nap/amb3.mp3"
+	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.wav"
 }
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_WALK,
+		act = ACT_RUN,
 		minspeed = 1,
 	},
 	[2] = {
-		act = ACT_WALK_ANGRY,
-		minspeed = 100,
+		act = ACT_RUN,
+		minspeed = 180,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 600,
-	},
-	[4] = {
-		act = ACT_RUN,
-		minspeed = 500
+		minspeed = 190
 	}
 }
 
@@ -82,7 +88,7 @@ function ENT:Initialize()
 	self:SetLastPostionSave( CurTime() )
 	self:SetStuckAt( self:GetPos() )
 	self:SetStuckCounter( 0 )
-	
+
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
@@ -130,10 +136,14 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		hasExploded = false
-		self:SetRunSpeed(20)
-		self:SetHealth(1000)
-		self:SetMaxHealth(3000)
+		self:SetRunSpeed(200)
+		self:SetHealth(3000)
+		self:SetMaxHealth(2000)
+		shooting = false
+		dying = false
+		helmet = true
+		counting = false
+		hasTaunted = false
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -165,38 +175,30 @@ function ENT:InitDataTables()
 end
 
 function ENT:OnSpawn()
-	
-	local seq = "drg_jump"
+	local seq = "enrage"
 	local tr = util.TraceLine({
 		start = self:GetPos() + Vector(0,0,500),
 		endpos = self:GetPos(),
 		filter = self,
 		mask = MASK_SOLID_BRUSHONLY,
 	})
-	if tr.Hit then seq = "drg_jump" end
+	if tr.Hit then seq = "enrage" end
 	local _, dur = self:LookupSequence(seq)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
 		
-		local pos = self:GetPos() + (seq == "drg_jump" and Vector(0,0,100) or Vector(0,0,450))
-		
-		local effectData = EffectData()
-		effectData:SetStart( pos )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude(1)
-		self:EmitSound("bo1_overhaul/nap/spawn.mp3",511)
-		local entParticle = ents.Create("info_particle_system")
-		entParticle:SetKeyValue("start_active", "1")
-		entParticle:SetKeyValue("effect_name", "napalm_emerge")
-		entParticle:SetPos(self:GetPos())
-		entParticle:SetAngles(self:GetAngles())
-		entParticle:Spawn()
-		entParticle:Activate()
-		entParticle:Fire("kill","",2)
-		self:EmitSound("bo1_overhaul/dirtintro"..math.random(2)..".mp3")
-		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		local pos = self:GetPos() + (seq == "enrage" and Vector(0,0,100) or Vector(0,0,450))
+		counting = true
+		self:SetNoDraw(true)
+		ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		ParticleEffect("driese_tp_arrival_ambient_lightning",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		ParticleEffect("driese_tp_arrival_phase1",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		self:EmitSound("roach/bo3/raz/spawn_short.mp3")
+		self:EmitSound("bo1_overhaul/lgtstrike.mp3")
+		self:SetNoDraw(true)
 	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
@@ -207,72 +209,41 @@ function ENT:OnSpawn()
 		
 		self:TimedEvent(dur, function()
 			--dust cloud
+			self:SetNoDraw(false)
+			self:SetPos(self:GetPos() + Vector(0,0,0))
+			ParticleEffect("driese_tp_arrival_phase2",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+			ParticleEffect("driese_tp_arrival_impact_fx02_a",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 			self:SetInvulnerable(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
+			counting = false
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
+	self:ResetSequence("run")
+	self:SetCycle(0)
 end
 
-function ENT:OnZombieDeath()
-	if !hasExploded then
-	self:SetNoDraw(true)
-	hasExploded = true
-	self:EmitSound("bo1_overhaul/nap/explode.mp3",511)
-		local ent = ents.Create("env_explosion")
-	ent:SetPos(self:GetPos())
-	ent:SetAngles(self:GetAngles())
-	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "200")
-	ent:Fire("explode")
-		local entParticle = ents.Create("info_particle_system")
-		entParticle:SetKeyValue("start_active", "1")
-		entParticle:SetKeyValue("effect_name", "napalm_postdeath_napalm")
-		entParticle:SetPos(self:GetPos())
-		entParticle:SetAngles(self:GetAngles())
-		entParticle:Spawn()
-		entParticle:Activate()
-		entParticle:Fire("kill","",20)
-        local vaporizer = ents.Create("point_hurt")
-        if !vaporizer:IsValid() then return end
-        vaporizer:SetKeyValue("Damage", 22)
-        vaporizer:SetKeyValue("DamageRadius", 150)
-        vaporizer:SetKeyValue("DamageType",DMG_BURN)
-        vaporizer:SetPos(self:GetPos())
-        vaporizer:SetOwner(self)
-        vaporizer:Spawn()
-        vaporizer:Fire("TurnOn","",0)
-        vaporizer:Fire("kill","",20)
-    self:SetRunSpeed(0)
-    self.loco:SetVelocity(Vector(0,0,0))
-    self:Stop()
-    local seqstr = self.DeathSequences[math.random(#self.DeathSequences)]
-    local seq, dur = self:LookupSequence(seqstr)
-    -- Delay it slightly; Seems to fix it instantly getting overwritten
-    timer.Simple(0, function() 
-        if IsValid(self) then
-            self:ResetSequence(seq)
-            self:SetCycle(0)
-            self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-        end 
-    end)
-
-    timer.Simple(dur + 1, function()
-        if IsValid(self) then
-            self:Remove()
-        end
-    end)
-	
-    self:EmitSound( self.DeathSounds[ math.random( #self.DeathSounds ) ], 100)
-	else
+function ENT:OnZombieDeath(dmgInfo)
+	dying = true
+	self:ReleasePlayer()
+	self:StopFlames()
+	self:SetRunSpeed(0)
+	self.loco:SetVelocity(Vector(0,0,0))
+	self:Stop()
+	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
-            self:SetCycle(0)
-            self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+	self:SetCycle(0)
+self:EmitSound("roach/bo3/raz/vox_plr_1_exert_pain_03_alt01.mp3")
+	timer.Simple(dur, function()
+		if IsValid(self) then
 			self:Remove()
-			end
+			ParticleEffect("bo3_panzer_explosion",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		end
+	end)
 
 end
 
@@ -284,7 +255,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 60 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 100 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_RUN end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -303,21 +274,39 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
-local atkData = {}
-				atkData.dmglow = 10
-				atkData.dmghigh = 20
-				atkData.dmgforce = Vector( 0, 0, 0 )
-				atkData.dmgdelay = 1.0
-				self:Attack( atkData )
-self:OnZombieDeath()
+if math.random(0,5)==5 then
+self.AttackSequences = {
+	{seq = "melee_uppercut"}
+	
+}
+  local atkData2 = {}
+    atkData2.dmglow = 110
+    atkData2.dmghigh = 145
+    atkData2.dmgforce = Vector( 0, 0, 0 )
+	atkData2.dmgdelay = 0.3
+    self:Attack( atkData2 )
+else
+self.AttackSequences = {
+	{seq = "melee1"},
+	{seq = "melee2"},
+	{seq = "melee3"}
+	
+}
+    local atkData = {}
+    atkData.dmglow = 65
+    atkData.dmghigh = 70
+    atkData.dmgforce = Vector( 0, 0, 0 )
+	atkData.dmgdelay = 0.2
+    self:Attack( atkData )
+	end
 end
 
 function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 7 and CurTime() > self.NextClawTime then
-		-- Ground Slam from engi
+	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
+		-- Claw
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
@@ -325,42 +314,49 @@ function ENT:OnPathTimeOut()
 				filter = self,
 			})
 			
+			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-			ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(140,0,0)),Angle(0,0,0),nil)
-			self:EmitSound("bo1_overhaul/engie/att"..math.random(2)..".mp3")
-			self:EmitSound("bo1_overhaul/engie/slamclub.mp3",511)
-			util.ScreenShake(self:GetPos(),10000,5000,1,1000)
-			self.loco:SetDesiredSpeed(0)
-			 local atkData = {}
-					self.AttackSequences = {
-						{seq = "g_slamground"}
-										}
-			
-		
+				self:Stop()
+				shooting = true
+				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
+			timer.Simple(0.2,function()
+				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
+				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
+			end)
+				timer.Simple(1.5, function()
+				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
+		self:StopParticles()
+	end)
+	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
+				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
+				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
+				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
+				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
+				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
+				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				self:PlaySequenceAndWait("shoot")
+				self.loco:SetDesiredSpeed(0)
 				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-					local id, dur = self:LookupSequence("g_slamground")
-			
+				
+				local seq = "taunt"
+			local id, dur = self:LookupSequence(seq)
+				self:ResetSequence(id)
 			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
-			
 			self:TimedEvent(dur, function()
-			self:SetAttackRange(125)
-			self.AttackSequences = {
-						{seq = "g_att"}
-										}
+			shooting = false
 				self.loco:SetDesiredSpeed(self:GetRunSpeed())
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
 			end)
-			
 				self.NextAction = CurTime() + math.random(1, 5)
 				self.NextClawTime = CurTime() + math.random(3, 15)
 			end
 		end
-	elseif math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Useless Removed flamethrower
+	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
+		-- Flamethrower
 		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
 			self:Stop()
 			self:PlaySequenceAndWait("nz_flamethrower_aim")
@@ -445,7 +441,36 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
+function ENT:OnInjured(dmg)
+	if helmet then
+	dmg:ScaleDamage(0.5)
+	if self:Health() < 2000 then
+	helmet = false
+	end
+	else
+	dmg:ScaleDamage(1)
+if  !hasTaunted then
+self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",511)
+self:SetBodygroup(1,1)
+hasTaunted = true
+end
+end
+end
+
+
 function ENT:OnThink()
+if !self:IsAttacking() then
+if !counting and !dying and !shooting and self:Health() > 0 then
+counting = true
+timer.Simple(0.3,function()
+self:EmitSound("roach/bo3/raz/step_0"..math.random(1,5)..".mp3")
+counting = false
+end)
+end
+end
+if self:IsAttacking() then
+self.loco:SetDesiredSpeed(0)
+end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

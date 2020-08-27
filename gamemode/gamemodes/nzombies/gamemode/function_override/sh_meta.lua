@@ -103,8 +103,17 @@ if SERVER then
 	
 	hook.Add("DoAnimationEvent", "nzReloadCherry", function(ply, event, data)
 		--print(ply, event, data)
+		if ply:HasPerk("politan") then
+	local wep = ply:GetActiveWeapon()
+	wep:ApplyNZModifier("rando")
+		end
+		if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") then
+	ply:StripWeapon( "nz_quickknife_crowbar" )
+								ply:Give("nz_yamato")
+		end
 		if event == PLAYERANIMEVENT_RELOAD then
 			if ply:HasPerk("cherry") then
+				print("cherry")
 				local wep = ply:GetActiveWeapon()
 				if IsValid(wep) and wep:Clip1() < wep:GetMaxClip1() then
 					local pct = 1 - (wep:Clip1()/wep:GetMaxClip1())
@@ -122,8 +131,8 @@ if SERVER then
 					--print(pct)
 					local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
 					local d = DamageInfo()
-					d:SetDamage( 300*pct )
-					d:SetDamageType( DMG_BULLET )
+					d:SetDamage( 100*pct )
+					d:SetDamageType( DMG_SHOCK )
 					d:SetAttacker(ply)
 					d:SetInflictor(ply)
 					
@@ -139,12 +148,12 @@ if SERVER then
 	
 	function GM:GetFallDamage( ply, speed )
 		local dmg = speed / 10
-		if ply:HasPerk("phd") and dmg >= 25 then
+		if ply:HasPerk("phd") and dmg >= 50 then
 			if ply:Crouching() then
-				local zombies = ents.FindInSphere(ply:GetPos(), 300)
+				local zombies = ents.FindInSphere(ply:GetPos(), 250)
 				for k,v in pairs(zombies) do
 					if nzConfig.ValidEnemies[v:GetClass()] then
-						v:TakeDamage(300, ply, ply)
+						v:TakeDamage(150, ply, ply)
 					end
 				end
 				local pos = ply:GetPos()

@@ -47,10 +47,7 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"re2/em6300/step1.mp3",
-	"re2/em6300/step2.mp3",
-	"re2/em6300/step3.mp3",
-	"re2/em6300/step4.mp3"
+	"re2/em6300/step1.wav"
 }
 
 ENT.ActStages = {
@@ -136,7 +133,9 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		
+		counting = true
+		dying = false
+		taunting = true
 		self:SetRunSpeed(87)
 		self:SetHealth(10000)
 		self:SetMaxHealth(9000)
@@ -388,19 +387,26 @@ end
 end
 
 function ENT:OnThink()
-if math.random(0,1250) == 49 then
+if self:IsAttacking() then
+self.loco:SetDesiredSpeed(0)
+end
+if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
+counting = true
+timer.Simple(0.5,function()
+self:EmitSound("re2/em6300/step"..math.random(1,4)..".mp3",511)
+counting = false
+end)
+end
+if !taunting and math.random(0,800) == 49 then
+taunting = true
+timer.Simple(4,function()
+taunting = false
+end)
 if math.random(0,1) == 0 then
 self:EmitSound("nemesis/alert"..math.random(2,3)..".mp3")
 else
 self:EmitSound("nemesis/stars.mp3")
 end
-end
-if self:GetNWBool( "Mutated" )==true then
-self:EmitSound("nemesis/pain.mp3")
-self:Stop()
-self:PlaySequenceAndWait( "stagger_f" )
-self:SetStop(false)
-self:SetNWBool( "Mutated",false )
 end
 
 	if self:GetFlamethrowing() then

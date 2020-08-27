@@ -8,16 +8,16 @@ ENT.Author = "Laby"
 ENT.Models = { "models/roach/re2/g3v3.mdl" }
 
 ENT.AttackRange = 210
-ENT.DamageLow = 65
-ENT.DamageHigh = 70
+ENT.DamageLow = 1
+ENT.DamageHigh = 1
 
 
 ENT.AttackSequences = {
-	{seq = "attack1", dmgtimes = {1}},
+{seq = "attack1", dmgtimes = {1}},
 	{seq = "attack2", dmgtimes = {1.1}},
-	{seq = "attack3", dmgtimes = {1.3}},
+	{seq = "attack3", dmgtimes = {1.1}},
 	{seq = "attack4", dmgtimes = {0.9}},
-	{seq = "attack5", dmgtimes = {1.5,0.7,0.6,0.2,0.6,1.3}}
+	{seq = "attack5", dmgtimes = {2,2.6,3,4}}
 }
 
 ENT.DeathSequences = {
@@ -75,7 +75,6 @@ function ENT:Initialize()
 
 	self:Precache()
 
-	for i=122,150 do self:ManipulateBoneJiggle(i, 1) end
 	
 	self:SetModel( self.Models[math.random( #self.Models )] )
 
@@ -140,10 +139,12 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		mutated=false
-		self:SetRunSpeed(200)
-		self:SetHealth(200)
-		self:SetMaxHealth(20000)
+		taunting = true
+		counting = true
+		dying = false
+		self:SetRunSpeed(120)
+		self:SetHealth(10000)
+		self:SetMaxHealth(100000)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -172,7 +173,6 @@ function ENT:InitDataTables()
 	self:NetworkVar("Entity", 0, "ClawHook")
 	self:NetworkVar("Bool", 1, "UsingClaw")
 	self:NetworkVar("Bool", 2, "Flamethrowing")
-	self:NetworkVar("Bool", 3, "Mutated")
 end
 
 function ENT:OnSpawn()
@@ -192,7 +192,7 @@ function ENT:OnSpawn()
 		
 		local pos = self:GetPos() + (seq == "reaction" and Vector(0,0,100) or Vector(0,0,450))
 		self:EmitSound("re2/em7200/idle3.mp3",511,100)
-		
+		util.ScreenShake(self:GetPos(),10,1000,dur,2048)
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
 		effectData:SetOrigin( pos )
@@ -206,14 +206,16 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:SetNWBool( "Mutated", false )
+			
 		end)
+		taunting = false
+		counting = false
 		self:PlaySequenceAndWait(seq)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -241,7 +243,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d >200 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d >200 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -260,85 +262,7 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
-			timer.Simple(0.2,function()
-				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
-				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
-			end)
-				timer.Simple(29/58, function()
-				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
-				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
-				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
-				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot")
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-				local seq = "taunt"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -381,7 +305,21 @@ end
 end
 
 function ENT:OnThink()
-if math.random(0,800) == 49 then
+if self:IsAttacking() then
+self.loco:SetDesiredSpeed(0)
+end
+if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
+counting = true
+timer.Simple(0.5,function()
+self:EmitSound("re2/em7200/step"..math.random(1,3)..".mp3",511)
+counting = false
+end)
+end
+if !taunting and math.random(0,800) == 49 then
+taunting = true
+timer.Simple(4,function()
+taunting = false
+end)
 if  math.random(0,1) == 1 then
 self:EmitSound("re2/em7200/idle"..math.random(3)..".mp3")
 else

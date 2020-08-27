@@ -24,8 +24,8 @@ ENT.AttackRange = 65
 ENT.RunSpeed = 200
 ENT.WalkSpeed = 100
 ENT.Acceleration = 400
-ENT.DamageLow = 40
-ENT.DamageHigh = 40
+ENT.DamageLow = 35
+ENT.DamageHigh = 45
 
 -- important for ent:IsZombie()
 ENT.bIsZombie = true
@@ -950,7 +950,11 @@ function ENT:Attack( data )
 		
 		if type(target) == "table" then
 			local id, dur = self:LookupSequenceAct(target.seq)
-			data.attackseq = {seq = id, dmgtimes = target.dmgtimes or {0.5}}
+			if !target.dmgtimes then
+			data.attackseq = {seq = id, dmgtimes =  {0.5} }
+			else
+			data.attackseq = {seq = id, dmgtimes = target.dmgtimes }
+			end
 			data.attackdur = dur
 		elseif target then -- It is a string or ACT
 			local id, dur = self:LookupSequenceAct(attacktbl)

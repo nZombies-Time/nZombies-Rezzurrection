@@ -92,6 +92,19 @@ function surface.DrawTexturedRectRotatedPoint( x, y, w, h, rot, x0, y0 )
 
 end
 
+local whoswhotime = 0
+net.Receive("NZWhosWhoCurTime", function() -- Update Who's Who clones with their down times for all players
+	local whoswhoowner = net.ReadEntity()
+	if !IsValid(whoswhoowner) then return end
+	whoswhoowner.DownTime = CurTime()
+end)
+
+net.Receive("NZWhosWhoReviving", function() -- Also update Who's Who clone's revive status so the revive icon is white
+	local whoswhoowner = net.ReadEntity()
+	if !IsValid(whoswhoowner) then return end
+	whoswhoowner.ReviveTime = net.ReadBool()
+end)
+
 local function DrawDownedPlayers()
 	
 	for k,v in pairs(nzRevive.Players) do
@@ -109,13 +122,38 @@ local function DrawDownedPlayers()
 			surface.SetMaterial(mat_revive)
 			if v.ReviveTime then
 				surface.SetDrawColor(255, 255, 255)
-			else
+			elseif v.DownTime then
 				surface.SetDrawColor(255, 150 - (CurTime() - v.DownTime)*(150/GetConVar("nz_downtime"):GetFloat()), 0)
 			end
 			
 			--draw.SimpleText(v.ReviveTime and "REVIVING" or "DOWNED", font, posxy["x"], posxy["y"] + 10, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			--draw.SimpleText(k:Nick(), font2, posxy["x"], posxy["y"] - 20, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			
+			surface.DrawTexturedRect(posxy.x - 35, posxy.y - 50, 70, 50)
+		end	
+	end
+
+	for k,v in pairs(ents.FindByClass("whoswho_downed_clone")) do
+		local ply = v
+		local player = ply:GetPerkOwner()
+		if IsValid(ply) then -- If they're outside PVS, don't draw the icon at all
+			local posxy = (ply:GetPos() + Vector(0,0,35)):ToScreen()
+			local dir = ((ply:GetPos() + Vector(0,0,35)) - EyeVector()*2):GetNormal():ToScreen()
+			--print(posxy["x"], posxy["y"], posxy["visible"])
+			
+			if posxy.x - 35 < 60 or posxy.x - 35 > ScrW()-130 or posxy.y - 50 < 60 or posxy.y - 50 > ScrH()-110 then
+				posxy.x, posxy.y = XYCompassToScreen((ply:GetPos() + Vector(0,0,35)), 60)
+			end
+			
+			surface.SetMaterial(mat_revive)
+			if player.ReviveTime then
+				surface.SetDrawColor(255, 255, 255)
+			elseif player.DownTime then
+				surface.SetDrawColor(255, 150 - (CurTime() - player.DownTime)*(150/GetConVar("nz_downtime"):GetFloat()), 0)
+			end
+			
+			--draw.SimpleText(v.ReviveTime and "REVIVING" or "DOWNED", font, posxy["x"], posxy["y"] + 10, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+			--draw.SimpleText(k:Nick(), font2, posxy["x"], posxy["y"] - 20, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
 			surface.DrawTexturedRect(posxy.x - 35, posxy.y - 50, 70, 50)
 		end	
 	end
@@ -126,7 +164,7 @@ local function DrawRevivalProgress()
 	local dply = tr.Entity
 	local id = dply:EntIndex()
 	
-	local revtime = LocalPlayer():HasPerk("revive") and 2 or 4
+	local revtime = LocalPlayer():HasPerk("revive") and 1.5 or 3.03
 	
 	if IsValid(dply) and nzRevive.Players[id] and nzRevive.Players[id].RevivePlayer == LocalPlayer() then
 		surface.SetDrawColor(0,0,0)
@@ -261,15 +299,15 @@ local function DrawTombstoneProgress()
 	end
 end
 
-local whoswhoactive = false
+NZHasWhosWhoClone = false
 net.Receive("nz_WhosWhoActive", function()
-	whoswhoactive = net.ReadBool()
+	NZHasWhosWhoClone = net.ReadBool()
 end)
 local whoswhomat = "models/shadertest/shader4"
 local firemat = "models/onfire"
 
 local function DrawWhosWhoOverlay()
-	if whoswhoactive then
+	if NZHasWhosWhoClone then
 		DrawMaterialOverlay(whoswhomat, 0.03)
 	end
 	--[[if LocalPlayer():IsOnFire() then

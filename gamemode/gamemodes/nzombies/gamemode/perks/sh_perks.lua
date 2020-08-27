@@ -361,16 +361,116 @@ nzPerks:NewPerk("staminup", {
 	icon = Material("perk_icons/staminup.png", "smooth unlitgeneric"),
 	color = Color(200, 255, 100),
 	func = function(self, ply, machine)
-		ply:SetRunSpeed(375)
-		ply:SetMaxRunSpeed( 375 )
+		ply:SetRunSpeed(350)
+		ply:SetMaxRunSpeed( 350 )
 		ply:SetStamina( 200 )
 		ply:SetMaxStamina( 200 )
 	end,
 	lostfunc = function(self, ply)
-		ply:SetRunSpeed(325)
-		ply:SetMaxRunSpeed( 325 )
+		ply:SetRunSpeed(300)
+		ply:SetMaxRunSpeed( 300 )
 		ply:SetStamina( 100 )
 		ply:SetMaxStamina( 100 )
+	end,
+})
+
+nzPerks:NewPerk("politan", {
+	name = "Random-o-Politan",
+	off_model = "models/alig96/perks/random/random_off.mdl",
+	on_model = "models/alig96/perks/random/random_on.mdl",
+	price = 5000,
+	material = "models/perk_bottle/c_perk_bottle_random",
+	icon = Material("perk_icons/random.png", "smooth unlitgeneric"),
+	color = Color(255, 172, 224),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+})
+
+nzPerks:NewPerk("sake", {
+	name = "Slasher's Sake",
+	off_model = "models/alig96/perks/sake/sake.mdl",
+	on_model = "models/alig96/perks/sake/sake.mdl",
+	price = 6000,
+	material = "models/perk_bottle/c_perk_bottle_sake",
+	icon = Material("perk_icons/sake.png", "smooth unlitgeneric"),
+	color = Color(185, 214, 0),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+})
+
+
+
+nzPerks:NewPerk("wall", {
+	name = "Wall Power Whiskey Sour",
+	off_model = "models/alig96/perks/wall/wall_off.mdl",
+	on_model = "models/alig96/perks/wall/wall.mdl",
+	price = 8000,
+	material = "models/perk_bottle/c_perk_bottle_wall",
+	icon = Material("perk_icons/wall.png", "smooth unlitgeneric"),
+	color = Color(230, 104, 167),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+})
+
+nzPerks:NewPerk("danger", {
+	name = "Danger Costa-Rican",
+	off_model = "models/alig96/perks/danger/danger_off.mdl",
+	on_model = "models/alig96/perks/danger/danger_on.mdl",
+	price = 2000,
+	material = "models/perk_bottle/c_perk_bottle_danger",
+	icon = Material("perk_icons/danger.png", "smooth unlitgeneric"),
+	color = Color(232, 116, 116),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+})
+
+nzPerks:NewPerk("everclear", {
+	name = "Explosive Everclear",
+	off_model = "models/alig96/perks/everclear/everclear.mdl",
+	on_model = "models/alig96/perks/everclear/everclear.mdl",
+	price = 3000,
+	material = "models/perk_bottle/c_perk_bottle_everclear",
+	icon = Material("perk_icons/everclear.png", "smooth unlitgeneric"),
+	color = Color(222, 222, 222),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+})
+
+nzPerks:NewPerk("gin", {
+	name = "Juicer's Gin",
+	off_model = "models/alig96/perks/gin/gin.mdl",
+	on_model = "models/alig96/perks/gin/gin.mdl",
+	price = 2000,
+	material = "models/perk_bottle/c_perk_bottle_gin",
+	icon = Material("perk_icons/gin.png", "smooth unlitgeneric"),
+	color = Color(75, 158, 188),
+	func = function(self, ply, machine)
+	if #player.GetAllPlaying() <= 1 then
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+2)
+	else
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+1)
+	end
+	end,
+	lostfunc = function(self, ply)
+		if #player.GetAllPlaying() <= 1 then
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks-2)
+	else
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks-1)
+	end
 	end,
 })
 

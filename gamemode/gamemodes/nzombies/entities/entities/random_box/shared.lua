@@ -58,6 +58,7 @@ end
 function ENT:Use( activator, caller )
 	if self:GetOpen() == true or self.Moving then return end
 	self:BuyWeapon(activator)
+	nzSounds:PlayEnt("Open", self)
 	-- timer.Simple(5,function() self:MoveAway() end)
 end
 
@@ -92,6 +93,7 @@ function ENT:Close()
 	self:AddEffects( EF_ITEM_BLINK )
 
 	self:SetOpen(false)
+	nzSounds:PlayEnt("Close", self)
 end
 
 function ENT:SpawnWeapon(activator, class)
@@ -105,8 +107,8 @@ function ENT:SpawnWeapon(activator, class)
 	--wep:SetParent( self )
 	wep.Box = self
 	--wep:SetAngles( self:GetAngles() )
-	self:EmitSound("nz/randombox/random_box_jingle.wav")
-
+	--self:EmitSound("nz/randombox/random_box_jingle.wav")
+	nzSounds:PlayEnt("Jingle", self)
 	return wep
 end
 
@@ -121,12 +123,14 @@ function ENT:Think()
 end
 
 function ENT:MoveAway()
-	nzNotifications:PlaySound("nz/randombox/Announcer_Teddy_Zombies.wav", 0)
+	--nzNotifications:PlaySound("nz/randombox/Announcer_Teddy_Zombies.wav", 0)
+	
 	self.Moving = true
 	self:SetSolid(SOLID_NONE)
 	local s = 0
 	local ang = self:GetAngles()
 	-- Shake Effect
+	nzSounds:PlayEnt("Shake", self)
 	timer.Create( "shake", 0.1, 300, function()
 		if s < 23 then
 			if s % 2 == 0 then
@@ -145,6 +149,15 @@ function ENT:MoveAway()
 		s = s + 1
 	end)
 
+	timer.Simple(0.1, function()
+		if (!IsValid(self)) then return end
+		self:EmitSound("nz/effects/gone.wav")
+		timer.Simple(0.1, function()
+			if (!IsValid(self)) then return end
+			nzSounds:Play("Bye")
+		end)
+	end)
+
 	-- Move Up
 	timer.Simple( 1, function()
 		timer.Create( "moveAway", 5, 1, function()
@@ -155,7 +168,8 @@ function ENT:MoveAway()
 			self.SpawnPoint.Box = nil
 			--self.SpawnPoint:SetBodygroup(1,0)
 			self:MoveToNewSpot(self.SpawnPoint)
-			self:EmitSound("nz/randombox/poof.wav")
+			--self:EmitSound("nz/randombox/poof.wav")
+			nzSounds:PlayEnt("Poof", self)
 			self:Remove()
 		end)
 		--print(self:GetMoveType())

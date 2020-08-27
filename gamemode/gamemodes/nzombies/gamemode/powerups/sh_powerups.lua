@@ -62,9 +62,18 @@ if SERVER then
 		end
 
 		-- Notify
-		if IsValid(ply) then ply:EmitSound("nz/powerups/power_up_grab.wav") end
-		if PowerupData.announcement then
-			nzNotifications:PlaySound(PowerupData.announcement, 1)
+		
+		if IsValid(ply) then 
+			--ply:EmitSound("nz/powerups/power_up_grab.wav") 
+			nzSounds:PlayEnt("Grab", ply)
+		end
+
+		-- if PowerupData.announcement then
+		-- 	nzNotifications:PlaySound(PowerupData.announcement, 1)
+		-- end
+		if isstring(PowerupData.announcement) then
+			local name = string.Replace(PowerupData.name, " ", "") -- Sound Events don't have spaces
+			nzSounds:Play(name)
 		end
 	end
 
@@ -100,7 +109,8 @@ if SERVER then
 		ent:SetPos(pos)
 		ent:SetAngles(PowerupData.angle)
 		ent:Spawn()
-		ent:EmitSound("nz/powerups/power_up_spawn.wav")
+		--ent:EmitSound("nz/powerups/power_up_spawn.wav")
+		nzSounds:PlayEnt("Spawn", ent)
 	end
 
 end
@@ -184,7 +194,8 @@ nzPowerUps:NewPowerUp("maxammo", {
 	chance = 5,
 	duration = 0,
 	func = (function(self, ply)
-		nzNotifications:PlaySound("nz/powerups/max_ammo.mp3", 2)
+		nzSounds:Play("MaxAmmo")
+		--nzNotifications:PlaySound("nz/powerups/max_ammo.mp3", 2)
 		-- Give everyone ammo
 		for k,v in pairs(player.GetAll()) do
 			v:GiveMaxAmmo()
