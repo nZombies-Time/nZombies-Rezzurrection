@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Xenomorph"
+ENT.PrintName = "Walker"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
@@ -11,90 +11,99 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/alien/alien.mdl",
+	"models/nzr/COTD_zombies.mdl",
 }
 
 local AttackSequences = {
-	{seq = "Attack1", dmgtimes = {0.4}},
-	{seq = "Attack3", dmgtimes = {0.2}},
-	{seq = "Attack4", dmgtimes = {0.5}},
-	{seq = "Attack13", dmgtimes = {0.5}}
+		{seq = "nz_walk_attack1", dmgtimes = {0.3}},
+	{seq = "nz_walk_attack2", dmgtimes = {0.4, 0.9}},
+	{seq = "nz_walk_attack3", dmgtimes = {0.5}},
+	{seq = "nz_walk_attack4", dmgtimes = {0.4, 0.75}}
 }
 local WalkAttackSequences = {
-	{seq = "Attack1", dmgtimes = {0.4}},
-	{seq = "Attack3", dmgtimes = {0.2}},
-	{seq = "Attack4", dmgtimes = {0.5}},
-	{seq = "Attack13", dmgtimes = {0.5}}
+	{seq = "nz_walk_attack1", dmgtimes = {0.3}},
+	{seq = "nz_walk_attack2", dmgtimes = {0.4, 0.9}},
+	{seq = "nz_walk_attack3", dmgtimes = {0.5}},
+	{seq = "nz_walk_attack4", dmgtimes = {0.4, 0.75}}
 }
 local RunAttackSequences = {
-	{seq = "Attack6", dmgtimes = {0.7}},
-	{seq = "Attack9", dmgtimes = {0.5}},
-	{seq = "RunAttack1", dmgtimes = {0.3}},
-	{seq = "RunAttack2", dmgtimes = {0.3}}
+	{seq = "nz_run_attack1", dmgtimes = {0.3}},
+	{seq = "nz_run_attack2", dmgtimes = {0.3, 0.65}},
+	{seq = "nz_run_attack3", dmgtimes = {0.3, 0.7}},
+	{seq = "nz_run_attack4", dmgtimes = {0.3, 0.8}}
 }
 
 local AttackSounds = {
-	"character/alien/vocals/aln_taunt_01",
-	"character/alien/vocals/aln_taunt_02",
-	"character/alien/vocals/aln_taunt_03",
-	"character/alien/vocals/aln_taunt_04",
-	"character/alien/vocals/aln_taunt_05",
-	"character/alien/vocals/aln_taunt_06",
-	"character/alien/vocals/aln_pain_small_1",
-	"character/alien/vocals/aln_pain_small_2",
-	"character/alien/vocals/aln_pain_small_3",
-	"character/alien/vocals/aln_pain_small_4",
-	"character/alien/vocals/aln_pain_small_5",
-	"character/alien/vocals/aln_pain_small_6",
-	"character/alien/vocals/aln_pain_small_7",
-	"character/alien/vocals/aln_pain_small_8",
-	"character/alien/vocals/aln_pain_small_9",
-	"character/alien/vocals/aln_pain_small_10"
-	
+	"nz/zombies/attack/attack_00.wav",
+	"nz/zombies/attack/attack_01.wav",
+	"nz/zombies/attack/attack_02.wav",
+	"nz/zombies/attack/attack_03.wav",
+	"nz/zombies/attack/attack_04.wav",
+	"nz/zombies/attack/attack_05.wav",
+	"nz/zombies/attack/attack_06.wav",
+	"nz/zombies/attack/attack_07.wav",
+	"nz/zombies/attack/attack_08.wav",
+	"nz/zombies/attack/attack_09.wav",
+	"nz/zombies/attack/attack_10.wav",
+	"nz/zombies/attack/attack_11.wav",
+	"nz/zombies/attack/attack_12.wav",
+	"nz/zombies/attack/attack_13.wav",
+	"nz/zombies/attack/attack_14.wav",
+	"nz/zombies/attack/attack_15.wav",
+	"nz/zombies/attack/attack_16.wav",
+	"nz/zombies/attack/attack_17.wav",
+	"nz/zombies/attack/attack_18.wav",
+	"nz/zombies/attack/attack_19.wav",
+	"nz/zombies/attack/attack_20.wav",
+	"nz/zombies/attack/attack_21.wav",
+	"nz/zombies/attack/attack_22.wav",
 }
 
 local WalkSounds = {
-	"character/alien/vocals/alien_breathing_steady_01",
-	"character/alien/footsteps/walk/prd_fs_dirt_1",
-	"character/alien/footsteps/walk/prd_fs_dirt_2",
-	"character/alien/footsteps/walk/prd_fs_dirt_3",
-	"character/alien/footsteps/walk/prd_fs_dirt_4",
-	"character/alien/footsteps/walk/prd_fs_dirt_5",
-	"character/alien/footsteps/walk/prd_fs_dirt_6",
-	"character/alien/footsteps/walk/prd_fs_dirt_7",
-	"character/alien/footsteps/walk/prd_fs_dirt_8",
-	"character/alien/footsteps/walk/prd_fs_dirt_9",
-	"character/alien/footsteps/walk/prd_fs_dirt_10",
-	"character/alien/footsteps/walk/prd_fs_dirt_11",
-	"character/alien/footsteps/walk/prd_fs_dirt_12",
-	"character/alien/footsteps/walk/prd_fs_dirt_13",
-	"character/alien/footsteps/walk/prd_fs_dirt_14",
-	"character/alien/footsteps/walk/prd_fs_dirt_15"
+	"nz/zombies/ambient/ambient_00.wav",
+	"nz/zombies/ambient/ambient_01.wav",
+	"nz/zombies/ambient/ambient_02.wav",
+	"nz/zombies/ambient/ambient_03.wav",
+	"nz/zombies/ambient/ambient_04.wav",
+	"nz/zombies/ambient/ambient_05.wav",
+	"nz/zombies/ambient/ambient_06.wav",
+	"nz/zombies/ambient/ambient_07.wav",
+	"nz/zombies/ambient/ambient_08.wav",
+	"nz/zombies/ambient/ambient_09.wav",
+	"nz/zombies/ambient/ambient_10.wav",
+	"nz/zombies/ambient/ambient_11.wav",
+	"nz/zombies/ambient/ambient_12.wav",
+	"nz/zombies/ambient/ambient_13.wav",
+	"nz/zombies/ambient/ambient_14.wav",
+	"nz/zombies/ambient/ambient_15.wav",
+	"nz/zombies/ambient/ambient_16.wav",
+	"nz/zombies/ambient/ambient_17.wav",
+	"nz/zombies/ambient/ambient_18.wav",
+	"nz/zombies/ambient/ambient_19.wav",
+	"nz/zombies/ambient/ambient_20.wav"
 }
 
 local RunSounds = {
-	"character/alien/footsteps/walk/prd_fs_dirt_1",
-	"character/alien/footsteps/walk/prd_fs_dirt_2",
-	"character/alien/footsteps/walk/prd_fs_dirt_3",
-	"character/alien/footsteps/walk/prd_fs_dirt_4",
-	"character/alien/footsteps/walk/prd_fs_dirt_5",
-	"character/alien/footsteps/walk/prd_fs_dirt_6",
-	"character/alien/footsteps/walk/prd_fs_dirt_7",
-	"character/alien/footsteps/walk/prd_fs_dirt_8",
-	"character/alien/footsteps/walk/prd_fs_dirt_9",
-	"character/alien/footsteps/walk/prd_fs_dirt_10",
-	"character/alien/footsteps/walk/prd_fs_dirt_11",
-	"character/alien/footsteps/walk/prd_fs_dirt_12",
-	"character/alien/footsteps/walk/prd_fs_dirt_13",
-	"character/alien/footsteps/walk/prd_fs_dirt_14",
-	"character/alien/footsteps/walk/prd_fs_dirt_15"
+	"nz/zombies/sprint2/sprint0.wav",
+	"nz/zombies/sprint2/sprint1.wav",
+	"nz/zombies/sprint2/sprint2.wav",
+	"nz/zombies/sprint2/sprint3.wav",
+	"nz/zombies/sprint2/sprint4.wav",
+	"nz/zombies/sprint2/sprint5.wav",
+	"nz/zombies/sprint2/sprint6.wav",
+	"nz/zombies/sprint2/sprint7.wav",
+	"nz/zombies/sprint2/sprint8.wav"
 }
 
 local JumpSequences = {
-	{seq = "Idle_2", speed = 15, time = 2.7}
+	{seq = "nz_barricade1", speed = 15, time = 2.7},
+	{seq = "nz_barricade2", speed = 15, time = 2.4},
+	{seq = "nz_barricade_fast1", speed = 15, time = 1.8},
+	{seq = "nz_barricade_fast2", speed = 35, time = 4},
 }
 local SprintJumpSequences = {
-	{seq = "Idle_5", speed = 50, time = 1.9}
+	{seq = "nz_barricade_sprint1", speed = 50, time = 1.9},
+	{seq = "nz_barricade_sprint2", speed = 35, time = 1.9},
 }
 
 ENT.ActStages = {
@@ -129,22 +138,24 @@ ENT.ActStages = {
 	},
 }
 
+ENT.RedEyes = true
 
 ENT.ElectrocutionSequences = {
-	"Flinch_Leg_Left1",
-	"Flinch_Leg_Left2"
+	"nz_electrocuted1",
+	"nz_electrocuted2",
+	"nz_electrocuted3",
+	"nz_electrocuted4",
+	"nz_electrocuted5",
 }
 ENT.EmergeSequences = {
-	"Emerge1",
-	"Emerge2",
-	"Emerge3"
+	"nz_emerge1",
+	"nz_emerge2",
+	"nz_emerge3",
+	"nz_emerge4",
+	"nz_emerge5",
 }
 ENT.AttackHitSounds = {
-	"weapons/alien/alien_clawhit_flesh_tp_1.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_2.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_3.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_4.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_5.mp3"
+	"npc/zombie/zombie_hit.wav"
 }
 ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet1.wav",
@@ -154,15 +165,17 @@ ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet5.wav"
 }
 ENT.DeathSounds = {
-	"character/alien/vocals/alien_death_scream_iconic_elephant.mp3",
-	"character/alien/vocals/aln_death_scream_20.mp3",
-	"character/alien/vocals/aln_death_scream_21.mp3",
-	"character/alien/vocals/aln_death_scream_22.mp3",
-	"character/alien/vocals/aln_death_scream_23.mp3",
-	"character/alien/vocals/aln_death_scream_24.mp3",
-	"character/alien/vocals/aln_death_scream_25.mp3",
-	"character/alien/vocals/aln_death_scream_26.mp3",
-	"character/alien/vocals/aln_death_scream_27.mp3"
+	"nz/zombies/death/death_00.wav",
+	"nz/zombies/death/death_01.wav",
+	"nz/zombies/death/death_02.wav",
+	"nz/zombies/death/death_03.wav",
+	"nz/zombies/death/death_04.wav",
+	"nz/zombies/death/death_05.wav",
+	"nz/zombies/death/death_06.wav",
+	"nz/zombies/death/death_07.wav",
+	"nz/zombies/death/death_08.wav",
+	"nz/zombies/death/death_09.wav",
+	"nz/zombies/death/death_10.wav"
 }
 
 function ENT:StatsInitialize()
@@ -182,6 +195,7 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
+		 self:SetBodygroup(  math.random(0,4),  math.random(0,1) )
 	end
 end
 
@@ -224,28 +238,12 @@ function ENT:OnSpawn()
 	effectData:SetOrigin( self:GetPos() )
 	effectData:SetMagnitude(dur)
 	util.Effect("zombie_spawn_dust", effectData)
-	self:EmitSound("character/alien/vocals/aln_pain_small_" ..math.random(1,10)..".mp3", 75, 100, 1)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
 		self:PlaySequenceAndWait(seq)
 	end
-end
-
-function ENT:OnThink()
-if math.random(0,1500) == 965 then
-if math.random(0,1) == 0 then
-self:EmitSound("character/alien/vocals/alien_growl_short_0" ..math.random(1,5)..".mp3", 70, 100, 1)
-else
-if math.random(0,1) == 0 then
-self:EmitSound("character/alien/vocals/alien_hiss_long_0" ..math.random(1,2)..".mp3", 70, 100, 1)
-else
-self:EmitSound("character/alien/vocals/aln_taunt_0" ..math.random(1,6)..".mp3", 70, 100, 1)
-end
-
-end
-end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
