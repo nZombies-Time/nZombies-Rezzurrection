@@ -374,9 +374,11 @@ local function StartChangeRound()
 
 	if lastround >= 1 then
 		if prevroundspecial then
-			surface.PlaySound("nz/round/special_round_end.wav")
+			--surface.PlaySound("nz/round/special_round_end.wav")
+			nzSounds:Play("SpecialRoundEnd")
 		else
-			surface.PlaySound("nz/round/round_end.mp3")
+			--surface.PlaySound("nz/round/round_end.mp3")
+			nzSounds:Play("RoundEnd")
 		end
 	elseif lastround == -2 then
 		surface.PlaySound("nz/round/round_-1_prepare.mp3")
@@ -412,12 +414,14 @@ local function StartChangeRound()
 					round_num = nzRound:GetNumber()
 					round_charger = 0.5
 					if round_num == -1 then
-						--surface.PlaySound("nz/easteregg/motd_round-03.wav")
+						-- --surface.PlaySound("nz/easteregg/motd_round-03.wav")
 					elseif nzRound:IsSpecial() then
-						surface.PlaySound("nz/round/special_round_start.wav")
+						--surface.PlaySound("nz/round/special_round_start.wav")
+						nzSounds:Play("SpecialRoundStart")
 						prevroundspecial = true
 					else
-						surface.PlaySound("nz/round/round_start.mp3")
+						--surface.PlaySound("nz/round/round_start.mp3")
+						nzSounds:Play("RoundStart")
 						prevroundspecial = false
 					end
 					haschanged = true

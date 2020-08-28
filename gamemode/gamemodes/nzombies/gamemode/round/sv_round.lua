@@ -401,7 +401,8 @@ function nzRound:End()
 	elseif nzMapping.OfficialConfig then
 		nzNotifications:PlaySound("nz/round/game_over_5.mp3", 21)
 	else
-		nzNotifications:PlaySound("nz/round/game_over_4.mp3", 21)
+		--nzNotifications:PlaySound("nz/round/game_over_4.mp3", 21)
+		nzSounds:Play("GameEnd")
 	end
 	
 	timer.Simple(10, function()
