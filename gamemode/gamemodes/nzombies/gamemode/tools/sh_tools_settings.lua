@@ -34,6 +34,11 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
+		valz["Row9"] = data.startingspawns == nil and 35 or data.startingspawns
+		valz["Row10"] = data.spawnperround == nil and 0 or data.spawnperround
+		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
+		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -42,6 +47,13 @@ nzTools:CreateTool("settings", {
 		valz["ACRow5"] = data.acpreventboost == nil and true or tobool(data.acpreventboost)
 		valz["ACRow6"] = data.acpreventcjump == nil and false or tobool(data.acpreventcjump)
 
+		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
+
+		-- More compact and less messy:
+		for k,v in pairs(nzSounds.struct) do
+			valz["SndRow" .. k] = data[v] or {}
+		end
+
 		local sheet = vgui.Create( "DPropertySheet", frame )
 		sheet:SetSize( 280, 220 )
 		sheet:SetPos( 10, 10 )
@@ -49,7 +61,7 @@ nzTools:CreateTool("settings", {
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
 		DProperties:SetSize( 280, 220 )
 		DProperties:SetPos( 0, 0 )
-		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Allows you to set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
+		sheet:AddSheet( "Map Properties", DProperties, "icon16/cog.png", false, false, "Set a list of general settings. The Easter Egg Song URL needs to be from Soundcloud.")
 
 		local Row1 = DProperties:CreateRow( "Map Settings", "Starting Weapon" )
 		Row1:Setup( "Combo" )
@@ -64,11 +76,13 @@ nzTools:CreateTool("settings", {
 		end
 		if data.startwep then
 			local wep = weapons.Get(data.startwep)
-			if !wep then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
-			if wep.Category and wep.Category != "" then
-				Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
-			else
-				Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.PrintName or wep.ClassName, wep.ClassName, false)
+			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
+			if wep != nil then  
+				if wep.Category and wep.Category != "" then
+					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
+				else
+					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.PrintName or wep.ClassName, wep.ClassName, false)
+				end
 			end
 		end
 
@@ -84,7 +98,7 @@ nzTools:CreateTool("settings", {
 		Row3:SetValue( valz["Row3"] )
 		Row3.DataChanged = function( _, val ) valz["Row3"] = val end
 		Row3:SetTooltip("Add a link to a SoundCloud track to play this when all easter eggs have been found")
-		
+
 		if nzTools.Advanced then
 			local Row4 = DProperties:CreateRow( "Map Settings", "Includes Map Script?" )
 			Row4:Setup( "Boolean" )
@@ -98,13 +112,13 @@ nzTools:CreateTool("settings", {
 			Row5.DataChanged = function( _, val ) valz["Row5"] = val end
 			Row5:SetTooltip("Sets the description displayed when attempting to load the script.")
 			
-			local Row6 = DProperties:CreateRow( "Map Settings", "Gamemode Extensions" )
-			Row6:Setup( "Boolean" )
+			local Row6 = DProperties:CreateRow( "Map Settings", "GM Extensions" )
+			Row6:Setup("Boolean")
 			Row6:SetValue( valz["Row6"] )
 			Row6.DataChanged = function( _, val ) valz["Row6"] = val end
 			Row6:SetTooltip("Sets whether the gamemode should spawn in map entities from other gamemodes, such as ZS.")
-			
-			local Row7 = DProperties:CreateRow( "Map Settings", "Special Round" )
+
+			local Row7 = DProperties:CreateRow("Map Settings", "Special Round")
 			Row7:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.SpecialData) do
@@ -134,8 +148,37 @@ nzTools:CreateTool("settings", {
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
 			
+			local Row9 = DProperties:CreateRow("Map Settings", "Starting Spawns")
+			Row9:Setup( "Integer" )
+			Row9:SetValue( valz["Row9"] )
+			Row9:SetTooltip("Allowed zombies alive at once, can be increased per round with Spawns Per Round")
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+
+			local Row10 = DProperties:CreateRow("Map Settings", "Spawns Per Round")
+			Row10:Setup( "Integer" )
+			Row10:SetValue( valz["Row10"] )
+			Row10:SetTooltip("Amount to increase spawns by each round (Cannot increase past Max Spawns)")
+			Row10.DataChanged = function( _, val ) valz["Row10"] = val end
+
+			local Row11 = DProperties:CreateRow("Map Settings", "Max Spawns")
+			Row11:Setup( "Integer" )
+			Row11:SetValue( valz["Row11"] )
+			Row11:SetTooltip("The max allowed zombies alive at any given time, it will NEVER go above this.")
+			Row11.DataChanged = function( _, val ) valz["Row11"] = val end
+
+			local Row13 = DProperties:CreateRow("Map Settings", "Zombies Per Player")
+			Row13:Setup( "Integer" )
+			Row13:SetValue( valz["Row13"] )
+			Row13:SetTooltip("Extra zombies to kill per player (Ignores first player)")
+			Row13.DataChanged = function( _, val ) valz["Row13"] = val end
+
+			local Row14 = DProperties:CreateRow("Map Settings", "Spawns Per Player")
+			Row14:Setup( "Integer" )
+			Row14:SetValue( valz["Row14"] )
+			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
+			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
 		end
-		
+
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
 			if !weapons.Get( valz["Row1"] ) then data.startwep = nil else data.startwep = valz["Row1"] end
 			if !tonumber(valz["Row2"]) then data.startpoints = 500 else data.startpoints = tonumber(valz["Row2"]) end
@@ -145,6 +188,11 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
+			if !tonumber(valz["Row9"]) then data.startingspawns = 35 else data.startingspawns = tonumber(valz["Row9"]) end
+			if !tonumber(valz["Row10"]) then data.spawnperround = 0 else data.spawnperround = tonumber(valz["Row10"]) end
+			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
+			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
+			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -153,6 +201,15 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = tobool(valz["ACRow5"]) end
 			if valz["ACRow6"] == nil then data.acpreventcjump = false else data.acpreventcjump = tobool(valz["ACRow6"]) end
+
+			for k,v in pairs(nzSounds.struct) do
+				if (valz["SndRow" .. k] == nil) then
+					data[v] = {}
+				else
+					data[v] = valz["SndRow" .. k]
+				end
+			end
+
 			PrintTable(data)
 
 			nzMapping:SendMapData( data )
@@ -179,6 +236,11 @@ nzTools:CreateTool("settings", {
 		ACRow1:Setup("Boolean")
 		ACRow1:SetValue(valz["ACRow1"])
 		ACRow1.DataChanged = function( _, val ) valz["ACRow1"] = val end
+		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
+		-- DermaButton3:SetText( "Submit" )
+		-- DermaButton3:SetPos( 0, 185 )
+		-- DermaButton3:SetSize( 260, 30 )
+		-- DermaButton3.DoClick = UpdateData
 
 		if nzTools.Advanced then
 			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
@@ -215,7 +277,7 @@ nzTools:CreateTool("settings", {
 			local numweplist = 0
 
 			local rboxpanel = vgui.Create("DPanel", sheet)
-			sheet:AddSheet( "Random Box Weapons", rboxpanel, "icon16/box.png", false, false, "Allows you to set which weapons appear in the Random Box.")
+			sheet:AddSheet( "Random Box Weapons", rboxpanel, "icon16/box.png", false, false, "Set which weapons appear in the Random Box.")
 			rboxpanel.Paint = function() return end
 
 			local rbweplist = vgui.Create("DScrollPanel", rboxpanel)
@@ -521,12 +583,335 @@ nzTools:CreateTool("settings", {
 					end
 				end
 			end
+			------------------Sound Chooser----------------------------
+			-- So we can create the elements in a loop
+			local SndMenuMain = { 
+				[1] = {
+					["Title"] = "Round Start",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow1"]
+				},
+				[2] = {
+					["Title"] = "Round End",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow2"]
+				},
+				[3] = {
+					["Title"] = "Special Round Start",
+					["ToolTip"] = "Eg. Dog Round",
+					["Bind"] = valz["SndRow3"]
+				},
+				[4] = {
+					["Title"] = "Special Round End",
+					["ToolTip"] = "Eg. Dog Round",
+					["Bind"] = valz["SndRow4"]
+				},
+				[5] = {
+					["Title"] = "Dog Round",
+					["ToolTip"] = "ONLY for dog rounds!",
+					["Bind"] = valz["SndRow5"]
+				},
+				[6] = {
+					["Title"] = "Game Over",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow6"]
+				}
+			}
+
+			local SndMenuPowerUp = { 
+				[1] = {
+					["Title"] = "Spawn",
+					["ToolTip"] = "Played on the powerup itself when it spawns",
+					["Bind"] = valz["SndRow7"]
+				},
+				[2] = {
+					["Title"] = "Grab",
+					["ToolTip"] = "When players get the powerup",
+					["Bind"] = valz["SndRow8"]
+				},
+				[3] = {
+					["Title"] = "Insta Kill",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow9"]
+				},
+				[4] = {
+					["Title"] = "Fire Sale",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow10"]
+				},
+				[5] = {
+					["Title"] = "Death Machine",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow11"]
+				},
+				[6] = {
+					["Title"] = "Carpenter",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow12"]
+				},
+				[7] = {
+					["Title"] = "Nuke",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow13"]
+				},
+				[8] = {
+					["Title"] = "Double Points",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow14"]
+				},
+				[9] = {
+					["Title"] = "Max Ammo",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow15"]
+				},
+				[10] = {
+					["Title"] = "Zombie Blood",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow16"]
+				}
+			}
+
+			local SndMenuBox = { 
+				[1] = {
+					["Title"] = "Shake",
+					["ToolTip"] = "When the teddy appears and the box starts hovering",
+					["Bind"] = valz["SndRow17"]
+				},
+				[2] = {
+					["Title"] = "Poof",
+					["ToolTip"] = "When the box moves to another destination",
+					["Bind"] = valz["SndRow18"]
+				},
+				[3] = {
+					["Title"] = "Laugh",
+					["ToolTip"] = "When the teddy appears",
+					["Bind"] = valz["SndRow19"]
+				},
+				[4] = {
+					["Title"] = "Bye Bye",
+					["ToolTip"] = "Plays along with Shake",
+					["Bind"] = valz["SndRow20"]
+				},
+				[5] = {
+					["Title"] = "Jingle",
+					["ToolTip"] = "When weapons are shuffling",
+					["Bind"] = valz["SndRow21"]
+				},
+				[6] = {
+					["Title"] = "Open",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow22"]
+				},
+				[7] = {
+					["Title"] = "Close",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow23"]
+				}
+			}
+
+			local sndPanel = vgui.Create("DPanel", sheet)
+			local sndheight, sndwidth = sheet:GetSize()
+			sndPanel:SetSize(sndheight, (sndwidth - 50))
+			sheet:AddSheet("Custom Sounds", sndPanel, "icon16/sound_add.png", false, false, "Customize the sounds that play for certain events.")
+
+			-- A modifiable list of all sounds bound to currently selected event:
+			local curSndList = vgui.Create("DListView", sndPanel)
+			curSndList:Dock(RIGHT)
+			curSndList:SetSize(110, 200)
+		
+			local curSndTbl = nil -- All sounds for currently selected Event Item
+			local function DeleteNewItem(text, line)
+				table.RemoveByValue(curSndTbl, text)
+				curSndList:RemoveLine(line)
+			end
+
+			local soundsPlayed = {}
+			curSndList.OnRowRightClick = function(lineID, line)
+				local file = curSndList:GetLine(line):GetColumnText(1)
+				local fileSubMenu = DermaMenu()	
+				local function StopPlayedSounds()
+					for k,v in pairs(soundsPlayed) do
+						LocalPlayer():StopSound(v)
+					end
+				end
+
+				fileSubMenu:AddOption("Play", function()
+					StopPlayedSounds()		
+					table.insert(soundsPlayed, file)	
+					curSound = CreateSound(LocalPlayer(), file)
+					curSound:Play()
+				end)
+
+				fileSubMenu:AddOption("Stop", function()
+					StopPlayedSounds()		
+				end)
+
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddSpacer()
+				fileSubMenu:AddOption("Remove", function()
+					DeleteNewItem(file, line)
+				end)
+
+				fileSubMenu:Open()
+			end
+
+			local newCol = curSndList:AddColumn("Assigned Sounds")
+			newCol:SetToolTip("A random sound from the list will play")
+			local theList = nil 
+			local function NewSelectedItem(list, tbl)
+				curSndTbl = tbl
+				theList = list
+				curSndList:Clear()
+				for k,v in pairs(tbl) do
+					local newline = curSndList:AddLine(v)
+					newline:SetToolTip(v)
+				end
+			end
+
+			local function AddNewItem(text)
+				table.insert(curSndTbl, text)
+				local newline = curSndList:AddLine(text)
+				newline:SetTooltip(text)
+			end
 			
+			local selectedData = {}
+			if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
+			sndFilePanel = nil -- We want to keep this reference so only 1 file menu exists at a time
+			local function ChooseSound() -- Menu to make selecting mounted sounds effortless
+				local eventItem = theList:GetLine(theList:GetSelectedLine())
+				if (!list || !eventItem) then return end
+
+				sndFilePanel = vgui.Create("DFrame", frame)
+				sndFilePanel:Dock(FILL)
+				sndFilePanel:SetTitle(eventItem:GetColumnText(1) .. " Sound")
+				sndFilePanel:SetDeleteOnClose(true)
+				sndFilePanel.OnClose = function()
+					sndFilePanel = nil
+				end
+
+				fileMenu = vgui.Create("DFileBrowser", sndFilePanel)
+				fileMenu:Dock(FILL)	
+				fileMenu:SetPath("GAME")
+				fileMenu:SetFileTypes("*.wav *.mp3 *.ogg")
+				fileMenu:SetBaseFolder("sound")
+				fileMenu:SetOpen(true)
+
+				local soundsPlayed = {}
+				function fileMenu:OnRightClick(filePath, selectedPnl)
+					if (SERVER) then return end
+					filePath = string.Replace(filePath, "sound/", "")
+					local fileSubMenu = DermaMenu()
+					
+					local function StopPlayedSounds()
+						for k,v in pairs(soundsPlayed) do
+							LocalPlayer():StopSound(v)
+						end
+					end
+
+					fileSubMenu:AddOption("Play", function()
+						StopPlayedSounds()		
+						table.insert(soundsPlayed, filePath)	
+						curSound = CreateSound(LocalPlayer(), filePath)
+						curSound:Play()
+					end)
+
+					fileSubMenu:AddOption("Stop", function()
+						StopPlayedSounds()		
+					end)
+
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddSpacer()
+					fileSubMenu:AddOption("Add", function()
+						AddNewItem(filePath)
+					end)
+
+					fileSubMenu:Open()
+				end
+			end
+
+			local catList = vgui.Create("DCategoryList", sndPanel)
+			catList:Dock(FILL)
+			catList:Center()
+
+			local addBtn = vgui.Create("DButton", curSndList)
+			addBtn:SetText("Add Sound")
+			addBtn:Dock(BOTTOM)
+			addBtn.DoClick = function()
+				ChooseSound()
+			end
+
+			-- Menu categories with Event Lists inside
+			local mainCat = catList:Add("Main")
+			local powerupCat = catList:Add("Powerups")
+			powerupCat:SetExpanded(false)
+			local boxCat = catList:Add("Mystery Box")
+			boxCat:SetExpanded(false)
+			local mainSnds = vgui.Create("DListView", mainCat)
+			local powerUpSnds = vgui.Create("DListView", powerupCat)
+			local boxSnds = vgui.Create("DListView", boxCat)
+
+			local function AddDList(listView)
+				listView:Dock(LEFT)
+				listView:AddColumn("Event")
+			end
+
+			AddDList(mainSnds)
+			AddDList(powerUpSnds)
+			AddDList(boxSnds)
+			mainCat:SetContents(mainSnds)
+			powerupCat:SetContents(powerUpSnds)
+			boxCat:SetContents(boxSnds)
+
+			local function AddContents(tbl, listView)
+				for k,v in ipairs(tbl) do
+					local newItem = listView:AddLine(v["Title"])
+					if (v["ToolTip"] != "") then newItem:SetTooltip(v["ToolTip"]) end
+
+					listView.OnRowSelected = function(panel, rowIndex, row) -- We need to update the editable list for the item we have selected
+						local tblSnds = tbl[rowIndex]["Bind"] -- The table of sounds that is saved along with the config
+						NewSelectedItem(listView, tblSnds)
+					end
+
+					listView:SetMultiSelect(false)
+				end
+			end
+			AddContents(SndMenuMain, mainSnds)
+			AddContents(SndMenuPowerUp, powerUpSnds)
+			AddContents(SndMenuBox, boxSnds)
 			
+			mainSnds:SelectFirstItem() -- Since Main category is always expanded, let's make sure the first item is selected
+
+			local function AddCollapseCB(this) -- New category expanded, collapse all others & deselect their items
+				this.OnToggle = function()
+					if (this:GetExpanded()) then 
+						for k,v in pairs({mainCat, powerupCat, boxCat}) do
+							if (v != this) then
+								-- These categories are expanded, we cannot have more than 1 expanded so let's collapse these
+								if (v:GetExpanded()) then
+									v:Toggle()
+								end
+							else
+								-- This category is expanded, let's select the first Event Item
+								local listView = v:GetChild(1)
+								if (ispanel(listView)) then
+									listView:SelectFirstItem()
+								end
+							end
+						end
+					end
+				end
+			end
+			AddCollapseCB(mainCat)
+			AddCollapseCB(powerupCat)
+			AddCollapseCB(boxCat)		
+			------------------------------------------------------------------------
+			------------------------------------------------------------------------
 			local perklist = {}
 
 			local perkpanel = vgui.Create("DPanel", sheet)
-			sheet:AddSheet( "Wunderfizz Perks", perkpanel, "icon16/drink.png", false, false, "Allows you to set which perks appears in Der Wunderfizz.")
+			sheet:AddSheet( "Wunderfizz Perks", perkpanel, "icon16/drink.png", false, false, "Set which perks appears in Der Wunderfizz.")
 			perkpanel.Paint = function() return end
 
 			local perklistpnl = vgui.Create("DScrollPanel", perkpanel)

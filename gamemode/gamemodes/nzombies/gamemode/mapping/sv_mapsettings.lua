@@ -50,11 +50,24 @@ function nzMapping:LoadMapSettings(data)
 	if data.gamemodeentities then
 		nzMapping.Settings.gamemodeentities = data.gamemodeentities or nil
 	end
+
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
 	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
+	end
+	
+	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
+	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround
+	nzMapping.Settings.maxspawns = data.maxspawns == nil and 35 or data.maxspawns
+	nzMapping.Settings.zombiesperplayer = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+	nzMapping.Settings.spawnsperplayer = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+
+	-- More compact and less messy:
+	for k,v in pairs(nzSounds.struct) do
+		nzMapping.Settings[v] = data[v] or {}
 	end
 
 	nzMapping.Settings.ac = data.ac == nil and false or data.ac
@@ -65,4 +78,5 @@ function nzMapping:LoadMapSettings(data)
 	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
 
 	nzMapping:SendMapData()
+	nzSounds:RefreshSounds()
 end

@@ -124,3 +124,37 @@ local function OnRagdollCreated( ent )
 	end
 end
 hook.Add("OnEntityCreated", "nzEnemies_OnEntityCreated", OnRagdollCreated)
+
+-- Increase max zombies alive per round
+hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
+	if (!nzRound or !nzRound:GetNumber()) then return end
+	if (nzRound:GetNumber() == 1 or nzRound:GetNumber() == -1) then return end -- Game just begun or it's round infinity
+
+	local perround = nzMapping.Settings.spawnperround != nil and nzMapping.Settings.spawnperround or 0
+
+	if (NZZombiesMaxAllowed == nil and nzMapping.Settings.startingspawns) then
+		NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+	end
+
+	local startSpawns = nzMapping.Settings.startingspawns
+	if !nzMapping.Settings.startingspawns then
+		NZZombiesMaxAllowed = 35
+		startSpawns = 35 
+	end
+
+	local maxspawns = nzMapping.Settings.maxspawns
+	if (maxspawns == nil) then 
+		maxspawns = 35 
+	end
+
+	local newmax = startSpawns + (nzRound:GetNumber() * perround)
+	if (newmax < maxspawns) then
+		NZZombiesMaxAllowed = newmax
+		print("Max zombies allowed at once: " .. NZZombiesMaxAllowed)
+	else
+		if (NZZombiesMaxAllowed != maxspawns) then
+			print("Max zombies allowed at once capped at: " .. maxspawns)
+			NZZombiesMaxAllowed = maxspawns
+		end
+	end
+end)
