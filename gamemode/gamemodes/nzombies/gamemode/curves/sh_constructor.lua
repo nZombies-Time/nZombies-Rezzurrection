@@ -12,8 +12,17 @@ if SERVER then
 	function nzCurves.GenerateMaxZombies(round)
 		local base = GetConVar("nz_difficulty_zombie_amount_base"):GetInt()
 		local scale = GetConVar("nz_difficulty_zombie_amount_scale"):GetFloat()
-		
-		return math.Round((base + (scale * (#player.GetAllPlaying() - 1))) * round)
+		local extrazombiesint = nzMapping.Settings.zombiesperplayer
+		local extraZombies = 0
+		if (isnumber(extrazombiesint)) then -- and nzRound:GetNumber() > 6
+			if (#player.GetAllPlayingAndAlive() - 1 > 0) then
+				if (extrazombiesint > 0) then
+					extraZombies = extrazombiesint * (#player.GetAllPlayingAndAlive() - 1)
+				end
+			end
+		end
+
+		return math.Round((base + (scale * (#player.GetAllPlaying() - 1))) * round) + extraZombies
 	end
 
 	function nzCurves.GenerateSpeedTable(round)

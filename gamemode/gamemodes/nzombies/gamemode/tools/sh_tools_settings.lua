@@ -34,6 +34,11 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
+		valz["Row9"] = data.startingspawns == nil and 35 or data.startingspawns
+		valz["Row10"] = data.spawnperround == nil and 0 or data.spawnperround
+		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
+		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
@@ -136,6 +141,36 @@ nzTools:CreateTool("settings", {
 			Row8:AddChoice(" None", "None", !found)
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
+			
+			local Row9 = DProperties:CreateRow("Map Settings", "Starting Spawns")
+			Row9:Setup( "Integer" )
+			Row9:SetValue( valz["Row9"] )
+			Row9:SetTooltip("Allowed zombies alive at once, can be increased per round with Spawns Per Round")
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+
+			local Row10 = DProperties:CreateRow("Map Settings", "Spawns Per Round")
+			Row10:Setup( "Integer" )
+			Row10:SetValue( valz["Row10"] )
+			Row10:SetTooltip("Amount to increase spawns by each round (Cannot increase past Max Spawns)")
+			Row10.DataChanged = function( _, val ) valz["Row10"] = val end
+
+			local Row11 = DProperties:CreateRow("Map Settings", "Max Spawns")
+			Row11:Setup( "Integer" )
+			Row11:SetValue( valz["Row11"] )
+			Row11:SetTooltip("The max allowed zombies alive at any given time, it will NEVER go above this.")
+			Row11.DataChanged = function( _, val ) valz["Row11"] = val end
+
+			local Row13 = DProperties:CreateRow("Map Settings", "Zombies Per Player")
+			Row13:Setup( "Integer" )
+			Row13:SetValue( valz["Row13"] )
+			Row13:SetTooltip("Extra zombies to kill per player (Ignores first player)")
+			Row13.DataChanged = function( _, val ) valz["Row13"] = val end
+
+			local Row14 = DProperties:CreateRow("Map Settings", "Spawns Per Player")
+			Row14:Setup( "Integer" )
+			Row14:SetValue( valz["Row14"] )
+			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
+			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -147,6 +182,11 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
+			if !tonumber(valz["Row9"]) then data.startingspawns = 35 else data.startingspawns = tonumber(valz["Row9"]) end
+			if !tonumber(valz["Row10"]) then data.spawnperround = 0 else data.spawnperround = tonumber(valz["Row10"]) end
+			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
+			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
+			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 
