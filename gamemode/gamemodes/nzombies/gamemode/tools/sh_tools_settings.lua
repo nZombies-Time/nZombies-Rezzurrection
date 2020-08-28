@@ -34,6 +34,7 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
+		valz["Row9"] = data.normalroundtype or "Kino der Toten"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -142,6 +143,20 @@ nzTools:CreateTool("settings", {
 			Row8:AddChoice(" None", "None", !found)
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
+			
+			local Row9 = DProperties:CreateRow("Map Settings", "Zombie Skins")
+			Row9:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.NormalData) do
+				if k == valz["Row9"] then
+					Row9:AddChoice(k, k, true)
+					found = true
+				else
+					Row9:AddChoice(k, k, false)
+				end
+			end
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+			Row9:SetTooltip("Set the skins of your zombies based on their map of origin.")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -153,6 +168,7 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
+			if !valz["Row9"] then data.normalroundtype = "Kino der Toten" else data.normalroundtype = valz["Row9"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end

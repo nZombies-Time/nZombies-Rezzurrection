@@ -53,6 +53,9 @@ function nzMapping:LoadMapSettings(data)
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
 	end
+	if data.normalroundtype then
+		nzMapping.Settings.normalroundtype = data.normalroundtype or "Kino der Toten"
+	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end

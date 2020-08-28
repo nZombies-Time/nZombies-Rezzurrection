@@ -2,21 +2,21 @@ AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
 ENT.PrintName = "Divider"
-ENT.Category = "NZ Rezzurrection Enemies"
+ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
 ENT.Models = {
 	"models/_maz_ter_/deadspace/deadspacenecros/divider_necro.mdl"
 }
 
-ENT.AttackRange = 90
-ENT.DamageLow = 25
-ENT.DamageHigh = 25
+ENT.AttackRange = 80
+ENT.DamageLow = 65
+ENT.DamageHigh = 75
 
 
 ENT.AttackSequences = {
-	{seq = "attack", dmgtimes = {0.5}},
-	{seq = "attack2", dmgtimes = {0.5, 1.0}}
+	{seq = "attack", dmgtimes = {0.8}},
+	{seq = "attack2", dmgtimes = {0.8,2,25}}
 }
 
 ENT.DeathSequences = {
@@ -49,13 +49,16 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"divider/awareness_howl_01.wav",
-	"divider/awareness_howl_02.wav",
-	"divider/awareness_howl_03.wav",
-	"divider/awareness_howl_04.wav",
-	"divider/awareness_howl_05.wav",
-	"divider/awareness_howl_06.wav"
-	
+	"divider/footstep/divider_body_footstep-01.wav",
+	"divider/footstep/divider_body_footstep-02.wav", 
+	"divider/footstep/divider_body_footstep-03.wav",
+	"divider/footstep/divider_body_footstep-04.wav", 
+	"divider/footstep/divider_body_footstep-05.wav",
+	"divider/footstep/divider_body_footstep-06.wav", 
+	"divider/footstep/divider_body_footstep-07.wav",
+	"divider/footstep/divider_body_footstep-08.wav",
+	"divider/footstep/divider_body_footstep-09.wav", 
+	"divider/footstep/divider_body_footstep-10.wav"
 }
 
 ENT.ActStages = {
@@ -142,11 +145,9 @@ end
 function ENT:StatsInitialize()
 	if SERVER then
 		
-		self:SetRunSpeed(35)
-		self:SetHealth(9000)
-		self:SetMaxHealth(90000)
-		dying = false
-		counting = false
+		self:SetRunSpeed(50)
+		self:SetHealth(100)
+		self:SetMaxHealth(9000)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -175,6 +176,7 @@ function ENT:InitDataTables()
 	self:NetworkVar("Entity", 0, "ClawHook")
 	self:NetworkVar("Bool", 1, "UsingClaw")
 	self:NetworkVar("Bool", 2, "Flamethrowing")
+	self:NetworkVar("Bool", 3, "Mutated")
 end
 
 function ENT:OnSpawn()
@@ -210,14 +212,14 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self.loco:SetDesiredSpeed(35)
+			self:SetNWBool( "Mutated", false )
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
+
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -259,6 +261,7 @@ function ENT:OnZombieDeath(dmgInfo)
 			self:Remove()
 		end
 	end)
+
 end
 
 function ENT:BodyUpdate()
@@ -288,7 +291,78 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnPathTimeOut()
+	local target = self:GetTarget()
+	if CurTime() < self.NextAction then return end
 	
+	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
+		-- Claw
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+			
+			
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
+				self:Stop()
+				self:PlaySequenceAndWait("rpg_raise",self.FaceEnemy)
+				self:EmitSound("roach/reuc_redc/nemesis_bazready.mp3")
+				timer.Simple(16/24, function()
+				self:EmitSound("weapons/rpg/rocketfire1.wav")
+				end)
+	local clawpos = self:GetBonePosition(self:LookupBone( "L_yubi2_2" ))
+				timer.Simple(16/24, function()self.ClawHook = ents.Create("nz_nemesis_rocket")end)
+				timer.Simple(16/24, function()self.ClawHook:SetPos(clawpos)end)
+				timer.Simple(16/24, function()self.ClawHook:Spawn()end)
+				timer.Simple(16/24, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
+				timer.Simple(16/24, function()self:SetClawHook(self.ClawHook)end)
+				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				self:PlaySequenceAndWait("rpg_fire",self.FaceEnemy)
+				
+				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
+				
+				
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:SetStop(false)
+			
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextClawTime = CurTime() + math.random(3, 15)
+			end
+		end
+	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
+		-- Flamethrower
+		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
+			self:Stop()
+			self:PlaySequenceAndWait("nz_flamethrower_aim")
+			self.loco:SetDesiredSpeed(0)
+			local ang = (target:GetPos() - self:GetPos()):Angle()
+			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+			
+			self:StartFlames()
+			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
+			local id, dur = self:LookupSequence(seq)
+			self:ResetSequence(id)
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur, function()
+				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+			self.NextAction = CurTime() + math.random(1, 5)
+			self.NextFlameTime = CurTime() + math.random(1, 10)
+		end
+	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -325,13 +399,10 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-if !self:IsAttacking() and !counting and !dying and self:Health() >= 1 and self.ZombieAlive then
-counting = true
-timer.Simple(1,function()
-self:EmitSound("divider/footstep/divider_body_footstep-0"..math.random(1,9)..".wav")
-counting = false
-end)
+if math.random(0,1250) == 49 then
+self:EmitSound("divider/awareness_howl_0"..math.random(6)..".mp3")
 end
+
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")
