@@ -49,6 +49,16 @@ nzTools:CreateTool("settings", {
 
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
 
+		-- Cache all Wunderfizz perks for saving/loading allowed Wunderfizz perks:
+		local wunderfizzlist = {}
+		for k,v in pairs(nzPerks:GetList()) do
+			if k != "wunderfizz" and k != "pap" then
+				wunderfizzlist[k] = {true, v}
+			end
+		end
+
+		valz["Wunderfizz"] = data.wunderfizzperks == nil and wunderfizzlist or data.wunderfizzperks
+
 		-- More compact and less messy:
 		for k,v in pairs(nzSounds.struct) do
 			valz["SndRow" .. k] = data[v] or {}
@@ -194,7 +204,8 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
-			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
+			--if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
+			if valz["Wunderfizz"] == nil then data.wunderfizzperks = wunderfizzlist else data.wunderfizzperks = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
@@ -926,28 +937,38 @@ nzTools:CreateTool("settings", {
 			perkchecklist:SetSpaceY( 5 )
 			perkchecklist:SetSpaceX( 5 )
 			
-			for k,v in pairs(nzPerks:GetList()) do
-				if k != "wunderfizz" and k != "pap" then
+			--for k,v in pairs(nzPerks:GetList()) do
+			--	if k != "wunderfizz" and k != "pap" then
+				for k,v in pairs(wunderfizzlist) do
+					if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
+
 					local perkitem = perkchecklist:Add( "DPanel" )
 					perkitem:SetSize( 130, 20 )
 					
 					local check = perkitem:Add("DCheckBox")
 					check:SetPos(2,2)
-					local has = nzMapping.Settings.wunderfizzperks and table.HasValue(nzMapping.Settings.wunderfizzperks, k) or 1
-					check:SetValue(has)
-					if has then perklist[k] = true else perklist[k] = nil end
+
+					if (nzMapping.Settings.wunderfizzperks and istable(nzMapping.Settings.wunderfizzperks[k]) and isbool(nzMapping.Settings.wunderfizzperks[k][1])) then
+						check:SetValue(nzMapping.Settings.wunderfizzperks[k][1])
+					else
+						check:SetValue(true)
+					end
+
+					--if has then perklist[k] = true else perklist[k] = nil end
 					check.OnChange = function(self, val)
-						if val then perklist[k] = true else perklist[k] = nil end
-						nzMapping:SendMapData( {wunderfizzperks = perklist} )
+						--if val then perklist[k] = true else perklist[k] = nil end
+						valz["Wunderfizz"][k][1] = val
+						--nzMapping:SendMapData( {wunderfizzperks = perklist} )
 					end
 					
 					local name = perkitem:Add("DLabel")
 					name:SetTextColor(Color(50,50,50))
 					name:SetSize(105, 20)
 					name:SetPos(20,1)
-					name:SetText(v)
+					name:SetText(v[2])
 				end
-			end
+				--end
+			--end
 		else
 			local text = vgui.Create("DLabel", DProperties)
 			text:SetText("Enable Advanced Mode for more options.")
