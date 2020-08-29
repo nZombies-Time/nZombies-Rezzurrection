@@ -36,6 +36,81 @@ if SERVER then
 	end
 end
 
+
+nzRound.ZombieData = nzRound.ZombieData or {}
+function nzRound:AddZombieType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.ZombieData[id] = data
+		else
+			nzRound.ZombieData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.ZombieData[id] = class
+	end
+end
+
+nzRound:AddZombieType("Kino der Toten", "nz_zombie_walker", {
+}) 
+
+nzRound:AddZombieType("Ascension", "nz_zombie_walker_ascension", {
+}) 
+
+nzRound:AddZombieType("Call of the Dead", "nz_zombie_walker_cotd", {
+}) 
+
+nzRound:AddZombieType("FIVE", "nz_zombie_walker_five", {
+}) 
+
+nzRound:AddZombieType("Gorod Krovi", "nz_zombie_walker_gorodkrovi", {
+}) 
+
+nzRound:AddZombieType("Shadows of Evil", "nz_zombie_walker_soemale", {
+}) 
+
+nzRound:AddZombieType("Zetsubou no Shima", "nz_zombie_walker_zetsubou", {
+}) 
+
+nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
+}) 
+
+nzRound:AddZombieType("Necromorph", "nz_zombie_walker_necromorph", {
+}) 
+
+function nzRound:GetZombieType(id)
+	if id == "Ascension" then
+	return "nz_zombie_walker_ascension"
+	end
+	if id == "Call of the Dead" then
+	return "nz_zombie_walker_cotd"
+	end
+	if id == "FIVE" then
+	return "nz_zombie_walker_five"
+	end
+	if id == "Gorod Krovi" then
+	return "nz_zombie_walker_gorodkrovi"
+	end
+	if id == "Shadows of Evil" then
+	return "nz_zombie_walker_soemale"
+	end
+	if id == "Zetsubou no Shima" then
+	return "nz_zombie_walker_zetsubou"
+	end
+	if id == "Xenomorph" then
+	return "nz_zombie_walker_xeno"
+	end
+	if id == "Necromorph" then
+	return "nz_zombie_walker_necromorph"
+	end
+	if id == "Kino der Toten" then
+	return "nz_zombie_walker"
+	end
+end
+
 nzRound.SpecialData = nzRound.SpecialData or {}
 function nzRound:AddSpecialRoundType(id, data, spawnfunc, roundfunc, endfunc)
 	if SERVER then
@@ -66,6 +141,66 @@ nzRound:AddSpecialRoundType("Hellhounds", {
 		dog:SetHealth(math.random(120, 1200))
 	else
 		dog:SetHealth(math.Clamp(round * 20, 120, 1200))
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Lickers", {
+	specialTypes = {
+		["nz_zombie_special_licker"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+		dog:SetHealth(math.Clamp(round * 32, 200, 2000))
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Facehuggers", {
+	specialTypes = {
+		["nz_zombie_special_facehugger"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+		dog:SetHealth(math.Clamp(round * 10, 60, 600))
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("The Pack (Dead Space)", {
+	specialTypes = {
+		["nz_zombie_special_pack"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+		dog:SetHealth(math.Clamp(round * 25, 150, 1500))
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Spiders", {
+	specialTypes = {
+		["nz_zombie_special_spooder"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+		dog:SetHealth(math.Clamp(round * 13, 90, 900))
 	end
 end) -- No round func or end func
 

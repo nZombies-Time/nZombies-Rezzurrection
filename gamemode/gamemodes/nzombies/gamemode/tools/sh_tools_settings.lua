@@ -34,7 +34,12 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
-		valz["Row9"] = data.normalroundtype or "Kino der Toten"
+		valz["Row9"] = data.startingspawns == nil and 35 or data.startingspawns
+		valz["Row10"] = data.spawnperround == nil and 0 or data.spawnperround
+		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
+		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+		valz["Row15"] = data.zombietype or "Kino der Toten"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -144,19 +149,49 @@ nzTools:CreateTool("settings", {
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
 			
-			local Row9 = DProperties:CreateRow("Map Settings", "Zombie Skins")
-			Row9:Setup( "Combo" )
+			local Row9 = DProperties:CreateRow("Map Settings", "Starting Spawns")
+			Row9:Setup( "Integer" )
+			Row9:SetValue( valz["Row9"] )
+			Row9:SetTooltip("Allowed zombies alive at once, can be increased per round with Spawns Per Round")
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+
+			local Row10 = DProperties:CreateRow("Map Settings", "Spawns Per Round")
+			Row10:Setup( "Integer" )
+			Row10:SetValue( valz["Row10"] )
+			Row10:SetTooltip("Amount to increase spawns by each round (Cannot increase past Max Spawns)")
+			Row10.DataChanged = function( _, val ) valz["Row10"] = val end
+
+			local Row11 = DProperties:CreateRow("Map Settings", "Max Spawns")
+			Row11:Setup( "Integer" )
+			Row11:SetValue( valz["Row11"] )
+			Row11:SetTooltip("The max allowed zombies alive at any given time, it will NEVER go above this.")
+			Row11.DataChanged = function( _, val ) valz["Row11"] = val end
+
+			local Row13 = DProperties:CreateRow("Map Settings", "Zombies Per Player")
+			Row13:Setup( "Integer" )
+			Row13:SetValue( valz["Row13"] )
+			Row13:SetTooltip("Extra zombies to kill per player (Ignores first player)")
+			Row13.DataChanged = function( _, val ) valz["Row13"] = val end
+
+			local Row14 = DProperties:CreateRow("Map Settings", "Spawns Per Player")
+			Row14:Setup( "Integer" )
+			Row14:SetValue( valz["Row14"] )
+			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
+			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
+			
+			local Row15 = DProperties:CreateRow("Map Settings", "Zombie Type")
+			Row15:Setup( "Combo" )
 			local found = false
-			for k,v in pairs(nzRound.NormalData) do
-				if k == valz["Row9"] then
-					Row9:AddChoice(k, k, true)
+			for k,v in pairs(nzRound.ZombieData) do
+				if k == valz["Row15"] then
+					Row15:AddChoice(k, k, true)
 					found = true
 				else
-					Row9:AddChoice(k, k, false)
+					Row15:AddChoice(k, k, false)
 				end
 			end
-			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
-			Row9:SetTooltip("Set the skins of your zombies based on their map of origin.")
+			Row15.DataChanged = function( _, val ) valz["Row15"] = val end
+			Row15:SetTooltip("Sets the zombies that will appear in your map.")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -168,7 +203,13 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
-			if !valz["Row9"] then data.normalroundtype = "Kino der Toten" else data.normalroundtype = valz["Row9"] end
+			if !tonumber(valz["Row9"]) then data.startingspawns = 35 else data.startingspawns = tonumber(valz["Row9"]) end
+			if !tonumber(valz["Row10"]) then data.spawnperround = 0 else data.spawnperround = tonumber(valz["Row10"]) end
+			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
+			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
+			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
+			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
+			print(nzRound:GetZombieType(data.zombietype))
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -177,6 +218,7 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = tobool(valz["ACRow5"]) end
 			if valz["ACRow6"] == nil then data.acpreventcjump = false else data.acpreventcjump = tobool(valz["ACRow6"]) end
+
 			for k,v in pairs(nzSounds.struct) do
 				if (valz["SndRow" .. k] == nil) then
 					data[v] = {}
@@ -201,12 +243,6 @@ nzTools:CreateTool("settings", {
 		MapSDermaButton:SetSize( 260, 30 )
 		MapSDermaButton.DoClick = UpdateData
 
-		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
-		-- DermaButton3:SetText( "Submit" )
-		-- DermaButton3:SetPos( 0, 185 )
-		-- DermaButton3:SetSize( 260, 30 )
-		-- DermaButton3.DoClick = UpdateData
-
 		local acPanel = vgui.Create("DPanel", sheet)
 		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
 		local acProps = vgui.Create("DProperties", acPanel)
@@ -217,10 +253,14 @@ nzTools:CreateTool("settings", {
 		ACRow1:Setup("Boolean")
 		ACRow1:SetValue(valz["ACRow1"])
 		ACRow1.DataChanged = function( _, val ) valz["ACRow1"] = val end
-		
+		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
+		-- DermaButton3:SetText( "Submit" )
+		-- DermaButton3:SetPos( 0, 185 )
+		-- DermaButton3:SetSize( 260, 30 )
+		-- DermaButton3.DoClick = UpdateData
+
 		if nzTools.Advanced then
-		
-		local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
+			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
 			ACRow2:Setup("Boolean")
 			ACRow2:SetValue(valz["ACRow2"])
 			ACRow2:SetTooltip("Shows \"Return to map!\" with a countdown on player's screens")

@@ -95,8 +95,20 @@ function meta:IsValidZombie()
 end
 
 nzEnemies:AddValidZombieType("nz_zombie_walker")
+nzEnemies:AddValidZombieType("nz_zombie_walker_ascension")
+nzEnemies:AddValidZombieType("nz_zombie_walker_cotd")
+nzEnemies:AddValidZombieType("nz_zombie_walker_five")
+nzEnemies:AddValidZombieType("nz_zombie_walker_gorodkrovi")
+nzEnemies:AddValidZombieType("nz_zombie_walker_soemale")
+nzEnemies:AddValidZombieType("nz_zombie_walker_zetsubou")
+nzEnemies:AddValidZombieType("nz_zombie_walker_xeno")
+nzEnemies:AddValidZombieType("nz_zombie_walker_necromorph")
 nzEnemies:AddValidZombieType("nz_zombie_special_burning")
 nzEnemies:AddValidZombieType("nz_zombie_special_dog")
+nzEnemies:AddValidZombieType("nz_zombie_special_facehugger")
+nzEnemies:AddValidZombieType("nz_zombie_special_pack")
+nzEnemies:AddValidZombieType("nz_zombie_special_licker")
+nzEnemies:AddValidZombieType("nz_zombie_special_spooder")
 
 function meta:ShouldPhysgunNoCollide()
 	return self.bPhysgunNoCollide

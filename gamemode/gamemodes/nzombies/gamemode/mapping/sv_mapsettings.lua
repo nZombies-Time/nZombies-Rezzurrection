@@ -50,14 +50,27 @@ function nzMapping:LoadMapSettings(data)
 	if data.gamemodeentities then
 		nzMapping.Settings.gamemodeentities = data.gamemodeentities or nil
 	end
+
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
 	end
-	if data.normalroundtype then
-		nzMapping.Settings.normalroundtype = data.normalroundtype or "Kino der Toten"
+	if data.zombietype then
+		nzMapping.Settings.zombietype = data.zombietype or "Kino der Toten"
 	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
+	end
+	
+	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
+	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround
+	nzMapping.Settings.maxspawns = data.maxspawns == nil and 35 or data.maxspawns
+	nzMapping.Settings.zombiesperplayer = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+	nzMapping.Settings.spawnsperplayer = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
+
+	-- More compact and less messy:
+	for k,v in pairs(nzSounds.struct) do
+		nzMapping.Settings[v] = data[v] or {}
 	end
 
 	nzMapping.Settings.ac = data.ac == nil and false or data.ac
@@ -66,11 +79,6 @@ function nzMapping:LoadMapSettings(data)
 	nzMapping.Settings.acpreventboost = data.acpreventboost == nil and true or data.acpreventboost
 	nzMapping.Settings.acpreventcjump = data.acpreventcjump == nil and false or data.acpreventcjump
 	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
-
-	-- More compact and less messy:
-	for k,v in pairs(nzSounds.struct) do
-		nzMapping.Settings[v] = data[v] or {}
-	end
 
 	nzMapping:SendMapData()
 	nzSounds:RefreshSounds()

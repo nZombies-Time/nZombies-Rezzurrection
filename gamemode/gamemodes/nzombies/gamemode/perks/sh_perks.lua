@@ -361,8 +361,8 @@ nzPerks:NewPerk("staminup", {
 	icon = Material("perk_icons/staminup.png", "smooth unlitgeneric"),
 	color = Color(200, 255, 100),
 	func = function(self, ply, machine)
-		ply:SetRunSpeed(350)
-		ply:SetMaxRunSpeed( 350 )
+		ply:SetRunSpeed(321)
+		ply:SetMaxRunSpeed( 321 )
 		ply:SetStamina( 200 )
 		ply:SetMaxStamina( 200 )
 	end,
@@ -383,8 +383,32 @@ nzPerks:NewPerk("politan", {
 	icon = Material("perk_icons/random.png", "smooth unlitgeneric"),
 	color = Color(255, 172, 224),
 	func = function(self, ply, machine)
+		local tbl = {}
+		for k,v in pairs(ply:GetWeapons()) do
+			if v:IsFAS2() then
+				table.insert(tbl, v)
+			end
+		end
+		if tbl[1] != nil then
+			for k,v in pairs(tbl) do
+				v:ApplyNZModifier("rando")
+			end
+		end
 	end,
 	lostfunc = function(self, ply)
+		if !ply:HasPerk("politan") then
+			local tbl = {}
+			for k,v in pairs(ply:GetWeapons()) do
+				if v:IsFAS2() then
+					table.insert(tbl, v)
+				end
+			end
+			if tbl[1] != nil then
+				for k,v in pairs(tbl) do
+					v:RevertNZModifier("rando")
+				end
+			end
+		end
 	end,
 })
 
