@@ -36,7 +36,7 @@ function ENT:DecideOutcomePerk(ply, specific)
 			end
 		end
 
-		local available = nzMapping.Settings.wunderfizzperks or wunderfizzlist
+		local available = nzMapping.Settings.wunderfizzperklist or wunderfizzlist
 		local tbl = {}
 		for k,v in pairs(available) do
 			if !self:GetUser():HasPerk(k) and !blockedperks[k] then

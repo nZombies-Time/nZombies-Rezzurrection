@@ -45,7 +45,7 @@ function nzMapping:LoadMapSettings(data)
 		end
 	end
 	
-	nzMapping.Settings.wunderfizzperks = data.wunderfizzperks
+	nzMapping.Settings.wunderfizzperklist = data.wunderfizzperklist
 	-- if data.wunderfizzperks then
 		
 	-- 	--nzMapping.Settings.wunderfizzperks = table.Count(data.wunderfizzperks) > 0 and data.wunderfizzperks or nil

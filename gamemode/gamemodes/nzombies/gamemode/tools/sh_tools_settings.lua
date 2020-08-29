@@ -57,7 +57,7 @@ nzTools:CreateTool("settings", {
 			end
 		end
 
-		valz["Wunderfizz"] = data.wunderfizzperks == nil and wunderfizzlist or data.wunderfizzperks
+		valz["Wunderfizz"] = data.wunderfizzperklist == nil and wunderfizzlist or data.wunderfizzperklist
 
 		-- More compact and less messy:
 		for k,v in pairs(nzSounds.struct) do
@@ -204,8 +204,8 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
-			--if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
-			if valz["Wunderfizz"] == nil then data.wunderfizzperks = wunderfizzlist else data.wunderfizzperks = valz["Wunderfizz"] end
+			--if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperklist = nil else data.wunderfizzperklist = valz["WMPerks"] end
+			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
@@ -948,8 +948,8 @@ nzTools:CreateTool("settings", {
 					local check = perkitem:Add("DCheckBox")
 					check:SetPos(2,2)
 
-					if (nzMapping.Settings.wunderfizzperks and istable(nzMapping.Settings.wunderfizzperks[k]) and isbool(nzMapping.Settings.wunderfizzperks[k][1])) then
-						check:SetValue(nzMapping.Settings.wunderfizzperks[k][1])
+					if (nzMapping.Settings.wunderfizzperklist and istable(nzMapping.Settings.wunderfizzperklist[k]) and isbool(nzMapping.Settings.wunderfizzperklist[k][1])) then
+						check:SetValue(nzMapping.Settings.wunderfizzperklist[k][1])
 					else
 						check:SetValue(true)
 					end
