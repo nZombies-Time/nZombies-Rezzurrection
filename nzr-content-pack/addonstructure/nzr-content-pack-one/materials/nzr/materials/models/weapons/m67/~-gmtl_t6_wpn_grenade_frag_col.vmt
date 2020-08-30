@@ -1,0 +1,8 @@
+"VertexLitGeneric"
+{
+	"$color"				"[1 1 1]"
+	"$baseTexture"			"models/weapons/m67/~-gmtl_t6_wpn_grenade_frag_col"
+	"$selfIllum"			0
+	"$translucent"			0
+	"$alpha"				1
+}
