@@ -1,8 +1,0 @@
-"VertexLitGeneric"
-{
-	"$color"				"[1 1 1]"
-	"$baseTexture"			"models/weapons/knife/~-gweapon_parbolic_knife_col"
-	"$selfIllum"			0
-	"$translucent"			0
-	"$alpha"				1
-}

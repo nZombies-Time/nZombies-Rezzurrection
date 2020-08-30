@@ -1,7 +1,0 @@
-"SpriteCard"
-{
-"$baseTexture" "models/mininuke/flame"
-"$translucent" 1
-"$additive" 1
-"$overbrightfactor" 1
-}
