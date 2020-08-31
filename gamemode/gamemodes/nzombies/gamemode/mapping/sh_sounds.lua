@@ -34,8 +34,8 @@ nzSounds.Sounds.Default.Poof = "nz/randombox/poof.wav"
 nzSounds.Sounds.Default.Laugh = "nz/randombox/teddy_bear_laugh.wav"
 nzSounds.Sounds.Default.Bye = "nz/randombox/Announcer_Teddy_Zombies.wav"
 nzSounds.Sounds.Default.Jingle = "nz/randombox/random_box_jingle.wav"
-nzSounds.Sounds.Default.Open = "nz/randombox/box_open.wav"
-nzSounds.Sounds.Default.Close = "nz/randombox/box_close.wav"
+nzSounds.Sounds.Default.Open = "nzr/announcer/mysterybox/box_open.mp3"
+nzSounds.Sounds.Default.Close = "nzr/announcer/mysterybox/box_close.mp3"
 --nzSounds.MainEvents = {"RoundStart", "RoundEnd", "SpecialRoundStart", "SpecialRoundEnd", "GameEnd", "DogRound"}
 
 function nzSounds:RefreshSounds()
