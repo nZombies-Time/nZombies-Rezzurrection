@@ -57,11 +57,25 @@ function nzMapping:LoadMapSettings(data)
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
+	
+	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
+	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround
+	nzMapping.Settings.maxspawns = data.maxspawns == nil and 35 or data.maxspawns
+	nzMapping.Settings.zombiesperplayer = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+	nzMapping.Settings.spawnsperplayer = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
 
 	-- More compact and less messy:
 	for k,v in pairs(nzSounds.struct) do
 		nzMapping.Settings[v] = data[v] or {}
 	end
+
+	nzMapping.Settings.ac = data.ac == nil and false or data.ac
+	nzMapping.Settings.acwarn = data.acwarn == nil and true or data.acwarn
+	nzMapping.Settings.acsavespot = data.acsavespot == nil and true or data.acsavespot
+	nzMapping.Settings.acpreventboost = data.acpreventboost == nil and true or data.acpreventboost
+	nzMapping.Settings.acpreventcjump = data.acpreventcjump == nil and false or data.acpreventcjump
+	nzMapping.Settings.actptime = data.actptime == nil and 5 or data.actptime
 
 	nzMapping:SendMapData()
 	nzSounds:RefreshSounds()

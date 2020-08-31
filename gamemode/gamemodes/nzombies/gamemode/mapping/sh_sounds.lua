@@ -194,4 +194,10 @@ if (CLIENT) then
         nzSounds:RefreshSounds()  
         nzSounds:StopAll()
     end)
+	
+	hook.Add("InitPostEntity", "NZSyncCustomSounds", function()
+        timer.Simple(2, function()
+            nzSounds:RefreshSounds()  
+        end)
+    end)
 end

@@ -1,4 +1,4 @@
-"nzombies_sound_chooser"
+"nzombies"
 {
 	"base"		"base"
     "title"  "nZombies"

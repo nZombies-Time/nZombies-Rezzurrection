@@ -34,7 +34,18 @@ nzTools:CreateTool("settings", {
 		valz["Row6"] = data.gamemodeentities or false
 		valz["Row7"] = data.specialroundtype or "Hellhounds"
 		valz["Row8"] = data.bosstype or "Panzer"
+		valz["Row9"] = data.startingspawns == nil and 35 or data.startingspawns
+		valz["Row10"] = data.spawnperround == nil and 0 or data.spawnperround
+		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
+		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
+		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 		valz["RBoxWeps"] = data.RBoxWeps or {}
+		valz["ACRow1"] = data.ac == nil and false or data.ac
+		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
+		valz["ACRow3"] = data.acsavespot == nil and true or tobool(data.acsavespot)
+		valz["ACRow4"] = data.actptime == nil and 5 or data.actptime
+		valz["ACRow5"] = data.acpreventboost == nil and true or tobool(data.acpreventboost)
+		valz["ACRow6"] = data.acpreventcjump == nil and false or tobool(data.acpreventcjump)
 
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
 
@@ -136,6 +147,36 @@ nzTools:CreateTool("settings", {
 			Row8:AddChoice(" None", "None", !found)
 			Row8.DataChanged = function( _, val ) valz["Row8"] = val end
 			Row8:SetTooltip("Sets what type of boss will appear.")
+			
+			local Row9 = DProperties:CreateRow("Map Settings", "Starting Spawns")
+			Row9:Setup( "Integer" )
+			Row9:SetValue( valz["Row9"] )
+			Row9:SetTooltip("Allowed zombies alive at once, can be increased per round with Spawns Per Round")
+			Row9.DataChanged = function( _, val ) valz["Row9"] = val end
+
+			local Row10 = DProperties:CreateRow("Map Settings", "Spawns Per Round")
+			Row10:Setup( "Integer" )
+			Row10:SetValue( valz["Row10"] )
+			Row10:SetTooltip("Amount to increase spawns by each round (Cannot increase past Max Spawns)")
+			Row10.DataChanged = function( _, val ) valz["Row10"] = val end
+
+			local Row11 = DProperties:CreateRow("Map Settings", "Max Spawns")
+			Row11:Setup( "Integer" )
+			Row11:SetValue( valz["Row11"] )
+			Row11:SetTooltip("The max allowed zombies alive at any given time, it will NEVER go above this.")
+			Row11.DataChanged = function( _, val ) valz["Row11"] = val end
+
+			local Row13 = DProperties:CreateRow("Map Settings", "Zombies Per Player")
+			Row13:Setup( "Integer" )
+			Row13:SetValue( valz["Row13"] )
+			Row13:SetTooltip("Extra zombies to kill per player (Ignores first player)")
+			Row13.DataChanged = function( _, val ) valz["Row13"] = val end
+
+			local Row14 = DProperties:CreateRow("Map Settings", "Spawns Per Player")
+			Row14:Setup( "Integer" )
+			Row14:SetValue( valz["Row14"] )
+			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
+			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -147,8 +188,19 @@ nzTools:CreateTool("settings", {
 			if !valz["Row6"] or valz["Row6"] == "0" then data.gamemodeentities = nil else data.gamemodeentities = tobool(valz["Row6"]) end
 			if !valz["Row7"] then data.specialroundtype = "Hellhounds" else data.specialroundtype = valz["Row7"] end
 			if !valz["Row8"] then data.bosstype = "Panzer" else data.bosstype = valz["Row8"] end
+			if !tonumber(valz["Row9"]) then data.startingspawns = 35 else data.startingspawns = tonumber(valz["Row9"]) end
+			if !tonumber(valz["Row10"]) then data.spawnperround = 0 else data.spawnperround = tonumber(valz["Row10"]) end
+			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
+			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
+			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
+			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
+			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
+			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
+			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
+			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = tobool(valz["ACRow5"]) end
+			if valz["ACRow6"] == nil then data.acpreventcjump = false else data.acpreventcjump = tobool(valz["ACRow6"]) end
 
 			for k,v in pairs(nzSounds.struct) do
 				if (valz["SndRow" .. k] == nil) then
@@ -174,6 +226,16 @@ nzTools:CreateTool("settings", {
 		MapSDermaButton:SetSize( 260, 30 )
 		MapSDermaButton.DoClick = UpdateData
 
+		local acPanel = vgui.Create("DPanel", sheet)
+		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
+		local acProps = vgui.Create("DProperties", acPanel)
+		local acheight, acwidth = sheet:GetSize()
+		acProps:SetSize(acwidth, acwidth - 50)
+
+		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
+		ACRow1:Setup("Boolean")
+		ACRow1:SetValue(valz["ACRow1"])
+		ACRow1.DataChanged = function( _, val ) valz["ACRow1"] = val end
 		-- local DermaButton3 = vgui.Create( "DButton", acPanel )
 		-- DermaButton3:SetText( "Submit" )
 		-- DermaButton3:SetPos( 0, 185 )
@@ -181,6 +243,36 @@ nzTools:CreateTool("settings", {
 		-- DermaButton3.DoClick = UpdateData
 
 		if nzTools.Advanced then
+			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
+			ACRow2:Setup("Boolean")
+			ACRow2:SetValue(valz["ACRow2"])
+			ACRow2:SetTooltip("Shows \"Return to map!\" with a countdown on player's screens")
+			ACRow2.DataChanged = function(_, val) valz["ACRow2"] = val end
+
+			local ACRow3 = acProps:CreateRow("Anti-Cheat Settings", "Save Last Spots?")
+			ACRow3:Setup("Boolean")
+			ACRow3:SetValue(valz["ACRow3"])
+			ACRow3:SetTooltip("Remembers the last spot a player was at before they were detected. (Uses more performance)")
+			ACRow3.DataChanged = function(_, val) valz["ACRow3"] = val end
+
+			local ACRow5 = acProps:CreateRow("Anti-Cheat Settings", "Prevent boosting?")
+			ACRow5:Setup("Boolean")
+			ACRow5:SetValue(valz["ACRow5"])
+			ACRow5:SetTooltip("Cancels out vertical velocity when players boost up faster than jump speed")
+			ACRow5.DataChanged = function(_, val) valz["ACRow5"] = val end
+
+			local ACRow6 = acProps:CreateRow("Anti-Cheat Settings", "No Crouch Jump?")
+			ACRow6:Setup("Boolean")
+			ACRow6:SetValue(valz["ACRow6"])
+			ACRow6:SetTooltip("Turns crouch jumps into normal jumps to make climbing on stuff harder")
+			ACRow6.DataChanged = function(_, val) valz["ACRow6"] = val end
+
+			local ACRow4 = acProps:CreateRow("Anti-Cheat Settings", "Seconds for TP")
+			ACRow4:Setup("Integer")
+			ACRow4:SetValue(valz["ACRow4"])
+			ACRow4:SetTooltip("Amount of seconds before a cheating player is teleported.")
+			ACRow4.DataChanged = function(_, val) valz["ACRow4"] = val end
+			
 			local weplist = {}
 			local numweplist = 0
 

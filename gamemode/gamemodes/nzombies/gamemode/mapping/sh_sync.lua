@@ -25,6 +25,10 @@ if CLIENT then
 	net.Receive("nzCleanUp", cleanUpMap )
 
 	local function receiveMapData()
+		if ispanel(nzQMenu.Data.MainFrame) then -- New config was loaded, refresh config menu
+			nzQMenu.Data.MainFrame:Remove()
+		end
+		
 		local oldeeurl = nzMapping.Settings.eeurl or ""
 		nzMapping.Settings = net.ReadTable()
 
