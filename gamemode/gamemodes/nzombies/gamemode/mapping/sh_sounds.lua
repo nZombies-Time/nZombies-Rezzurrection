@@ -1,6 +1,11 @@
 if (SERVER) then
     util.AddNetworkString("nzSounds.PlaySound")
     util.AddNetworkString("nzSounds.RefreshSounds")
+
+    hook.Add("PlayerSpawn", "NZForceSyncSounds", function(ply)
+        net.Start("nzSounds.RefreshSounds")
+        net.Send(ply)
+    end)
 end
 
 nzSounds = {}
@@ -97,6 +102,12 @@ function nzSounds:GetSound(event)
     end
 
     if (CLIENT) then
+        -- FALLBACK in case for some reason the client has not gotten their sounds to refresh yet
+        if (nzSounds and nzSounds.Sounds and table.IsEmpty(nzSounds.Sounds.Custom)) then    
+            nzSounds:RefreshSounds()
+            snd = nzSounds:GetSound(event)
+        end
+
         if (!nzSounds.Sounds.Default[event]) then 
             if (isstring(event)) then
                 print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
