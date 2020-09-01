@@ -359,13 +359,6 @@ if CLIENT then
 	local lightyellow = Color( 255, 255, 200, 200 )
 	local clawglow = Material( "sprites/orangecore1" )
 	local clawred = Color( 255, 100, 100, 255 )
-		local leftEye = self:GetAttachment(self:LookupAttachment("tag_eye_l")).Pos
-			local rightEye = self:GetAttachment(self:LookupAttachment("tag_eye_r")).Pos
-			cam.Start3D()
-				render.SetMaterial( eyeGlow )
-				render.DrawSprite( leftEye, 4, 4, white)
-				render.DrawSprite( rightEye, 4, 4, white)
-			cam.End3D()
 end
 
 function ENT:OnRemove()

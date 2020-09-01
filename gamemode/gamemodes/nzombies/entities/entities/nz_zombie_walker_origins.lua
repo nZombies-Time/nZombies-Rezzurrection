@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Walker_Spetsnaz"
+ENT.PrintName = "Walker"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
@@ -11,31 +11,26 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/roach/bo1_overhaul/soldier_zombie.mdl"
-	
-	
+	"models/nzr/origins_zombies.mdl", "models/nzr/origins_templar_zombies.mdl"
 }
 
 local AttackSequences = {
-	{seq = "attack1", dmgtimes = {0.9}},
-	{seq = "attack2", dmgtimes = {0.9}},
-	{seq = "attack4", dmgtimes = {0.3}},
-	{seq = "attack5", dmgtimes = {0.2}},
-	{seq = "attack6", dmgtimes = {0.4, 0.8}}
+		{seq = "nz_walk_attack1", dmgtimes = {0.3}},
+	{seq = "nz_walk_attack2", dmgtimes = {0.4, 0.9}},
+	{seq = "nz_walk_attack3", dmgtimes = {0.5}},
+	{seq = "nz_walk_attack4", dmgtimes = {0.4, 0.75}}
 }
 local WalkAttackSequences = {
-	{seq = "attack1", dmgtimes = {0.9}},
-	{seq = "attack2", dmgtimes = {0.9}},
-	{seq = "attack4", dmgtimes = {0.3}},
-	{seq = "attack5", dmgtimes = {0.2}},
-	{seq = "attack6", dmgtimes = {0.4, 0.8}}
+	{seq = "nz_walk_attack1", dmgtimes = {0.3}},
+	{seq = "nz_walk_attack2", dmgtimes = {0.4, 0.9}},
+	{seq = "nz_walk_attack3", dmgtimes = {0.5}},
+	{seq = "nz_walk_attack4", dmgtimes = {0.4, 0.75}}
 }
 local RunAttackSequences = {
-	{seq = "attack1", dmgtimes = {0.9}},
-	{seq = "attack2", dmgtimes = {0.9}},
-	{seq = "attack4", dmgtimes = {0.3}},
-	{seq = "attack5", dmgtimes = {0.2}},
-	{seq = "attack6", dmgtimes = {0.4, 0.8}}
+	{seq = "nz_run_attack1", dmgtimes = {0.3}},
+	{seq = "nz_run_attack2", dmgtimes = {0.3, 0.65}},
+	{seq = "nz_run_attack3", dmgtimes = {0.3, 0.7}},
+	{seq = "nz_run_attack4", dmgtimes = {0.3, 0.8}}
 }
 
 local AttackSounds = {
@@ -101,12 +96,14 @@ local RunSounds = {
 }
 
 local JumpSequences = {
-	{seq = "drg_jump", speed = 15, time = 3},
-	{seq = "drg_jump", speed = 15, time = 3}
+	{seq = "nz_barricade1", speed = 15, time = 2.7},
+	{seq = "nz_barricade2", speed = 15, time = 2.4},
+	{seq = "nz_barricade_fast1", speed = 15, time = 1.8},
+	{seq = "nz_barricade_fast2", speed = 35, time = 4},
 }
 local SprintJumpSequences = {
-	{seq = "drg_jump", speed = 15, time = 3},
-	{seq = "drg_jump", speed = 15, time = 3}
+	{seq = "nz_barricade_sprint1", speed = 50, time = 1.9},
+	{seq = "nz_barricade_sprint2", speed = 35, time = 1.9},
 }
 
 ENT.ActStages = {
@@ -119,7 +116,7 @@ ENT.ActStages = {
 		barricadejumps = JumpSequences,
 	},
 	[2] = {
-		act = ACT_WALK,
+		act = ACT_WALK_ANGRY,
 		minspeed = 40,
 		attackanims = WalkAttackSequences,
 		sounds = WalkSounds,
@@ -138,18 +135,24 @@ ENT.ActStages = {
 		attackanims = RunAttackSequences,
 		sounds = RunSounds,
 		barricadejumps = SprintJumpSequences,
-	}
+	},
 }
 
+ENT.RedEyes = true
 
 ENT.ElectrocutionSequences = {
-	"death5"
+	"nz_electrocuted1",
+	"nz_electrocuted2",
+	"nz_electrocuted3",
+	"nz_electrocuted4",
+	"nz_electrocuted5",
 }
 ENT.EmergeSequences = {
-	"dirt_fast",
-	"dirt_run",
-	"dirt_walk1",
-	"dirt_walk2"
+	"nz_emerge1",
+	"nz_emerge2",
+	"nz_emerge3",
+	"nz_emerge4",
+	"nz_emerge5",
 }
 ENT.AttackHitSounds = {
 	"npc/zombie/zombie_hit.wav"
@@ -192,17 +195,20 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
-<<<<<<< Updated upstream:gamemode/gamemodes/nzombies/entities/entities/nz_zombie_walkerfail.lua
-=======
-		 self:SetBodygroup( 0, math.random(0,4))
-		 self:SetBodygroup(1  math.random(0,1) )
->>>>>>> Stashed changes:gamemode/gamemodes/nzombies/entities/entities/nz_zombie_walker_cotd.lua
 	end
 end
 
 function ENT:SpecialInit()
 
 	if CLIENT then
+	if self:GetModel() == "models/nzr/origins_zombies.mdl" then
+		self:SetBodygroup(0,  math.random(0,3) )
+		self:SetBodygroup(1,  math.random(0,2) )
+		self:SetBodygroup(2,  math.random(0,3) )
+		else
+		self:SetBodygroup(0,  math.random(0,1))
+		self:SetBodygroup(1,  math.random(0,1))
+		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized
 			if string.find(self:GetSequenceName(self:GetSequence()), "nz_emerge") then
@@ -260,13 +266,12 @@ function ENT:OnZombieDeath(dmgInfo)
 		-- Emit electrocution scream here when added
 		timer.Simple(dur, function()
 			if IsValid(self) then
-				self:Remove() 
-				
+				self:BecomeRagdoll(dmgInfo)
 			end
 		end)
 	else
 		self:EmitSound( self.DeathSounds[ math.random( #self.DeathSounds ) ], 100)
-		self:Remove()
+		self:BecomeRagdoll(dmgInfo)
 	end
 
 end
