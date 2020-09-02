@@ -13,7 +13,7 @@ local function Notify()
 end
 
 hook.Add("StartCommand", "ACNoCrouchJump", function(ply, ucmd)
-    if (nzMapping.Settings.ac and nzMapping.Settings.acpreventcjump) then
+    if (nzMapping.Settings.ac and nzMapping.Settings.acpreventcjump and !ply:IsInCreative()) then
         local isDucking = bit.band(ucmd:GetButtons(), IN_DUCK) == IN_DUCK
         local isJumping = bit.band(ucmd:GetButtons(), IN_JUMP) == IN_JUMP
         
