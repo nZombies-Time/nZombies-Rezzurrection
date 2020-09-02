@@ -2,7 +2,7 @@
 nzDisplay = nzDisplay or AddNZModule("Display")
 
 local bloodline_points = Material("bloodline_score2.png", "unlitgeneric smooth")
-local bloodline_gun = Material("origins_hud.png", "unlitgeneric smooth")
+local bloodline_gun = Material("cod_hud.png", "unlitgeneric smooth")
 
 --[[local bloodDecals = {
 	Material("decals/blood1"),
@@ -86,7 +86,7 @@ local function ScoreHud()
 					--surface.DrawTexturedRect(ScrW() - 325*scale - numname * 10, ScrH() - 285*scale - (30*k), 250 + numname*10, 35)
 					if text then draw.SimpleText(text, font, ScrW() - textW - 60, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER) end
 					if LocalPlayer() == v then
-						font = "nz.display.hud.medium"
+						font = "nz.display.hud.small"
 					end
 					draw.SimpleText(v:GetPoints(), font, ScrW() - textW - 60 - nameoffset, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 					v.PointsSpawnPosition = {x = ScrW() - textW - 170, y = ScrH() - 255 * scale - offset}
@@ -157,122 +157,24 @@ local function GunHud()
 	end
 end
 
-local max_ammo = Material("chron/perk_icons/maxammo.png", "unlitgeneric smooth")
-local powerup_death_machine_icon = Material("chron/perk_icons/death_machine.png", "unlitgeneric smooth")
-local powerup_zombie_blood_icon = Material("chron/perk_icons/zombie_blood.png", "unlitgeneric smooth")
-local powerup_double_points_icon = Material("chron/perk_icons/doublepointsicon.png", "unlitgeneric smooth")
-local powerup_insta_kill_icon = Material("chron/perk_icons/insta_kill.png", "unlitgeneric smooth")
-local powerup_firesale_icon = Material("chron/perk_icons/fire_sale.png", "unlitgeneric smooth")
-local fadeouttime = nil
-local fadeout = 0
-local totalWidth = 0
-
-net.Receive("RenderMaxAmmo", function()
-	local alpha = 0
-	local fadeout = 0
-	local fadeouttime = nil
-
-	hook.Add("HUDPaint", "NZMaxAmmoImg", function()
-		if fadeouttime == nil then fadeouttime = CurTime() + 3 end -- We want the max ammo to fade out after 5 seconds..
-
-		if CurTime() < fadeouttime and alpha < 255 then
-			alpha = alpha + 50
-		end
-
-		if CurTime() > fadeouttime then
-			if CurTime() > fadeout then
-				fadeout = CurTime() + 0.05
-				alpha = alpha - 100
-			end
-		end 
-
-		surface.SetMaterial(max_ammo)
-		surface.SetDrawColor(255, 255, 255, alpha)	
-		surface.DrawTexturedRect(ScrW() / 2 - 280 / 2, 50, 280, 180)
-	end)
-
-	timer.Simple(5, function()
-		hook.Remove("HUDPaint", "NZMaxAmmoImg")
-	end)
-end)
-
 local function PowerUpsHud()
 	if nzRound:InProgress() or nzRound:InState(ROUND_CREATE) then
 		local font = "nz.display.hud.main"
 		local w = ScrW() / 2
 		local offset = 40
 		local c = 0
-		local text_w = 745
-
-		---------icon--------------
-		local scale = (ScrW()/1920 + 1)/1.25
-		local w = 617
-		local size = 38
-		local es = 82
-		local es_nom = 0
-		local width = (ScrW() / 2)
-		local height = ScrH() - 130
-		local powerupsActive = 0
-
-		function ReturnPosition(id, seconds, subtractBy) -- When the powerup disappears we need to align everything back again
-			if timer.Exists(id) then return end -- We already did this, we need to wait..
-			timer.Create(id, seconds, 1, function()
-				totalWidth = totalWidth - 75
-			end)
-		end
-
-		local function AddPowerup(material, time) -- Display another powerup on the player's screen
-			local width = ScrW() / 2 + 75 * powerupsActive - totalWidth / 2
-			
-			if width - ScrW() / 2 > totalWidth then 
-				prevWidth = totalWidth
-				totalWidth = width - ScrW() / 2 
-			end
-
-			surface.SetMaterial(material)
-			surface.SetDrawColor(255,255,255)
-			surface.DrawTexturedRect(width - 30, ScrH() - 98, 60, 60)
-			draw.SimpleText(math.Round(time - CurTime()), font, width - 5, height, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			powerupsActive = powerupsActive + 1
-		end
-
-		for k,v in pairs(nzPowerUps.ActivePowerUps) do	
+		for k,v in pairs(nzPowerUps.ActivePowerUps) do
 			if nzPowerUps:IsPowerupActive(k) then
-				if k == "dp" then
-					AddPowerup(powerup_double_points_icon, v)
-					ReturnPosition("Returning" .. "dp", math.Round(v - CurTime()))	
-				end
-
-				if k == "insta" then
-					AddPowerup(powerup_insta_kill_icon, v)
-					ReturnPosition("Returning" .. "insta", math.Round(v - CurTime()))	
-				end
-
-				if k == "firesale" then
-					AddPowerup(powerup_firesale_icon, v)
-					ReturnPosition("Returning" .. "firesale", math.Round(v - CurTime()))	
-				end
-
 				local powerupData = nzPowerUps:Get(k)
-				--draw.SimpleText(powerupData.name .. " - " .. math.Round(v - CurTime()), font, w, ScrH() * 0.85 + offset * c, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText(powerupData.name .. " - " .. math.Round(v - CurTime()), font, w, ScrH() * 0.85 + offset * c, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				c = c + 1
 			end
 		end
 		if !nzPowerUps.ActivePlayerPowerUps[LocalPlayer()] then nzPowerUps.ActivePlayerPowerUps[LocalPlayer()] = {} end
 		for k,v in pairs(nzPowerUps.ActivePlayerPowerUps[LocalPlayer()]) do
 			if nzPowerUps:IsPlayerPowerupActive(LocalPlayer(), k) then
-				if k == "zombieblood" then
-					AddPowerup(powerup_zombie_blood_icon, v)
-					ReturnPosition("Returning" .. "zombieblood", math.Round(v - CurTime()))	
-				end
-
-				if k == "deathmachine" then
-					AddPowerup(powerup_death_machine_icon, v)
-					ReturnPosition("Returning" .. "deathmachine", math.Round(v - CurTime()))	
-				end
-
 				local powerupData = nzPowerUps:Get(k)
-				--draw.SimpleText(powerupData.name .. " - " .. math.Round(v - CurTime()), font, w, ScrH() * 0.85 + offset * c, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+				draw.SimpleText(powerupData.name .. " - " .. math.Round(v - CurTime()), font, w, ScrH() * 0.85 + offset * c, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 				c = c + 1
 			end
 		end
@@ -386,7 +288,7 @@ local function PerksHud()
 	for k,v in pairs(LocalPlayer():GetPerks()) do
 		surface.SetMaterial(nzPerks:Get(v).icon)
 		surface.SetDrawColor(255,255,255)
-		surface.DrawTexturedRect(w + k*(size*scale + 10), ScrH() - 245, size*scale, size*scale)
+		surface.DrawTexturedRect(w + k*(size*scale + 10), ScrH() - 200, size*scale, size*scale)
 	end
 end
 
@@ -429,36 +331,36 @@ local round_num = 0
 local infmat = Material("materials/round_-1.png", "smooth")
 local function RoundHud()
 
-    local text = ""
-    local font = "nz.display.hud.rounds"
-    local w = 35
-    local h = ScrH() - 15
-    local round = round_num
-    local col = Color(100 + round_white*55, round_white, round_white,round_alpha)
-    if round == -1 then
-        --text = "∞"
-        surface.SetMaterial(infmat)
-        surface.SetDrawColor(col.r,round_white,round_white,round_alpha)
-        surface.DrawTexturedRect(w - 25, h - 100, 200, 100)
-        return
-    elseif round < 6 then
-        for i = 1, round do
-            if i == 5 or i == 6 then
-                text = text.." "
-            else
-                text = text.."i"
-            end
-        end
-        if round >= 5 then
-            draw.TextRotatedScaled( "i", w + 170, h - 250, col, font, 60, 1, 1.45 )
-        end
-        --if round >= 10 then
-        --    draw.TextRotatedScaled( "i", w + 220, h - 150, col, font, 60, 1, 1.45 )
-        --end
-    else
-        text = round
-    end
-    draw.SimpleText(text, font, w, h + 20, col, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
+	local text = ""
+	local font = "nz.display.hud.rounds"
+	local w = 70
+	local h = ScrH() - 30
+	local round = round_num
+	local col = Color(200 + round_white*55, round_white, round_white,round_alpha)
+	if round == -1 then
+		--text = "∞"
+		surface.SetMaterial(infmat)
+		surface.SetDrawColor(col.r,round_white,round_white,round_alpha)
+		surface.DrawTexturedRect(w - 25, h - 100, 200, 100)
+		return
+	elseif round < 11 then
+		for i = 1, round do
+			if i == 5 or i == 10 then
+				text = text.." "
+			else
+				text = text.."i"
+			end
+		end
+		if round >= 5 then
+			draw.TextRotatedScaled( "i", w + 100, h - 150, col, font, 60, 1, 1.7 )
+		end
+		if round >= 10 then
+			draw.TextRotatedScaled( "i", w + 220, h - 150, col, font, 60, 1, 1.7 )
+		end
+	else
+		text = round
+	end
+	draw.SimpleText(text, font, w, h, col, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM)
 
 end
 
@@ -512,7 +414,7 @@ local function StartChangeRound()
 					round_num = nzRound:GetNumber()
 					round_charger = 0.5
 					if round_num == -1 then
-						--surface.PlaySound("nz/easteregg/motd_round-03.wav")
+						-- --surface.PlaySound("nz/easteregg/motd_round-03.wav")
 					elseif nzRound:IsSpecial() then
 						--surface.PlaySound("nz/round/special_round_start.wav")
 						nzSounds:Play("SpecialRoundStart")

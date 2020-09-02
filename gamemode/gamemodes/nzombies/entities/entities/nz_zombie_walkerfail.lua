@@ -192,11 +192,6 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
-<<<<<<< Updated upstream:gamemode/gamemodes/nzombies/entities/entities/nz_zombie_walkerfail.lua
-=======
-		 self:SetBodygroup( 0, math.random(0,4))
-		 self:SetBodygroup(1  math.random(0,1) )
->>>>>>> Stashed changes:gamemode/gamemodes/nzombies/entities/entities/nz_zombie_walker_cotd.lua
 	end
 end
 
