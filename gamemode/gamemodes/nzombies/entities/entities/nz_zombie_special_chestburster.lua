@@ -28,14 +28,11 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-	"character/alien/vocals/aln_death_scream_20.mp3",
-	"character/alien/vocals/aln_death_scream_21.mp3",
-	"character/alien/vocals/aln_death_scream_22.mp3",
-	"character/alien/vocals/aln_death_scream_23.mp3",
-	"character/alien/vocals/aln_death_scream_24.mp3",
-	"character/alien/vocals/aln_death_scream_25.mp3",
-	"character/alien/vocals/aln_death_scream_26.mp3",
-	"character/alien/vocals/aln_death_scream_27.mp3"
+	"physics/flesh/flesh_impact_bullet1.wav",
+	"physics/flesh/flesh_impact_bullet2.wav",
+	"physics/flesh/flesh_impact_bullet3.wav",
+	"physics/flesh/flesh_impact_bullet4.wav",
+	"physics/flesh/flesh_impact_bullet5.wav"
 }
 
 ENT.AttackHitSounds = {
@@ -198,7 +195,7 @@ function ENT:OnSpawn()
 		self:PlaySequenceAndWait(seq)
 		
 			self:TimedEvent( 30, function()
-			self.G2 = ents.Create("nz_zombie_walker")
+			self.G2 = ents.Create("nz_zombie_walker_xeno")
 				self.G2:SetPos(self:GetPos())
 				self.G2:Spawn()
 			self:Remove()
@@ -263,79 +260,7 @@ function ENT:OnTargetInAttackRange()
 end
 
 function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
-	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				timer.Simple(22/55, function()
-				self:EmitSound("roach/bo3/spider/spd_attack_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-				timer.Simple(1, function()self.ClawHook = ents.Create("nz_spider_goo")end)
-				timer.Simple(1, function()self.ClawHook:SetPos(self:LocalToWorld(Vector(0,0,80)))end)
-				timer.Simple(1, function()self.ClawHook:Spawn()end)
-				timer.Simple(1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot_web")
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-				local seq = "idle"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(1, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
+
 end
 
 function ENT:IsValidTarget( ent )

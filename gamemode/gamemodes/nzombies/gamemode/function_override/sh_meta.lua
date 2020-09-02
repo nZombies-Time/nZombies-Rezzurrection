@@ -103,10 +103,7 @@ if SERVER then
 	
 	hook.Add("DoAnimationEvent", "nzReloadCherry", function(ply, event, data)
 		--print(ply, event, data)
-		if ply:HasPerk("politan") then
-	local wep = ply:GetActiveWeapon()
-	wep:ApplyNZModifier("rando")
-		end
+
 		if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") then
 	ply:StripWeapon( "nz_quickknife_crowbar" )
 								ply:Give("nz_yamato")

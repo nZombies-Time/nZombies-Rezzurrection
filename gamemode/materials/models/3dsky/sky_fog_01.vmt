@@ -1,0 +1,9 @@
+"UnlitGeneric"
+{
+	"$basetexture" "models\3dsky\sky_fog_01"
+		"$translucent" "1"
+//	"$nofog" "1"
+//	"$ignorez" "1"
+	"$model" "1"
+
+}

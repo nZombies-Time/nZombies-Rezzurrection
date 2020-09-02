@@ -94,7 +94,7 @@ ENT.ActStages = {
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 150,
+		minspeed = 100,
 	},
 	[4] = {
 		act = ACT_RUN,
@@ -185,7 +185,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 150 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 50 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 99 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 50 ) then self.CalcIdeal = ACT_WALK_ANGRY elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP

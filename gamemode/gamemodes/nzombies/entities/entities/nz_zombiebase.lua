@@ -137,7 +137,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(2750) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()

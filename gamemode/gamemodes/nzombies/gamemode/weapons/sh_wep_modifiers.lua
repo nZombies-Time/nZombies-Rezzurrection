@@ -49,7 +49,7 @@ local WeaponModificationFunctionsDefaults = {
 	wep.Reload = function(self, ...)
 	if ply:KeyReleased( IN_RELOAD ) then
 			if SERVER and  ply:GetActiveWeapon():Clip1() < 1 then
-			if GetConVar("nz_randombox_maplist"):GetBool() and nzMapping.Settings.rboxweps then
+			if nzMapping.Settings.rboxweps then
 	local guns = {}
 			for k,v in pairs(nzMapping.Settings.rboxweps) do
 				guns[k] = v
@@ -58,6 +58,7 @@ local WeaponModificationFunctionsDefaults = {
 			local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
 	ply:Give(gun)
 	else
+	PrintMessage( HUD_PRINTTALK, "Why the hell did you buy this?")
 	for k,v in pairs( weapons.GetList() ) do
 				guns[v.ClassName] = 10
 		end

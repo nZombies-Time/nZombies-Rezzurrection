@@ -89,7 +89,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -135,7 +135,7 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self:SetRunSpeed(500)
 		self:SetHealth(350)
-		self:SetMaxHealth(1000)
+		self:SetMaxHealth(10000)
 		screaming = false
 	end
 
@@ -292,85 +292,7 @@ atkData.dmglow = 1
 end
 
 function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 7 and CurTime() > self.NextClawTime then
-		-- Ground Slam from engi
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-			ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(140,0,0)),Angle(0,0,0),nil)
-			self:EmitSound("bo1_overhaul/engie/att"..math.random(2)..".mp3")
-			self:EmitSound("bo1_overhaul/engie/slamclub.mp3",511)
-			util.ScreenShake(self:GetPos(),10000,5000,1,1000)
-			self:SetDesiredSpeed(0)
-			 local atkData = {}
-					self.AttackSequences = {
-						{seq = "g_slamground"}
-										}
-			 self:SetAttackRange(275)
-				atkData.dmglow = 60
-				atkData.dmghigh = 80
-				atkData.dmgforce = Vector( 0, 0, 0 )
-				atkData.dmgdelay = 0.7
-				self:Attack( atkData )
-		
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-					local id, dur = self:LookupSequence("g_slamground")
-			
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-			self:SetAttackRange(125)
-			self.AttackSequences = {
-						{seq = "g_att"}
-										}
-				self.loco:SetDesiredSpeed(500)
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Useless Removed flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
 end
 
 function ENT:IsValidTarget( ent )

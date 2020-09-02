@@ -9,7 +9,7 @@ ENT.AdminSpawnable	= false
 
 ENT.MyModel = "models/weapons/tfa_cso/w_rpg7_rocket.mdl"
 ENT.MyModelScale = 1
-ENT.Damage = 900
+ENT.Damage = 75
 ENT.Radius = 350
 if SERVER then
 

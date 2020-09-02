@@ -3,7 +3,7 @@ function nzMapping:LoadMapSettings(data)
 	if !data then return end
 	
 	if data.startwep then
-		nzMapping.Settings.startwep = weapons.Get(data.startwep) and data.startwep or nzConfig.BaseStartingWeapons[1]
+		nzMapping.Settings.startwep = weapons.Get(data.startwep) and data.startwep or "robotnik_bo1_1911"
 	end
 	if data.startpoints then
 		nzMapping.Settings.startpoints = tonumber(data.startpoints) or 500

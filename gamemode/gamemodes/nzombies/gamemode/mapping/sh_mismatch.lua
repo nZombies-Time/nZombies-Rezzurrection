@@ -252,7 +252,7 @@ CreateMismatchCheck("Map Settings", function()
 	local tbl = {}
 	local settings = nzMapping.Settings
 
-	local startwep = settings.startwep or nzConfig.BaseStartingWeapons[1] or "Invalid"
+	local startwep = settings.startwep or "robotnik_bo1_1911" or "Invalid"
 	if !weapons.Get(startwep) then tbl["startwep"] = startwep end
 	
 	local specialround = settings.specialroundtype

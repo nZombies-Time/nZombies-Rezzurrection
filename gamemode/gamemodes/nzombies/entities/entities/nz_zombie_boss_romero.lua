@@ -11,44 +11,6 @@ ENT.AttackRange = 140
 ENT.DamageLow = 70
 ENT.DamageHigh = 88
 
-sound.Add({
-	channel = CHAN_VOICE,
-	name = "NPC_BO1o.Director.IdleVox",
-	level = 511,
-	sound = {
-		"bo1_overhaul/dir/vox_director_behind_01.mp3","bo1_overhaul/dir/vox_director_behind_02.mp3",
-		"bo1_overhaul/dir/vox_director_behind_03.mp3","bo1_overhaul/dir/vox_director_behind_04.mp3",
-		
-		"bo1_overhaul/dir/vox/vox_romero_search_1.mp3","bo1_overhaul/dir/vox/vox_romero_search_2.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_search_3.mp3","bo1_overhaul/dir/vox/vox_romero_search_4.mp3",
-		
-		"bo1_overhaul/dir/vox/vox_romero_taunt_1.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_2.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_3.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_4.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_5.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_6.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_7.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_8.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_9.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_10.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_11.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_12.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_taunt_13.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_14.mp3",
-	}
-})
-
-sound.Add({
-	channel = CHAN_VOICE,
-	name = "NPC_BO1o.Director.EnragedVox",
-	level = 511,
-	sound = {
-		"bo1_overhaul/dir/vox_director_slam_01.mp3",
-		"bo1_overhaul/dir/vox_director_slam_02.mp3",
-		"bo1_overhaul/dir/vox_director_slam_03.mp3",
-		"bo1_overhaul/dir/vox_director_slam_04.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_react_1.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_react_2.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_react_3.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_react_4.mp3",
-		"bo1_overhaul/dir/vox/vox_romero_react_5.mp3"
-		
-	}
-})
 ENT.OnDeathSounds = {
 	"bo1_overhaul/dir/vox_director_die_01.mp3","bo1_overhaul/dir/vox_director_die_02.mp3","bo1_overhaul/dir/vox_director_die_03.mp3",
 }
@@ -85,7 +47,7 @@ ENT.PainSounds = {
 }
 
 ENT.WalkSounds = {
-	"bo1_overhaul/dir/vox/vox_romero_taunt_1.wav"
+	"empty.wav"
 	
 }
 
@@ -133,7 +95,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -252,10 +214,11 @@ self:SetInvulnerable(true)
 		self:PlaySequenceAndWait("emerge")
 		timer.Simple(0.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_0.mp3",511)end)
 		timer.Simple(2.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_1.mp3",511)end)
+		timer.Simple(14,function() taunting = false end)
 		timer.Simple(2,function()self:SetInvulnerable(false)end)
 		self.IsEmerging = false
 		counting = false
-		taunting = false
+		
 		self.loco:SetDesiredSpeed(69)
 		self:ResetSequence("walk")
 		self:SetCycle(0)
@@ -396,6 +359,7 @@ function ENT:Director_DynamicLight(color, radius, brightness,style)
 end
 
 function ENT:OnTargetInAttackRange()
+taunting = true
     local atkData = {}
     atkData.dmglow = 70
     atkData.dmghigh = 88
@@ -424,6 +388,8 @@ function ENT:OnPathTimeOut()
 			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
 			slamming = true
+			
+			taunting = true
 			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_0"..math.random(0,1)..".mp3",511)
 			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_flux.mp3")
 			ParticleEffect("romero_club_hit",self:LocalToWorld(Vector(60,-30,0)),Angle(0,0,0),nil)
@@ -569,19 +535,17 @@ counting = false
 end)
 end
 end
-if !taunting and !self:IsAttacking() then
+if !taunting then
 taunting = true
-if self.Enraged then
 timer.Simple(11,function()
+if self.Enraged then
 self:EmitSound("bo1_overhaul/dir/vox/vox_romero_angry_"..math.random(1,5)..".mp3")
 taunting = false
-end)
 else
-timer.Simple(11,function()
 self:EmitSound("bo1_overhaul/dir/vox/vox_romero_taunt_"..math.random(1,14)..".mp3")
 taunting = false
-end)
 end
+end)
 end
 end
 if self:IsAttacking() then

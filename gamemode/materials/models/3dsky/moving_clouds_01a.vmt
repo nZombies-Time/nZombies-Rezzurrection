@@ -1,0 +1,26 @@
+UnlitGeneric
+{
+	"$basetexture"	"models\3dsky\moving_clouds_01a"
+	"$translucent" "1"
+	"$model" "1"
+	"$nofog" "1"
+
+		"Proxies"
+
+		{
+
+			"TextureScroll"
+
+			{
+
+			"texturescrollvar" "$baseTextureTransform"
+
+			"texturescrollrate" 0.01
+
+			"texturescrollangle" 30.00
+
+			}
+
+		}
+
+}

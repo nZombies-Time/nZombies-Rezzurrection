@@ -183,7 +183,6 @@ function nzRound:Prepare( time )
 	-- else just do regular walker spawning
 	else
 		local normalSpawner = Spawner("nz_spawn_zombie_normal", {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}, self:GetZombiesMax())
-
 		-- after round 20 spawn some hellhounds aswell (half of the round number 21: 10, 22: 11, 23: 11, 24: 12 ...)
 		if self:GetNumber() > 20 then
 			local amount = math.floor(self:GetNumber() / 2)

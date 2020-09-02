@@ -28,9 +28,10 @@ ENT.AttackSounds = {
 
 }
 
-ENT.PainSounds = {
-	"roach/bo3/spider/vox/ambient_01.mp3"
-
+ENT.AttackSounds = {
+	"npc/headcrab/attack1.wav",
+	"npc/headcrab/attack2.wav",
+	"npc/headcrab/attack3.wav"
 }
 
 ENT.AttackHitSounds = {
@@ -365,7 +366,7 @@ end
 
 function ENT:OnContact( ent )
 	if ent:IsPlayer() then
-		if ent:Health() <= 25 then	
+		if ent:Health() <= 40 then	
 			self.G2 = ents.Create("nz_zombie_special_chestburster")
 				self.G2:SetPos(self:GetPos())
 				self.G2:Spawn()	

@@ -47,7 +47,7 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"re2/em6300/step1.wav"
+	"empty.wav"
 }
 
 ENT.ActStages = {

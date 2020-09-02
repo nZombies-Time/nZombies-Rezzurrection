@@ -70,9 +70,6 @@ function SWEP:Initialize()
 			local mat = nzPerks:Get(self:GetPerk()).material --perk_materials[self:GetPerk()]
 			oldmat = vm:GetMaterial() or ""
 			vm:SetMaterial(mat)
-			timer.Simple(3.2,function()
-		vm:SetMaterial(oldmat)
-	end)
 		end
 	end
 end

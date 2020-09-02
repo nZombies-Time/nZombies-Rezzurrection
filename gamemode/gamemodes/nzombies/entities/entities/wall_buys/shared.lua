@@ -226,14 +226,13 @@ if SERVER then
 			activator:Buy(price, self, function()
 				local wep = activator:Give(self.WeaponGive)
 				if !wep:HasNZModifier("pap") and activator:HasPerk("wall") then
+								wep:ApplyNZModifier("pap")
 				if wep.NZPaPReplacement then
 				activator:Give(wep.NZPaPReplacement)
-				timer.Simple(0, function() activator:GetActiveWeapon():ApplyNZModifier("pap") end)
-				else
-				wep:ApplyNZModifier("pap")
+				timer.Simple(0.1, function() activator:GetActiveWeapon():ApplyNZModifier("pap") end)
 				end
 				end
-				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo()  end end)
+				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
 				self:SetBought(true)
 				return true
 			end)

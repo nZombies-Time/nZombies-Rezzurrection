@@ -195,13 +195,21 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
-		 self:SetBodygroup(  math.random(0,4),  math.random(0,1) )
 	end
 end
 
 function ENT:SpecialInit()
 
 	if CLIENT then
+	if self:GetModel() == "models/nzr/soe_male_zombies.mdl" then
+		self:SetBodygroup(0,  math.random(0,2))
+		self:SetBodygroup(1,0)
+		self:SetBodygroup(2,  math.random(0,1))
+		else
+		self:SetBodygroup(0,  math.random(0,3))
+		self:SetBodygroup(1,  math.random(0,3))
+		self:SetBodygroup(2,  math.random(0,3))
+		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized
 			if string.find(self:GetSequenceName(self:GetSequence()), "nz_emerge") then

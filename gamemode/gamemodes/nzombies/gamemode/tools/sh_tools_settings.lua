@@ -77,7 +77,7 @@ nzTools:CreateTool("settings", {
 		end
 		if data.startwep then
 			local wep = weapons.Get(data.startwep)
-			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
+			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get("robotnik_bo1_1911") end
 			if wep != nil then  
 				if wep.Category and wep.Category != "" then
 					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)

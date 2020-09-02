@@ -57,6 +57,186 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+	["nz_zombie_walker_buried"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_walker_moon"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_walker_eisendrache"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_walker_origins"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_walker_shangrila"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_walker_sumpf"] = {
+		-- Set to false to disable the spawning of this zombie
+		Valid = true,
+		-- Allow you to scale damage on a per-hitgroup basis
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			-- Headshots for double damage
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		-- Function runs whenever the zombie is damaged (NOT when killed)
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			-- If player is playing and is not downed, give points
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		-- Function is run whenever the zombie is killed
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
 	["nz_zombie_walker_ascension"] = {
 		-- Set to false to disable the spawning of this zombie
 		Valid = true,
@@ -291,6 +471,54 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+	["nz_zombie_special_keeper"] = {
+		Valid = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_special_nova"] = {
+		Valid = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
 	["nz_zombie_special_dog"] = {
 		Valid = true,
 		SpecialSpawn = true,
@@ -317,6 +545,31 @@ nzConfig.ValidEnemies = {
 		end
 	},
 	["nz_zombie_special_facehugger"] = {
+		Valid = true,
+		SpecialSpawn = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+	["nz_zombie_special_chestburster"] = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
@@ -526,7 +779,7 @@ if SERVER then
 	}
 
 	-- Player Class
-	nzConfig.BaseStartingWeapons = {"robotnik_bo1_1911"} -- "fas2_p226", "fas2_ots33", "fas2_glock20" "weapon_pistol"
+	nzConfig.BaseStartingWeapons = {"fas2_glock20"} -- "fas2_p226", "fas2_ots33", "fas2_glock20" "weapon_pistol"
 	-- nzConfig.CustomConfigStartingWeps = true -- If this is set to false, the gamemode will avoid using custom weapons in configs
 
 end
