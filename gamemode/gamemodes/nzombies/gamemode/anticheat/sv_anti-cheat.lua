@@ -292,9 +292,11 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             ply:OnCheating()
         end
 
-        if (nzMapping.Settings.ac and nzMapping.Settings.acpreventboost) then -- Stop boosting
+        if (nzMapping.Settings.ac and nzMapping.Settings.acpreventboost and !ply:IsInCreative()) then -- Stop boosting fast upwards
             if (ply:GetVelocity()[3] >= ply:GetJumpPower()) then
-                ply:SetVelocity(Vector(0, 0, math.abs(ply:GetVelocity()[3])) * -1) -- Cancel out their speed
+                timer.Simple(0, function()
+                    ply:SetVelocity(Vector(0, 0, -math.abs(ply:GetVelocity()[3])))
+                end) 
             end
         end
     end
