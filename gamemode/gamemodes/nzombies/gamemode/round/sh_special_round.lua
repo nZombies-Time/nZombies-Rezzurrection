@@ -36,8 +36,6 @@ if SERVER then
 	end
 end
 
-<<<<<<< Updated upstream
-=======
 
 nzRound.ZombieData = nzRound.ZombieData or {}
 function nzRound:AddZombieType(id, class)
@@ -139,9 +137,11 @@ function nzRound:GetZombieType(id)
 	if id == "Shi no Numa" then
 	return "nz_zombie_walker_sumpf"
 	end
+	if id == nil then
+	return "nz_zombie_walker"
+	end
 end
 
->>>>>>> Stashed changes
 nzRound.SpecialData = nzRound.SpecialData or {}
 function nzRound:AddSpecialRoundType(id, data, spawnfunc, roundfunc, endfunc)
 	if SERVER then
@@ -175,8 +175,6 @@ nzRound:AddSpecialRoundType("Hellhounds", {
 	end
 end) -- No round func or end func
 
-<<<<<<< Updated upstream
-=======
 nzRound:AddSpecialRoundType("Keepers", {
 	specialTypes = {
 		["nz_zombie_special_keeper"] = {chance = 100}
@@ -267,7 +265,6 @@ nzRound:AddSpecialRoundType("Spiders", {
 	end
 end) -- No round func or end func
 
->>>>>>> Stashed changes
 nzRound:AddSpecialRoundType("Burning Zombies", {
 	normalTypes = {
 		["nz_zombie_special_burning"] = {chance = 100}

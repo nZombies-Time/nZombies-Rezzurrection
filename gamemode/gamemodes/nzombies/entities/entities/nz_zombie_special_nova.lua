@@ -63,7 +63,7 @@ ENT.ActStages = {
 		minspeed = 5,
 	},
 	[2] = {
-		act = ACT_WALK_ANGRY,
+		act = ACT_WALK,
 		minspeed = 50,
 	},
 	[3] = {
@@ -78,6 +78,7 @@ ENT.ActStages = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+	hasExploded = false
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(60, 600) )
 			self:SetHealth( math.random(200, 30000) )
@@ -144,19 +145,43 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	if (dmgInfo:IsDamageType( 2 ) and !hasExploded) then
+			for k,v in pairs(ents.FindInSphere(self:GetPos(),100)) do
+						if v:IsPlayer() then
+						local walk = v:GetWalkSpeed()
+						local run = v:GetRunSpeed()
+						v:SetDSP(34, false)
+							v:SetRunSpeed(25)
+							v:SetWalkSpeed(25)
+							timer.Simple(1.2,function()
+								v:SetRunSpeed(run)
+							v:SetWalkSpeed(walk)
+							end)
+						end
+	end
+        self:SetNoDraw(true)
+        hasExploded = true
+            local ent = ents.Create("env_explosion")
+        ent:SetPos(self:GetPos())
+        ent:SetAngles(self:GetAngles())
+        ent:Spawn()
+        ent:SetKeyValue("imagnitude", "20")
+		ent:SetKeyValue("iradiusoverride", "67")
+        ent:Fire("explode")
 	self:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
 	ParticleEffect("novagas_xplo",self:GetPos(),self:GetAngles(),nil)
 		local vaporizer = ents.Create("point_hurt")
 		if !vaporizer:IsValid() then return end
-		vaporizer:SetKeyValue("Damage", 5)
+		vaporizer:SetKeyValue("Damage", 0.1)
 		vaporizer:SetKeyValue("DamageRadius", 100)
-		vaporizer:SetKeyValue("DamageType",DMG_RADIATION)
+		vaporizer:SetKeyValue("DamageDelay", 0.25)
+		vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
 		vaporizer:SetPos(self:GetPos())
 		vaporizer:SetOwner(self)
 		vaporizer:Spawn()
 		vaporizer:Fire("TurnOn","",0)
-		vaporizer:Fire("kill","",20)
+		vaporizer:Fire("kill","",18)
+		end
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()
@@ -177,7 +202,6 @@ function ENT:OnZombieDeath(dmgInfo)
 		end
 	end)
 	self:EmitSound( self.DeathSounds[ math.random( #self.DeathSounds ) ], 100)
-
 end
 
 function ENT:BodyUpdate()
@@ -188,7 +212,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 150 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 50 ) then self.CalcIdeal = ACT_WALK_ANGRY elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 150 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 50 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP

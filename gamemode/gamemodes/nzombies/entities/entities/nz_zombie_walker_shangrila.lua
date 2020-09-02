@@ -196,10 +196,11 @@ function ENT:StatsInitialize()
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
 				if math.random(0,1) == 0 then 
+		self:SetBodygroup(0,0)
 		self:SetBodygroup( 1,  math.random(0,1) )
 		else
-		self:SetBodygroup( 0, math.random(1,3))
-		self:SetBodygroup( 1, math.random(2,3))
+		self:SetBodygroup( 0, math.random(2,3))
+		self:SetBodygroup( 1, math.random(1,3))
 		end
 	end
 end

@@ -172,3 +172,213 @@ nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
 		end
 	end,
 }) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Brute (Dead Space)", "nz_zombie_boss_brute", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(6,7)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 350 + 1000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(2,3)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Brutus", "nz_zombie_boss_brutus", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 130 + 1500)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Divider (Dead Space)", "nz_zombie_boss_Divider", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(4,6)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 100 + 1000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("William Birkin", "nz_zombie_boss_G1", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(11,13)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 350 + 3000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(7,8)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("The Mangler", "nz_zombie_boss_mangler", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 130 + 1500)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("The Margwa", "nz_zombie_boss_margwa", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(8,11)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 450 + 6000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Napalm Zombie", "nz_zombie_boss_Napalm", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 115 + 3000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,4)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Nemesis", "nz_zombie_boss_Nemesis", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(8,9)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 500 + 1000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,7)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("George Romero", "nz_zombie_boss_romero", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(2,8)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 225 + 8000)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,6)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 160 + 1500)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(7,11)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(nzRound:GetNumber() * 388 + 2500)
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

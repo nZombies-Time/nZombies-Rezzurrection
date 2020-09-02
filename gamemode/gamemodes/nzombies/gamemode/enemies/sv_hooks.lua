@@ -18,6 +18,35 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				drop:Spawn()
 			end
 		end
+		if attacker:HasPerk("everclear") then
+		if math.random(7) == 1 then
+			enemy:EmitSound("bo1_overhaul/nap/explode.mp3",511)
+            local ent = ents.Create("env_explosion")
+        ent:SetPos(enemy:GetPos())
+        ent:SetAngles(enemy:GetAngles())
+        ent:Spawn()
+        ent:SetKeyValue("imagnitude", "50")
+        ent:Fire("explode")
+            local entParticle = ents.Create("info_particle_system")
+            entParticle:SetKeyValue("start_active", "1")
+            entParticle:SetKeyValue("effect_name", "napalm_postdeath_napalm")
+            entParticle:SetPos(enemy:GetPos())
+            entParticle:SetAngles(enemy:GetAngles())
+            entParticle:Spawn()
+            entParticle:Activate()
+            entParticle:Fire("kill","",9)
+            local vaporizer = ents.Create("point_hurt")
+            if !vaporizer:IsValid() then return end
+            vaporizer:SetKeyValue("Damage", 22)
+            vaporizer:SetKeyValue("DamageRadius", 100)
+            vaporizer:SetKeyValue("DamageType",DMG_BURN)
+            vaporizer:SetPos(enemy:GetPos())
+            vaporizer:SetOwner(enemy)
+            vaporizer:Spawn()
+            vaporizer:Fire("TurnOn","",0)
+            vaporizer:Fire("kill","",9)
+			end
+		end
 	end
 
 	-- Run on-killed function to give points if the hook isn't blocking it
@@ -64,14 +93,18 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 	-- Who's Who clones can't take damage!
 	if zombie:GetClass() == "whoswho_downed_clone" then return true end
 	
-	if zombie.Alive and zombie:Health() <= 0 then zombie:Kill(dmginfo) end -- No zombie should ever have under 0 health
+	if zombie.Alive and zombie:Alive() and zombie:Health() < 0 then zombie:Kill(dmginfo) end
 	
 	local attacker = dmginfo:GetAttacker()
 
-	if !attacker:IsPlayer() then return end
+	if !attacker:IsValid() then return end
 	if IsValid(zombie) then
 		if zombie.NZBossType then
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end -- Bosses can still be invulnerable
+			
+			if dmginfo:IsDamageType( 134217728 )  then
+				dmginfo:ScaleDamage( 1.5 )
+			return end
 			
 			local data = nzRound:GetBossData(zombie.NZBossType) -- Just in case it was switched mid-game, use the id stored on zombie
 			if data then -- If we got the boss data
@@ -87,18 +120,29 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 		elseif zombie:IsValidZombie() then
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end
 			local hitgroup = util.QuickTrace( dmginfo:GetDamagePosition( ), dmginfo:GetDamagePosition( ) ).HitGroup
-			
+
 			if nzPowerUps:IsPowerupActive("insta") then
-				dmginfo:ScaleDamage(zombie:Health()) --zombie:Kill(dmginfo)
+				zombie:Kill(dmginfo)
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
-
-			if attacker:HasPerk("dtap2") and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
 			
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1.5) end
+			if attacker:IsPlayer() and attacker:HasPerk("sake") and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
+				zombie:Kill(dmginfo)
+				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
+			return end
+			
+			if attacker:IsPlayer() and attacker:HasPerk("danger") and dmginfo:IsDamageType( 64 ) then
+				dmginfo:ScaleDamage( 1.5 )
+			return end
+			
+			if attacker:IsPlayer() and dmginfo:IsDamageType( 8 ) then
+				zombie:Ignite((dmginfo:GetDamage()/10))
+			return end
 
-			--  Pack-a-Punch doubles damage
-			if dmginfo:GetAttacker():GetActiveWeapon():HasNZModifier("pap") then dmginfo:ScaleDamage(2) end
+
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+
+			--  Pack-a-Punch doubles damage...hell no it doesnt
 
 			if zombie:Health() > dmginfo:GetDamage() then
 				if zombie.HasTakenDamageThisTick then return end
@@ -124,6 +168,7 @@ local function OnRagdollCreated( ent )
 	end
 end
 hook.Add("OnEntityCreated", "nzEnemies_OnEntityCreated", OnRagdollCreated)
+
 
 -- Increase max zombies alive per round
 hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()

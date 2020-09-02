@@ -28,9 +28,7 @@ function PLAYER:Loadout()
 		self.Player:Give( nzMapping.Settings.startwep )
 	else
 		-- A setting does not exist, give default starting weapons
-		for k,v in pairs(nzConfig.BaseStartingWeapons) do
-			self.Player:Give( v )
-		end
+			self.Player:Give("robotnik_bo1_1911" )
 	end
 	self.Player:GiveMaxAmmo()
 

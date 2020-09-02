@@ -1,0 +1,6 @@
+"UnLitGeneric"
+{
+    $basetexture    "models\dmc5ppl\vergil\e1"
+    $additive        "1"
+	$nocull "1"
+}

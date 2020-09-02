@@ -9,8 +9,8 @@ ENT.Author = "Ruko"
 ENT.Models = { "models/roach/blackops3/goalkeeper.mdl" }
 
 ENT.AttackRange = 90
-ENT.DamageLow = 90
-ENT.DamageHigh = 150
+ENT.DamageLow = 40
+ENT.DamageHigh = 50
 
 ENT.AttackSequences = {
 	{seq = "melee1"},

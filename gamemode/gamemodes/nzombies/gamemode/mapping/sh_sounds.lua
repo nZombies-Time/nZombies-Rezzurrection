@@ -1,11 +1,6 @@
 if (SERVER) then
     util.AddNetworkString("nzSounds.PlaySound")
     util.AddNetworkString("nzSounds.RefreshSounds")
-
-    hook.Add("PlayerSpawn", "NZForceSyncSounds", function(ply)
-        net.Start("nzSounds.RefreshSounds")
-        net.Send(ply)
-    end)
 end
 
 nzSounds = {}
@@ -29,19 +24,19 @@ nzSounds.Sounds.Default.Grab = "nz/powerups/power_up_grab.wav"
 nzSounds.Sounds.Default.InstaKill = "nz/powerups/insta_kill.mp3"
 nzSounds.Sounds.Default.FireSale = "nz/powerups/fire_sale_announcer.wav"
 nzSounds.Sounds.Default.DeathMachine = "nz/powerups/deathmachine.mp3"
-nzSounds.Sounds.Default.Carpenter = "nz/powerups/carpenter.wav"
-nzSounds.Sounds.Default.Nuke = "nz/powerups/nuke.wav"
+nzSounds.Sounds.Default.Carpenter = "nz/announcer/powerups/carpenter.wav"
+nzSounds.Sounds.Default.Nuke = "nz/announcer/powerups/nuke.wav"
 nzSounds.Sounds.Default.DoublePoints = "nz/powerups/double_points.mp3"
 nzSounds.Sounds.Default.MaxAmmo = "nz/powerups/max_ammo.mp3"
 nzSounds.Sounds.Default.ZombieBlood = "nz/powerups/zombie_blood.wav"
-nzSounds.Sounds.Default.Shake = "nzr/announcer/mysterybox/randombox/box_spinning.wav"
+nzSounds.Sounds.Default.Shake = "nz/randombox/box_spinning.wav"
 nzSounds.Sounds.Default.Poof = "nz/randombox/poof.wav"
 nzSounds.Sounds.Default.Laugh = "nz/randombox/teddy_bear_laugh.wav"
 nzSounds.Sounds.Default.Bye = "nz/randombox/Announcer_Teddy_Zombies.wav"
 nzSounds.Sounds.Default.Jingle = "nz/randombox/random_box_jingle.wav"
-nzSounds.Sounds.Default.Open = "nzr/announcer/mysterybox/box_open.mp3"
-nzSounds.Sounds.Default.Close = "nzr/announcer/mysterybox/box_close.mp3"
---nzSounds.MainEvents = {"RoundStart", "RoundEnd", "SpecialRoundStart", "SpecialRoundEnd", "GameEnd", "DogRound"}
+nzSounds.Sounds.Default.Open = "nz/randombox/box_open.wav"
+nzSounds.Sounds.Default.Close = "nz/randombox/box_close.wav"
+nzSounds.MainEvents = {"RoundStart", "RoundEnd", "SpecialRoundStart", "SpecialRoundEnd", "GameEnd", "DogRound"}
 
 function nzSounds:RefreshSounds()
     nzSounds.Sounds.Custom.RoundStart = nzMapping.Settings.roundstartsnd
@@ -102,12 +97,6 @@ function nzSounds:GetSound(event)
     end
 
     if (CLIENT) then
-        -- FALLBACK in case for some reason the client has not gotten their sounds to refresh yet
-        if (nzSounds and nzSounds.Sounds and table.IsEmpty(nzSounds.Sounds.Custom)) then    
-            nzSounds:RefreshSounds()
-            snd = nzSounds:GetSound(event)
-        end
-
         if (!nzSounds.Sounds.Default[event]) then 
             if (isstring(event)) then
                 print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
@@ -163,6 +152,10 @@ function nzSounds:Play(event, ply) -- Plays everywhere either for 1 or all playe
     if (CLIENT) then
         if (event == "GameEnd") then
             nzSounds:StopAll()
+        elseif (string.find(event, "Round")) then -- Stop all main event sounds for this one
+            for k,v in pairs(nzSounds.MainEvents) do
+                nzSounds:Stop(v)
+            end
         else
             nzSounds:Stop(event)
         end
@@ -200,11 +193,5 @@ if (CLIENT) then
     net.Receive("nzSounds.RefreshSounds", function()
         nzSounds:RefreshSounds()  
         nzSounds:StopAll()
-    end)
-
-    hook.Add("InitPostEntity", "NZSyncCustomSounds", function()
-        timer.Simple(2, function()
-            nzSounds:RefreshSounds()  
-        end)
     end)
 end

@@ -39,6 +39,7 @@ nzTools:CreateTool("settings", {
 		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
 		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
 		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+		valz["Row15"] = data.zombietype or "Kino der Toten"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -48,16 +49,6 @@ nzTools:CreateTool("settings", {
 		valz["ACRow6"] = data.acpreventcjump == nil and false or tobool(data.acpreventcjump)
 
 		if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
-
-		-- Cache all Wunderfizz perks for saving/loading allowed Wunderfizz perks:
-		local wunderfizzlist = {}
-		for k,v in pairs(nzPerks:GetList()) do
-			if k != "wunderfizz" and k != "pap" then
-				wunderfizzlist[k] = {true, v}
-			end
-		end
-
-		valz["Wunderfizz"] = data.wunderfizzperklist == nil and wunderfizzlist or data.wunderfizzperklist
 
 		-- More compact and less messy:
 		for k,v in pairs(nzSounds.struct) do
@@ -86,7 +77,7 @@ nzTools:CreateTool("settings", {
 		end
 		if data.startwep then
 			local wep = weapons.Get(data.startwep)
-			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
+			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get("robotnik_bo1_1911") end
 			if wep != nil then  
 				if wep.Category and wep.Category != "" then
 					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
@@ -187,6 +178,20 @@ nzTools:CreateTool("settings", {
 			Row14:SetValue( valz["Row14"] )
 			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
 			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
+			
+			local Row15 = DProperties:CreateRow("Map Settings", "Zombie Type")
+			Row15:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.ZombieData) do
+				if k == valz["Row15"] then
+					Row15:AddChoice(k, k, true)
+					found = true
+				else
+					Row15:AddChoice(k, k, false)
+				end
+			end
+			Row15.DataChanged = function( _, val ) valz["Row15"] = val end
+			Row15:SetTooltip("Sets the zombies that will appear in your map.")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -203,9 +208,10 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
+			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
+			print(nzRound:GetZombieType(data.zombietype))
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
-			--if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperklist = nil else data.wunderfizzperklist = valz["WMPerks"] end
-			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
+			if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperks = nil else data.wunderfizzperks = valz["WMPerks"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end
 			if valz["ACRow3"] == nil then data.acsavespot = nil else data.acsavespot = tobool(valz["ACRow3"]) end
@@ -937,38 +943,28 @@ nzTools:CreateTool("settings", {
 			perkchecklist:SetSpaceY( 5 )
 			perkchecklist:SetSpaceX( 5 )
 			
-			--for k,v in pairs(nzPerks:GetList()) do
-			--	if k != "wunderfizz" and k != "pap" then
-				for k,v in pairs(wunderfizzlist) do
-					if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
-
+			for k,v in pairs(nzPerks:GetList()) do
+				if k != "wunderfizz" and k != "pap" then
 					local perkitem = perkchecklist:Add( "DPanel" )
 					perkitem:SetSize( 130, 20 )
 					
 					local check = perkitem:Add("DCheckBox")
 					check:SetPos(2,2)
-
-					if (nzMapping.Settings.wunderfizzperklist and istable(nzMapping.Settings.wunderfizzperklist[k]) and isbool(nzMapping.Settings.wunderfizzperklist[k][1])) then
-						check:SetValue(nzMapping.Settings.wunderfizzperklist[k][1])
-					else
-						check:SetValue(true)
-					end
-
-					--if has then perklist[k] = true else perklist[k] = nil end
+					local has = nzMapping.Settings.wunderfizzperks and table.HasValue(nzMapping.Settings.wunderfizzperks, k) or 1
+					check:SetValue(has)
+					if has then perklist[k] = true else perklist[k] = nil end
 					check.OnChange = function(self, val)
-						--if val then perklist[k] = true else perklist[k] = nil end
-						valz["Wunderfizz"][k][1] = val
-						--nzMapping:SendMapData( {wunderfizzperks = perklist} )
+						if val then perklist[k] = true else perklist[k] = nil end
+						nzMapping:SendMapData( {wunderfizzperks = perklist} )
 					end
 					
 					local name = perkitem:Add("DLabel")
 					name:SetTextColor(Color(50,50,50))
 					name:SetSize(105, 20)
 					name:SetPos(20,1)
-					name:SetText(v[2])
+					name:SetText(v)
 				end
-				--end
-			--end
+			end
 		else
 			local text = vgui.Create("DLabel", DProperties)
 			text:SetText("Enable Advanced Mode for more options.")

@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/dmc5ppl/vergil/yamato/wp03_000_albmout"
+	"$bumpmap" "models/dmc5ppl/vergil/yamato/wp03_000_nrmrout"
+	"$phongexponenttexture" "models/dmc5ppl/vergil/yamato/wp03_000_S"
+}
