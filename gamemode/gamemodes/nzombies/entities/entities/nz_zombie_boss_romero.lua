@@ -11,6 +11,47 @@ ENT.AttackRange = 140
 ENT.DamageLow = 70
 ENT.DamageHigh = 88
 
+sound.Add({
+	channel = CHAN_VOICE,
+	name = "NPC_BO1o.Director.IdleVox",
+	level = 511,
+	sound = {
+		"bo1_overhaul/dir/vox_director_behind_01.mp3","bo1_overhaul/dir/vox_director_behind_02.mp3",
+		"bo1_overhaul/dir/vox_director_behind_03.mp3","bo1_overhaul/dir/vox_director_behind_04.mp3",
+		
+		"bo1_overhaul/dir/vox/vox_romero_search_1.mp3","bo1_overhaul/dir/vox/vox_romero_search_2.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_search_3.mp3","bo1_overhaul/dir/vox/vox_romero_search_4.mp3",
+		
+		"bo1_overhaul/dir/vox/vox_romero_taunt_1.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_2.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_3.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_4.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_5.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_6.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_7.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_8.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_9.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_10.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_11.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_12.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_taunt_13.mp3","bo1_overhaul/dir/vox/vox_romero_taunt_14.mp3",
+	}
+})
+
+sound.Add({
+	channel = CHAN_VOICE,
+	name = "NPC_BO1o.Director.EnragedVox",
+	level = 511,
+	sound = {
+		"bo1_overhaul/dir/vox_director_slam_01.mp3",
+		"bo1_overhaul/dir/vox_director_slam_02.mp3",
+		"bo1_overhaul/dir/vox_director_slam_03.mp3",
+		"bo1_overhaul/dir/vox_director_slam_04.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_react_1.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_react_2.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_react_3.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_react_4.mp3",
+		"bo1_overhaul/dir/vox/vox_romero_react_5.mp3"
+		
+	}
+})
+
+ENT.OnIdleSounds = {}
+ENT.IdleSoundDelay = 15
 ENT.OnDeathSounds = {
 	"bo1_overhaul/dir/vox_director_die_01.mp3","bo1_overhaul/dir/vox_director_die_02.mp3","bo1_overhaul/dir/vox_director_die_03.mp3",
 }
@@ -39,15 +80,34 @@ ENT.AttackHitSounds = {
 }
 
 ENT.PainSounds = {
-		"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"bo1_overhaul/dir/vox_director_pain_yell_04.mp3",
+	"bo1_overhaul/dir/vox_director_pain_yell_03.mp3"
 }
 
 ENT.WalkSounds = {
-	"empty.wav"
+	"bo1_overhaul/dir/sfx/step_01.mp3",
+	"bo1_overhaul/dir/sfx/step_02.mp3",
+	"bo1_overhaul/dir/sfx/step_03.mp3",
+	"bo1_overhaul/dir/sfx/step_04.mp3",
+	"bo1_overhaul/dir/sfx/step_01.mp3",
+	"bo1_overhaul/dir/sfx/step_02.mp3",
+	"bo1_overhaul/dir/sfx/step_03.mp3",
+	"bo1_overhaul/dir/sfx/step_04.mp3",
+	"bo1_overhaul/dir/sfx/step_01.mp3",
+	"bo1_overhaul/dir/sfx/step_02.mp3",
+	"bo1_overhaul/dir/sfx/step_03.mp3",
+	"bo1_overhaul/dir/sfx/step_04.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_1.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_2.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_3.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_6.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_7.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_8.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_10.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_11.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_12.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_taunt_13.mp3",
+	"bo1_overhaul/dir/vox/vox_romero_angry_3.mp3"
 	
 }
 
@@ -95,7 +155,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -143,11 +203,6 @@ function ENT:StatsInitialize()
 		self:SetRunSpeed(69)
 		self:SetHealth(4500)
 		self:SetMaxHealth(4500)
-		counting = true
-		dying = false
-		slamming = false
-		taunting = true
-		
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -178,6 +233,14 @@ self.Enraged = false
 	self:NetworkVar("Entity", 0, "ClawHook")
 	self:NetworkVar("Bool", 1, "UsingClaw")
 	self:NetworkVar("Bool", 2, "Flamethrowing")
+end
+
+function ENT:UpdateIdleSounds()
+	if self.Enraged then
+		self.OnIdleSounds = {"NPC_BO1o.Director.EnragedVox"}
+	else
+		self.OnIdleSounds = {"NPC_BO1o.Director.IdleVox"}
+	end
 end
 
 function ENT:OnSpawn()
@@ -212,14 +275,10 @@ self:SetInvulnerable(true)
 	
 		self:SetNoDraw(false)
 		self:PlaySequenceAndWait("emerge")
-		timer.Simple(0.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_0.mp3",511)end)
-		timer.Simple(2.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_1.mp3",511)end)
-		timer.Simple(14,function() taunting = false end)
+		timer.Simple(2,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_0.mp3",511)end)
+		timer.Simple(6,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_1.mp3",511)end)
 		timer.Simple(2,function()self:SetInvulnerable(false)end)
 		self.IsEmerging = false
-		counting = false
-		
-		self.loco:SetDesiredSpeed(69)
 		self:ResetSequence("walk")
 		self:SetCycle(0)
 end
@@ -229,26 +288,21 @@ function ENT:OnInjured(dmg, delay)
 	if self:WaterLevel() < 1 and not self.Enraged then
 		self.Enraged = true
 			self.loco:SetDesiredSpeed(350)
+		self:UpdateIdleSounds()
 		self:EmitSound("bo1_overhaul/dir/vox_director_angered_0"..math.random(4)..".mp3",511)
 		self:SetBodygroup(0,1)
 		util.ScreenShake(self:GetPos(),10000,5000,3,1000)
 		self:EmitSound("bo1_overhaul/dir/sfx/_aggro_2d.mp3",511)
-		timer.Simple(30,function()
-		self.Enraged = false
-		self:SetBodygroup(0,0)
-		self:SetRunSpeed(69)
-		self.loco:SetDesiredSpeed(69)
-		self:EmitSound("bo1_overhaul/dir/vox/vox_romero_water_"..math.random(2)..".mp3")
-		end)
+		self:PlaySequenceAndWait("enrage"..math.random(2),1,function(self,cycle)if self.Dying then return true end end)
 	elseif self:WaterLevel() >= 1 and not self.Enraged then
 			local seq,dur = self:LookupSequence("yell_water")
-			self:PlaySequenceAndWait("yell_water")
+			self:PlaySequenceAndWait("yell_water",1,function(self,cycle)if self.Dying then return true end end)
 			self:EmitSound("bo1_overhaul/dir/vox_director_speed_buff_03.mp3",1.4)
 		end
 	end
 
 
---[[function ENT:OnChaseEnemy(enemy) 
+function ENT:OnChaseEnemy(enemy) 
 	self:EnragedWaterCodeInnit()
 end
 
@@ -269,10 +323,10 @@ function ENT:EnragedWaterCodeInnit()
 		
 		self:EmitSound("bo1_overhaul/dir/vox/vox_romero_water_"..math.random(2)..".mp3")
 	end
-end]]
+end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
+
 	self:ReleasePlayer()
 	self:StopFlames()
 		self.loco:SetDesiredSpeed(0)
@@ -304,7 +358,7 @@ function ENT:OnZombieDeath(dmgInfo)
 			fx:SetScale(10)
 			util.Effect("WaterSurfaceExplosion",fx)
 	self:EmitSound("bo1_overhaul/dir/sfx/_beam.mp3",511)
-	self:ResetSequence("demerge")
+	self:PlaySequenceAndWait("demerge")
 		end
 	end)
 
@@ -359,7 +413,6 @@ function ENT:Director_DynamicLight(color, radius, brightness,style)
 end
 
 function ENT:OnTargetInAttackRange()
-taunting = true
     local atkData = {}
     atkData.dmglow = 70
     atkData.dmghigh = 88
@@ -387,9 +440,6 @@ function ENT:OnPathTimeOut()
 			})
 			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-			slamming = true
-			
-			taunting = true
 			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_0"..math.random(0,1)..".mp3",511)
 			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_flux.mp3")
 			ParticleEffect("romero_club_hit",self:LocalToWorld(Vector(60,-30,0)),Angle(0,0,0),nil)
@@ -413,7 +463,6 @@ function ENT:OnPathTimeOut()
 			self:SetVelocity(Vector(0,0,0))
 			self:TimedEvent(dur, function()
 			self:SetAttackRange(140)
-			slamming = false
 			if self.Enraged then
 					self.loco:SetDesiredSpeed(350)
 				else
@@ -520,37 +569,7 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-if !dying and !slamming and self:Health() > 0 then
-if !counting and !self:IsAttacking() then
-counting = true
-if self.Enraged then
-timer.Simple(0.34,function()
-self:EmitSound("bo1_overhaul/dir/sfx/step_0"..math.random(1,4)..".mp3")
-counting = false
-end)
-else
-timer.Simple(0.8,function()
-self:EmitSound("bo1_overhaul/dir/sfx/step_0"..math.random(1,4)..".mp3")
-counting = false
-end)
-end
-end
-if !taunting then
-taunting = true
-timer.Simple(11,function()
-if self.Enraged then
-self:EmitSound("bo1_overhaul/dir/vox/vox_romero_angry_"..math.random(1,5)..".mp3")
-taunting = false
-else
-self:EmitSound("bo1_overhaul/dir/vox/vox_romero_taunt_"..math.random(1,14)..".mp3")
-taunting = false
-end
-end)
-end
-end
-if self:IsAttacking() then
-self.loco:SetDesiredSpeed(0)
-end
+
 	if self:WaterLevel() > 0 and self.Enraged then
 		self.Enraged = false
 		self:SetBodygroup(0,0)
@@ -567,7 +586,6 @@ end
 		
 		self:EmitSound("bo1_overhaul/dir/vox/vox_romero_water_"..math.random(2)..".mp3")
 	end
-	
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

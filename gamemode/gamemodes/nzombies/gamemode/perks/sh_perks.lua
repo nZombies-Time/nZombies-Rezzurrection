@@ -58,7 +58,7 @@ nzPerks:NewPerk("jugg", {
 	on_model = "models/alig96/perks/jugg/jugg_on.mdl",
 	price = 2500,
 	material = "models/perk_bottle/c_perk_bottle_jugg",
-	icon = Material("perk_icons/chron/jugg.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/jugg.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
 			ply:SetMaxHealth(250)
@@ -76,7 +76,7 @@ nzPerks:NewPerk("dtap", {
 	on_model = "models/alig96/perks/doubletap/doubletap_on.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_dtap",
-	icon = Material("perk_icons/chron/dtap.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/dtap.png", "smooth unlitgeneric"),
 	color = Color(255, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -114,7 +114,7 @@ nzPerks:NewPerk("revive", {
 	on_model = "models/alig96/perks/revive/revive_on.mdl",
 	price = 1500,
 	material = "models/perk_bottle/c_perk_bottle_revive",
-	icon = Material("perk_icons/chron/revive.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/revive.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 255),
 	func = function(self, ply, machine)
 			if #player.GetAllPlaying() <= 1 then
@@ -137,7 +137,7 @@ nzPerks:NewPerk("speed", {
 	on_model = "models/alig96/perks/speed/speed_on.mdl",
 	price = 3000,
 	material = "models/perk_bottle/c_perk_bottle_speed",
-	icon = Material("perk_icons/chron/speed.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/speed.png", "smooth unlitgeneric"),
 	color = Color(100, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -320,7 +320,7 @@ nzPerks:NewPerk("dtap2", {
 	on_model = "models/alig96/perks/doubletap2/doubletap2.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_dtap2",
-	icon = Material("perk_icons/chron/dtap2.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/dtap2.png", "smooth unlitgeneric"),
 	color = Color(255, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -358,49 +358,55 @@ nzPerks:NewPerk("staminup", {
 	on_model = "models/alig96/perks/staminup/staminup.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_stamin",
-	icon = Material("perk_icons/chron/staminup.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/staminup.png", "smooth unlitgeneric"),
 	color = Color(200, 255, 100),
 	func = function(self, ply, machine)
-		ply:SetRunSpeed(321)
-		ply:SetMaxRunSpeed( 321 )
+		ply:SetRunSpeed(375)
+		ply:SetMaxRunSpeed( 375 )
 		ply:SetStamina( 200 )
 		ply:SetMaxStamina( 200 )
 	end,
 	lostfunc = function(self, ply)
-		ply:SetRunSpeed(300)
-		ply:SetMaxRunSpeed( 300 )
+		ply:SetRunSpeed(325)
+		ply:SetMaxRunSpeed( 325 )
 		ply:SetStamina( 100 )
 		ply:SetMaxStamina( 100 )
 	end,
 })
 
+<<<<<<< Updated upstream
+=======
 nzPerks:NewPerk("politan", {
 	name = "Random-o-Politan",
 	off_model = "models/alig96/perks/random/random_off.mdl",
 	on_model = "models/alig96/perks/random/random_on.mdl",
 	price = 5000,
 	material = "models/perk_bottle/c_perk_bottle_random",
-	icon = Material("perk_icons/chron/random.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/random.png", "smooth unlitgeneric"),
 	color = Color(255, 172, 224),
 	func = function(self, ply, machine)
 		local tbl = {}
 		for k,v in pairs(ply:GetWeapons()) do
+			if v:IsFAS2() then
 				table.insert(tbl, v)
-		end
-			for k,v in pairs(tbl) do
-			if !v:IsSpecial() then
-				v:ApplyNZModifier("rando")
-				end
 			end
+		end
+		if tbl[1] != nil then
+			for k,v in pairs(tbl) do
+				v:ApplyNZModifier("rando")
+			end
+		end
 	end,
 	lostfunc = function(self, ply)
+		if !ply:HasPerk("politan") then
 			local tbl = {}
 			for k,v in pairs(ply:GetWeapons()) do
 				if v:HasNZModifier("rando") then
 					v:RevertNZModifier("rando")
+				
 			end
 			end
-		
+		end
 	end,
 })
 
@@ -410,7 +416,7 @@ nzPerks:NewPerk("sake", {
 	on_model = "models/alig96/perks/sake/sake.mdl",
 	price = 6000,
 	material = "models/perk_bottle/c_perk_bottle_sake",
-	icon = Material("perk_icons/chron/sake.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/sake.png", "smooth unlitgeneric"),
 	color = Color(185, 214, 0),
 	func = function(self, ply, machine)
 	end,
@@ -428,7 +434,7 @@ nzPerks:NewPerk("wall", {
 	on_model = "models/alig96/perks/wall/wall.mdl",
 	price = 8000,
 	material = "models/perk_bottle/c_perk_bottle_wall",
-	icon = Material("perk_icons/chron/wall.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/wall.png", "smooth unlitgeneric"),
 	color = Color(230, 104, 167),
 	func = function(self, ply, machine)
 	end,
@@ -442,7 +448,7 @@ nzPerks:NewPerk("danger", {
 	on_model = "models/alig96/perks/danger/danger_on.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_danger",
-	icon = Material("perk_icons/chron/danger.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/danger.png", "smooth unlitgeneric"),
 	color = Color(232, 116, 116),
 	func = function(self, ply, machine)
 	end,
@@ -456,7 +462,7 @@ nzPerks:NewPerk("everclear", {
 	on_model = "models/alig96/perks/everclear/everclear.mdl",
 	price = 3000,
 	material = "models/perk_bottle/c_perk_bottle_everclear",
-	icon = Material("perk_icons/chron/everclear.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/everclear.png", "smooth unlitgeneric"),
 	color = Color(222, 222, 222),
 	func = function(self, ply, machine)
 	end,
@@ -470,7 +476,7 @@ nzPerks:NewPerk("gin", {
 	on_model = "models/alig96/perks/gin/gin.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_gin",
-	icon = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/gin.png", "smooth unlitgeneric"),
 	color = Color(75, 158, 188),
 	func = function(self, ply, machine)
 	if #player.GetAllPlaying() <= 1 then
@@ -492,13 +498,14 @@ nzPerks:NewPerk("gin", {
 	end,
 })
 
+>>>>>>> Stashed changes
 nzPerks:NewPerk("phd", {
 	name = "PhD Flopper",
 	off_model = "models/alig96/perks/phd/phdflopper_off.mdl",
 	on_model = "models/alig96/perks/phd/phdflopper.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_phd",
-	icon = Material("perk_icons/chron/phd.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/phd.png", "smooth unlitgeneric"),
 	color = Color(255, 50, 255),
 	func = function(self, ply, machine)
 	end,
@@ -512,7 +519,7 @@ nzPerks:NewPerk("deadshot", {
 	on_model = "models/alig96/perks/deadshot/deadshot.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_deadshot",
-	icon = Material("perk_icons/chron/deadshot.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/deadshot.png", "smooth unlitgeneric"),
 	color = Color(150, 200, 150),
 	func = function(self, ply, machine)
 	end,
@@ -526,7 +533,7 @@ nzPerks:NewPerk("mulekick", {
 	on_model = "models/alig96/perks/mulekick/mulekick.mdl",
 	price = 4000,
 	material = "models/perk_bottle/c_perk_bottle_mulekick",
-	icon = Material("perk_icons/chron/mulekick.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/mulekick.png", "smooth unlitgeneric"),
 	color = Color(100, 200, 100),
 	func = function(self, ply, machine)
 	end,
@@ -545,7 +552,7 @@ nzPerks:NewPerk("tombstone", {
 	on_model = "models/alig96/perks/tombstone/tombstone.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_tombstone",
-	icon = Material("perk_icons/chron/tombstone.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/tombstone.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 100),
 	func = function(self, ply, machine)
 	end,
@@ -559,7 +566,7 @@ nzPerks:NewPerk("whoswho", {
 	on_model = "models/alig96/perks/whoswho/whoswho.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_whoswho",
-	icon = Material("perk_icons/chron/whoswho.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/whoswho.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 255),
 	func = function(self, ply, machine)
 	end,
@@ -573,7 +580,7 @@ nzPerks:NewPerk("cherry", {
 	on_model = "models/alig96/perks/cherry/cherry.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_cherry",
-	icon = Material("perk_icons/chron/cherry.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/cherry.png", "smooth unlitgeneric"),
 	color = Color(50, 50, 200),
 	func = function(self, ply, machine)
 	end,
@@ -587,7 +594,7 @@ nzPerks:NewPerk("vulture", {
 	on_model = "models/alig96/perks/vulture/vultureaid.mdl",
 	price = 3000,
 	material = "models/perk_bottle/c_perk_bottle_vulture",
-	icon = Material("perk_icons/chron/vulture.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/vulture.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
 	end,
@@ -607,7 +614,7 @@ nzPerks:NewPerk("widowswine", {
 	on_skin = 0,
 	price = 4000,
 	material = "models/perk_bottle/c_perk_bottle_widowswine",
-	icon = Material("perk_icons/chron/widows_wine.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/widows_wine.png", "smooth unlitgeneric"),
 	color = Color(255, 50, 200),
 	func = function(self, ply, machine)
 	end,

@@ -24,8 +24,8 @@ ENT.AttackRange = 65
 ENT.RunSpeed = 200
 ENT.WalkSpeed = 100
 ENT.Acceleration = 400
-ENT.DamageLow = 35
-ENT.DamageHigh = 45
+ENT.DamageLow = 40
+ENT.DamageHigh = 40
 
 -- important for ent:IsZombie()
 ENT.bIsZombie = true
@@ -137,7 +137,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(2750) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -950,11 +950,7 @@ function ENT:Attack( data )
 		
 		if type(target) == "table" then
 			local id, dur = self:LookupSequenceAct(target.seq)
-			if !target.dmgtimes then
-			data.attackseq = {seq = id, dmgtimes =  {0.5} }
-			else
-			data.attackseq = {seq = id, dmgtimes = target.dmgtimes }
-			end
+			data.attackseq = {seq = id, dmgtimes = target.dmgtimes or {0.5}}
 			data.attackdur = dur
 		elseif target then -- It is a string or ACT
 			local id, dur = self:LookupSequenceAct(attacktbl)

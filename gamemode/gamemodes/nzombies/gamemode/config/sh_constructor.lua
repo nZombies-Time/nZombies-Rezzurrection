@@ -57,6 +57,8 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+<<<<<<< Updated upstream
+=======
 	["nz_zombie_walker_buried"] = {
 		-- Set to false to disable the spawning of this zombie
 		Valid = true,
@@ -447,6 +449,7 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+>>>>>>> Stashed changes
 	["nz_zombie_special_burning"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
@@ -544,6 +547,8 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+<<<<<<< Updated upstream
+=======
 	["nz_zombie_special_facehugger"] = {
 		Valid = true,
 		SpecialSpawn = true,
@@ -668,6 +673,7 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+>>>>>>> Stashed changes
 }
 
 -- Random Box
@@ -744,36 +750,42 @@ if SERVER then
 
 	nzConfig.RoundData[1] = {
 		normalTypes = {
-			[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {
+			["nz_zombie_walker"] = {
 				chance = 100,
 			},
 		},
 	}
 	nzConfig.RoundData[2] = {
 		normalTypes = {
-			[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {
+			["nz_zombie_walker"] = {
 				chance = 100,
 			},
 		},
 	}
 	nzConfig.RoundData[13] = {
 		normalTypes = {
-			[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {
-				chance = 100,
+			["nz_zombie_walker"] = {
+				chance = 75,
+			},
+			["nz_zombie_special_burning"] = {
+				chance = 25,
 			},
 		},
 	}
 	nzConfig.RoundData[14] = {
 		normalTypes = {
-			[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {
+			["nz_zombie_walker"] = {
 				chance = 100,
 			},
 		},
 	}
 	nzConfig.RoundData[23] = {
 		normalTypes = {
-			[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {
-				chance = 100,
+			["nz_zombie_walker"] = {
+				chance = 90,
+			},
+			["nz_zombie_special_burning"] = {
+				chance = 10,
 			},
 		},
 	}

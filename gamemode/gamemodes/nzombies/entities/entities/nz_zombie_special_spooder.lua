@@ -29,11 +29,8 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"roach/bo3/spider/vox/ambient_01.mp3"
+
 }
 
 ENT.AttackHitSounds = {

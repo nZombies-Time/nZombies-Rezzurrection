@@ -40,9 +40,6 @@ function ENT:Use( activator, caller )
 				if activator:HasPerk("speed") and weapon:IsFAS2() then
 					weapon:ApplyNZModifier("speed")
 				end
-				if activator:HasPerk("politan") then
-				weapon:ApplyNZModifier("rando")
-				end
 				if (activator:HasPerk("dtap") or activator:HasPerk("dtap2")) and weapon:IsFAS2()  then
 					weapon:ApplyNZModifier("dtap")
 				end

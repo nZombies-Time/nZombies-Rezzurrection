@@ -7,7 +7,7 @@ ENT.Author = "Laby"
 
 ENT.Models = { "models/roach/blackops3/so_like_this_guy_is_made_of_kush_right.mdl" }
 
-ENT.AttackRange = 112
+ENT.AttackRange = 130
 ENT.DamageLow = 140
 ENT.DamageHigh = 240
 
@@ -32,11 +32,9 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"roach/bo3/thrasher/vox/pain_01.mp3",
+	"roach/bo3/thrasher/vox/pain_02.mp3",
+	"roach/bo3/thrasher/vox/pain_03.mp3",
 }
 
 ENT.AttackHitSounds = {
@@ -47,6 +45,9 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
+	"roach/bo3/thrasher/fall_01.mp3",
+	"roach/bo3/thrasher/fall_02.mp3",
+	"roach/bo3/thrasher/fall_03.mp3",
 	"roach/bo3/thrasher/vox/ambient_01.mp3",
 	"roach/bo3/thrasher/vox/ambient_02.mp3",
 	"roach/bo3/thrasher/vox/ambient_03.mp3",
@@ -63,15 +64,15 @@ ENT.ActStages = {
 		minspeed = 1,
 	},
 	[2] = {
-		act = ACT_WALK,
+		act = ACT_WALK_ANGRY,
 		minspeed = 5,
 	},
 	[3] = {
-		act = ACT_WALK,
+		act = ACT_RUN,
 		minspeed = 300,
 	},
 	[4] = {
-		act = ACT_WALK,
+		act = ACT_RUN,
 		minspeed = 450
 	}
 }
@@ -144,12 +145,9 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self.loco:SetDesiredSpeed(80)
-		self:SetRunSpeed(80)
+		self.loco:SetDesiredSpeed(300)
 		self:SetHealth(400)
 		self:SetMaxHealth(2000)
-		counting = true
-		dying = false
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -228,14 +226,12 @@ function ENT:OnSpawn()
 		end
 			
 		end)
-		counting = false
 		self:PlaySequenceAndWait(seq)
-		self.loco:SetDesiredSpeed(80)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
+
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -272,7 +268,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 100 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 100 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK_ANGRY end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -440,13 +436,6 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-if !counting and !dying and self:Health() > 0 then
-counting = true
-timer.Simple(0.7,function()
-self:EmitSound("roach/bo3/thrasher/fall_0"..math.random(1,3)..".mp3")
-counting = false
-end)
-end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

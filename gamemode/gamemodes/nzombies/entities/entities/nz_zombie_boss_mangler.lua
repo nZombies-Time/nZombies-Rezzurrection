@@ -32,12 +32,9 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-		"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
-
+	"roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",
+	"roach/bo3/raz/vox_plr_1_exert_charge_02.mp3",
+	"roach/bo3/raz/vox_plr_1_exert_charge_04.mp3"
 }
 
 ENT.AttackHitSounds = {
@@ -50,12 +47,20 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.wav"
+	"roach/bo3/raz/vox_stal_mang_mangler_taunt_1.mp3",
+	"roach/bo3/raz/vox_stal_mang_mangler_taunt_2.mp3",
+	"roach/bo3/raz/vox_stal_mang_mangler_taunt_5.mp3",
+	"roach/bo3/raz/vox_stal_mang_mangler_taunt_6.mp3",
+	"roach/bo3/raz/step_01.mp3",
+	"roach/bo3/raz/step_02.mp3",
+	"roach/bo3/raz/step_03.mp3",
+	"roach/bo3/raz/step_04.mp3",
+	"roach/bo3/raz/step_05.mp3"
 }
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_RUN,
+		act = ACT_WALK,
 		minspeed = 1,
 	},
 	[2] = {
@@ -137,13 +142,8 @@ end
 function ENT:StatsInitialize()
 	if SERVER then
 		self:SetRunSpeed(200)
-		self:SetHealth(3000)
+		self:SetHealth(800)
 		self:SetMaxHealth(2000)
-		shooting = false
-		dying = false
-		helmet = true
-		counting = false
-		hasTaunted = false
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -190,7 +190,7 @@ function ENT:OnSpawn()
 	if coroutine.running() then
 		
 		local pos = self:GetPos() + (seq == "enrage" and Vector(0,0,100) or Vector(0,0,450))
-		counting = true
+		
 		self:SetNoDraw(true)
 		ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
@@ -213,21 +213,20 @@ function ENT:OnSpawn()
 			self:SetPos(self:GetPos() + Vector(0,0,0))
 			ParticleEffect("driese_tp_arrival_phase2",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 			ParticleEffect("driese_tp_arrival_impact_fx02_a",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+			self:EmitSound("roach/bo3/raz/vox_stal_mang_mangler_taunt_1.mp3",511)
 			self:SetInvulnerable(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			counting = false
+			
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
-	self:ResetSequence("run")
-	self:SetCycle(0)
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
+
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -255,7 +254,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 100 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_RUN end
+	if ( len2d > 100 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -317,13 +316,12 @@ function ENT:OnPathTimeOut()
 			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
 				self:Stop()
-				shooting = true
 				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
 			timer.Simple(0.2,function()
 				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
 				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
 			end)
-				timer.Simple(1.5, function()
+				timer.Simple(29/58, function()
 				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
 		self:StopParticles()
 	end)
@@ -345,7 +343,6 @@ function ENT:OnPathTimeOut()
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
 			self:TimedEvent(dur, function()
-			shooting = false
 				self.loco:SetDesiredSpeed(self:GetRunSpeed())
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
@@ -441,36 +438,7 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnInjured(dmg)
-	if helmet then
-	dmg:ScaleDamage(0.5)
-	if self:Health() < 2000 then
-	helmet = false
-	end
-	else
-	dmg:ScaleDamage(1)
-if  !hasTaunted then
-self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",511)
-self:SetBodygroup(1,1)
-hasTaunted = true
-end
-end
-end
-
-
 function ENT:OnThink()
-if !self:IsAttacking() then
-if !counting and !dying and !shooting and self:Health() > 0 then
-counting = true
-timer.Simple(0.3,function()
-self:EmitSound("roach/bo3/raz/step_0"..math.random(1,5)..".mp3")
-counting = false
-end)
-end
-end
-if self:IsAttacking() then
-self.loco:SetDesiredSpeed(0)
-end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

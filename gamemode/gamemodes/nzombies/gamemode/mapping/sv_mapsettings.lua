@@ -3,7 +3,7 @@ function nzMapping:LoadMapSettings(data)
 	if !data then return end
 	
 	if data.startwep then
-		nzMapping.Settings.startwep = weapons.Get(data.startwep) and data.startwep or "robotnik_bo1_1911"
+		nzMapping.Settings.startwep = weapons.Get(data.startwep) and data.startwep or nzConfig.BaseStartingWeapons[1]
 	end
 	if data.startpoints then
 		nzMapping.Settings.startpoints = tonumber(data.startpoints) or 500
@@ -44,18 +44,19 @@ function nzMapping:LoadMapSettings(data)
 			nzMapping.Settings.rboxweps = nil
 		end
 	end
-	if data.wunderfizzperks then
-		nzMapping.Settings.wunderfizzperks = table.Count(data.wunderfizzperks) > 0 and data.wunderfizzperks or nil
-	end
+	
+	nzMapping.Settings.wunderfizzperklist = data.wunderfizzperklist
+	-- if data.wunderfizzperks then
+		
+	-- 	--nzMapping.Settings.wunderfizzperks = table.Count(data.wunderfizzperks) > 0 and data.wunderfizzperks or nil
+	-- end
+
 	if data.gamemodeentities then
 		nzMapping.Settings.gamemodeentities = data.gamemodeentities or nil
 	end
 
 	if data.specialroundtype then
 		nzMapping.Settings.specialroundtype = data.specialroundtype or "Hellhounds"
-	end
-	if data.zombietype then
-		nzMapping.Settings.zombietype = data.zombietype or "Kino der Toten"
 	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"

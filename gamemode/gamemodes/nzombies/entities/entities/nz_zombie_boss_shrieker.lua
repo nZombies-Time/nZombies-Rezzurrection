@@ -7,9 +7,9 @@ ENT.Author = "Laby"
 
 ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
 
-ENT.AttackRange = 250
-ENT.DamageLow = 30
-ENT.DamageHigh = 32
+ENT.AttackRange = 175
+ENT.DamageLow = 75
+ENT.DamageHigh = 90
 
 
 ENT.AttackSequences = {
@@ -25,18 +25,11 @@ ENT.AttackSounds = {
 }
 
 ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"bo1_overhaul/son/charge.mp3",
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"roach/bo3/thrasher/bite_04.mp3"
 }
 
 
@@ -89,7 +82,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -135,8 +128,7 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self:SetRunSpeed(500)
 		self:SetHealth(350)
-		self:SetMaxHealth(10000)
-		screaming = false
+		self:SetMaxHealth(1000)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -280,19 +272,97 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
+self:EmitSound("bo1_overhaul/son/charge.mp3")
 local atkData = {}
-atkData.dmglow = 1
-    atkData.dmghigh = 1
-    atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 1
-		self:Attack( atkData )
-		screaming = false
-		self.loco:SetDesiredSpeed(300)
+    
+    self:Attack( atkData )
+	self:PlaySequenceAndWait("shriek"..math.random(3), 1, self.FaceEnemy)
+		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
+	
 	
 end
 
 function ENT:OnPathTimeOut()
+	local target = self:GetTarget()
+	if CurTime() < self.NextAction then return end
 	
+	if math.random(0,5) == 7 and CurTime() > self.NextClawTime then
+		-- Ground Slam from engi
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+			
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
+			ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(140,0,0)),Angle(0,0,0),nil)
+			self:EmitSound("bo1_overhaul/engie/att"..math.random(2)..".mp3")
+			self:EmitSound("bo1_overhaul/engie/slamclub.mp3",511)
+			util.ScreenShake(self:GetPos(),10000,5000,1,1000)
+			self:SetDesiredSpeed(0)
+			 local atkData = {}
+					self.AttackSequences = {
+						{seq = "g_slamground"}
+										}
+			 self:SetAttackRange(275)
+				atkData.dmglow = 60
+				atkData.dmghigh = 80
+				atkData.dmgforce = Vector( 0, 0, 0 )
+				atkData.dmgdelay = 0.7
+				self:Attack( atkData )
+		
+				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
+					local id, dur = self:LookupSequence("g_slamground")
+			
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur, function()
+			self:SetAttackRange(125)
+			self.AttackSequences = {
+						{seq = "g_att"}
+										}
+				self.loco:SetDesiredSpeed(500)
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextClawTime = CurTime() + math.random(3, 15)
+			end
+		end
+	elseif math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
+		-- Useless Removed flamethrower
+		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
+			self:Stop()
+			self:PlaySequenceAndWait("nz_flamethrower_aim")
+			self.loco:SetDesiredSpeed(0)
+			local ang = (target:GetPos() - self:GetPos()):Angle()
+			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+			
+			self:StartFlames()
+			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
+			local id, dur = self:LookupSequence(seq)
+			self:ResetSequence(id)
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur, function()
+				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+			self.NextAction = CurTime() + math.random(1, 5)
+			self.NextFlameTime = CurTime() + math.random(1, 10)
+		end
+	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -352,31 +422,6 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
- if self:IsAttacking() then
- 	self.loco:SetDesiredSpeed(0)
-	if !screaming then
-
-	screaming = true
-		timer.Simple(0.6,function() 
-			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
-						if v:IsPlayer() then
-						local walk = v:GetWalkSpeed()
-						local run = v:GetRunSpeed()
-						v:SetDSP(34, false)
-							v:SetRunSpeed(25)
-							v:SetWalkSpeed(25)
-							timer.Simple(1.5,function()
-								v:SetRunSpeed(run)
-							v:SetWalkSpeed(walk)
-							end)
-						end
-	end
-		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,55)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
-			end)
-	end
-	
- end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

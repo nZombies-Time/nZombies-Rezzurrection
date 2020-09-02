@@ -46,6 +46,12 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
+	"roach/bo3/margwa/step_01.mp3",
+	"roach/bo3/margwa/step_02.mp3",
+	"roach/bo3/margwa/step_03.mp3",
+	"roach/bo3/margwa/step_04.mp3",
+	"roach/bo3/margwa/step_05.mp3",
+	"roach/bo3/margwa/step_06.mp3",
 	"roach/bo3/margwa/vox/vox_ambient_01.mp3",
 	"roach/bo3/margwa/vox/vox_ambient_02.mp3",
 	"roach/bo3/margwa/vox/vox_ambient_03.mp3",
@@ -104,9 +110,11 @@ function ENT:Initialize()
 	self:ResetIgnores()
 
 	self:SetHealth( 75 ) --fallback
-	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+
 	self:SetRunSpeed( self.RunSpeed ) --fallback
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
+
+
 
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
@@ -141,15 +149,9 @@ end
 function ENT:StatsInitialize()
 	if SERVER then
 		slamming=false
-		self:SetRunSpeed(170)
-		self:SetHealth(100000)
-		self:SetMaxHealth(500000)
-		head_L = 100
-		head_M = 100
-		head_R = 100
-		counting = true
-		dying = false
-		
+		self:SetRunSpeed(220)
+		self:SetHealth(4000)
+		self:SetMaxHealth(4000)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -225,7 +227,7 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			counting = false
+			
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
@@ -234,7 +236,7 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
+
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -293,13 +295,13 @@ end
 
 function ENT:OnTargetInAttackRange()
 self.loco:SetDesiredSpeed(0)
-self:SetAttackRange(175)
+self:SetAttackRange(150)
     local atkData = {}
 	self.AttackSequences = {
 						{seq = "melee"}
 										}
-    atkData.dmglow = 30
-    atkData.dmghigh = 35
+    atkData.dmglow = 75
+    atkData.dmghigh = 80
     atkData.dmgforce = Vector( 0, 0, 0 )
 	atkData.dmgdelay = 0.2
     self:Attack( atkData )
@@ -325,24 +327,22 @@ function ENT:OnPathTimeOut()
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) and !slamming then
 			slamming=true
 			self:EmitSound("roach/bo3/margwa/vox/vox_attack_raise_0"..math.random(3)..".mp3")
-			timer.Simple(55/55,function()util.ScreenShake(self:GetPos(),300,1000,5,2048)
-			local vaporizer = ents.Create("point_hurt")
-        if !vaporizer:IsValid() then return end
-        vaporizer:SetKeyValue("Damage", 16)
-        vaporizer:SetKeyValue("DamageRadius", 300)
-        vaporizer:SetKeyValue("DamageType",DMG_CRUSH)
-        vaporizer:SetPos(self:GetPos())
-        vaporizer:SetOwner(self)
-        vaporizer:Spawn()
-        vaporizer:Fire("TurnOn","",0)
-        vaporizer:Fire("kill","",0.3)
-			end)
+			timer.Simple(55/55,function()util.ScreenShake(self:GetPos(),300,1000,5,2048)end)
 				timer.Simple(55/55,function()self:EmitSound("roach/bo3/margwa/slam_attack_close.mp3")end)
 				timer.Simple(55/55,function()self:EmitSound("roach/bo3/margwa/slam_attack_far.mp3",511)end)
 				timer.Simple(55/55,function()ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(100,50,0)),self:GetAngles(),nil)end)
 				timer.Simple(55/55,function()ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(100,-50,0)),self:GetAngles(),nil)end)
 				self:PlaySequenceAndWait("slam")
-				
+				local vaporizer = ents.Create("point_hurt")
+        if !vaporizer:IsValid() then return end
+        vaporizer:SetKeyValue("Damage", 16)
+        vaporizer:SetKeyValue("DamageRadius", 350)
+        vaporizer:SetKeyValue("DamageType",DMG_CRUSH)
+        vaporizer:SetPos(self:GetPos())
+        vaporizer:SetOwner(self)
+        vaporizer:Spawn()
+        vaporizer:Fire("TurnOn","",0)
+        vaporizer:Fire("kill","",0.5)
 		self:ResetSequence("run")
 			self:SetCycle(0)
 			local id, dur = self:LookupSequence("slam")
@@ -352,6 +352,7 @@ function ENT:OnPathTimeOut()
 			self:TimedEvent(dur, function()
 						self:SetAttackRange(150)
 						slamming=false
+						self:ResetSequence("run")
 				self.loco:SetDesiredSpeed(self:GetRunSpeed())
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
@@ -460,86 +461,55 @@ function ENT:OnInjured(dmg)
 		})
 		local d = dmg:GetDamage()
 		if tr.HitGroup == HITGROUP_RIGHTARM and not self.GibbedRight then
-			head_R = head_R - dmg:GetDamage()
-				print("R")
-			print(head_R)
-					print("M")
-		print(head_M)
-			print("L")
-		print(head_L)
-			if head_R < 1 then
 			self.GibbedRight = true
 
 			self:EmitSound("roach/bo3/margwa/margwa_head_explo_"..math.random(3)..".mp3")
 			ParticleEffectAttach("bo3_margwa_death",PATTACH_POINT_FOLLOW,self,4)
+			self:ResetSequence("run")
+			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
 			
 			if self.GibbedHead and self.GibbedLeft and self.GibbedRight then
-				self:TakeDamage(200001,dmg:GetAttacker(),dmg:GetInflictor())
+				self:TakeDamage(4001,dmg:GetAttacker(),dmg:GetInflictor())
 			else
 				
 			end
-			end
 		elseif tr.HitGroup == HITGROUP_HEAD and not self.GibbedHead then
-		dmg:ScaleDamage(0.25 )
-		head_M = head_M - dmg:GetDamage()
-					print("R")
-			print(head_R)
-					print("M")
-		print(head_M)
-			print("L")
-		print(head_L)
-		if head_M < 1 then
 			self.GibbedHead = true
 			
 			self:EmitSound("roach/bo3/margwa/margwa_head_explo_"..math.random(3)..".mp3")
 			ParticleEffectAttach("bo3_margwa_death",PATTACH_POINT_FOLLOW,self,2)
+			self:ResetSequence("run")
+			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
 			
 			if self.GibbedHead and self.GibbedLeft and self.GibbedRight then
-				self:TakeDamage(200001,dmg:GetAttacker(),dmg:GetInflictor())
+				self:TakeDamage(4001,dmg:GetAttacker(),dmg:GetInflictor())
 			else
 			
 			end
-			end
 		elseif tr.HitGroup == HITGROUP_LEFTARM and not self.GibbedLeft then
-		head_L = head_L - dmg:GetDamage() 
-					print("R")
-			print(head_R)
-					print("M")
-		print(head_M)
-			print("L")
-		print(head_L)
-		if head_L < 1 then
 			self.GibbedLeft = true
 			
 			self:SetVelocity(Vector(0,0,0))
 			self:EmitSound("roach/bo3/margwa/margwa_head_explo_"..math.random(3)..".mp3")
 			ParticleEffectAttach("bo3_margwa_death",PATTACH_POINT_FOLLOW,self,3)
+			self:ResetSequence("run")
+			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
 			
 			if self.GibbedHead and self.GibbedLeft and self.GibbedRight then
-				self:TakeDamage(200001,dmg:GetAttacker(),dmg:GetInflictor())
+				self:TakeDamage(4001,dmg:GetAttacker(),dmg:GetInflictor())
 			else
 				
-			end
 			end
 		end
 	end
 end
 function ENT:OnThink()
-if !self:IsAttacking() and !counting and !dying and !slamming then
-counting = true
-timer.Simple(0.42,function()
-self:EmitSound("roach/bo3/margwa/step_0"..math.random(1,6)..".mp3")
-util.ScreenShake(self:GetPos(),3,1000,0.5,2048)
-counting = false
-end)
-end
-
 if self.GibbedHead then
 self:SetBodygroup(2,1)
 end
