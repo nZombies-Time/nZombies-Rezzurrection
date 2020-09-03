@@ -39,6 +39,7 @@ nzTools:CreateTool("settings", {
 		valz["Row11"] = data.maxspawns == nil and 35 or data.maxspawns
 		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
 		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
+		valz["Row15"] = data.zombietype or "Kino der Toten"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -64,6 +65,7 @@ nzTools:CreateTool("settings", {
 			valz["SndRow" .. k] = data[v] or {}
 		end
 
+
 		local sheet = vgui.Create( "DPropertySheet", frame )
 		sheet:SetSize( 280, 220 )
 		sheet:SetPos( 10, 10 )
@@ -86,7 +88,7 @@ nzTools:CreateTool("settings", {
 		end
 		if data.startwep then
 			local wep = weapons.Get(data.startwep)
-			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get(nzConfig.BaseStartingWeapons[1]) end
+			if !wep and weapons.Get(nzConfig.BaseStartingWeapons) and #weapons.Get(nzConfig.BaseStartingWeapons) >= 1 then wep = weapons.Get("robotnik_bo1_1911") end
 			if wep != nil then  
 				if wep.Category and wep.Category != "" then
 					Row1:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
@@ -187,6 +189,20 @@ nzTools:CreateTool("settings", {
 			Row14:SetValue( valz["Row14"] )
 			Row14:SetTooltip("Extra zombies allowed to spawn per player (Ignores first player and Max Spawns option)")
 			Row14.DataChanged = function( _, val ) valz["Row14"] = val end
+			
+			local Row15 = DProperties:CreateRow("Map Settings", "Zombie Type")
+			Row15:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.ZombieData) do
+				if k == valz["Row15"] then
+					Row15:AddChoice(k, k, true)
+					found = true
+				else
+					Row15:AddChoice(k, k, false)
+				end
+			end
+			Row15.DataChanged = function( _, val ) valz["Row15"] = val end
+			Row15:SetTooltip("Sets the zombies that will appear in your map.")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -203,8 +219,8 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row11"]) then data.maxspawns = 35 else data.maxspawns = tonumber(valz["Row11"]) end
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
+			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
-			--if !valz["WMPerks"] or !valz["WMPerks"][1] then data.wunderfizzperklist = nil else data.wunderfizzperklist = valz["WMPerks"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
 			if valz["ACRow2"] == nil then data.acwarn = nil else data.acwarn = tobool(valz["ACRow2"]) end

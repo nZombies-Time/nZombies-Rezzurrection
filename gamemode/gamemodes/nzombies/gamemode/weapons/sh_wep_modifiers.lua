@@ -44,6 +44,22 @@ local WeaponModificationFunctionsDefaults = {
 			end)
 		end
 	end,
+	rando = function(wep)
+	local ply = wep.Owner
+	wep.Reload = function(self, ...)
+	if ply:KeyReleased( IN_RELOAD ) then
+			if ply:GetActiveWeapon():Clip1() < 1 then
+	local guns = {}
+			for k,v in pairs(nzMapping.Settings.rboxweps) do
+				guns[k] = v
+			end
+			
+			local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+	ply:Give(gun)
+	end
+	end
+	end
+	end,
 	dtap = function(wep)
 		local oldpfire = wep.PrimaryAttack
 		if oldpfire then
@@ -246,6 +262,26 @@ function wepmeta:HasNZModifier(id)
 	if !self.NZModifiers then return false end
 	return self.NZModifiers[id] and true or false
 end
+
+nzWeps:AddWeaponModification("rando_cw", "rando", function(wep)
+	return wep:IsFAS2() or wep:IsCW2()
+end, function(wep)
+	wep.ReloadOld = wep.ReloadOld or wep.Reload
+	local ply = wep.Owner
+	wep.Reload = function(self, ...)
+	if ply:KeyReleased( IN_RELOAD ) then
+			if  ply:GetActiveWeapon():Clip1() < 1 then
+	local guns = {}
+			for k,v in pairs(nzMapping.Settings.rboxweps) do
+				guns[k] = v
+			end
+			
+			local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+	ply:Give(gun)
+	end
+	end
+	end
+end)
 
 nzWeps:AddWeaponModification("speed_fascw2", "speed", function(wep)
 	return wep:IsFAS2() or wep:IsCW2()
@@ -466,6 +502,35 @@ end, function(wep)
 		self.Owner:GetViewModel():SetPlaybackRate(2)
 	end
 end)
+
+nzWeps:AddWeaponModification("rando_tfa", "rando", function(wep)
+	return wep:IsTFA()
+end, function(wep)
+	wep.ReloadOld = wep.ReloadOld or wep.Reload
+	local ply = wep.Owner
+	wep.Reload = function(self, ...)
+if ply:KeyReleased( IN_RELOAD ) then
+cooldown = false
+			if ply:GetActiveWeapon():Clip1() < 1 then
+	local guns = {}
+			for k,v in pairs(nzMapping.Settings.rboxweps) do
+				guns[k] = v
+			end
+			
+			local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+			if !cooldown then
+			 ply:StripWeapon( ply:GetActiveWeapon():GetClass() )
+			 ply:Give(gun)
+	cooldown = true
+	timer.Simple(1, function()
+					cooldown = false
+				end)
+				end
+	end
+	end
+	end
+end)
+
 
 nzWeps:AddWeaponModification("dtap_tfa", "dtap", function(wep)
 	return wep:IsTFA()

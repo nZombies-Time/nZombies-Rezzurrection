@@ -66,6 +66,9 @@ local function OnWeaponAdded( weapon )
 						if ply:HasPerk("dtap") or ply:HasPerk("dtap2") then
 							weapon:ApplyNZModifier("dtap")
 						end
+						if ply:HasPerk("politan") then
+							weapon:ApplyNZModifier("rando")
+						end
 						if !weapon.NoSpawnAmmo then
 							weapon:GiveMaxAmmo()
 						end

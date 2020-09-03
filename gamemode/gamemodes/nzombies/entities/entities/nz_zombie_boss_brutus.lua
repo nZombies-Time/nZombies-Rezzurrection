@@ -33,8 +33,7 @@ ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet2.wav",
 	"physics/flesh/flesh_impact_bullet3.wav",
 	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav",
-	"cb/low_health.mp3"
+	"physics/flesh/flesh_impact_bullet5.wav"
 }
 
 ENT.AttackHitSounds = {
@@ -51,15 +50,12 @@ ENT.WalkSounds = {
 	"cb/step2.mp3",
 	"cb/step3.mp3",
 	"cb/step4.mp3",
-	"cb/step5.mp3",
-	"cb/taunt2.mp3",
-	"cb/taunt4.mp3",
-	"cb/taunt5.mp3"
+	"cb/step5.mp3"
 }
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_WALK,
+		act = ACT_RUN,
 		minspeed = 1,
 	},
 	[2] = {
@@ -67,7 +63,7 @@ ENT.ActStages = {
 		minspeed = 150,
 	},
 	[3] = {
-		act = ACT_RUN,
+		act = ACT_SPRINT,
 		minspeed = 180
 	}
 }
@@ -107,7 +103,6 @@ function ENT:Initialize()
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
 
 	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
-
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
 
@@ -141,8 +136,10 @@ end
 function ENT:StatsInitialize()
 	if SERVER then
 		self:SetRunSpeed(180)
-		self:SetHealth(800)
-		self:SetMaxHealth(9000)
+		self:SetHealth(10000)
+		self:SetMaxHealth(100000)
+		hasTaunted = false
+		helmet = true
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -252,7 +249,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 88 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 200 ) then self.CalcIdeal = ACT_SPRINT elseif ( len2d > 0 ) then self.CalcIdeal = ACT_RUN end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -377,13 +374,6 @@ if CLIENT then
 	local lightyellow = Color( 255, 255, 200, 200 )
 	local clawglow = Material( "sprites/orangecore1" )
 	local clawred = Color( 255, 100, 100, 255 )
-		local leftEye = self:GetAttachment(self:LookupAttachment("tag_eye_l")).Pos
-			local rightEye = self:GetAttachment(self:LookupAttachment("tag_eye_r")).Pos
-			cam.Start3D()
-				render.SetMaterial( eyeGlow )
-				render.DrawSprite( leftEye, 4, 4, white)
-				render.DrawSprite( rightEye, 4, 4, white)
-			cam.End3D()
 end
 
 function ENT:OnRemove()
@@ -401,7 +391,30 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
+function ENT:OnInjured(dmg)
+	if helmet then
+	dmg:ScaleDamage(0.5)
+	if self:Health() < 2000 then
+	helmet = false
+	end
+	else
+	dmg:ScaleDamage(1)
+if  !hasTaunted then
+self:EmitSound("dir/idle_hitpalm1.mp3",511)
+self:EmitSound("cb/low_health.mp3",511)
+self:SetBodygroup(1,1)
+self.loco:SetDesiredSpeed(300)
+self:SetRunSpeed(300)
+hasTaunted = true
+end
+end
+end
+
 function ENT:OnThink()
+
+if math.random(0,2500) == 1 then
+self:EmitSound("cb/taunt"..math.random(1,6)..".mp3")
+end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

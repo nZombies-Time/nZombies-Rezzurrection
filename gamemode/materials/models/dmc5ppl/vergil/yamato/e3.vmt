@@ -1,0 +1,6 @@
+"UnLitGeneric"
+{
+    $basetexture    "models\dmc5ppl\vergil\yamato\e3"
+    $additive        "1"
+	$nocull "1"
+}

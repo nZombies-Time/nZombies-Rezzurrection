@@ -1,252 +1,117 @@
-
-	-- Weapon base courtesy of CptFuzzies SWEP Bases project
-	-- Recoded to do more balanced damage
-
-SWEP.Author			= ""
-SWEP.Contact		= ""
-SWEP.Purpose		= ""
-SWEP.Instructions	= ""
-
-SWEP.ViewModelFOV	= 54
-SWEP.ViewModelFlip	= false
-SWEP.ViewModel		= "models/weapons/tfa_nmrih/v_me_hatchet.mdl"
-SWEP.WorldModel		= "models/weapons/tfa_nmrih/w_me_hatchet.mdl"
-SWEP.AnimPrefix		= "melee2"
-SWEP.HoldType		= "melee2"
-
+SWEP.Base = "tfa_melee_base"
+SWEP.Category = "TFA CS:O"
+SWEP.PrintName = "Better nZombies Knife"
+SWEP.Author		= "Kamikaze" --Author Tooltip
+SWEP.ViewModel = "models/weapons/knife/v_knife.mdl"
+SWEP.WorldModel = "models/weapons/knife/w_knife.mdl"
+SWEP.ViewModelFlip = false
+SWEP.ViewModelFOV = 80
 SWEP.UseHands = true
+SWEP.HoldType = "knife"
+SWEP.DrawCrosshair = true
 
-SWEP.Spawnable			= false
-SWEP.AdminSpawnable		= false
+SWEP.Primary.Directional = false
 
-CROWBAR_RANGE	= 100.0
-CROWBAR_REFIRE	= 0.3
+SWEP.Spawnable = true
+SWEP.AdminOnly = false
 
-SWEP.Primary.Sound			= Sound( "Weapon_Crowbar.Single" )
-SWEP.Primary.Hit			= Sound( "Weapon_Crowbar.Melee_Hit" )
-SWEP.Primary.Range			= CROWBAR_RANGE
-SWEP.Primary.Damage			= 80
-SWEP.Primary.DamageType		= DMG_CLUB
-SWEP.Primary.Force			= 0.75
-SWEP.Primary.ClipSize		= -1
-SWEP.Primary.Delay			= CROWBAR_REFIRE
-SWEP.Primary.DefaultClip	= -1
-SWEP.Primary.Automatic		= true
-SWEP.Primary.Ammo			= "None"
+SWEP.DisableIdleAnimations = false
 
-SWEP.Secondary.ClipSize		= -1
-SWEP.Secondary.DefaultClip	= -1
-SWEP.Secondary.Automatic	= false
-SWEP.Secondary.Ammo			= "None"
+SWEP.Secondary.CanBash = false
+SWEP.Secondary.MaxCombo = -1
+SWEP.Primary.MaxCombo = -1
 
-SWEP.NZPreventBox = true
+SWEP.VMPos = Vector(0,0,0) --The viewmodel positional offset, constantly.  Subtract this from any other modifications to viewmodel position.
+
+-- nZombies Stuff
+SWEP.NZWonderWeapon		= false	-- Is this a Wonder-Weapon? If true, only one player can have it at a time. Cheats aren't stopped, though.
+--SWEP.NZRePaPText		= "your text here"	-- When RePaPing, what should be shown? Example: Press E to your text here for 2000 points.
+SWEP.NZPaPName				= "Lady's Kiss"
+--SWEP.NZPaPReplacement 	= "tfa_cso_dualinfinityfinal"	-- If Pack-a-Punched, replace this gun with the entity class shown here.
+SWEP.NZPreventBox		= false	-- If true, this gun won't be placed in random boxes GENERATED. Users can still place it in manually.
+SWEP.NZTotalBlackList	= false	-- if true, this gun can't be placed in the box, even manually, and can't be bought off a wall, even if placed manually. Only code can give this gun.
 
 
+SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
+		Pos = {
+		Up = -8.2,
+		Right = 1,
+		Forward = 3.5,
+		},
+		Ang = {
+		Up = 60,
+		Right = -70,
+		Forward = 10
+		},
+		Scale = 1
+}
 
-/*---------------------------------------------------------
-   Name: SWEP:Initialize( )
-   Desc: Called when the weapon is first loaded
----------------------------------------------------------*/
-function SWEP:Initialize()
-	self:SetWeaponHoldType( self.HoldType )
+
+sound.Add({
+	['name'] = "Mastercombat.Hit",
+	['channel'] = CHAN_STATIC,
+	['sound'] = { "nz/knife/knife_slash.wav" },
+	['pitch'] = {100,100}
+})
+sound.Add({
+	['name'] = "Mastercombat.Slash",
+	['channel'] = CHAN_STATIC,
+	['sound'] = { "nz/knife/whoosh.wav" },
+	['pitch'] = {100,100}
+})
+sound.Add({
+	['name'] = "Mastercombat.Stab",
+	['channel'] = CHAN_STATIC,
+	['sound'] = { "nz/knife/knife_stab.wav" },
+	['pitch'] = {100,100}
+})
+sound.Add({
+	['name'] = "Mastercombat.Wall",
+	['channel'] = CHAN_STATIC,
+	['sound'] = { "nz/knife/hit_object.wav" },
+	['pitch'] = {100,100}
+})
+
+SWEP.Primary.Attacks = {
+	{
+		['act'] = ACT_VM_HITLEFT, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['len'] = 16*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dir'] = Vector(-60,0,0), -- Trace dir/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dmg'] = 60, --This isn't overpowered enough, I swear!!
+		['dmgtype'] = DMG_SLASH, --DMG_SLASH,DMG_CRUSH, etc.
+		['delay'] = 0.15, --Delay
+		['spr'] = true, --Allow attack while sprinting?
+		['snd'] = "Mastercombat.Slash", -- Sound ID
+		['snd_delay'] = 0.01,
+		["viewpunch"] = Angle(0,0,0), --viewpunch angle
+		['end'] = 0.6, --time before next attack
+		['hull'] = 60, --Hullsize
+		['direction'] = "W", --Swing dir,
+		['hitflesh'] = "Mastercombat.Hit",
+		['hitworld'] = "Mastercombat.Wall"
+	},
+}
+
+SWEP.Secondary.Attacks = {
+	{
+		['act'] = ACT_VM_MISSRIGHT, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['len'] = 15*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dir'] = Vector(0,0,-40), -- Trace dir/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dmg'] = 120, --This isn't overpowered enough, I swear!!
+		['dmgtype'] = DMG_SLASH, --DMG_SLASH,DMG_CRUSH, etc.
+		['delay'] = 0.18, --Delay
+		['spr'] = true, --Allow attack while sprinting?
+		['snd'] = "Mastercombat.Slash", -- Sound ID
+		['snd_delay'] = 0.01,
+		["viewpunch"] = Angle(0,0,0), --viewpunch angle
+		['end'] = 1.25, --time before next attack
+		['hull'] = 60, --Hullsize
+		['direction'] = "S", --Swing dir,
+		['hitflesh'] = "Mastercombat.Stab",
+		['hitworld'] = "Mastercombat.Wall"
+	}
+}
+if CLIENT then
+	SWEP.WepSelectIconCSO = Material("vgui/killicons/tfa_cso_mastercombatknife")
+	SWEP.DrawWeaponSelection = TFA_CSO_DrawWeaponSelection
 end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:PrimaryAttack( )
-   Desc: +attack1 has been pressed
----------------------------------------------------------*/
-function SWEP:PrimaryAttack()
-
-	// Only the player fires this way so we can cast
-	local pPlayer		= self.Owner;
-
-	if ( !pPlayer ) then
-		return;
-	end
-
-	// Make sure we can swing first
-	if ( !self:CanPrimaryAttack() ) then return end
-
-	local vecSrc		= pPlayer:GetShootPos();
-	local vecDirection	= pPlayer:GetAimVector();
-
-	local trace			= {}
-		trace.start		= vecSrc
-		trace.endpos	= vecSrc + ( vecDirection * self:GetRange() )
-		trace.filter	= pPlayer
-
-	local traceHit		= util.TraceLine( trace )
-
-	if ( traceHit.Hit ) then
-
-		self.Weapon:EmitSound( self.Primary.Hit );
-
-		self.Weapon:SendWeaponAnim( ACT_VM_HITCENTER );
-		pPlayer:SetAnimation( PLAYER_ATTACK1 );
-
-		self.Weapon:SetNextPrimaryFire( CurTime() + self:GetFireRate() );
-		self.Weapon:SetNextSecondaryFire( CurTime() + self.Weapon:SequenceDuration() );
-
-		self:Hit( traceHit, pPlayer );
-
-		return
-
-	end
-
-	self.Weapon:EmitSound( self.Primary.Sound );
-
-	self.Weapon:SendWeaponAnim( ACT_VM_MISSCENTER );
-	pPlayer:SetAnimation( PLAYER_ATTACK1 );
-
-	self.Weapon:SetNextPrimaryFire( CurTime() + self:GetFireRate() );
-	self.Weapon:SetNextSecondaryFire( CurTime() + self.Weapon:SequenceDuration() );
-
-	self:Swing( traceHit, pPlayer );
-
-	return
-
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:SecondaryAttack( )
-   Desc: +attack2 has been pressed
----------------------------------------------------------*/
-function SWEP:SecondaryAttack()
-	return false
-end
-
-/*---------------------------------------------------------
-   Name: SWEP:Reload( )
-   Desc: Reload is being pressed
----------------------------------------------------------*/
-function SWEP:Reload()
-	return false
-end
-
-//-----------------------------------------------------------------------------
-// Purpose: Get the damage amount for the animation we're doing
-// Input  : hitActivity - currently played activity
-// Output : Damage amount
-//-----------------------------------------------------------------------------
-function SWEP:GetDamageForActivity( hitActivity )
-	return nzRound:InProgress() and 30 + (45/nzRound:GetNumber()) or 75
-end
-
-//-----------------------------------------------------------------------------
-// Purpose: Add in a view kick for this weapon
-//-----------------------------------------------------------------------------
-function SWEP:AddViewKick()
-
-	local pPlayer  = self:GetOwner();
-
-	if ( pPlayer == NULL ) then
-		return;
-	end
-
-	if ( pPlayer:IsNPC() ) then
-		return;
-	end
-
-	local punchAng = Angle( 0, 0 ,0 );
-
-	punchAng.pitch = math.Rand( 1.0, 2.0 );
-	punchAng.yaw   = math.Rand( -2.0, -1.0 );
-	punchAng.roll  = 0.0;
-
-	pPlayer:ViewPunch( punchAng );
-
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:Deploy( )
-   Desc: Whip it out
----------------------------------------------------------*/
-function SWEP:Deploy()
-
-	self.Weapon:SendWeaponAnim( ACT_VM_DRAW )
-	self:SetDeploySpeed( self.Weapon:SequenceDuration() )
-
-	return true
-
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:Hit( )
-   Desc: A convenience function to trace impacts
----------------------------------------------------------*/
-function SWEP:Hit( traceHit, pPlayer )
-
-	local vecSrc = pPlayer:GetShootPos();
-
-	if ( SERVER ) then
-		pPlayer:TraceHullAttack( vecSrc, traceHit.HitPos, Vector( -5, -5, -5 ), Vector( 5, 5, 36 ), self:GetDamageForActivity(), self.Primary.DamageType, self.Primary.Force );
-	end
-
-	// self:AddViewKick();
-
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:Swing( )
-   Desc: A convenience function to trace impacts
----------------------------------------------------------*/
-function SWEP:Swing( traceHit, pPlayer )
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:CanPrimaryAttack( )
-   Desc: Helper function for checking for no ammo
----------------------------------------------------------*/
-function SWEP:CanPrimaryAttack()
-	return true
-end
-
-
-/*---------------------------------------------------------
-   Name: SWEP:CanSecondaryAttack( )
-   Desc: Helper function for checking for no ammo
----------------------------------------------------------*/
-function SWEP:CanSecondaryAttack()
-	return false
-end
-
-
-/*---------------------------------------------------------
-   Name: SetDeploySpeed
-   Desc: Sets the weapon deploy speed.
-		 This value needs to match on client and server.
----------------------------------------------------------*/
-function SWEP:SetDeploySpeed( speed )
-
-	self.m_WeaponDeploySpeed = tonumber( speed / GetConVarNumber( "phys_timescale" ) )
-
-	self.Weapon:SetNextPrimaryFire( CurTime() + speed )
-	self.Weapon:SetNextSecondaryFire( CurTime() + speed )
-
-end
-
-
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-function SWEP:Drop( vecVelocity )
-if ( !CLIENT ) then
-	self:Remove();
-end
-end
-
-function SWEP:GetRange()
-	return	self.Primary.Range;
-end
-
-function SWEP:GetFireRate()
-	return	self.Primary.Delay;
-end
-

@@ -1,15 +1,15 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Brutus"
+ENT.PrintName = "Nemesis (Damaged)"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
 ENT.Models = { "models/roach/reuc/ens2.mdl" }
 
-ENT.AttackRange = 280
-ENT.DamageLow = 85
-ENT.DamageHigh = 90
+ENT.AttackRange = 300
+ENT.DamageLow = 50
+ENT.DamageHigh = 50
 
 
 ENT.AttackSequences = {
@@ -30,7 +30,6 @@ ENT.AttackSounds = {
 	"re3/nemesis/att6.mp3",
 	"re3/nemesis/att7.mp3",
 	"re3/nemesis/att8.mp3"
-	
 }
 
 ENT.PainSounds = {
@@ -51,10 +50,7 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"re2/em6300/step1.mp3",
-	"re2/em6300/step2.mp3",
-	"re2/em6300/step3.mp3",
-	"re2/em6300/step4.mp3"
+	"empty.wav"
 }
 
 ENT.ActStages = {
@@ -140,8 +136,10 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		mutated=false
-		self:SetRunSpeed(750)
+		counting = true
+		dying = false
+		taunting = true
+		self:SetRunSpeed(200)
 		self:SetHealth(100)
 		self:SetMaxHealth(9000)
 	end
@@ -205,14 +203,15 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:SetNWBool( "Mutated", false )
+			counting = false
+			taunting = false
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -381,7 +380,21 @@ end
 end
 
 function ENT:OnThink()
-if math.random(0,2500) == 49 then
+if self:IsAttacking() then
+self.loco:SetDesiredSpeed(0)
+end
+if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
+counting = true
+timer.Simple(0.4,function()
+self:EmitSound("re2/em6300/step"..math.random(1,4)..".mp3",511)
+counting = false
+end)
+end
+if !taunting and math.random(0,800) == 49 then
+taunting = true
+timer.Simple(5,function()
+taunting = false
+end)
 if math.random(0,1) == 0 then
 self:EmitSound("nemesis/alert"..math.random(2,3)..".mp3")
 else

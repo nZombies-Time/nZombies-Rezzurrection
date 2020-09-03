@@ -1,7 +1,7 @@
 "nzombies"
 {
 	"base"		"base"
-    "title"  "nZombies"
+    "title"  "nZombies Rezzurrection"
     "version"   "4.0"
     "menusystem"	"1"
     "maps"	"^nz_"

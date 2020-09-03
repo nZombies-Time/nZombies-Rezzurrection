@@ -103,6 +103,11 @@ if SERVER then
 	
 	hook.Add("DoAnimationEvent", "nzReloadCherry", function(ply, event, data)
 		--print(ply, event, data)
+
+		if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_bowieknife") then
+	ply:StripWeapon( "nz_quickknife_crowbar" )
+								ply:Give("nz_yamato")
+		end
 		if event == PLAYERANIMEVENT_RELOAD then
 			if ply:HasPerk("cherry") then
 				local wep = ply:GetActiveWeapon()

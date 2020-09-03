@@ -34,7 +34,7 @@ end
 function ENT:RandomizeSkin()
 	local skin
 	if nzMapping.Settings.wunderfizzperks then
-		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperks))).material
+		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperklist))).material
 	else
 		skin = nzPerks:Get(table.Random(table.GetKeys(nzPerks:GetList()))).material
 	end
