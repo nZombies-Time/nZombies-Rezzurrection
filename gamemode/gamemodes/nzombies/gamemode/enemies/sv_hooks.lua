@@ -139,7 +139,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				zombie:Ignite((dmginfo:GetDamage()/10))
 			return end
 			
-			if attacker:HasPerk("dtap2") and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
+			if attacker:HasPerk("dtap2") and attacker:IsPlayer() and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
 
 			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1.5) end
 

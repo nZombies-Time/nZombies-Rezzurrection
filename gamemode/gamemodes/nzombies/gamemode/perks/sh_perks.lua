@@ -190,6 +190,7 @@ nzPerks:NewPerk("pap", {
 			return ply:GetPoints() >= cost
 		else
 			ply:PrintMessage( HUD_PRINTTALK, "This weapon is already Pack-a-Punched")
+			
 			return false
 		end
 	end,

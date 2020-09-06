@@ -459,11 +459,10 @@ if SERVER then
 			timer.Simple(0, function()
 				local ply = wep:GetOwner()
 				if IsValid(ply) then
-					local oldwep = ply:GetSpecialWeaponFromCategory( wep:GetSpecialCategory() )
-					--print(wep, oldwep)
-					if IsValid(oldwep) then
-						ply:StripWeapon(oldwep:GetClass())
-					end
+					local oldwep = ply:GetSpecialWeaponFromCategory(wep:GetSpecialCategory())
+
+					if IsValid(oldwep) then ply:StripWeapon(oldwep:GetClass()) end
+
 					ply:AddSpecialWeapon(wep)
 				end
 			end)
@@ -473,7 +472,7 @@ end
 
 -- Players switching to special weapons can then no longer switch away until its action has been completed
 function GM:PlayerSwitchWeapon(ply, oldwep, newwep)
-	print(ply, oldwep, newwep)
+
 	if IsValid(oldwep) and IsValid(newwep) then
 	
 		if !oldwep:IsSpecial() then

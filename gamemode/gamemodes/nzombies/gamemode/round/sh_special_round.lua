@@ -84,12 +84,37 @@ nzRound:AddZombieType("Shangri-La", "nz_zombie_walker_shangrila", {
 }) 
 nzRound:AddZombieType("Shi no Numa", "nz_zombie_walker_sumpf", {
 }) 
+nzRound:AddZombieType("Tranzit", "nz_zombie_walker_greenrun", {
+}) 
+nzRound:AddZombieType("Nuketown", "nz_zombie_walker_nuketown", {
+}) 
+nzRound:AddZombieType("Zombies in Spaceland", "nz_zombie_walker_clown", {
+}) 
+nzRound:AddZombieType("Deathtrooper", "nz_zombie_walker_deathtrooper", {
+}) 
+nzRound:AddZombieType("Skeleton", "nz_zombie_walker_skeleton", {
+}) 
 nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
 }) 
 nzRound:AddZombieType("Necromorph", "nz_zombie_walker_necromorph", {
 }) 
 
 function nzRound:GetZombieType(id)
+	if id == "Skeleton" then
+	return "nz_zombie_walker_skeleton"
+	end
+		if id == "Deathtrooper" then
+	return "nz_zombie_walker_deathtrooper"
+	end
+		if id == "Zombies in Spaceland" then
+	return "nz_zombie_walker_clown"
+	end
+		if id == "Tranzit" then
+	return "nz_zombie_walker_greenrun" 
+	end
+		if id == "Nuketown" then
+	return "nz_zombie_walker_nuketown"
+	end
 	if id == "Ascension" then
 	return "nz_zombie_walker_ascension"
 	end
@@ -215,6 +240,21 @@ nzRound:AddSpecialRoundType("Lickers", {
 		dog:SetHealth(math.random(120, 1200))
 	else
 		dog:SetHealth(math.Clamp(round * 32, 200, 2000))
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Raptors", {
+	specialTypes = {
+		["nz_zombie_special_raptor"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+		dog:SetHealth(math.Clamp(round * 60, 200, 2000))
 	end
 end) -- No round func or end func
 

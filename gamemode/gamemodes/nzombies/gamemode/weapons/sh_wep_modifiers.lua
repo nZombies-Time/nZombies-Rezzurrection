@@ -481,9 +481,7 @@ nzWeps:AddWeaponModification("pap_cw2_attachments", "pap", function(wep) return 
 end)
 nzWeps:AddWeaponModification("pap_cw2_attachments", "repap", cond, atts) -- Add the same to both PaP and Re-PaP
 
-nzWeps:AddWeaponModification("speed_tfa", "speed", function(wep)
-	return wep:IsTFA()
-end, function(wep)
+nzWeps:AddWeaponModification("speed_tfa", "speed", function(wep) return wep:IsTFA() end, function(wep)
 	wep.ReloadOld = wep.ReloadOld or wep.Reload
 	wep.Reload = function(self, ...)
 		local ct = CurTime()
@@ -491,12 +489,9 @@ end, function(wep)
 		local diff = self:GetNextPrimaryFire() - ct
 		diff = diff/2 + ct
 		
-		print(diff)
 		
 		if self.SetReloadingEnd then self:SetReloadingEnd(diff) end -- This function handles the ammo refill
 		self.ReloadingTime = diff
-		self:SetNextPrimaryFire(diff)
-		self:SetNextSecondaryFire(diff)
 		self:SetNextIdleAnim(diff)
 		self:SetPlaybackRate(2)
 		self.Owner:GetViewModel():SetPlaybackRate(2)
