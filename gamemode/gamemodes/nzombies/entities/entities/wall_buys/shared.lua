@@ -232,23 +232,30 @@ if SERVER then
 				timer.Simple(0.2, function() 
 				local wep2 = activator:GetActiveWeapon()
 				wep2:ApplyNZModifier("pap") 
-				if (!wep2.Ispackapunched = nil and !wep.Category == "NZ Rezzurrection") then
+				if wep2.Ispackapunched then 
+				if !wep.Category == "NZ Rezzurrection" then
 				wep2.Ispackapunched = 1
 				end
-				if (!wep2.NZPaPName = nil) then
-				wep2.PrintName == wep2.NZPaPName
+				end
+				if wep2.NZPaPName then
+				wep2.PrintName = wep2.NZPaPName
 				end
 				end)
 				end
 				end
 				timer.Simple(0.2, function() if IsValid(wep) then wep:GiveMaxAmmo() end
-				if (!wep.Ispackapunched = nil and !wep.Category == "NZ Rezzurrection") then
-				wep.Ispackapunched = 1
+				if wep.Ispackapunched  then
+				if !wep.Category == "NZ Rezzurrection" then
+				
+				wep2.Ispackapunched = 1
 				end
-				if (!wep.NZPaPName = nil) then
-				wep.PrintName == wep.NZPaPName
+				end
+				if wep.NZPaPName  then
+				wep.PrintName = wep.NZPaPName
+				
 				end
 				end)
+				
 				self:SetBought(true)
 				return true
 			end)
