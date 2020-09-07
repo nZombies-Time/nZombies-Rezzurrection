@@ -36,21 +36,131 @@ if SERVER then
 	end
 end
 
+nzRound.HudSelectData = nzRound.HudSelectData or {}
+function nzRound:AddHUDType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.HudSelectData[id] = data
+		else
+			nzRound.HudSelectData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.HudSelectData[id] = class
+	end
+end
 
-nzRound.ZombieData = nzRound.ZombieData or {}
+nzRound:AddHUDType("Black Ops 3", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Buried", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Origins (Black Ops 2)", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Tranzit (Black Ops 2)", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("nZombies Classic(HD)", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Covenant", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("UNSC", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Dead Space", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Devil May Cry - Dante", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Devil May Cry - Nero", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Devil May Cry - V", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Devil May Cry - Vergil", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Gears of War", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Killing Floor 2", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Resident Evil", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Simple (Black)", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Simple (Outline)", "nz_zombie_walker", {
+}) 
+
+function nzRound:GetHUDType(id)
+	if id == "Black Ops 3" then
+	return "b03_hud.png"
+	end
+		if id == "Buried" then
+	return "buried_hud.png"
+	end
+		if id == "Origins (Black Ops 2)" then
+	return "origins_hud.png"
+	end
+		if id == "Tranzit (Black Ops 2)" then
+	return "tranzit_hud.png" 
+	end
+		if id == "nZombies Classic(HD)" then
+	return "HD_hud.png"
+	end
+	if id == "Covenant" then
+	return "covenant_hud.png"
+	end
+	if id == "UNSC" then
+	return "Halo_hud.png"
+	end
+	if id == "Dead Space" then
+	return "deadspace_hud.png"
+	end
+	if id == "Devil May Cry - Dante" then
+	return "DMC_Dante__hud.png"
+	end
+	if id == "Devil May Cry - Nero" then
+	return "DMC_Nero__hud.png"
+	end
+	if id == "Devil May Cry - V" then
+	return "DMC_V__hud.png"
+	end
+	if id == "Devil May Cry - Vergil" then
+	print("DMC_Vergil__hud.png")
+	return "DMC_Vergil__hud.png"
+	end
+	if id == "Gears of War" then
+	return "gears_hud.png"
+	end
+	if id == "Killing Floor 2" then
+	return "KF2__hud.png"
+	end
+	if id == "Resident Evil" then
+	return "RE_hud.png"
+	end
+	if id == "Simple (Black)" then
+	return "simple_hud.png"
+	end
+	if id == "Simple (Outline)" then
+	return "simple_hud2.png"
+	end
+	if id == nil then
+	return "origins_hud.png"
+	end
+end
+
+
+nzRound.ZombieSkinData = nzRound.ZombieSkinData or {}
 function nzRound:AddZombieType(id, class)
 	if SERVER then
 		if class then
 			local data = {}
 			-- Which entity to spawn
 			data.class = class
-			nzRound.ZombieData[id] = data
+			nzRound.ZombieSkinData[id] = data
 		else
-			nzRound.ZombieData[id] = nil -- Remove it if no valid class was added
+			nzRound.ZombieSkinData[id] = nil -- Remove it if no valid class was added
 		end
 	else
 		-- Clients only need it for the dropdown, no need to actually know the data and such
-		nzRound.ZombieData[id] = class
+		nzRound.ZombieSkinData[id] = class
 	end
 end
 

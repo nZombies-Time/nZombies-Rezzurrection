@@ -40,6 +40,7 @@ nzTools:CreateTool("settings", {
 		valz["Row13"] = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
 		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 		valz["Row15"] = data.zombietype or "Kino der Toten"
+		valz["Row16"] = data.hudtype or "Origins (Black Ops 2)"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -193,7 +194,7 @@ nzTools:CreateTool("settings", {
 			local Row15 = DProperties:CreateRow("Map Settings", "Zombie Type")
 			Row15:Setup( "Combo" )
 			local found = false
-			for k,v in pairs(nzRound.ZombieData) do
+			for k,v in pairs(nzRound.ZombieSkinData) do
 				if k == valz["Row15"] then
 					Row15:AddChoice(k, k, true)
 					found = true
@@ -203,6 +204,20 @@ nzTools:CreateTool("settings", {
 			end
 			Row15.DataChanged = function( _, val ) valz["Row15"] = val end
 			Row15:SetTooltip("Sets the zombies that will appear in your map.")
+			
+			local Row16 = DProperties:CreateRow("Map Settings", "HUD Select")
+			Row16:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.HudSelectData) do
+				if k == valz["Row16"] then
+					Row16:AddChoice(k, k, true)
+					found = true
+				else
+					Row16:AddChoice(k, k, false)
+				end
+			end
+			Row16.DataChanged = function( _, val ) valz["Row16"] = val end
+			Row16:SetTooltip("Sets the HUD players will see in your map")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -220,6 +235,7 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
+			if !valz["Row16"] then data.hudtype = "Kino der Toten" else data.hudtype = valz["Row16"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end

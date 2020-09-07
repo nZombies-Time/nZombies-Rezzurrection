@@ -1072,6 +1072,7 @@ end
 
 --we do our own jump since the loco one is a bit weird.
 function ENT:Jump()
+if (!IsValid(self:GetTargetNavArea())) then return end
 	if CurTime() < self:GetLastLand() + 0.5 or navmesh.GetNavArea(self:GetPos(), 50):HasAttributes( NAV_MESH_NO_JUMP ) then return end
 	if !self:IsOnGround() then return end
 	self.loco:SetDesiredSpeed( 450 )

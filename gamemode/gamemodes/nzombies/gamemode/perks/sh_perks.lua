@@ -55,7 +55,7 @@ end
 nzPerks:NewPerk("jugg", {
 	name = "Juggernog",
 	off_model = "models/alig96/perks/jugg/jugg_off.mdl",
-	on_model = "models/alig96/perks/jugg/jugg_on.mdl",
+	on_model = "models/yolojoenshit/bo3perks/juggernog/mc_mtl_p7_zm_vending_jugg.mdl",
 	price = 2500,
 	material = "models/perk_bottle/c_perk_bottle_jugg",
 	icon = Material("perk_icons/chron/jugg.png", "smooth unlitgeneric"),
@@ -111,7 +111,7 @@ nzPerks:NewPerk("dtap", {
 nzPerks:NewPerk("revive", {
 	name = "Quick Revive",
 	off_model = "models/alig96/perks/revive/revive_off.mdl",
-	on_model = "models/alig96/perks/revive/revive_on.mdl",
+	on_model = "models/yolojoenshit/bo3perks/revivesoda/mc_mtl_p7_zm_vending_revive.mdl",
 	price = 1500,
 	material = "models/perk_bottle/c_perk_bottle_revive",
 	icon = Material("perk_icons/chron/revive.png", "smooth unlitgeneric"),
@@ -134,7 +134,7 @@ nzPerks:NewPerk("revive", {
 nzPerks:NewPerk("speed", {
 	name = "Speed Cola",
 	off_model = "models/alig96/perks/speed/speed_off.mdl",
-	on_model = "models/alig96/perks/speed/speed_on.mdl",
+	on_model = "models/yolojoenshit/bo3perks/speedcola/mc_mtl_p7_zm_vending_speedcola.mdl",
 	price = 3000,
 	material = "models/perk_bottle/c_perk_bottle_speed",
 	icon = Material("perk_icons/chron/speed.png", "smooth unlitgeneric"),
@@ -172,7 +172,7 @@ nzPerks:NewPerk("speed", {
 nzPerks:NewPerk("pap", {
 	name = "Pack-a-Punch",
 	off_model = "models/alig96/perks/packapunch/packapunch.mdl", //Find a new model.
-	on_model = "models/alig96/perks/packapunch/packapunch.mdl",
+	on_model = "models/yolojoenshit/extras/packapunch/mc_mtl_p7_packapunch.mdl",
 	price = 0,
 	specialmachine = true, -- Prevents players from getting the perk when they buy it
 	nobuy = true, -- A "Buy" event won't run when this is used (we do that ourselves in its function)
@@ -318,7 +318,7 @@ nzPerks:NewPerk("pap", {
 nzPerks:NewPerk("dtap2", {
 	name = "Double Tap II",
 	off_model = "models/alig96/perks/doubletap2/doubletap2_off.mdl",
-	on_model = "models/alig96/perks/doubletap2/doubletap2.mdl",
+	on_model = "models/yolojoenshit/bo3perks/doubletap2/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_dtap2",
 	icon = Material("perk_icons/chron/dtap2.png", "smooth unlitgeneric"),
@@ -356,7 +356,7 @@ nzPerks:NewPerk("dtap2", {
 nzPerks:NewPerk("staminup", {
 	name = "Stamin-Up",
 	off_model = "models/alig96/perks/staminup/staminup_off.mdl",
-	on_model = "models/alig96/perks/staminup/staminup.mdl",
+	on_model = "models/yolojoenshit/bo3perks/staminup/mc_mtl_p7_zm_vending_marathon.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_stamin",
 	icon = Material("perk_icons/chron/staminup.png", "smooth unlitgeneric"),
@@ -510,7 +510,7 @@ nzPerks:NewPerk("phd", {
 nzPerks:NewPerk("deadshot", {
 	name = "Deadshot Daiquiri",
 	off_model = "models/alig96/perks/deadshot/deadshot_off.mdl",
-	on_model = "models/alig96/perks/deadshot/deadshot.mdl",
+	on_model = "models/yolojoenshit/bo3perks/deadshot/mc_mtl_p7_zm_vending_deadshot.mdl",
 	price = 2000,
 	material = "models/perk_bottle/c_perk_bottle_deadshot",
 	icon = Material("perk_icons/chron/deadshot.png", "smooth unlitgeneric"),
@@ -524,7 +524,7 @@ nzPerks:NewPerk("deadshot", {
 nzPerks:NewPerk("mulekick", {
 	name = "Mule Kick",
 	off_model = "models/alig96/perks/mulekick/mulekick_off.mdl",
-	on_model = "models/alig96/perks/mulekick/mulekick.mdl",
+	on_model = "models/yolojoenshit/bo3perks/mulekick/mc_mtl_p7_zm_vending_mulekick.mdl",
 	price = 4000,
 	material = "models/perk_bottle/c_perk_bottle_mulekick",
 	icon = Material("perk_icons/chron/mulekick.png", "smooth unlitgeneric"),

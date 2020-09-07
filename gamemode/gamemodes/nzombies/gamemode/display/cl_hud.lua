@@ -2,7 +2,7 @@
 nzDisplay = nzDisplay or AddNZModule("Display")
 
 local bloodline_points = Material("bloodline_score2.png", "unlitgeneric smooth")
-local bloodline_gun = Material("origins_hud.png", "unlitgeneric smooth")
+local bloodline_gun = Material("bloodline_score2.png", "unlitgeneric smooth")
 
 --[[local bloodDecals = {
 	Material("decals/blood1"),
@@ -73,6 +73,7 @@ local function ScoreHud()
 					else
 						offset = offset + textH
 					end
+					
 
 					surface.SetDrawColor(200,200,200)
 					local index = v:EntIndex()
@@ -103,7 +104,7 @@ local function GunHud()
 			local w,h = ScrW(), ScrH()
 			local scale = ((w/1920)+1)/2
 
-			surface.SetMaterial(bloodline_gun)
+			surface.SetMaterial(Material(nzRound:GetHUDType(nzMapping.Settings.hudtype), "unlitgeneric smooth"))
 			surface.SetDrawColor(200,200,200)
 			surface.DrawTexturedRect(w - 630*scale, h - 225*scale, 600*scale, 225*scale)
 			if IsValid(wep) then
