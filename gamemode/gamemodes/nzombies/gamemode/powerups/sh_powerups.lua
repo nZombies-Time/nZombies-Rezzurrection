@@ -273,8 +273,9 @@ nzPowerUps:NewPowerUp("carpenter", {
 	chance = 5,
 	duration = 0,
 	func = (function(self, ply)
-		nzNotifications:PlaySound("nz/powerups/carpenter.wav", 0)
-		nzNotifications:PlaySound("nz/powerups/carp_loop.wav", 1)
+		--nzNotifications:PlaySound("nz/powerups/carpenter.wav", 0)
+		--nzNotifications:PlaySound("nz/powerups/carp_loop.wav", 1)
+		nzSounds:Play("Carpenter")
 		nzPowerUps:Carpenter()
 	end),
 })
