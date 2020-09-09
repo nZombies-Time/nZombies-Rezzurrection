@@ -1,3 +1,5 @@
+-- By Ethorbit
+
 if (SERVER) then
     util.AddNetworkString("nzSounds.PlaySound")
     util.AddNetworkString("nzSounds.RefreshSounds")
