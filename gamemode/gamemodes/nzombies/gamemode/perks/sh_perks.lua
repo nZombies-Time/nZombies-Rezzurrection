@@ -476,7 +476,7 @@ nzPerks:NewPerk("gin", {
 	func = function(self, ply, machine)
 	if #player.GetAllPlaying() <= 1 then
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
-	GetConVar("nz_difficulty_perks_max"):SetInt(perks+2)
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+3)
 	else
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
 	GetConVar("nz_difficulty_perks_max"):SetInt(perks+1)
@@ -485,7 +485,7 @@ nzPerks:NewPerk("gin", {
 	lostfunc = function(self, ply)
 		if #player.GetAllPlaying() <= 1 then
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
-	GetConVar("nz_difficulty_perks_max"):SetInt(perks-2)
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks-3)
 	else
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
 	GetConVar("nz_difficulty_perks_max"):SetInt(perks-1)

@@ -170,7 +170,7 @@ function ENT:Initialize()
 		self:SetBodygroup( i-1, math.random(0, self:GetBodygroupCount(i-1) - 1))
 	end
 	self:SetSkin( math.random(self:SkinCount()) - 1 )
-
+	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
 	self.ZombieAlive = true
 
 end
@@ -242,8 +242,7 @@ function ENT:Think()
 					effectData:SetMagnitude(1)
 					util.Effect("zombie_spawn_dust", effectData)
 
-					self:RespawnZombie()
-					self:SetStuckCounter( 0 )
+					self:Jump()
 				end
 
 				if self:GetStuckCounter() <= 3 then
@@ -253,13 +252,24 @@ function ENT:Think()
 
 				if self:GetStuckCounter() > 3 and self:GetStuckCounter() <= 5 then
 					--try to unstuck via jump
-					self:Jump()
+					if self.NZBossType then
+	nzRound:SpawnBoss(self.NZBossType)
+	self:Remove()
+	else
+	self:RespawnZombie()
+	end
+					self:SetStuckCounter( 0 )
 				end
 
 				if self:GetStuckCounter() > 5 then
 					--Worst case:
 					--respawn the zombie after 32 seconds with no postion change
-					self:RespawnZombie()
+					if self.NZBossType then
+	nzRound:SpawnBoss(self.NZBossType)
+	self:Remove()
+	else
+	self:RespawnZombie()
+	end
 					self:SetStuckCounter( 0 )
 				end
 
@@ -431,6 +441,10 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnTargetInAttackRange()
+self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
+	timer.Simple(2, function()
+		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+		end)
 	if !self:GetBlockAttack() then
 		self:Attack()
 	else
@@ -524,7 +538,12 @@ function ENT:OnNoTarget()
 		else
 			-- If not visible to players respawn immediately
 			if !self:IsInSight() then
-				self:RespawnZombie()
+				if self.NZBossType then
+	nzRound:SpawnBoss(self.NZBossType)
+	self:Remove()
+	else
+	self:RespawnZombie()
+	end
 			else
 				self:UpdateSequence() -- Updates the sequence to be idle animation
 				self:StartActivity(self.CalcIdeal) -- Starts the newly updated sequence
@@ -1072,7 +1091,7 @@ end
 
 --we do our own jump since the loco one is a bit weird.
 function ENT:Jump()
-if (!IsValid(self:GetTargetNavArea())) then return end
+	if navmesh.GetNavArea(self:GetPos(), 50):IsValid() then
 	if CurTime() < self:GetLastLand() + 0.5 or navmesh.GetNavArea(self:GetPos(), 50):HasAttributes( NAV_MESH_NO_JUMP ) then return end
 	if !self:IsOnGround() then return end
 	self.loco:SetDesiredSpeed( 450 )
@@ -1082,6 +1101,32 @@ if (!IsValid(self:GetTargetNavArea())) then return end
 	self.loco:Jump()
 	--Boost them
 	self:TimedEvent( 0.5, function() self.loco:SetVelocity( self:GetForward() * 5 ) end)
+	else
+	local stuckdata = nzRound:GetBossData(nzMapping.Settings.bosstype)
+	if self:GetClass() ==  stuckdata.class then
+	print("BOSS")
+	local bosstype =  self.BossType
+		if bosstype then
+			local data = nzRound:GetBossData(bosstype)
+			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" -- Check what spawnpoint type we're using
+			local spawnpoints = {}
+			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
+				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
+					table.insert(spawnpoints, v)
+				end
+			end
+			
+			local spawn = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
+			if IsValid(spawn) then -- If we this exists, spawn here
+				self:SetPos( spawn:GetPos() )
+				
+			end
+		end
+
+	else
+	self:RespawnZombie()
+	end
+	end
 end
 
 function ENT:Flames( state )

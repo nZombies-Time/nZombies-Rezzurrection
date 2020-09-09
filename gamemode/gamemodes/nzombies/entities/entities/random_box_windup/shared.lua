@@ -22,6 +22,7 @@ function ENT:Initialize()
 	self:SetLocalVelocity(self:GetAngles():Up() * 4)
 
 	self:SetSolid( SOLID_OBB )
+	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
 	self:DrawShadow( false )
 
 	self:SetWinding(true)

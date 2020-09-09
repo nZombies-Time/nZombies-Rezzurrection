@@ -72,7 +72,12 @@ if SERVER then
 		if !nosync then
 			hook.Call("PlayerRevived", nzRevive, self, revivor)
 		end
-		self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+		self:SetTargetPriority(TARGET_PRIORITY_NONE)
+        timer.Simple(2, function()
+        if (IsValid(self)) and self:IsPlaying() then
+        self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+     end
+   end)
 		self.HasWhosWho = nil
 		if IsValid(revivor) and revivor:IsPlayer() then
 			if self.DownPoints then

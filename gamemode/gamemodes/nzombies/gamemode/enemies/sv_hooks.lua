@@ -39,7 +39,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
             if !vaporizer:IsValid() then return end
             vaporizer:SetKeyValue("Damage", 22)
             vaporizer:SetKeyValue("DamageRadius", 100)
-            vaporizer:SetKeyValue("DamageType",DMG_BURN)
+            vaporizer:SetKeyValue("DamageType",DMG_SLOWBURN)
             vaporizer:SetPos(enemy:GetPos())
             vaporizer:SetOwner(enemy)
             vaporizer:Spawn()
@@ -89,7 +89,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 end
 
 function GM:EntityTakeDamage(zombie, dmginfo)
-
+	if zombie:IsPlayer() and dmginfo:IsDamageType( 2097152 ) then return true end
 	-- Who's Who clones can't take damage!
 	if zombie:GetClass() == "whoswho_downed_clone" then return true end
 	
@@ -126,8 +126,8 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
 			
-			if attacker:IsPlayer() and attacker:HasPerk("sake") and !zombie.NZBossType and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
-				zombie:Kill(dmginfo)
+			if !zombie.NZBossType and attacker:IsPlayer() and attacker:HasPerk("sake") and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
+				dmginfo:ScaleDamage(zombie:Health()) --zombie:Kill(dmginfo)
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
 			
@@ -135,13 +135,14 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:ScaleDamage( 1.5 )
 			return end
 			
-			if attacker:IsPlayer() and dmginfo:IsDamageType( 8 ) then
+			if dmginfo:IsDamageType( 2097152 ) then
+			dmginfo:ScaleDamage(zombie:Health()/5)
 				zombie:Ignite((dmginfo:GetDamage()/10))
 			return end
 			
-			if attacker:HasPerk("dtap2") and attacker:IsPlayer() and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
+			if attacker:IsPlayer()  and attacker:HasPerk("dtap2")  and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
 
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1.5) end
+			if hitgroup == HITGROUP_HEAD and !dmginfo:IsDamageType( 128 ) and !dmginfo:IsDamageType( 4 ) then dmginfo:ScaleDamage(1.5) end
 
 			--  Pack-a-Punch doubles damage...hell no it doesnt
 
