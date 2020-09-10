@@ -37,14 +37,14 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
             entParticle:Fire("kill","",9)
             local vaporizer = ents.Create("point_hurt")
             if !vaporizer:IsValid() then return end
-            vaporizer:SetKeyValue("Damage", 22)
+            vaporizer:SetKeyValue("Damage", 87)
             vaporizer:SetKeyValue("DamageRadius", 100)
             vaporizer:SetKeyValue("DamageType",DMG_SLOWBURN)
             vaporizer:SetPos(enemy:GetPos())
             vaporizer:SetOwner(enemy)
             vaporizer:Spawn()
             vaporizer:Fire("TurnOn","",0)
-            vaporizer:Fire("kill","",9)
+            vaporizer:Fire("kill","",8)
 			end
 		end
 	end
@@ -136,7 +136,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			return end
 			
 			if dmginfo:IsDamageType( 2097152 ) then
-			dmginfo:ScaleDamage(zombie:Health()/5)
 				zombie:Ignite((dmginfo:GetDamage()/10))
 			return end
 			
