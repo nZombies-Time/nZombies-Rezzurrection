@@ -175,6 +175,8 @@ end
 
 if (CLIENT) then
     function nzSounds:Stop(event) -- Stops all sounds bound to an event
+        if (!IsValid(LocalPlayer())) then return end -- The client has not fully loaded yet, LocalPlayer() does not exist.
+        
         local notValid = !nzSounds.Sounds.Custom[event] or table.IsEmpty(nzSounds.Sounds.Custom[event])
         local snds = notValid and nzSounds.Sounds.Default[event] or nzSounds.Sounds.Custom[event]
 
