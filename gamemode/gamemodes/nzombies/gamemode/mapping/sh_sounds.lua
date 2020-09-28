@@ -96,7 +96,7 @@ function nzSounds:GetSound(event)
             snd = nzSounds:GetDefaultSound(event)
         end
 
-        if snd == nil then return end
+        if snd == nil then return nzSounds:GetDefaultSound(event) end
         -- if (!file.Exists("sound/" .. snd, "GAME")) then
         --     ServerLog("[nZombies] Tried to play an invalid sound file (" .. snd .. ") for Event: " .. event .. "\n")
         -- end
