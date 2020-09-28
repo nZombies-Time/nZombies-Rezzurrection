@@ -1,5 +1,3 @@
--- By Ethorbit
-
 if (SERVER) then
     util.AddNetworkString("nzSounds.PlaySound")
     util.AddNetworkString("nzSounds.RefreshSounds")
@@ -69,7 +67,10 @@ function nzSounds:RefreshSounds()
     nzSounds.Sounds.Custom.Jingle = nzMapping.Settings.boxjinglesnd
     nzSounds.Sounds.Custom.Open = nzMapping.Settings.boxopensnd
     nzSounds.Sounds.Custom.Close = nzMapping.Settings.boxclosesnd
-
+    if (!table.IsEmpty(nzMapping.Settings) and table.IsEmpty(nzSounds.Sounds.Custom)) then
+        nzSounds.Sounds.Custom = table.Copy(nzSounds.Sounds.Default)
+    end
+    
     if (SERVER) then
         net.Start("nzSounds.RefreshSounds")
         net.Broadcast()
@@ -78,8 +79,7 @@ end
 nzSounds:RefreshSounds()
 
 function nzSounds:GetSound(event)
-    local notValid = !nzSounds.Sounds.Custom[event] || table.IsEmpty(nzSounds.Sounds.Custom[event])
-    local snd = notValid and nzSounds.Sounds.Default[event] or nzSounds.Sounds.Custom[event]
+    local snd = !nzSounds.Sounds.Custom[event] and nzSounds.Sounds.Default[event] or nzSounds.Sounds.Custom[event]
 
     if (istable(snd)) then
         snd = table.Random(snd) -- ^ is a table of sounds, but we can only play 1
@@ -97,20 +97,21 @@ function nzSounds:GetSound(event)
         end
 
         if snd == nil then return end
-
-        if (!file.Exists("sound/" .. snd, "GAME")) then
-            ServerLog("[nZombies] Tried to play an invalid sound file (" .. snd .. ") for Event: " .. event .. "\n")
-        end
+        -- if (!file.Exists("sound/" .. snd, "GAME")) then
+        --     ServerLog("[nZombies] Tried to play an invalid sound file (" .. snd .. ") for Event: " .. event .. "\n")
+        -- end
     end
 
     if (CLIENT) then
         -- FALLBACK in case for some reason the client has not gotten their sounds to refresh yet
         if (nzSounds and nzSounds.Sounds and table.IsEmpty(nzSounds.Sounds.Custom)) then    
-            nzSounds:RefreshSounds()
-            snd = nzSounds:GetSound(event)
+            if (!table.IsEmpty(nzMapping.Settings)) then -- Stops endless loop from non-submitted configs
+                nzSounds:RefreshSounds()
+                snd = nzSounds:GetSound(event)
+            end
         end
 
-        if (!nzSounds.Sounds.Default[event]) then 
+        if (!isstring(snd) or !nzSounds.Sounds.Default[event]) then 
             if (isstring(event)) then
                 print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
             else
@@ -177,7 +178,7 @@ if (CLIENT) then
     function nzSounds:Stop(event) -- Stops all sounds bound to an event
         if (!IsValid(LocalPlayer())) then return end -- The client has not fully loaded yet, LocalPlayer() does not exist.
         
-        local notValid = !nzSounds.Sounds.Custom[event] or table.IsEmpty(nzSounds.Sounds.Custom[event])
+        local notValid = !nzSounds.Sounds.Custom[event] or table.IsEmpty(nzSounds.Sounds.Custom)
         local snds = notValid and nzSounds.Sounds.Default[event] or nzSounds.Sounds.Custom[event]
 
         if (istable(snds)) then
