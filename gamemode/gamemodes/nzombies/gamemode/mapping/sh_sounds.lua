@@ -111,12 +111,14 @@ function nzSounds:GetSound(event)
             end
         end
 
-        if (!isstring(snd) or !nzSounds.Sounds.Default[event]) then 
-            if (isstring(event)) then
-                print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
-            else
-                print("[nZombies] Tried to play an invalid Sound Event!")
-            end
+        if (snd == nil or !nzSounds.Sounds.Default[event]) then 
+            if (!nzSounds.Sounds.Default[event]) then
+                if (isstring(event)) then
+                    print("[nZombies] Tried to play an invalid Sound Event! (" .. event .. ")")
+                else
+                    print("[nZombies] Tried to play an invalid Sound Event!")
+                end
+            end 
 
             snd = nzSounds:GetDefaultSound(event)
         end  
