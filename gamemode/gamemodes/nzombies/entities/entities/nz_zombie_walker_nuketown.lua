@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/nzr/nuketown_zombies.mdl"
+	"models/nzr/nuketown_zombies1.mdl", "models/nzr/nuketown_zombies2.mdl", "models/nzr/nuketown_zombies3.mdl", "models/nzr/nuketown_zombies4.mdl"
 }
 
 local AttackSequences = {
@@ -202,7 +202,9 @@ end
 function ENT:SpecialInit()
 
 	if CLIENT then
-	
+	if not self:GetModel() == "models/nzr/nuketown_zombies1.mdl" then
+		self:SetBodygroup(1,  math.random(0,2))
+		end
 		
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized
@@ -230,11 +232,7 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-self:SetBodygroup(0, math.random(0,3))
-		self:SetBodygroup(1, math.random(0,2))
-		 if self:GetBodygroup(0) == 3 then
-		 self:SetBodygroup(1,3 )
-		 end
+
 	local seq = self.EmergeSequences[self:GetEmergeSequenceIndex()]
 	local _, dur = self:LookupSequence(seq)
 

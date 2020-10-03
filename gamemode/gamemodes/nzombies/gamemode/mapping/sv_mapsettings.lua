@@ -70,7 +70,9 @@ function nzMapping:LoadMapSettings(data)
 	nzMapping.Settings.zombiesperplayer = data.zombiesperplayer == nil and 0 or data.zombiesperplayer
 	nzMapping.Settings.spawnsperplayer = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
-
+	
+	nzMapping.Settings.zombieeyecolor = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or Color(data.zombieeyecolor.r, data.zombieeyecolor.g, data.zombieeyecolor.b)
+	
 	-- More compact and less messy:
 	for k,v in pairs(nzSounds.struct) do
 		nzMapping.Settings[v] = data[v] or {}

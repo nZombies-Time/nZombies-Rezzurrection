@@ -203,12 +203,11 @@ function ENT:SpecialInit()
 	if CLIENT then
 	if self:GetModel() == "models/nzr/soe_male_zombies.mdl" then
 		self:SetBodygroup(0,  math.random(0,2))
-		self:SetBodygroup(1,0)
-		self:SetBodygroup(2,  math.random(0,1))
+		self:SetBodygroup(2,  math.random(0,2))
+		self:SetBodygroup(3,  math.random(0,1))
 		else
-		self:SetBodygroup(0,  math.random(0,3))
-		self:SetBodygroup(1,  math.random(0,3))
-		self:SetBodygroup(2,  math.random(0,3))
+		self:SetBodygroup(0,  math.random(0,1))
+		self:SetBodygroup(2,  math.random(0,2))
 		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized

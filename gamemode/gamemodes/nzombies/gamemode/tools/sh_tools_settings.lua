@@ -41,6 +41,7 @@ nzTools:CreateTool("settings", {
 		valz["Row14"] = data.spawnsperplayer == nil and 0 or data.spawnsperplayer
 		valz["Row15"] = data.zombietype or "Kino der Toten"
 		valz["Row16"] = data.hudtype or "Origins (Black Ops 2)"
+		valz["Row17"] = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or data.zombieeyecolor
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -235,7 +236,8 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row13"]) then data.zombiesperplayer = 0 else data.zombiesperplayer = tonumber(valz["Row13"]) end
 			if !tonumber(valz["Row14"]) then data.spawnsperplayer = 0 else data.spawnsperplayer = tonumber(valz["Row14"]) end
 			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
-			if !valz["Row16"] then data.hudtype = "Kino der Toten" else data.hudtype = valz["Row16"] end
+			if !valz["Row16"] then data.hudtype = "Origins (Black Ops 2)" else data.hudtype = valz["Row16"] end
+			if !istable(valz["Row17"]) then data.zombieeyecolor = Color(0, 255, 255, 255) else data.zombieeyecolor = valz["Row17"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -268,13 +270,54 @@ nzTools:CreateTool("settings", {
 	--	DermaButton:SetPos( 0, 185 )
 		MapSDermaButton:SetSize( 260, 30 )
 		MapSDermaButton.DoClick = UpdateData
+		
+		local function AddEyeStuff()
+			local eyePanel = vgui.Create("DPanel", sheet)
+			sheet:AddSheet("Eye Color", eyePanel, "icon16/palette.png", false, false, "Set the eye glow color the zombies have.")
+			eyePanel:DockPadding(5, 5, 5, 5)
+			local colorChoose = vgui.Create("DColorMixer", eyePanel)
+			colorChoose:SetColor(valz["Row17"])
+			colorChoose:SetPalette(false)
+			colorChoose:SetAlphaBar(false)
+			colorChoose:Dock(TOP)
+			colorChoose:SetSize(150, 150)
+			
+			local presets = vgui.Create("DComboBox", eyePanel)
+			presets:SetSize(60, 20)
+			presets:Dock(BOTTOM)
+			presets:AddChoice("Richtofen")
+			presets:AddChoice("Samantha")
+			presets:AddChoice("Avogadro")
+			presets:AddChoice("Warden")
+			presets.OnSelect = function(self, index, value)
+				if (value == "Richtofen") then
+					colorChoose:SetColor(Color(0, 255, 255))
+				elseif (value == "Samantha") then
+					colorChoose:SetColor(Color(255, 145, 0))
+				elseif (value == "Avogadro") then
+					colorChoose:SetColor(Color(255, 255, 255))
+				elseif (value == "Warden") then
+					colorChoose:SetColor(Color(255, 0, 0))	
+				end
 
+				colorChoose:ValueChanged(nil)
+			end
+
+			colorChoose.ValueChanged = function(col)
+				valz["Row17"] = colorChoose:GetColor()
+			end
+		end
+		
 		local acPanel = vgui.Create("DPanel", sheet)
 		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
 		local acProps = vgui.Create("DProperties", acPanel)
 		local acheight, acwidth = sheet:GetSize()
 		acProps:SetSize(acwidth, acwidth - 50)
 
+		if (!nzTools.Advanced) then
+			AddEyeStuff()
+		end
+		
 		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
 		ACRow1:Setup("Boolean")
 		ACRow1:SetValue(valz["ACRow1"])
@@ -756,7 +799,9 @@ nzTools:CreateTool("settings", {
 			local sndheight, sndwidth = sheet:GetSize()
 			sndPanel:SetSize(sndheight, (sndwidth - 50))
 			sheet:AddSheet("Custom Sounds", sndPanel, "icon16/sound_add.png", false, false, "Customize the sounds that play for certain events.")
-
+			
+			AddEyeStuff()
+			
 			-- A modifiable list of all sounds bound to currently selected event:
 			local curSndList = vgui.Create("DListView", sndPanel)
 			curSndList:Dock(RIGHT)

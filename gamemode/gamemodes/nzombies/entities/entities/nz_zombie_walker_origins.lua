@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/nzr/origins_zombies.mdl", "models/nzr/origins_templar_zombies.mdl"
+	"models/nzr/origins_zombies1.mdl", "models/nzr/origins_zombies2.mdl", "models/nzr/origins_zombies3.mdl", "models/nzr/origins_zombies4.mdl", "models/nzr/origins_zombiescrusader.mdl" , "models/nzr/origins_zombiestemplar.mdl"
 }
 
 local AttackSequences = {
@@ -201,13 +201,11 @@ end
 function ENT:SpecialInit()
 
 	if CLIENT then
-	if self:GetModel() == "models/nzr/origins_zombies.mdl" then
-		self:SetBodygroup(0,  math.random(0,3) )
-		self:SetBodygroup(1,  math.random(0,2) )
-		self:SetBodygroup(2,  math.random(0,3) )
+	if self:GetModel() == "models/nzr/origins_zombiestemplar.mdl" or self:GetModel() == "models/nzr/origins_zombiescrusader.mdl"  then
+		--tfw no bodygroups
 		else
-		self:SetBodygroup(0,  math.random(0,1))
-		self:SetBodygroup(1,  math.random(0,1))
+		self:SetBodygroup(1,  math.random(0,2))
+		self:SetBodygroup(2,  math.random(0,3))
 		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized

@@ -80,6 +80,27 @@ function nzMapping:EasterEgg(pos, ang, model, ply)
 	return egg
 end
 
+function nzMapping:BuyableEnding(pos, ang, model, ply)
+	local ending = ents.Create( "buyable_ending" )
+	ending:SetModel( model )
+	ending:SetPos( pos )
+	ending:SetAngles( ang )
+	ending:Spawn()
+
+	local phys = ending:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:EnableMotion(false)
+	end
+
+	if ply then
+		undo.Create( "Easter Egg" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ending )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ending
+end
+
 function nzMapping:WallBuy(pos, gun, price, angle, oldent, ply, flipped)
 
 	if IsValid(oldent) then oldent:Remove() end

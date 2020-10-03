@@ -193,6 +193,26 @@ nzMapping:AddSaveModule("EasterEggs", {
 	cleanents = {"easter_egg"},
 })
 
+nzMapping:AddSaveModule("Endings", {
+	savefunc = function()
+		local endings = {}
+		for _, v in pairs(ents.FindByClass("buyable_ending")) do
+			table.insert(endings, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			model = v:GetModel(),
+			})
+		end
+		return endings
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:BuyableEnding(v.pos, v.angle, v.model)
+		end
+	end,
+	cleanents = {"buyable_ending"},
+})
+
 nzMapping:AddSaveModule("ElecSpawns", {
 	savefunc = function()
 		local elec_spawn = {}

@@ -57,11 +57,9 @@ end
 
 function ENT:Use( activator, caller )
 	if self:GetOpen() == true or self.Moving then return end
-	
 	if (activator:GetPoints() >= 950) then
 		nzSounds:PlayEnt("Open", self)
 	end
-	
 	self:BuyWeapon(activator)
 	-- timer.Simple(5,function() self:MoveAway() end)
 end

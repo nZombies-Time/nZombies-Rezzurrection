@@ -55,6 +55,16 @@ end
 
 nzRound:AddHUDType("Black Ops 3", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Division 9", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Mob of the Dead", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Fade", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Shadows of Evil", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Black Ops 1", "nz_zombie_walker", {
+}) 
 nzRound:AddHUDType("Buried", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Origins (Black Ops 2)", "nz_zombie_walker", {
@@ -92,6 +102,21 @@ function nzRound:GetHUDType(id)
 	if id == "Black Ops 3" then
 	return "b03_hud.png"
 	end
+	if id == "Division 9" then
+	return "D9.png"
+	end
+	if id == "Mob of the Dead" then
+	return "motd.png"
+	end
+	if id == "Shadows of Evil" then
+	return "soe.png"
+	end
+	if id == "Fade" then
+	return "fade.png"
+	end
+	if id == "Black Ops 1" then
+	return "bo1.png"
+	end
 		if id == "Buried" then
 	return "buried_hud.png"
 	end
@@ -123,7 +148,6 @@ function nzRound:GetHUDType(id)
 	return "DMC_V__hud.png"
 	end
 	if id == "Devil May Cry - Vergil" then
-	print("DMC_Vergil__hud.png")
 	return "DMC_Vergil__hud.png"
 	end
 	if id == "Gears of War" then
@@ -166,18 +190,16 @@ end
 
 nzRound:AddZombieType("Kino der Toten", "nz_zombie_walker", {
 }) 
-
 nzRound:AddZombieType("Ascension", "nz_zombie_walker_ascension", {
 }) 
-
 nzRound:AddZombieType("Call of the Dead", "nz_zombie_walker_cotd", {
 }) 
-
 nzRound:AddZombieType("FIVE", "nz_zombie_walker_five", {
 }) 
-
 nzRound:AddZombieType("Gorod Krovi", "nz_zombie_walker_gorodkrovi", {
 }) 
+nzRound:AddZombieType("Mob of the Dead", "nz_zombie_walker_motd", {
+})
 nzRound:AddZombieType("Shadows of Evil", "nz_zombie_walker_soemale", {
 }) 
 nzRound:AddZombieType("Zetsubou no Shima", "nz_zombie_walker_zetsubou", {
@@ -221,6 +243,9 @@ function nzRound:GetZombieType(id)
 	end
 		if id == "Tranzit" then
 	return "nz_zombie_walker_greenrun" 
+	end
+		if id == "Mob of the Dead" then
+	return "nz_zombie_walker_motd" 
 	end
 		if id == "Nuketown" then
 	return "nz_zombie_walker_nuketown"

@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/nzr/cotd_zombies.mdl",
+	"models/nzr/cotd_zombies1.mdl", "models/nzr/cotd_zombies2.mdl", "models/nzr/cotd_zombies3.mdl", "models/nzr/cotd_zombies4.mdl", "models/nzr/cotd_zombies5.mdl"
 }
 
 local AttackSequences = {
@@ -195,14 +195,15 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
-		 self:SetBodygroup( 0, math.random(0,4))
-		 self:SetBodygroup(1 , math.random(0,1) )
 	end
 end
 
 function ENT:SpecialInit()
 
 	if CLIENT then
+	if not self:GetModel() == "models/nzr/cotd_zombies1.mdl" then
+		self:SetBodygroup(1,  math.random(0,1))
+		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized
 			if string.find(self:GetSequenceName(self:GetSequence()), "nz_emerge") then

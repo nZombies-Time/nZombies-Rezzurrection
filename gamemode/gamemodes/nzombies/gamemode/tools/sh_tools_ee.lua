@@ -34,3 +34,39 @@ nzTools:CreateTool("ee", {
 	end,
 	--defaultdata = {}
 })
+nzTools:CreateTool("usable_ending", {
+	displayname = "Ending Placer",
+	desc = "LMB: Place Ending Prop, RMB: Remove , When interacted with, ends game",
+	condition = function(wep, ply)
+		return true
+	end,
+	PrimaryAttack = function(wep, ply, tr, data)
+		nzMapping:BuyableEnding(tr.HitPos, Angle(0,0,0), "models/hoff/props/teddy_bear/teddy_bear.mdl", ply)
+	end,
+	SecondaryAttack = function(wep, ply, tr, data)
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "buyable_ending" then
+			tr.Entity:Remove()
+		end
+	end,
+	Reload = function(wep, ply, tr, data)
+		-- Nothing
+	end,
+	OnEquip = function(wep, ply, data)
+
+	end,
+	OnHolster = function(wep, ply, data)
+
+	end
+}, {
+	displayname = "Ending Placer",
+	desc = "LMB: Place Ending Prop, RMB: Remove , When interacted with, ends game",
+	icon = "icon16/tick.png",
+	weight = 20,
+	condition = function(wep, ply)
+		return true
+	end,
+	interface = function(frame, data)
+
+	end,
+	--defaultdata = {}
+})

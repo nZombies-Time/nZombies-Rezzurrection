@@ -17,15 +17,25 @@ local playerColors = {
 
 function player:GetHUDPointsType(id)
 	if id == "Black Ops 3" then
-	 if math.random(0,1) ==0 then
 	 return "bo3_score1.png"
-	 else
-	  return "bo3_score1.png"
-	 end
-	
 	end
 		if id == "Buried" then
 	return "buried_score1.png"
+	end
+	if id == "Division 9" then
+	 return "bo3_score1.png"
+	end
+	if id == "Shadows of Evil" then
+		return "bo3_score2.png"
+	end
+	if id == "Black Ops 1" then
+	 return "bo1s.png"
+	end
+		if id == "Mob of the Dead" then
+	return "bloodline_score2.png"
+	end
+	if id == "Fade" then
+	return "fades.png"
 	end
 		if id == "Origins (Black Ops 2)" then
 	return "bloodline_score2.png"

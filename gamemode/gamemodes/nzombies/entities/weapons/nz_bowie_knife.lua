@@ -48,7 +48,7 @@ SWEP.Secondary.Ammo			= "none"
 SWEP.NextReload				= 1
 
 SWEP.Primary.Damage 		= 200
-SWEP.Range					= 100
+SWEP.Range					= 150
 
 
 function SWEP:Initialize()

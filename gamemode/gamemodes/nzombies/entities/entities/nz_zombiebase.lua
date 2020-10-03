@@ -27,6 +27,7 @@ ENT.Acceleration = 400
 ENT.DamageLow = 35
 ENT.DamageHigh = 45
 
+
 -- important for ent:IsZombie()
 ENT.bIsZombie = true
 ENT.bSelfHandlePath = true -- PathFollower will not auto-check for barricades or navlocks
@@ -374,11 +375,12 @@ function ENT:Stop()
 	self:SetTarget(nil)
 end
 
---Draw sppoky red eyes
-local eyeglow =  Material( "sprites/redglow1" )
-local white = Color( 255, 255, 255, 255 )
+--Draw correct eyes
+local eyeglow =  Material( "nz/zlight" )
+local defaultColor = Color(0, 255, 255, 255)
 
 function ENT:Draw()
+	local eyeColor = !IsColor(nzMapping.Settings.zombieeyecolor) and defaultColor or nzMapping.Settings.zombieeyecolor
 	self:DrawModel()
 	if self.RedEyes then
 		--local eyes = self:GetAttachment(self:LookupAttachment("eyes")).Pos
@@ -395,21 +397,21 @@ function ENT:Draw()
 		local lefteyepos
 		
 		if lefteye and righteye then
-			lefteyepos = lefteye.Pos
-			righteyepos = righteye.Pos
+			lefteyepos = lefteye.Pos + self:GetForward() * 1.0
+			righteyepos = righteye.Pos+ self:GetForward() * 1.0
 		else
 			local eyes = self:GetAttachment(self:LookupAttachment("eyes"))
 			if eyes then
-				lefteyepos = eyes.Pos + self:GetRight() * -1.5 + self:GetForward() * 0.5
-				righteyepos = eyes.Pos + self:GetRight() * 1.5 + self:GetForward() * 0.5
+				lefteyepos = eyes.Pos + self:GetRight() * -1.5 + self:GetForward() * 1.0
+				righteyepos = eyes.Pos + self:GetRight() * 1.5 + self:GetForward() * 1.0
 			end
 		end
 		
 		if lefteyepos and righteyepos then
 			cam.Start3D(EyePos(),EyeAngles())
-				render.SetMaterial( eyeglow )
-				render.DrawSprite( lefteye.Pos, 4, 4, white)
-				render.DrawSprite( righteye.Pos, 4, 4, white)
+				render.SetMaterial(eyeglow)
+				render.DrawSprite( lefteyepos, 4, 4, eyeColor)
+				render.DrawSprite( righteyepos, 4, 4, eyeColor)
 			cam.End3D()
 		end
 	end
@@ -441,10 +443,6 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnTargetInAttackRange()
-self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-	timer.Simple(2, function()
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-		end)
 	if !self:GetBlockAttack() then
 		self:Attack()
 	else
@@ -1102,9 +1100,8 @@ function ENT:Jump()
 	--Boost them
 	self:TimedEvent( 0.5, function() self.loco:SetVelocity( self:GetForward() * 5 ) end)
 	else
-	local stuckdata = nzRound:GetBossData(nzMapping.Settings.bosstype)
-	if self:GetClass() ==  stuckdata.class then
-	print("BOSS")
+	local stuckdata = nzRound:GetBossData(nzMapping.Settings.bosstype).class
+	if isstring(stuckdata) and self:GetClass() ==  stuckdata then
 	local bosstype =  self.BossType
 		if bosstype then
 			local data = nzRound:GetBossData(bosstype)
@@ -1124,7 +1121,12 @@ function ENT:Jump()
 		end
 
 	else
-	self:RespawnZombie()
+	timer.Simple(5, function()
+		if (IsValid(self) and self:Health() > 0) and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
+			else
+			self:RespawnZombie()
+			end
+	end)
 	end
 	end
 end
@@ -1438,13 +1440,13 @@ function ENT:TriggerBarricadeJump( barricade, dir )
 			self:UpdateSequence()
 		end)
 		
-		local pos = barricade:GetPos() - dir * 40
+		local pos = barricade:GetPos() - dir * 60
 		
 		--debugoverlay.Cross(pos, 5, 5)
 		-- This forces us to move straight through the barricade
 		-- in the opposite direction of where we hit the trace from
 		self:MoveToPos(pos, {
-			lookahead = 40,
+			lookahead = 60,
 			tolerance = 1,
 			draw = false,
 			maxage = 3,

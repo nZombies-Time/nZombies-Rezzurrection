@@ -37,9 +37,10 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
             entParticle:Fire("kill","",9)
             local vaporizer = ents.Create("point_hurt")
             if !vaporizer:IsValid() then return end
-            vaporizer:SetKeyValue("Damage", 87)
+            vaporizer:SetKeyValue("Damage", 100)
             vaporizer:SetKeyValue("DamageRadius", 100)
             vaporizer:SetKeyValue("DamageType",DMG_SLOWBURN)
+			vaporizer:SetKeyValue("DamageDelay",0.5)
             vaporizer:SetPos(enemy:GetPos())
             vaporizer:SetOwner(enemy)
             vaporizer:Spawn()
@@ -47,6 +48,16 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
             vaporizer:Fire("kill","",8)
 			end
 		end
+		if dmginfo:IsDamageType( 1024 ) then
+			enemy:EmitSound("bo1_overhaul/nap/explode.mp3",511)
+            local ent = ents.Create("env_explosion")
+        ent:SetPos(enemy:GetPos())
+        ent:SetAngles(enemy:GetAngles())
+        ent:Spawn()
+        ent:SetKeyValue("imagnitude", "100")
+        ent:Fire("explode")
+			end
+		
 	end
 
 	-- Run on-killed function to give points if the hook isn't blocking it
@@ -127,7 +138,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			return end
 			
 			if !zombie.NZBossType and attacker:IsPlayer() and attacker:HasPerk("sake") and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
-				dmginfo:ScaleDamage(zombie:Health()) --zombie:Kill(dmginfo)
+				dmginfo:ScaleDamage(zombie:Health()) 
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
 			
@@ -135,7 +146,26 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:ScaleDamage( 1.5 )
 			return end
 			
-			if dmginfo:IsDamageType( 2097152 ) then
+			if attacker:IsPlayer() and dmginfo:IsDamageType( 262144 ) then
+				dmginfo:ScaleDamage(zombie:Health()/10) 
+			return end
+			
+			if attacker:IsPlayer() and dmginfo:IsDamageType( 268435456 ) then
+				dmginfo:ScaleDamage(zombie:Health()) 
+				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
+			return end
+			
+			if attacker:IsPlayer() and dmginfo:IsDamageType( 16777216 ) then
+			local zombiespeed = zombie.RunSpeed
+				zombie:SetRunSpeed(100)
+				timer.Simple(5, function()
+					if IsValid(self) then
+						zombie:SetRunSpeed(zombiespeed)
+					end
+				end)
+			return end
+			
+			if attacker:IsPlayer() and dmginfo:IsDamageType( 2097152 ) then
 				zombie:Ignite((dmginfo:GetDamage()/10))
 			return end
 			

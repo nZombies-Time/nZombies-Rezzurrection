@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/nzr/moon_zombiesT1.mdl","models/nzr/moon_zombiesT2.mdl", "models/nzr/moon_zombiesT3.mdl", "models/nzr/moon_zombiesT4.mdl", "models/nzr/moon_zombiesM4.mdl", "models/nzr/moon_zombiesM5.mdl", "models/nzr/moon_zombiesM6.mdl", "models/nzr/moon_zombiesM7.mdl"
+	"models/nzr/mob_zombies1.mdl", 	"models/nzr/mob_zombies2.mdl", 	"models/nzr/mob_zombies3.mdl", 	"models/nzr/mob_zombies4.mdl", 	"models/nzr/mob_zombies5.mdl" 
 }
 
 local AttackSequences = {
@@ -195,25 +195,16 @@ function ENT:StatsInitialize()
 
 		--Preselect the emerge sequnces for clientside use
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
-
-		
+		 self:SetBodygroup(1,  math.random(0,2) )
 	end
 end
 
 function ENT:SpecialInit()
 
-
 	if CLIENT then
-		if self:GetModel() == "models/nzr/moon_zombiesT1.mdl" or self:GetModel() == "models/nzr/moon_zombiesT2.mdl" or self:GetModel() == "models/nzr/moon_zombiesT3.mdl" or  self:GetModel() == "models/nzr/moon_zombiesT4.mdl" then
-		self:SetBodygroup(0,  math.random(0,3))
-		self:SetBodygroup(2,  math.random(0,3))
-		else
-		self:SetBodygroup(2, 0)
-		end
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:TimedEvent(0.1, function() -- Tiny delay just to make sure they are fully initialized
 			if string.find(self:GetSequenceName(self:GetSequence()), "nz_emerge") then
-			
 				self:SetNoDraw(true)
 				self:TimedEvent( 0.15, function()
 					self:SetNoDraw(false)
