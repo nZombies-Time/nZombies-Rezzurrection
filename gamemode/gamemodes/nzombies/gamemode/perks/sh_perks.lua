@@ -74,7 +74,7 @@ nzPerks:NewPerk("jugg", {
 	price = 2500,
 	price_skin = 2500,
 	material = "models/perk_bottle/c_perk_bottle_jugg",
-	icon = Material("perk_icons/chron/tuff.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/chron/jugg.png", "smooth unlitgeneric"),
 	icon_skin = Material("perk_icons/chron/tuff.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
