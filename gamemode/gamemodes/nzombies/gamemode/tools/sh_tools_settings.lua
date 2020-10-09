@@ -42,6 +42,7 @@ nzTools:CreateTool("settings", {
 		valz["Row15"] = data.zombietype or "Kino der Toten"
 		valz["Row16"] = data.hudtype or "Origins (Black Ops 2)"
 		valz["Row17"] = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or data.zombieeyecolor
+		valz["Row18"] = data.perkmachinetype or "Original"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -219,6 +220,20 @@ nzTools:CreateTool("settings", {
 			end
 			Row16.DataChanged = function( _, val ) valz["Row16"] = val end
 			Row16:SetTooltip("Sets the HUD players will see in your map")
+			
+			local Row18 = DProperties:CreateRow("Map Settings", "Perk Machine Skins")
+			Row18:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.PerkSelectData) do
+				if k == valz["Row18"] then
+					Row18:AddChoice(k, k, true)
+					found = true
+				else
+					Row18:AddChoice(k, k, false)
+				end
+			end
+			Row18.DataChanged = function( _, val ) valz["Row18"] = val end
+			Row18:SetTooltip("Sets the Perk Machines")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -238,6 +253,7 @@ nzTools:CreateTool("settings", {
 			if !valz["Row15"] then data.zombietype = "Kino der Toten" else data.zombietype = valz["Row15"] end
 			if !valz["Row16"] then data.hudtype = "Origins (Black Ops 2)" else data.hudtype = valz["Row16"] end
 			if !istable(valz["Row17"]) then data.zombieeyecolor = Color(0, 255, 255, 255) else data.zombieeyecolor = valz["Row17"] end
+			if !valz["Row18"] then data.perkmachinetype = "Original" else data.perkmachinetype = valz["Row18"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end

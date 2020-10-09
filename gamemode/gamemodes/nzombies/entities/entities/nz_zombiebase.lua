@@ -199,7 +199,7 @@ function ENT:Think()
 			} )
 			if !tr.HitNonWorld then
 				self:SetSolidMask(MASK_NPCSOLID)
-				self:SetCollisionGroup(COLLISION_GROUP_PLAYER)
+				self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
 				--print("No longer no-colliding")
 			end
 			--[[for _,ent in pairs(ents.FindInBox(self:GetPos() + Vector( -16, -16, 0 ), self:GetPos() + Vector( 16, 16, 70 ))) do
@@ -1422,7 +1422,7 @@ function ENT:TriggerBarricadeJump( barricade, dir )
 		end
 		
 		self:SetSolidMask(MASK_SOLID_BRUSHONLY)
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+		self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
 		--self.loco:SetAcceleration( 5000 )
 		self.loco:SetDesiredSpeed(speed)
 		self:SetVelocity(self:GetForward() * speed)

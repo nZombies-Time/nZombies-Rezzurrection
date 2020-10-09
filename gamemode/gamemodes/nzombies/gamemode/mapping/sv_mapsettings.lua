@@ -57,6 +57,11 @@ function nzMapping:LoadMapSettings(data)
 	if data.zombietype then
 		nzMapping.Settings.zombietype = data.zombietype or "Kino der Toten"
 	end
+	if data.perkmachinetype then
+		nzMapping.Settings.perkmachinetype = data.perkmachinetype or "Original"
+		else
+		nzMapping.Settings.perkmachinetype = "Original"
+	end
 	if data.hudtype then
 		nzMapping.Settings.hudtype = data.hudtype or "Origins (Black Ops 2)"
 	end

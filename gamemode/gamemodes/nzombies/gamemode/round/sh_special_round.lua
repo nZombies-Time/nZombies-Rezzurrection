@@ -36,6 +36,28 @@ if SERVER then
 	end
 end
 
+nzRound.PerkSelectData = nzRound.PerkSelectData or {}
+function nzRound:AddMachineType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.PerkSelectData[id] = data
+		else
+			nzRound.PerkSelectData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.PerkSelectData[id] = class
+	end
+end
+
+nzRound:AddMachineType("Original", "nz_zombie_walker", {
+}) 
+nzRound:AddMachineType("Infinite Warfare", "nz_zombie_walker", {
+}) 
+
 nzRound.HudSelectData = nzRound.HudSelectData or {}
 function nzRound:AddHUDType(id, class)
 	if SERVER then
@@ -329,7 +351,11 @@ nzRound:AddSpecialRoundType("Hellhounds", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(math.Clamp(round * 20, 120, 1200))
+	local hp = 55
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.13
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -344,7 +370,11 @@ nzRound:AddSpecialRoundType("Keepers", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(math.Clamp(round * 20, 120, 1200))
+	local hp = 50
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.05
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -359,7 +389,11 @@ nzRound:AddSpecialRoundType("Nova Crawlers", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(50 + (100*nzRound:GetNumber()))
+	local hp = 40
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -374,7 +408,11 @@ nzRound:AddSpecialRoundType("Lickers", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(math.Clamp(round * 32, 200, 2000))
+	local hp = 54
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.17
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -389,7 +427,11 @@ nzRound:AddSpecialRoundType("Raptors", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(math.Clamp(round * 60, 200, 2000))
+	local hp = 70
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.05
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -404,7 +446,11 @@ nzRound:AddSpecialRoundType("Facehuggers", {
 	if round == -1 then
 		dog:SetHealth(50)
 	else
-		dog:SetHealth(50 + (100*nzRound:GetNumber()))
+	local hp = 32
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -419,7 +465,11 @@ nzRound:AddSpecialRoundType("The Pack (Dead Space)", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(math.Clamp(round * 25, 150, 1500))
+	local hp = 50
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 
@@ -434,7 +484,11 @@ nzRound:AddSpecialRoundType("Spiders", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-		dog:SetHealth(50 + (100*nzRound:GetNumber()))
+	local hp = 48
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
 	end
 end) -- No round func or end func
 

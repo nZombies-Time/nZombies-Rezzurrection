@@ -385,7 +385,11 @@ local function PerksHud()
 	local w = -20
 	local size = 50
 	for k,v in pairs(LocalPlayer():GetPerks()) do
-		surface.SetMaterial(nzPerks:Get(v).icon)
+	if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						surface.SetMaterial(nzPerks:Get(v).icon_skin)
+						else
+						surface.SetMaterial(nzPerks:Get(v).icon)
+						end
 		surface.SetDrawColor(255,255,255)
 		surface.DrawTexturedRect(w + k*(size*scale + 10), ScrH() - 245, size*scale, size*scale)
 	end
@@ -413,7 +417,11 @@ local function VultureVision()
 		elseif target == "perk_machine" then
 			local data = v:WorldSpaceCenter():ToScreen()
 			if data.visible then
-				local icon = nzPerks:Get(v:GetPerkID()).icon
+				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						local icon = nzPerks:Get(v:GetPerkID()).icon_skin
+						else
+						local icon = nzPerks:Get(v:GetPerkID()).icon
+						end
 				if icon then
 					surface.SetMaterial(icon)
 					surface.SetDrawColor(255,255,255,150)

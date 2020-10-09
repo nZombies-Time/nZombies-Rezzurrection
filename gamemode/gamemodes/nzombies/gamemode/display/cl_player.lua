@@ -23,7 +23,7 @@ function player:GetHUDPointsType(id)
 	return "buried_score1.png"
 	end
 	if id == "Division 9" then
-	 return "bo3_score1.png"
+	 return "d9s.png"
 	end
 	if id == "Shadows of Evil" then
 		return "bo3_score2.png"

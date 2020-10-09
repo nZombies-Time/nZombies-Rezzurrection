@@ -40,7 +40,15 @@ function ENT:Initialize()
 		self:SetUseType( SIMPLE_USE )
 		self:SetBeingUsed(false)
 		local PerkData = nzPerks:Get(self:GetPerkID())
-		self:SetPrice(PerkData.price)
+		if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						self:SetPrice(PerkData.price_skin)
+						else
+						self:SetPrice(PerkData.price)
+						end
+		if offmodel then
+		self:SetModel(offmodel)
+		end
+		
 	end
 end
 
@@ -57,14 +65,32 @@ end
 function ENT:Update()
 	local PerkData = nzPerks:Get(self:GetPerkID())
 	local skinmodel = PerkData.model
+	local iwskin = PerkData.skin
+	if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+	
+	else
+		local offmodel = PerkData.model_off
+		end
 	if skinmodel then
+	if offmodel then
+	if self:IsOn() then
+			self:SetModel(skinmodel)
+		else
+			self:SetModel(offmodel)
+		end
+		else
+	if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" and iwskin then
+	self:SetModel(iwskin)
+	else
 		self:SetModel(skinmodel)
+		end
 		if self:IsOn() then
 			self:SetSkin(PerkData.on_skin or 0)
 		else
 			self:SetSkin(PerkData.off_skin or 1)
 		end
-	else
+		end
+		else
 		self:SetModel(PerkData and (self:IsOn() and PerkData.on_model or PerkData.off_model) or "")
 	end
 end
@@ -112,7 +138,12 @@ function ENT:Use(activator, caller)
 						else
 							activator:GivePerk(id, self)
 						end
+						
+						if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						self:EmitSound("nz/machines/jingle/IW/"..id.."_get.wav", 75)
+						else
 						self:EmitSound("nz/machines/jingle/"..id.."_get.wav", 75)
+						end
 						return true
 					end
 				else

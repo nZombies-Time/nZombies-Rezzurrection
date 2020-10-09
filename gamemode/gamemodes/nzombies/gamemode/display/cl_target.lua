@@ -73,7 +73,11 @@ local traceents = {
 			else
 				local perkData = nzPerks:Get(ent:GetPerkID())
 				-- Its on
-				text = "Press E to buy " .. perkData.name .. " for " .. ent:GetPrice() .. " points."
+				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						text = "Press E to buy " .. perkData.name_skin .. " for " .. ent:GetPrice() .. " points."
+						else
+						text = "Press E to buy " .. perkData.name .. " for " .. ent:GetPrice() .. " points."
+						end
 				-- Check if they already own it
 				if LocalPlayer():HasPerk(ent:GetPerkID()) then
 					text = "You already own this perk."
@@ -103,7 +107,12 @@ local traceents = {
 			text = "The Wunderfizz Orb is currently at another location."
 		elseif ent:GetBeingUsed() then
 			if ent:GetUser() == LocalPlayer() and ent:GetPerkID() != "" and !ent:GetIsTeddy() then
-				text = "Press E to take "..nzPerks:Get(ent:GetPerkID()).name.." from Der Wunderfizz."
+				
+				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						text = "Press E to take "..nzPerks:Get(ent:GetPerkID()).name_skin.." from Der Wunderfizz."
+						else
+						text = "Press E to take "..nzPerks:Get(ent:GetPerkID()).name.." from Der Wunderfizz."
+						end
 			else
 				text = "Currently in use."
 			end
