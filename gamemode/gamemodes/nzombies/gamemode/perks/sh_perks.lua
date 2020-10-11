@@ -593,7 +593,7 @@ nzPerks:NewPerk("deadshot", {
 	price = 2000,
 	price_skin = 1500,
 	material = "models/perk_bottle/c_perk_bottle_deadshot",
-	icon = Material("perk_icons/chron/deadeye.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/chron/deadshot.png", "smooth unlitgeneric"),
 	icon_skin = Material("perk_icons/chron/deadeye.png", "smooth unlitgeneric"),
 	color = Color(150, 200, 150),
 	func = function(self, ply, machine)

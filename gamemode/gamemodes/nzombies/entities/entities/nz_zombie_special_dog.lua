@@ -5,7 +5,6 @@ ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
---ENT.Models = { "models/boz/killmeplease.mdl" }
 ENT.Models = { "models/nz_zombie/zombie_hellhound.mdl" }
 
 ENT.AttackRange = 80
@@ -15,7 +14,7 @@ ENT.DamageHigh = 35
 ENT.AttackSequences = {
 	{seq = "nz_attack1"},
 	{seq = "nz_attack2"},
-	{seq = "nz_attack3"}
+	{seq = "nz_attack3"},
 }
 
 ENT.DeathSequences = {
@@ -94,7 +93,7 @@ ENT.ActStages = {
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 100,
+		minspeed = 150,
 	},
 	[4] = {
 		act = ACT_RUN,
@@ -153,18 +152,18 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()
 	local seqstr = self.DeathSequences[math.random(#self.DeathSequences)]
 	local seq, dur = self:LookupSequence(seqstr)
-	-- Delay it slightly; Seems to fix it instantly getting overwritten
-	timer.Simple(0, function() 
+	
+	timer.Simple(0, function()
+		--delay it slightly; Seems to fix it instantly getting overwritten
 		if IsValid(self) then
 			self:ResetSequence(seq)
 			self:SetCycle(0)
-			self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+			self:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE) --we use this type so the dogs d
 		end 
 	end)
 
@@ -173,68 +172,64 @@ function ENT:OnZombieDeath(dmgInfo)
 			self:Remove()
 		end
 	end)
-	self:EmitSound( self.DeathSounds[ math.random( #self.DeathSounds ) ], 100)
-
+	
+	self:EmitSound(self.DeathSounds[math.random(#self.DeathSounds)], 100)
 end
 
 function ENT:BodyUpdate()
-
 	self.CalcIdeal = ACT_IDLE
-
-	local velocity = self:GetVelocity()
-
-	local len2d = velocity:Length2D()
-
-	if ( len2d > 99 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 50 ) then self.CalcIdeal = ACT_WALK_ANGRY elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
-
-	if self:IsJumping() and self:WaterLevel() <= 0 then
-		self.CalcIdeal = ACT_JUMP
-	end
-
-	--if self:GetActivity() != self.CalcIdeal and !self:IsAttacking() and !self:GetStop() then self:StartActivity(self.CalcIdeal) end
-
-	if !self:GetSpecialAnimation() and !self:IsAttacking() then
-		if self:GetActivity() != self.CalcIdeal and !self:GetStop() then self:StartActivity(self.CalcIdeal) end
+	
+	local len2d = self:GetVelocity():Length2D()
+	
+	if len2d > 150 then self.CalcIdeal = ACT_RUN
+	elseif len2d > 50 then self.CalcIdeal = ACT_WALK_ANGRY
+	elseif len2d > 5 then self.CalcIdeal = ACT_WALK end
+	
+	if self:IsJumping() and self:WaterLevel() <= 0 then self.CalcIdeal = ACT_JUMP end
+	
+	if not self:GetSpecialAnimation() and not self:IsAttacking() then
+		if self:GetActivity() ~= self.CalcIdeal and not self:GetStop() then self:StartActivity(self.CalcIdeal) end
 
 		self:BodyMoveXY()
 	end
 
 	self:FrameAdvance()
-
 end
 
 function ENT:OnTargetInAttackRange()
-    local atkData = {}
-    atkData.dmglow = 35
-    atkData.dmghigh = 40
-    atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 0.3
-    self:Attack( atkData )
+    local attack_data = {}
+    
+    attack_data.dmglow = 35
+    attack_data.dmghigh = 40
+    attack_data.dmgforce = Vector(0, 0, 0)
+	attack_data.dmgdelay = 0.3
+	
+    self:Attack(attack_data)
 end
 
--- Hellhounds target differently
+
 function ENT:GetPriorityTarget()
-
-	if GetConVar( "nz_zombie_debug" ):GetBool() then
-		print(self, "Retargeting")
-	end
-
-	self:SetLastTargetCheck( CurTime() )
-
+	--hellhounds target differently --it's who killed the most?
+	if GetConVar("nz_zombie_debug"):GetBool() then print(self, "Retargeting") end
+	
+	self:SetLastTargetCheck(CurTime())
+	
 	-- Well if he exists and he is targetable, just target this guy!
 	if IsValid(self:GetTarget()) and self:GetTarget():GetTargetPriority() > 0 then
 		local dist = self:GetRangeSquaredTo( self:GetTarget():GetPos() )
-		if dist < 1000 then
-			if !self.sprinting then
-				self:EmitSound( self.SprintSounds[ math.random( #self.SprintSounds ) ], 100 )
+		if dist < 100000000 then --if they are within 10000 units
+			if not self.sprinting then
+				self:EmitSound(self.SprintSounds[math.random(#self.SprintSounds)], 100)
 				self.sprinting = true
 			end
+			
 			self:SetRunSpeed(250)
-			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		elseif !self.sprinting then
+			self.loco:SetDesiredSpeed(self:GetRunSpeed())
+		elseif not self.sprinting then
 			self:SetRunSpeed(100)
-			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			self.loco:SetDesiredSpeed(self:GetRunSpeed())
 		end
+		
 		return self:GetTarget()
 	end
 
@@ -282,13 +277,12 @@ function ENT:GetPriorityTarget()
 		self:SetTarget(bestTarget) -- Well we found a target, we kinda have to force it
 
 		return bestTarget
-	else
-		self:TimeOut(0.2)
-	end
+	else self:TimeOut(0.2) end
 end
 
-function ENT:IsValidTarget( ent )
-	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
-	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
+function ENT:IsValidTarget(ent)
+	if not ent then return false end
+	
+	--Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
 end
