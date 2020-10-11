@@ -37,6 +37,6 @@ end
 net.Receive("nz_hellhoundround", function()
 	if net.ReadBool() then
 		hook.Call( "OnSpecialRoundStart" )
-		--nzSounds:Play("SpecialRoundStart")
+		nzSounds:Play("DogRound")
 	end
 end)
