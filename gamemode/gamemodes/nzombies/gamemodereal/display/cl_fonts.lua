@@ -7,21 +7,24 @@ surface.CreateFont( "nz.display.hud.main", {
 } )
 
 surface.CreateFont( "nz.display.hud.small", {
-	font = "Reckoner", //Avenir Next
+	font = "Reckoner2", //Avenir Next
+	extended = true,
 	size = 42,
 	weight = 300,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.medium", {
-	font = "Reckoner", //Avenir Next
+	font = "Reckoner2", //Avenir Next
+	extended = true,
 	size = 54,
 	weight = 300,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.points", {
-	font = "Reckoner",
+	font = "Reckoner2",
+	extended = true,
 	size = 20,
 	weight = 5000,
 	antialias = true,
@@ -56,14 +59,16 @@ surface.CreateFont( "nz.display.hud.ammo4", {
 } )
 
 surface.CreateFont( "nz.display.hud.smaller", {
-	font = "Reckoner", //Avenir Next
+	font = "Reckoner2", //Avenir Next
+	extended = true,
 	size = 36,
 	weight = 300,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.rounds", {
-	font = "DK Umbilical Noose", //Avenir Next
+	font = "DK Umbilical Noose2", //Avenir Next
+	extended = true,
 	size = 400,
 	weight = 30,
 	antialias = true,
