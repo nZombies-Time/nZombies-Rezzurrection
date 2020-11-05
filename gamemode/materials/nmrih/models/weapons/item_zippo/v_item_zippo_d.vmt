@@ -1,0 +1,12 @@
+Patch
+{
+include "materials/nmrih/models/weapons/nmrih_wmelee_shared.vmt"
+insert
+{
+$baseTexture "nmrih\models\weapons\item_zippo\v_item_zippo_d"
+$bumpmap "nmrih\models\weapons\item_zippo\v_item_zippo_n"
+
+$surfaceprop "metal"
+	"keywords" "zippo"
+}
+}

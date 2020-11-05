@@ -1,0 +1,13 @@
+"VertexlitGeneric"
+{
+	"$basetexture" 			"models/weapons/nam/m24grenade/weapon_w_stielhandgranate_dm"
+	"$bumpmap" 			"models/weapons/nam/m24grenade/weapon_w_stielhandgranate_nm"
+	
+	"$phongtint" 			"[0.6 0.8 1.0]"
+
+	"$phong" 			"1"
+	"$phongexponent" 		"25"
+	"$phongboost"			"0.1"	
+	"$phongFresnelRanges" 		"[.3 .3 1]"
+	"$phongdisablehalflambert" 	"1"
+}

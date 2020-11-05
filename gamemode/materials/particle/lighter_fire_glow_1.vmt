@@ -1,0 +1,6 @@
+"SpriteCard"
+{
+	"$basetexture" "particle/lighter_fire_glow_1"
+	"$additive" 1
+	"$vertexcolor" 1
+}

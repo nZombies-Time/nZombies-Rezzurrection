@@ -1,0 +1,19 @@
+"VertexLitGeneric"
+{
+	"$basetexture"					"models\weapons\compb\weapon_w_alliedexplosive_dm"
+	"$bumpmap"						"models\weapons\compb\weapon_w_alliedexplosive_nm"
+	"$model"						"1"
+    "$color"						"[1 1 1]"
+
+//PHONG
+	"$phong"                        "1"
+	"$phongtint"                    "[0.97 0.8 0.5]"
+	"$phongboost"                   ".2"
+	"$phongexponent"				"60"
+	"$phongfresnelranges"           "[1 3 7]"
+
+//ENVMAP
+	"$envmap"                       "env_cubemap"
+	"$envmapfresnel" 				"1"
+	"$envmaptint"                   "[0.08 0.06 0]"
+}

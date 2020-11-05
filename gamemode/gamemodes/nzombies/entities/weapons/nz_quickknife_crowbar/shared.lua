@@ -74,11 +74,11 @@ sound.Add({
 
 SWEP.Primary.Attacks = {
 	{
-		['act'] = ACT_VM_MISSRIGHT, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['act'] = ACT_VM_PRIMARYATTACK, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
 		['len'] = 16*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		['dir'] = Vector(-60,0,0), -- Trace dir/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		['dmg'] = 80, --This isn't overpowered enough, I swear!!
-		['dmgtype'] = DMG_SLASH, --DMG_SLASH,DMG_CRUSH, etc.
+		["dmgtype"] = bit.bor(DMG_GENERIC),  --DMG_SLASH,DMG_CRUSH, etc.
 		['delay'] = 0.15, --Delay
 		['spr'] = true, --Allow attack while sprinting?
 		['snd'] = "Mastercombat.Slash", -- Sound ID
@@ -94,11 +94,11 @@ SWEP.Primary.Attacks = {
 
 SWEP.Secondary.Attacks = {
 	{
-		['act'] = ACT_VM_MISSRIGHT, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['act'] = ACT_VM_PRIMARYATTACK, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
 		['len'] = 15*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		['dir'] = Vector(0,0,-40), -- Trace dir/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		['dmg'] = 80, --This isn't overpowered enough, I swear!!
-		['dmgtype'] = DMG_SLASH, --DMG_SLASH,DMG_CRUSH, etc.
+		["dmgtype"] = bit.bor(DMG_GENERIC),  --DMG_SLASH,DMG_CRUSH, etc.
 		['delay'] = 0.18, --Delay
 		['spr'] = true, --Allow attack while sprinting?
 		['snd'] = "Mastercombat.Slash", -- Sound ID

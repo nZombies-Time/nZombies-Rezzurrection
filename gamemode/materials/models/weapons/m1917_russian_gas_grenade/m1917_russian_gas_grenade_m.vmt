@@ -1,0 +1,20 @@
+"VertexLitGeneric"
+{
+	$basetexture				"models\weapons\m1917_russian_gas_grenade\gas_grenade_d"
+	$bumpmap					"models\weapons\m1917_russian_gas_grenade\gas_grenade_n"
+	"$phongexponenttexture"		"models\weapons\m1917_russian_gas_grenade\gas_grenade_s"
+	"$color2"					"[0 0 0]"
+//	"$color2"					"[0.0 0.0 0.0]"
+	"$translucent"				"1"
+	
+	$envmap						env_cubemap
+	$envmaptint					"[ .04 .04 .04 ]"
+        $normalmapalphaenvmapmask	"1"
+
+	$phong						1
+	$phongexponent				65
+	$phongboost					15
+	$phongfresnelranges			"[0.2 0.5 1]"
+	"$phongalbedotint" 			"1"
+	"$phongalbedoboost" 		"55"
+}

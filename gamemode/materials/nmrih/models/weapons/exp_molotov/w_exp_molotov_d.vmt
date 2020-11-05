@@ -1,0 +1,11 @@
+Patch
+{
+include "materials/nmrih/models/weapons/nmrih_wguns_shared.vmt"
+insert
+{
+$baseTexture "nmrih\models\weapons\exp_molotov\w_exp_molotov_d"
+$bumpmap "nmrih\models\weapons\exp_molotov\w_exp_molotov_n"
+$surfaceprop "glass"
+	"keywords" "molotov"
+}
+}

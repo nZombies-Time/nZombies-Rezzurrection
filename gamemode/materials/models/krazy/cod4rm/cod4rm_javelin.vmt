@@ -1,0 +1,29 @@
+
+VertexLitGeneric
+{
+
+	$baseTexture				models/krazy/cod4rm/cod4rm_javelin_d
+	$bumpmap					models/krazy/cod4rm/cod4rm_javelin_b
+
+	$nocull						1
+	$blendtintbybasealpha		1
+	$halflambert				1
+	$ambientocclusion			1
+	
+	$phong						1
+	$phongexponent				4.5
+	$phongalbedotint			1
+	$phongalbedoboost			1
+	$phongboost					0.05
+ 	$phongfresnelranges			"[ 0.55 0.75 0.55 ]"
+	
+	$rimlight					1
+	$rimlightexponent			65
+	$rimlightboost				0.25
+	
+	$detail						models/krazy/cod4rm/cod4rm_javelin_de
+	$detailscale				1
+	$detailblendfactor			0.2
+	$detailblendmode			1
+	
+}

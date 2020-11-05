@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "vgui/hud/tfa_ww1_tnt_charge"
+	"$translucent" 1
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}

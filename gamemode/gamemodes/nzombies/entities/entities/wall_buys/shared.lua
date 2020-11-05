@@ -213,7 +213,7 @@ if SERVER then
 		end
 		if !wep then wep = weapons.Get(self.WeaponGive) end
 		if !wep then return end
-		local ammo_type = wep.GetPrimaryAmmoType and wep:GetPrimaryAmmoType() or wep.Primary.Ammo
+		local ammo_type = wep.Primary.Ammo
 
 		local ammo_price = math.ceil((price - (price % 10))/2)
 		local ammo_price_pap = 4500
@@ -225,37 +225,7 @@ if SERVER then
 		if !activator:HasWeapon( self.WeaponGive ) then
 			activator:Buy(price, self, function()
 				local wep = activator:Give(self.WeaponGive)
-				if !wep:HasNZModifier("pap") and activator:HasPerk("wall") then
-								wep:ApplyNZModifier("pap")
-				if wep.NZPaPReplacement then
-				activator:Give(wep.NZPaPReplacement)
-				timer.Simple(0.2, function() 
-				local wep2 = activator:GetActiveWeapon()
-				wep2:ApplyNZModifier("pap") 
-				if wep2.Ispackapunched then 
-				if !wep.Category == "NZ Rezzurrection" then
-				wep2.Ispackapunched = 1
-				end
-				end
-				if wep2.NZPaPName then
-				wep2.PrintName = wep2.NZPaPName
-				end
-				end)
-				end
-				end
-				timer.Simple(0.2, function() if IsValid(wep) then wep:GiveMaxAmmo() end
-				if wep.Ispackapunched  then
-				if !wep.Category == "NZ Rezzurrection" then
-				
-				wep2.Ispackapunched = 1
-				end
-				end
-				if wep.NZPaPName  then
-				wep.PrintName = wep.NZPaPName
-				
-				end
-				end)
-				
+				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
 				self:SetBought(true)
 				return true
 			end)

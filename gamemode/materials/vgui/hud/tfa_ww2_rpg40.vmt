@@ -1,0 +1,7 @@
+"UnlitGeneric"
+{
+	"$basetexture" "vgui/hud/tfa_ww2_rpg40"
+	"$translucent" 1
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}

@@ -1,0 +1,19 @@
+"VertexLitGeneric"
+{
+	$basetexture				"models\weapons\type97_grenade\rope_d"
+	$bumpmap					"models\weapons\type97_grenade\rope_n"
+	"$phongexponenttexture"		"models\weapons\type97_grenade\rope_s"
+	"$color2"					"[0 0 0]"
+//	"$color2"					"[0 0 0]"
+	"$translucent"				"1"
+	
+	$envmap						env_cubemap
+	$envmaptint					"[ .13 .13 .13 ]"
+
+	$phong						1
+	$phongexponent				20
+	$phongboost					700
+	$phongfresnelranges			"[0.25 0.5 1]"
+	"$phongalbedotint" 			"1"
+	"$phongalbedoboost" 		"48"
+}

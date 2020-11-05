@@ -2,6 +2,7 @@ local meleetypes = {
 	[DMG_CLUB] = true,
 	[DMG_SLASH] = true,
 	[DMG_CRUSH] = true,
+	[DMG_GENERIC] = true,
 }
 
 function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)

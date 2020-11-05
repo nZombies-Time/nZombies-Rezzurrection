@@ -35,7 +35,7 @@ SWEP.vModel = true
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo			= "grenade"
+SWEP.Primary.Ammo			= "none"
 
 SWEP.Secondary.ClipSize		= -1
 SWEP.Secondary.DefaultClip	= -1
@@ -57,9 +57,8 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
-	if self.Owner:GetAmmoCount(GetNZAmmoID("grenade")) <= 0 then return end
 	self.ct = CurTime()
-	self.Owner:GetViewModel():SetPlaybackRate( 1.6 )
+	self.Owner:GetViewModel():SetPlaybackRate( 1.5 )
 	self.restorerun = self.Owner:GetRunSpeed()
 	self:SendWeaponAnim(ACT_VM_PULLBACK_HIGH)
 	--if !self.Owner:GetUsingSpecialWeapon() then
@@ -68,10 +67,8 @@ function SWEP:Deploy()
 	timer.Simple(0.1, function() self.Owner:SetRunSpeed( self.Owner:GetWalkSpeed() ) end)
 	if !self.Owner:HasPerk("widowswine") then
 		timer.Create(self.Owner:EntIndex().."YouFuckedUp", 4.0, 1, function()
-			if self.Owner:GetAmmoCount(GetNZAmmoID("grenade")) <= 0 then return end
-			if self.Owner:GetActiveWeapon() != self then return end -- Something weird happened and this is not their weapon, don't blow them up!
-
-			util.BlastDamage(self, self.Owner, self.Owner:GetShootPos(), 32, 200)
+			if self.Owner:GetActiveWeapon() != self then return end
+			util.BlastDamage(self, self.Owner, self.Owner:GetShootPos(), 32, 350)
 			local vPoint = self.Owner:GetShootPos()
 			local effectdata = EffectData()
 			effectdata:SetOrigin( vPoint )
@@ -93,7 +90,6 @@ function SWEP:CrossShrinkTimer()
 end
 
 function SWEP:PrimaryAttack()
-	if self.Owner:GetAmmoCount(GetNZAmmoID("grenade")) <= 0 then return end
 	if self.FuckedUp then return end
 	self:ThrowGrenade(5500)
 end
@@ -106,7 +102,12 @@ function SWEP:ThrowGrenade(force)
 	self:SendWeaponAnim(ACT_VM_THROW)
 	
 	if SERVER then
-		local nade = ents.Create("nz_m67grenade")
+		local nade 
+		if self.Owner:HasPerk("widowswine") then
+			nade = ents.Create("nz_semtex_thrown")
+		else
+			nade = ents.Create("nz_grenade_thrown")
+		end
 		nade:SetPos(self.Owner:EyePos() + (self.Owner:GetAimVector() * 20))
 		nade:SetAngles( Angle(30,0,0)  )
 		nade:Spawn()

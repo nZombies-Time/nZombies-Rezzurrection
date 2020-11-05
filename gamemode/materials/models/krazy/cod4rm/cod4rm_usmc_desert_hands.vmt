@@ -1,0 +1,12 @@
+
+VertexLitGeneric
+{
+
+	$baseTexture				models/krazy/cod4rm/cod4rm_usmc_desert_hands_d
+	$bumpmap					models/krazy/cod4rm/cod4rm_usmc_desert_hands_b
+
+	$nocull						1
+	$blendtintbybasealpha		1
+	$halflambert				1
+	$ambientocclusion			1
+}

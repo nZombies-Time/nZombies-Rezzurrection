@@ -1,0 +1,21 @@
+"VertexLitGeneric"
+{
+$baseTexture "nmrih\models\hands\sleeves"
+$bumpmap "nmrih\models\hands\sleeves_Normal"
+$halflambert "1"	
+$model "1"
+
+$phong "1"
+$phongexponent "10"
+$phongtint "2 2 2"
+$phongboost ".1"	
+$phongfresnelranges	"[1 8 13]"
+$basemapalphaphongmask ".1"
+$phongexponenttexture "nmrih\models\hands\sleeves_Normal"
+$phongalbedotint "1"
+
+$detail "nmrih\models\hands\fabricdetail"
+$detailscale 10
+$detailblendfactor 1.7
+$detailblendmode 0
+}

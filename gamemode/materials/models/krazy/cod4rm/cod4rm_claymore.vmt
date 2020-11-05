@@ -1,0 +1,17 @@
+
+VertexLitGeneric
+{
+
+	$baseTexture				models/krazy/cod4rm/cod4rm_claymore_d
+	$bumpmap					models/krazy/cod4rm/cod4rm_claymore_b
+
+	$nocull						1
+	$blendtintbybasealpha		1
+	$halflambert				1
+	$ambientocclusion			1
+	
+	$rimlight					1
+	$rimlightexponent			65
+	$rimlightboost				0.25
+	
+}

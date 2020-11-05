@@ -1,0 +1,5 @@
+"VertexlitGeneric"
+{
+	"$basetexture" "models/codzombies/mtl_t6_wpn_claymore_col"
+	"$surfaceprop" "Default"
+}

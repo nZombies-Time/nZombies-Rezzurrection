@@ -1,0 +1,18 @@
+"VertexLitGeneric"
+{
+	$basetexture				"models\weapons\rpg40\rpg40_d"
+	$bumpmap					"models\weapons\rpg40\rpg40_n"
+	"$phongexponenttexture"		"models\weapons\rpg40\rpg40_s"
+        $normalmapalphaenvmapmask	"1"
+	"$color2"					"[0.0 0.0 0.0]"
+//	"$color2"					"[0.0 0.0 0.0]"
+	"$translucent"				"1"
+	$envmap						env_cubemap
+	$envmaptint					"[ .05 .05 .05 ]"
+        $phongalbedotint			"1"
+	$phongalbedoboost 		"55"
+	$phong						1
+	$phongexponent				45
+	$phongboost					35
+	$phongfresnelranges			"[0.2 0.5 1]"
+}

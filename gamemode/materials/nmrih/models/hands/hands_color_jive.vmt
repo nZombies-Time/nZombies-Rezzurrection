@@ -1,0 +1,28 @@
+VertexLitGeneric
+{
+$baseTexture "nmrih\models\hands\Hands_Color"
+$bumpmap "nmrih\models\hands\Hands_Normal"
+$halflambert 1
+$phong "1"
+$phongexponent "10"
+$phongtint "2 2 2"
+$phongboost ".1"
+$phongfresnelranges "[1 8 13]"
+
+$lightwarptexture "nmrih\models\player\player_flesh_shared"
+
+$detail "blood_hands"
+$detailblendmode 2
+$detailblendfactor 0.0
+$detailscale 1.0
+
+	"Proxies"
+	{
+		"BloodyTexture"
+		{
+			"detailcount"	"3"
+			"source"		"player"
+		}
+	}
+
+}

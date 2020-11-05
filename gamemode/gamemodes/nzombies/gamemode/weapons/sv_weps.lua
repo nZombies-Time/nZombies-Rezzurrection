@@ -69,6 +69,36 @@ local function OnWeaponAdded( weapon )
 						if ply:HasPerk("politan") then
 							weapon:ApplyNZModifier("rando")
 						end
+						if !weapon:HasNZModifier("pap") and ply:HasPerk("wall") then
+								weapon:ApplyNZModifier("pap")
+						if weapon.NZPaPReplacement then
+						ply:Give(weapon.NZPaPReplacement)
+						timer.Simple(0.1, function() 
+						local wep2 = ply:GetActiveWeapon()
+						wep2:ApplyNZModifier("pap") 
+						if IsValid(wep2) then wep2:GiveMaxAmmo() end
+						if wep2.Ispackapunched then 
+						if !weapon.Category == "NZ Rezzurrection" then
+						wep2.Ispackapunched = 1
+						end
+						end
+						if wep2.NZPaPName then
+						wep2.PrintName = wep2.NZPaPName
+						end
+						end)
+						else
+						timer.Simple(0.1, function() if IsValid(weapon) then weapon:GiveMaxAmmo() end
+						if weapon.Ispackapunched  then
+						if !weapon.Category == "NZ Rezzurrection" then
+						wep2.Ispackapunched = 1
+						end
+						end
+						if weapon.NZPaPName  then
+						weapon.PrintName = weapon.NZPaPName
+						end
+						end)
+						end
+						end
 						if !weapon.NoSpawnAmmo then
 							weapon:GiveMaxAmmo()
 						end

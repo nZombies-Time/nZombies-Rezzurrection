@@ -1,0 +1,6 @@
+"UnlitGeneric"
+{
+	"$basetexture" "vgui/entities/svn_holyhandgrenadeworms.vtf"
+	"$vertexalpha" 1
+	"$vertexcolor" 1
+}
