@@ -609,11 +609,11 @@ end, function(wep)
 				end
 			end
 			self:ClearStatCache()
-			if id > 0 then
-				self.Attachments[cat].sel = id
-			else
-				self.Attachments[cat].sel = nil
-			end
+			--if id > 0 then
+			--	self.Attachments[cat].sel = id
+			--else
+			--	self.Attachments[cat].sel = nil
+			--end
 			self:BuildAttachmentCache()
 			if nw then
 				net.Start("TFA_Attachment_Set")
