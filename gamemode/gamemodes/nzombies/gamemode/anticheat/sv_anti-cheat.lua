@@ -85,6 +85,7 @@ function PLAYER:WarnToMove() -- Give the player a chance to move before being te
     return end 
 
     if self.warning then return end -- They still have time to move
+    hook.Call("NZAntiCheatWarningPlayer", nil, self:GetPos(), self)
     self.warning = true
     
     net.Start("AntiCheatWarningCancel")
@@ -181,12 +182,12 @@ function PLAYER:NZPlayerUnreachable()
         filter = function(ent) return !ent:IsPlayer() end
     })
 
-    --if (self:NearUndetectedSpot()) then print("THAT's WHY") return true end
     if tr.Hit and !table.HasValue(excludedClasses, tr.Entity:GetClass()) then -- If it hit something that can't move
         if !IsValid(tr.Entity:GetParent()) then -- Parented entities typically have the ability to move, don't tp people on them
             local hitPos = tr.HitPos
             local navnear = self:GetClosestNavMesh()
             if !IsValid(navnear) then return true end -- No nav mesh close enough
+            if IsValid(navnear) and nzNav.Locks and nzNav.Locks[navnear:GetID()] and !nzDoors:IsLinkOpened(nzNav.Locks[navnear:GetID()].link) then return true end
         end
     end
 
@@ -205,14 +206,14 @@ end
 
 function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
     if !nzMapping.Settings.ac and nzMapping.Settings.ac != nil then return end
-    hook.Call("NZAntiCheatMovedPlayer", nil, self)
 
-    if !self.Teleporting then
-        self.Teleporting = true
+    if !self.LastTPTime or isnumber(self.LastTPTime) and CurTime() > self.LastTPTime then
+        self.LastTPTime = CurTime() + 5
 
         local navmeshDist = nil
         local navPos = nil
-        
+        local oldPos = self:GetPos()
+    
         timer.Simple(0.1, function()
             if (self.noncheatspot != nil and self.lastTPspot == nil or self.noncheatspot != nil and self.lastTPspot != nil and self.noncheatspot:Distance(self.lastTPspot) > 150) then -- Make sure they aren't being teleported where they last teleported at     
                 self:SetPos(self.noncheatspot) -- Tp to their last non-cheat spot
@@ -244,8 +245,10 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
                 -- Prevent zombies from immediately targetting, so they don't instantly die on AC teleport:
                 if (self.aczblood == nil or self.aczblood) then 
                     self.aczblood = false -- Don't allow again for 10 minutes
-                    nzPowerUps:SpawnPowerUp(self:GetPos(), "zombieblood") -- They are going to be tp'd far away, don't let them die by a crowd
-                    timer.Create("ACZombieBloodCD" .. self:SteamID(), 600, 1, function()
+                    --nzPowerUps:SpawnPowerUp(self:GetPos(), "zombieblood") -- They are going to be tp'd far away, don't let them die by a crowd
+                    nzPowerUps:Activate("zombieblood", self)
+                    
+                    timer.Create("ACZombieBloodCD" .. self:SteamID(), 1500, 1, function()
                         if IsValid(self) then self.aczblood = true end
                     end)
                 else -- No available zombie blood for them, just make them untargetable for 5 seconds
@@ -263,7 +266,7 @@ function PLAYER:NZMoveCheater() -- Teleports them out of the cheat spot
 
         ServerLog("[NZ Anti-Cheat] " .. self:Nick() .. " was caught cheating!\n")
         PrintMessage(HUD_PRINTTALK, "[NZ] " .. self:Nick() .. " was teleported by the Anti-Cheat.")
-        timer.Simple(5, function() self.Teleporting = false end)
+        hook.Call("NZAntiCheatMovedPlayer", nil, oldPos, self)
     end
 end
 
@@ -274,7 +277,7 @@ function PLAYER:OnCheating()
     end
 end
 
-hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are cheating
+hook.Add("Tick", "NZAntiCheat", function() -- Scan for players who are cheating
     if !nzMapping.Settings.ac then return end
     
     if (waittime == nil or CurTime() > waittime) then 
@@ -288,15 +291,19 @@ hook.Add("PlayerTick", "NZAntiCheat", function(ply) -- Scan for players who are 
             waittime = CurTime()
         end
 
-        if ply:NZPlayerUnreachable() then 
-            ply:OnCheating()
-        end
+        for _,ply in pairs(player.GetAll()) do
+            if ply:NZPlayerUnreachable() then 
+                if (!ply:IsSpectating()) then
+                    ply:OnCheating()
+                end
+            end
 
-        if (nzMapping.Settings.ac and nzMapping.Settings.acpreventboost and !ply:IsInCreative()) then -- Stop boosting fast upwards
-            if (ply:GetVelocity()[3] >= ply:GetJumpPower()) then
-                timer.Simple(0, function()
-                    ply:SetVelocity(Vector(0, 0, -math.abs(ply:GetVelocity()[3])))
-                end) 
+            if (nzMapping.Settings.ac and nzMapping.Settings.acpreventboost and !ply:IsInCreative()) then -- Stop boosting fast upwards
+                if (ply:GetVelocity()[3] >= ply:GetJumpPower()) then
+                    timer.Simple(0, function()
+                        ply:SetVelocity(Vector(0, 0, -math.abs(ply:GetVelocity()[3])))
+                    end) 
+                end
             end
         end
     end
