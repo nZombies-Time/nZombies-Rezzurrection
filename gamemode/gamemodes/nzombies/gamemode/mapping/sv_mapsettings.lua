@@ -65,6 +65,9 @@ function nzMapping:LoadMapSettings(data)
 	if data.hudtype then
 		nzMapping.Settings.hudtype = data.hudtype or "Origins (Black Ops 2)"
 	end
+	if data.boxtype then
+		nzMapping.Settings.boxtype = data.boxtype or "Original"
+	end
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
@@ -77,6 +80,7 @@ function nzMapping:LoadMapSettings(data)
 	NZZombiesMaxAllowed = nzMapping.Settings.startingspawns
 	
 	nzMapping.Settings.zombieeyecolor = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or Color(data.zombieeyecolor.r, data.zombieeyecolor.g, data.zombieeyecolor.b)
+	nzMapping.Settings.boxlightcolor = data.boxlightcolor == nil and Color(0, 150,200,255) or Color(data.boxlightcolor.r, data.boxlightcolor.g, data.boxlightcolor.b) 
 	
 	-- More compact and less messy:
 	for k,v in pairs(nzSounds.struct) do

@@ -17,7 +17,7 @@ function ENT:Initialize()
 	self:SetModel("models/props_c17/fence01b.mdl")
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
-
+	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
 	--self:SetHealth(0)
 	self:SetCustomCollisionCheck(true)
 	self.NextPlank = CurTime()
@@ -117,16 +117,16 @@ function ENT:Touch(ent)
 end
 
 hook.Add("ShouldCollide", "zCollisionHook", function(ent1, ent2)
-	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent2:GetClass()] and !ent1:GetTriggerJumps() and ent1:GetNumPlanks() == 0 then
+	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent2:GetClass()] and !ent1:GetTriggerJumps() and ent1:GetNumPlanks() <2 then
 		if !ent1.CollisionResetTime then
-			ent1:SetSolid(SOLID_NONE)
+			--ent1:SetSolid(SOLID_NONE)
 		end
 		ent1.CollisionResetTime = CurTime() + 0.1
 	end
 	
-	if IsValid(ent2) and ent2:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent1:GetClass()] and !ent2:GetTriggerJumps() and ent2:GetNumPlanks() == 0 then
+	if IsValid(ent2) and ent2:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent1:GetClass()] and !ent2:GetTriggerJumps() and ent2:GetNumPlanks() < 2 then
 		if !ent2.CollisionResetTime then
-			ent2:SetSolid(SOLID_NONE)
+			--ent2:SetSolid(SOLID_NONE)
 		end
 		ent2.CollisionResetTime = CurTime() + 0.1
 	end

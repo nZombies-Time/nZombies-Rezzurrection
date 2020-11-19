@@ -133,7 +133,6 @@ end
 
 function ENT:OnZombieDeath(dmgInfo)
 
-	self:DrG_Dissolve()
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()

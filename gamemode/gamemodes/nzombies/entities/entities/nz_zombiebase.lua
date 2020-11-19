@@ -1122,9 +1122,12 @@ function ENT:Jump()
 
 	else
 	timer.Simple(5, function()
-		if (IsValid(self) and self:Health() > 0) and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
-			else
+	if self:IsValid() then
+	if self:Health() > 0 and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
+	else
 			self:RespawnZombie()
+			end
+	else
 			end
 	end)
 	end

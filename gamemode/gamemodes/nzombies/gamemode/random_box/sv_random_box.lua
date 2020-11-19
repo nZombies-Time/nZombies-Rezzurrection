@@ -19,7 +19,12 @@ function nzRandomBox.Spawn(exclude, first)
 		local pos = rand:GetPos()
 		local ang = rand:GetAngles()
 		
+		if (nzMapping.Settings.boxtype == "Original") then
 		box:SetPos( pos + ang:Up()*10 + ang:Right()*7 )
+	else
+		box:SetPos(pos)
+	end
+		
 		box:SetAngles( ang )
 		box:Spawn()
 		--box:PhysicsInit( SOLID_VPHYSICS )
@@ -27,7 +32,10 @@ function nzRandomBox.Spawn(exclude, first)
 		rand.Box = box
 		
 		rand:SetBodygroup(1,1)
-
+		if (nzMapping.Settings.boxtype =="Resident Evil") then
+			rand:SetModelScale(0, 0 )
+			end
+		
 		local phys = box:GetPhysicsObject()
 		if phys:IsValid() then
 			phys:EnableMotion(false)

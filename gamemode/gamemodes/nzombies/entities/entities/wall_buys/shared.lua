@@ -20,7 +20,7 @@ local normalscale = Vector(0.01, 1.5, 1.5) 	-- based on the bool self:GetFlipped
 
 CreateClientConVar("nz_outlinedetail", "4", true) -- Controls the outline creation
 
-chalkmaterial = Material("chalk.png", "unlitgeneric smooth")
+chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 
 function ENT:Initialize()
 	if SERVER then
@@ -59,6 +59,7 @@ function ENT:OnRemove()
 end
 
 function ENT:RecalculateModelOutlines()
+chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 	self:RemoveOutline()
 	local num = GetConVar("nz_outlinedetail"):GetInt()
 	local ang = self:GetAngles()

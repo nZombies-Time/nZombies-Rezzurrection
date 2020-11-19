@@ -7,7 +7,7 @@ ENT.Spawnable		= false
 ENT.AdminSpawnable	= false
 
 
-ENT.MyModel = "models/weapons/tfa_cso/w_rpg7_rocket.mdl"
+ENT.MyModel = "models/missiles/rpg_rocket_cod4rm.mdl"
 ENT.MyModelScale = 1
 ENT.Damage = 75
 ENT.Radius = 350
@@ -17,7 +17,7 @@ if SERVER then
 
 	function ENT:Initialize()
 
-		local model = self.MyModel and self.MyModel or   "models/weapons/tfa_cso/w_rpg7_rocket.mdl"
+		local model = self.MyModel and self.MyModel or  "models/missiles/rpg_rocket_cod4rm.mdl"
 		
 		self.Class = self:GetClass()
 		

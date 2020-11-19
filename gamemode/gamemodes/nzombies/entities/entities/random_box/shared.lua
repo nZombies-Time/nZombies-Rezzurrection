@@ -7,6 +7,7 @@ ENT.Author			= "Alig96"
 ENT.Contact			= "Don't"
 ENT.Purpose			= ""
 ENT.Instructions	= ""
+ENT.Rotated = false
 
 function ENT:SetupDataTables()
 
@@ -15,19 +16,39 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
-
-	self:SetModel( "models/hoff/props/mysterybox/box.mdl" )
-	self:PhysicsInit( SOLID_VPHYSICS )
+		
+		if (nzMapping.Settings.boxtype =="Original") then
+	self:SetModel("models/hoff/props/mysterybox/box.mdl")
+	end
+	if (nzMapping.Settings.boxtype =="Origins") then
+	self:SetModel( "models/nzr/originsbox/box.mdl" )
+	end
+	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+	self:SetModel( "models/nzr/motd/box.mdl" )
+	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	end
+	if (nzMapping.Settings.boxtype =="Dead Space") then
+	self:SetModel( "models/nzr/deadspace/kiosk3.mdl" )
+	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	end
+	if (nzMapping.Settings.boxtype =="Resident Evil") then
+	self:SetModel( "models/nzr/re/box.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == nil) then
+	self:SetModel("models/hoff/props/mysterybox/box.mdl")
+	end
+	
+		self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
-
+	
 	--[[local phys = self:GetPhysicsObject()
 	if (phys:IsValid()) then
 		phys:Wake()
 	end]]
 
 	self:DrawShadow( false )
-	self:AddEffects( EF_ITEM_BLINK )
+	--self:AddEffects( EF_ITEM_BLINK )
 	self:SetOpen(false)
 	self.Moving = false
 	self:Activate()
@@ -41,7 +62,9 @@ function ENT:Initialize()
 		self.Light:SetAngles(Angle(0, ang[2], 180))
 		self.Light:SetPos(self:GetPos() - Vector(0,0,50))
 		--self.Light:SetParent(self)
-		self.Light:SetColor(Color(150,200,255))
+		local defaultColor = Color(0, 150,200,255)
+		local lightColor = !IsColor(nzMapping.Settings.boxlightcolor) and defaultColor or nzMapping.Settings.boxlightcolor
+		self.Light:SetColor(nzMapping.Settings.boxlightcolor)
 		self.Light:DrawShadow(false)
 		local min, max = self.Light:GetRenderBounds()
 		self.Light:SetRenderBounds(Vector(min.x, min.y, min.z), Vector(max.x, max.y, max.z*10))
@@ -80,19 +103,22 @@ function ENT:BuyWeapon(ply)
 	end)
 end
 
-
 function ENT:Open()
+
 	local sequence = self:LookupSequence("Close")
-	self:ResetSequence(sequence)
-	self:RemoveEffects( EF_ITEM_BLINK )
+	--self:ResetSequence(sequence)
+	self:SetPlaybackRate( 0.1 )
+	self:SetSequence( sequence )
+	--self:RemoveEffects( EF_ITEM_BLINK )
 
 	self:SetOpen(true)
 end
 
 function ENT:Close()
 	local sequence = self:LookupSequence("Open")
-	self:ResetSequence(sequence)
-	self:AddEffects( EF_ITEM_BLINK )
+	--self:ResetSequence(sequence)
+	self:SetSequence( sequence )
+	--self:AddEffects( EF_ITEM_BLINK )
 
 	self:SetOpen(false)
 	nzSounds:PlayEnt("Close", self)
@@ -102,7 +128,11 @@ function ENT:SpawnWeapon(activator, class)
 	local wep = ents.Create("random_box_windup")
 	local ang = self:GetAngles()
 	wep:SetAngles( ang )
-	wep:SetPos( self:GetPos() + ang:Up()*10 )
+	if (nzMapping.Settings.boxtype =="Original") then
+	wep:SetPos( self:GetPos() + ang:Up()*17 )
+	else
+	wep:SetPos( self:GetPos() + ang:Up()*30 )
+	end
 	wep:SetWepClass(class)
 	wep:Spawn()
 	wep.Buyer = activator
@@ -161,6 +191,18 @@ function ENT:MoveAway()
 	end)
 
 	-- Move Up
+	if (nzMapping.Settings.boxtype =="Dead Space") then
+	self.Moving = false
+			timer.Destroy("moveAway")
+			timer.Destroy("shake")
+
+			self.SpawnPoint.Box = nil
+			--self.SpawnPoint:SetBodygroup(1,0)
+			self:MoveToNewSpot(self.SpawnPoint)
+			--self:EmitSound("nz/randombox/poof.wav")
+			nzSounds:PlayEnt("Poof", self)
+			self:Remove()
+	else
 	timer.Simple( 1, function()
 		timer.Create( "moveAway", 5, 1, function()
 			self.Moving = false
@@ -202,6 +244,7 @@ function ENT:MoveAway()
 			end)
 		end)
 	end)
+	end
 end
 
 function ENT:MoveToNewSpot(oldspot)
@@ -249,6 +292,9 @@ function ENT:OnRemove()
 	else
 		if IsValid(self.SpawnPoint) then
 			--self.SpawnPoint.Box = nil
+			if (nzMapping.Settings.boxtype =="Resident Evil") then
+			self.SpawnPoint:SetModelScale(1, 0 )
+			end
 			self.SpawnPoint:SetBodygroup(1,0)
 		end
 	end

@@ -43,6 +43,8 @@ nzTools:CreateTool("settings", {
 		valz["Row16"] = data.hudtype or "Origins (Black Ops 2)"
 		valz["Row17"] = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or data.zombieeyecolor
 		valz["Row18"] = data.perkmachinetype or "Original"
+		valz["Row19"] = data.boxtype or "Original"
+		valz["Row20"] = data.boxlightcolor == nil and Color(0,150,200,255) or data.boxlightcolor
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -234,6 +236,20 @@ nzTools:CreateTool("settings", {
 			end
 			Row18.DataChanged = function( _, val ) valz["Row18"] = val end
 			Row18:SetTooltip("Sets the Perk Machines")
+			
+			local Row19 = DProperties:CreateRow("Map Settings", "Mystery Box Skin")
+			Row19:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.BoxSkinData) do
+				if k == valz["Row19"] then
+					Row19:AddChoice(k, k, true)
+					found = true
+				else
+					Row19:AddChoice(k, k, false)
+				end
+			end
+			Row19.DataChanged = function( _, val ) valz["Row19"] = val end
+			Row19:SetTooltip("Sets the Mystery Box Skin")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -254,6 +270,8 @@ nzTools:CreateTool("settings", {
 			if !valz["Row16"] then data.hudtype = "Origins (Black Ops 2)" else data.hudtype = valz["Row16"] end
 			if !istable(valz["Row17"]) then data.zombieeyecolor = Color(0, 255, 255, 255) else data.zombieeyecolor = valz["Row17"] end
 			if !valz["Row18"] then data.perkmachinetype = "Original" else data.perkmachinetype = valz["Row18"] end
+			if !valz["Row19"] then data.boxtype = "Original" else data.boxtype= valz["Row19"] end
+			if !istable(valz["Row20"]) then data.boxlightcolor = Color(0, 150,200,255) else data.boxlightcolor = valz["Row20"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -324,6 +342,38 @@ nzTools:CreateTool("settings", {
 			end
 		end
 		
+		local function AddBoxStuff()
+			local boxlightPanel = vgui.Create("DPanel", sheet)
+			sheet:AddSheet("Box Color", boxlightPanel, "icon16/palette.png", false, false, "Set the color of the Mystery Box light.")
+			boxlightPanel:DockPadding(5, 5, 5, 5)
+			local colorChoose2 = vgui.Create("DColorMixer", boxlightPanel)
+			colorChoose2:SetColor(valz["Row20"])
+			colorChoose2:SetPalette(false)
+			colorChoose2:SetAlphaBar(false)
+			colorChoose2:Dock(TOP)
+			colorChoose2:SetSize(150, 150)
+			
+			local presets = vgui.Create("DComboBox", boxlightPanel)
+			presets:SetSize(60, 20)
+			presets:Dock(BOTTOM)
+			presets:AddChoice("Default")
+			presets:AddChoice("Mob of the Dead")
+			presets.OnSelect = function(self, index, value)
+				if (value == "Default") then
+					colorChoose2:SetColor(Color(150,200,255))
+				elseif (value == "Mob of the Dead") then
+					colorChoose2:SetColor(Color(204, 102, 0))	
+				end
+
+				colorChoose2:ValueChanged(nil)
+			end
+
+			colorChoose2.ValueChanged = function(col)
+				valz["Row20"] = colorChoose2:GetColor()
+				print(valz["Row20"])
+			end
+		end
+		
 		local acPanel = vgui.Create("DPanel", sheet)
 		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
 		local acProps = vgui.Create("DProperties", acPanel)
@@ -332,6 +382,7 @@ nzTools:CreateTool("settings", {
 
 		if (!nzTools.Advanced) then
 			AddEyeStuff()
+			AddBoxStuff()
 		end
 		
 		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
@@ -817,6 +868,7 @@ nzTools:CreateTool("settings", {
 			sheet:AddSheet("Custom Sounds", sndPanel, "icon16/sound_add.png", false, false, "Customize the sounds that play for certain events.")
 			
 			AddEyeStuff()
+			AddBoxStuff()
 			
 			-- A modifiable list of all sounds bound to currently selected event:
 			local curSndList = vgui.Create("DListView", sndPanel)

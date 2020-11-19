@@ -58,6 +58,29 @@ nzRound:AddMachineType("Original", "nz_zombie_walker", {
 nzRound:AddMachineType("Infinite Warfare", "nz_zombie_walker", {
 }) 
 
+nzRound.BoxSkinData = nzRound.BoxSkinData or {}
+function nzRound:AddBoxType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.BoxSkinData[id] = data
+		else
+			nzRound.BoxSkinData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.BoxSkinData[id] = class
+	end
+end
+
+nzRound:AddBoxType("Original", "", {}) 
+nzRound:AddBoxType("Mob of the Dead", "", {}) 
+nzRound:AddBoxType("Origins", "", {}) 
+nzRound:AddBoxType("Dead Space", "", {}) 
+nzRound:AddBoxType("Resident Evil", "", {}) 
+
 nzRound.HudSelectData = nzRound.HudSelectData or {}
 function nzRound:AddHUDType(id, class)
 	if SERVER then
