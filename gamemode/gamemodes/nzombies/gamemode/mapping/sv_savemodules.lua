@@ -466,7 +466,7 @@ nzMapping:AddSaveModule("CreateAntiCheatExclusions", {
 			nzMapping:CreateAntiCheatExclusion(v.pos, v.maxbound)
 		end
 	end,
-	cleanents = {"anticheat_exclusions"},
+	cleanents = {"anticheat_exclude"},
 })
 
 nzMapping:AddSaveModule("DamageWalls", {
