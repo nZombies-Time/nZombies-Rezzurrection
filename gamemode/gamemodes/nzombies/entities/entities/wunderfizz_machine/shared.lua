@@ -21,7 +21,7 @@ end
 function ENT:DecideOutcomePerk(ply, specific)
 	if specific then self:SetPerkID(specific) return end
 	
-	if self.TimesUsed > 2 and math.random(100) <= 55 and #ents.FindByClass("wunderfizz_machine") > 1 then
+	if self.TimesUsed > 1 and math.random(100) <= 20 and #ents.FindByClass("wunderfizz_machine") > 1 then
 		return hook.Call("OnPlayerBuyWunderfizz", nil, ply, "teddy") or "teddy"
 	else
 		local blockedperks = {
