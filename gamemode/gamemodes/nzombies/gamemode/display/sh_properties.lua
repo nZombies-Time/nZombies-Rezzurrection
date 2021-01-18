@@ -207,7 +207,7 @@ properties.Add( "nz_editzspawn", {
 	Filter = function( self, ent, ply )
 
 		if ( !IsValid( ent ) or !IsValid(ply) ) then return false end
-		if ( ent:GetClass() != "nz_spawn_zombie_normal" and ent:GetClass() != "nz_spawn_zombie_special" ) then return false end
+		if ( ent:GetClass() != "nz_spawn_zombie_normal" and ent:GetClass() != "nz_spawn_zombie_special" and ent:GetClass() != "nz_spawn_zombie_boss"  and ent:GetClass() != "nz_spawn_zombie_extra1"  and ent:GetClass() != "nz_spawn_zombie_extra2"  and ent:GetClass() != "nz_spawn_zombie_extra3"  and ent:GetClass() != "nz_spawn_zombie_extra4")  then return false end
 		if !nzRound:InState( ROUND_CREATE ) then return false end
 		if ( !ply:IsInCreative() ) then return false end
 

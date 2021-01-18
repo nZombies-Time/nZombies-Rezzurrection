@@ -45,6 +45,18 @@ nzTools:CreateTool("settings", {
 		valz["Row18"] = data.perkmachinetype or "Original"
 		valz["Row19"] = data.boxtype or "Original"
 		valz["Row20"] = data.boxlightcolor == nil and Color(0,150,200,255) or data.boxlightcolor
+		valz["Row21"] = data.newwave1 or 20
+		valz["Row22"] = data.newtype1 or "Hellhounds"
+		valz["Row23"] = data.newratio1 or 0.5
+		valz["Row24"] = data.newwave2 or 0
+		valz["Row25"] = data.newtype2 or "None"
+		valz["Row26"] = data.newratio2 or 0
+		valz["Row27"] = data.newwave3 or 0
+		valz["Row28"] = data.newtype3 or "None"
+		valz["Row29"] = data.newratio3 or 0
+		valz["Row30"] = data.newwave4 or 0
+		valz["Row31"] = data.newtype4 or "None"
+		valz["Row32"] = data.newratio4 or 0
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -72,7 +84,7 @@ nzTools:CreateTool("settings", {
 
 
 		local sheet = vgui.Create( "DPropertySheet", frame )
-		sheet:SetSize( 280, 220 )
+		sheet:SetSize( 480, 450 )
 		sheet:SetPos( 10, 10 )
 
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
@@ -109,7 +121,7 @@ nzTools:CreateTool("settings", {
 		Row2:Setup( "Integer" )
 		Row2:SetValue( valz["Row2"] )
 		Row2.DataChanged = function( _, val ) valz["Row2"] = val end
-
+		
 		local Row3 = DProperties:CreateRow( "Map Settings", "Easter Egg Song URL" )
 		Row3:Setup( "Generic" )
 		Row3:SetValue( valz["Row3"] )
@@ -250,6 +262,106 @@ nzTools:CreateTool("settings", {
 			end
 			Row19.DataChanged = function( _, val ) valz["Row19"] = val end
 			Row19:SetTooltip("Sets the Mystery Box Skin")
+			
+		local Row21 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 1" )
+		Row21:Setup( "Integer" )
+		Row21:SetValue( valz["Row21"] )
+		Row21.DataChanged = function( _, val ) valz["Row21"] = val end
+		
+		local Row22 = DProperties:CreateRow("Map Settings", "Extra Enemy 1")
+			Row22:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.AdditionalZombieData) do
+				if k == valz["Row22"] then
+					Row22:AddChoice(k, k, true)
+					found = true
+				else
+					Row22:AddChoice(k, k, false)
+				end
+			end
+			Row22:AddChoice(" None", "None", !found)
+			Row22.DataChanged = function( _, val ) valz["Row22"] = val end
+			Row22:SetTooltip("Sets what type of new enemy will appear on the first new enemy interval")
+			
+		local Row23 = DProperties:CreateRow( "Map Settings", "Extra Enemy 1 Ratio" )
+		Row23:Setup( "Integer" )
+		Row23:SetValue( valz["Row23"] )
+		Row23.DataChanged = function( _, val ) valz["Row23"] = val end
+		
+		local Row24 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 2" )
+		Row24:Setup( "Integer" )
+		Row24:SetValue( valz["Row24"] )
+		Row24.DataChanged = function( _, val ) valz["Row24"] = val end
+		
+		local Row25 = DProperties:CreateRow("Map Settings", "Extra Enemy 2")
+			Row25:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.AdditionalZombieData) do
+				if k == valz["Row25"] then
+					Row25:AddChoice(k, k, true)
+					found = true
+				else
+					Row25:AddChoice(k, k, false)
+				end
+			end
+			Row25:AddChoice(" None", "None", !found)
+			Row25.DataChanged = function( _, val ) valz["Row25"] = val end
+			Row25:SetTooltip("Sets what type of new enemy will appear on the second new enemy interval")
+			
+		local Row26 = DProperties:CreateRow( "Map Settings", "Extra Enemy 2 Ratio" )
+		Row26:Setup( "Integer" )
+		Row26:SetValue( valz["Row26"] )
+		Row26.DataChanged = function( _, val ) valz["Row26"] = val end
+		
+		local Row27 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 3" )
+		Row27:Setup( "Integer" )
+		Row27:SetValue( valz["Row27"] )
+		Row27.DataChanged = function( _, val ) valz["Row27"] = val end
+		
+		local Row28 = DProperties:CreateRow("Map Settings", "Extra Enemy 3")
+			Row28:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.AdditionalZombieData) do
+				if k == valz["Row28"] then
+					Row28:AddChoice(k, k, true)
+					found = true
+				else
+					Row28:AddChoice(k, k, false)
+				end
+			end
+			Row28:AddChoice(" None", "None", !found)
+			Row28.DataChanged = function( _, val ) valz["Row28"] = val end
+			Row28:SetTooltip("Sets what type of new enemy will appear on the third new enemy interval")
+			
+		local Row29 = DProperties:CreateRow( "Map Settings", "Extra Enemy 3 Ratio" )
+		Row29:Setup( "Integer" )
+		Row29:SetValue( valz["Row29"] )
+		Row29.DataChanged = function( _, val ) valz["Row29"] = val end
+		
+		local Row30 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 4" )
+		Row30:Setup( "Integer" )
+		Row30:SetValue( valz["Row30"] )
+		Row30.DataChanged = function( _, val ) valz["Row30"] = val end
+		
+		local Row31 = DProperties:CreateRow("Map Settings", "Extra Enemy 4")
+			Row31:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.AdditionalZombieData) do
+				if k == valz["Row31"] then
+					Row31:AddChoice(k, k, true)
+					found = true
+				else
+					Row31:AddChoice(k, k, false)
+				end
+			end
+			Row31:AddChoice(" None", "None", !found)
+			Row31.DataChanged = function( _, val ) valz["Row31"] = val end
+			Row31:SetTooltip("Sets what type of new enemy will appear on the fourth new enemy interval")
+			
+		local Row32 = DProperties:CreateRow( "Map Settings", "Extra Enemy 4 Ratio" )
+		Row32:Setup( "Integer" )
+		Row32:SetValue( valz["Row32"] )
+		Row32.DataChanged = function( _, val ) valz["Row32"] = val end
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -272,6 +384,18 @@ nzTools:CreateTool("settings", {
 			if !valz["Row18"] then data.perkmachinetype = "Original" else data.perkmachinetype = valz["Row18"] end
 			if !valz["Row19"] then data.boxtype = "Original" else data.boxtype= valz["Row19"] end
 			if !istable(valz["Row20"]) then data.boxlightcolor = Color(0, 150,200,255) else data.boxlightcolor = valz["Row20"] end
+			if !tonumber(valz["Row21"]) then data.newwave1 = 20 else data.newwave1 = tonumber(valz["Row21"]) end
+			if !valz["Row22"] then data.newtype1 = "Hellhounds" else data.newtype1 = valz["Row22"] end
+			if !tonumber(valz["Row23"]) then data.newratio1 = 0.5 else data.newratio1 = tonumber(valz["Row23"]) end
+			if !tonumber(valz["Row24"]) then data.newwave2 = 0 else data.newwave2 = tonumber(valz["Row24"]) end
+			if !valz["Row25"] then data.newtype2 = "None" else data.newtype2 = valz["Row25"] end
+			if !tonumber(valz["Row26"]) then data.newratio2 = 0 else data.newratio2 = tonumber(valz["Row26"]) end
+			if !tonumber(valz["Row27"]) then data.newwave3 = 0 else data.newwave3 = tonumber(valz["Row27"]) end
+			if !valz["Row28"] then data.newtype3 = "None" else data.newtype3 = valz["Row28"] end
+			if !tonumber(valz["Row29"]) then data.newratio3 = 0 else data.newratio3 = tonumber(valz["Row29"]) end
+			if !tonumber(valz["Row30"]) then data.newwave4 = 0 else data.newwave4 = tonumber(valz["Row30"]) end
+			if !valz["Row31"] then data.newtype4 = "None" else data.newtype4 = valz["Row31"] end
+			if !tonumber(valz["Row32"]) then data.newratio4 = 0 else data.newratio4 = tonumber(valz["Row32"]) end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -294,15 +418,16 @@ nzTools:CreateTool("settings", {
 			nzMapping:SendMapData( data )
 		end
 
-		if (MapSDermaButton != nil) then
+			if (MapSDermaButton != nil) then
 			MapSDermaButton:Remove()
 		end
 
 		MapSDermaButton = vgui.Create( "DButton", frame )
 		MapSDermaButton:SetText( "Submit" )
-		MapSDermaButton:Dock(BOTTOM)
-	--	DermaButton:SetPos( 0, 185 )
-		MapSDermaButton:SetSize( 260, 30 )
+		--MapSDermaButton:Dock(BOTTOM)
+		MapSDermaButton:SetPos( 10, 430 )
+
+		MapSDermaButton:SetSize( 480, 30 )
 		MapSDermaButton.DoClick = UpdateData
 		
 		local function AddEyeStuff()
@@ -314,10 +439,11 @@ nzTools:CreateTool("settings", {
 			colorChoose:SetPalette(false)
 			colorChoose:SetAlphaBar(false)
 			colorChoose:Dock(TOP)
-			colorChoose:SetSize(150, 150)
+			colorChoose:SetSize(150, 220)
 			
 			local presets = vgui.Create("DComboBox", eyePanel)
-			presets:SetSize(60, 20)
+			presets:SetSize(335, 20)
+			presets:SetPos(5, 225)
 			presets:Dock(BOTTOM)
 			presets:AddChoice("Richtofen")
 			presets:AddChoice("Samantha")
@@ -435,7 +561,7 @@ nzTools:CreateTool("settings", {
 
 			local rbweplist = vgui.Create("DScrollPanel", rboxpanel)
 			rbweplist:SetPos(0, 0)
-			rbweplist:SetSize(265, 150)
+			rbweplist:SetSize(365, 350)
 			rbweplist:SetPaintBackground(true)
 			rbweplist:SetBackgroundColor( Color(200, 200, 200) )
 
@@ -443,7 +569,7 @@ nzTools:CreateTool("settings", {
 				weight = weight or 10
 				if IsValid(weplist[class]) then return end
 				weplist[class] = vgui.Create("DPanel", rbweplist)
-				weplist[class]:SetSize(265, 16)
+				weplist[class]:SetSize(365, 16)
 				weplist[class]:SetPos(0, numweplist*16)
 				valz["RBoxWeps"][class] = weight
 
@@ -456,14 +582,14 @@ nzTools:CreateTool("settings", {
 				local dhover = vgui.Create("DPanel", weplist[class])
 				dhover.Paint = function() end
 				dhover:SetText("")
-				dhover:SetSize(265, 16)
+				dhover:SetSize(365, 16)
 				dhover:SetPos(0,0)
 				if tooltip then
 					dhover:SetTooltip(tooltip)
 				end
 				
 				local dweight = vgui.Create("DNumberWang", weplist[class])
-				dweight:SetPos(195, 1)
+				dweight:SetPos(295, 1)
 				dweight:SetSize(40, 14)
 				dweight:SetTooltip("The chance of this weapon appearing in the box")
 				dweight:SetMinMax( 1, 100 )
@@ -474,7 +600,7 @@ nzTools:CreateTool("settings", {
 				
 				local ddelete = vgui.Create("DImageButton", weplist[class])
 				ddelete:SetImage("icon16/delete.png")
-				ddelete:SetPos(235, 0)
+				ddelete:SetPos(335, 0)
 				ddelete:SetSize(16, 16)
 				ddelete.DoClick = function()
 					valz["RBoxWeps"][class] = nil
@@ -517,7 +643,7 @@ nzTools:CreateTool("settings", {
 			end
 
 			local wepentry = vgui.Create( "DComboBox", rboxpanel )
-			wepentry:SetPos( 0, 155 )
+			wepentry:SetPos( 0, 355 )
 			wepentry:SetSize( 146, 20 )
 			wepentry:SetValue( "Weapon ..." )
 			for k,v in pairs(weapons.GetList()) do
@@ -534,7 +660,7 @@ nzTools:CreateTool("settings", {
 
 			local wepadd = vgui.Create( "DButton", rboxpanel )
 			wepadd:SetText( "Add" )
-			wepadd:SetPos( 150, 155 )
+			wepadd:SetPos( 150, 355 )
 			wepadd:SetSize( 53, 20 )
 			wepadd.DoClick = function()
 				local v = weapons.Get(wepentry:GetOptionData(wepentry:GetSelectedID()))
@@ -550,7 +676,7 @@ nzTools:CreateTool("settings", {
 			
 			local wepmore = vgui.Create( "DButton", rboxpanel )
 			wepmore:SetText( "More ..." )
-			wepmore:SetPos( 207, 155 )
+			wepmore:SetPos( 207, 355 )
 			wepmore:SetSize( 53, 20 )
 			wepmore.DoClick = function()
 				local morepnl = vgui.Create("DFrame")
@@ -565,7 +691,7 @@ nzTools:CreateTool("settings", {
 				morecat:SetSize(150, 20)
 				morecat:SetPos(10, 30)
 				local cattbl = {}
-				for k,v in pairs(weapons.GetList()) do
+				for k,v in SortedPairsByMemberValue(weapons.GetList(), "PrintName") do
 					if v.Category and v.Category != "" then
 						if !cattbl[v.Category] then
 							morecat:AddChoice(v.Category, v.Category, false)
@@ -582,7 +708,7 @@ nzTools:CreateTool("settings", {
 				morecatadd.DoClick = function()
 					local cat = morecat:GetOptionData(morecat:GetSelectedID())
 					if cat and cat != "" then
-						for k,v in pairs(weapons.GetList()) do
+						for k,v in SortedPairsByMemberValue(weapons.GetList(), "PrintName") do
 							if  v.Category and v.Category == cat and !nzConfig.WeaponBlackList[v.ClassName] and !v.NZPreventBox and !v.NZTotalBlacklist then
 								InsertWeaponToList(v.PrintName != "" and v.PrintName or v.ClassName, v.ClassName, 10, v.ClassName.." ["..v.Category.."]")
 							end
@@ -636,7 +762,7 @@ nzTools:CreateTool("settings", {
 				moreprefixadd.DoClick = function()
 					local prefix = moreprefix:GetOptionData(moreprefix:GetSelectedID())
 					if prefix and prefix != "" then
-						for k,v in pairs(weapons.GetList()) do
+						for k,v in SortedPairsByMemberValue(weapons.GetList(), "PrintName") do
 							local wepprefix = string.sub(v.ClassName, 0, string.find(v.ClassName, "_"))
 							if wepprefix and wepprefix == prefix and !nzConfig.WeaponBlackList[v.ClassName] and !v.NZPreventBox and !v.NZTotalBlacklist then
 								if v.Category and v.Category != "" then
@@ -697,7 +823,7 @@ nzTools:CreateTool("settings", {
 						weplist[k] = nil
 						numweplist = 0
 					end
-					for k,v in pairs(weapons.GetList()) do
+					for k,v in SortedPairsByMemberValue(weapons.GetList(), "PrintName") do
 						-- By default, add all weapons that have print names unless they are blacklisted
 						if v.PrintName and v.PrintName != "" and !nzConfig.WeaponBlackList[v.ClassName] and v.PrintName != "Scripted Weapon" and !v.NZPreventBox and !v.NZTotalBlacklist then
 							if v.Category and v.Category != "" then
@@ -939,7 +1065,7 @@ nzTools:CreateTool("settings", {
 				if (!list || !eventItem) then return end
 
 				sndFilePanel = vgui.Create("DFrame", frame)
-				sndFilePanel:Dock(FILL)
+				sndFilePanel:SetSize(500, 475)
 				sndFilePanel:SetTitle(eventItem:GetColumnText(1) .. " Sound")
 				sndFilePanel:SetDeleteOnClose(true)
 				sndFilePanel.OnClose = function()
@@ -1072,46 +1198,46 @@ nzTools:CreateTool("settings", {
 
 			local perklistpnl = vgui.Create("DScrollPanel", perkpanel)
 			perklistpnl:SetPos(0, 0)
-			perklistpnl:SetSize(265, 250)
+			perklistpnl:SetSize(465, 450)
 			perklistpnl:SetPaintBackground(true)
 			perklistpnl:SetBackgroundColor( Color(200, 200, 200) )
 			
 			local perkchecklist = vgui.Create( "DIconLayout", perklistpnl )
-			perkchecklist:SetSize( 265, 250 )
-			perkchecklist:SetPos( 0, 0 )
+			perkchecklist:SetSize( 465, 450 )
+			perkchecklist:SetPos( 35, 10 )
 			perkchecklist:SetSpaceY( 5 )
 			perkchecklist:SetSpaceX( 5 )
 			
 			--for k,v in pairs(nzPerks:GetList()) do
 			--	if k != "wunderfizz" and k != "pap" then
 				for k,v in pairs(wunderfizzlist) do
-					if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
+				if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
 
-					local perkitem = perkchecklist:Add( "DPanel" )
-					perkitem:SetSize( 130, 20 )
-					
-					local check = perkitem:Add("DCheckBox")
-					check:SetPos(2,2)
+				local perkitem = perkchecklist:Add( "DPanel" )
+				perkitem:SetSize( 130, 20 )
+				
+				local check = perkitem:Add("DCheckBox")
+				check:SetPos(2,2)
 
-					if (nzMapping.Settings.wunderfizzperklist and istable(nzMapping.Settings.wunderfizzperklist[k]) and isbool(nzMapping.Settings.wunderfizzperklist[k][1])) then
-						check:SetValue(nzMapping.Settings.wunderfizzperklist[k][1])
-					else
-						check:SetValue(true)
-					end
-
-					--if has then perklist[k] = true else perklist[k] = nil end
-					check.OnChange = function(self, val)
-						--if val then perklist[k] = true else perklist[k] = nil end
-						valz["Wunderfizz"][k][1] = val
-						--nzMapping:SendMapData( {wunderfizzperks = perklist} )
-					end
-					
-					local name = perkitem:Add("DLabel")
-					name:SetTextColor(Color(50,50,50))
-					name:SetSize(105, 20)
-					name:SetPos(20,1)
-					name:SetText(v[2])
+				if (nzMapping.Settings.wunderfizzperklist and istable(nzMapping.Settings.wunderfizzperklist[k]) and isbool(nzMapping.Settings.wunderfizzperklist[k][1])) then
+					check:SetValue(nzMapping.Settings.wunderfizzperklist[k][1])
+				else
+					check:SetValue(true)
 				end
+
+				--if has then perklist[k] = true else perklist[k] = nil end
+				check.OnChange = function(self, val)
+					--if val then perklist[k] = true else perklist[k] = nil end
+					valz["Wunderfizz"][k][1] = val
+					--nzMapping:SendMapData( {wunderfizzperks = perklist} )
+				end
+				
+				local name = perkitem:Add("DLabel")
+				name:SetTextColor(Color(50,50,50))
+				name:SetSize(105, 20)
+				name:SetPos(20,1)
+				name:SetText(v[2])
+			end
 				--end
 			--end
 		else

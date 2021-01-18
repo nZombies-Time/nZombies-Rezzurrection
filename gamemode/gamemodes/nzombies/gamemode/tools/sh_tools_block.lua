@@ -99,10 +99,10 @@ nzTools:CreateTool("block", {
 	PrimaryAttack = function(wep, ply, tr, data)
 		local ent = tr.Entity
 		if IsValid(ent) and ent:GetClass() == "wall_block" then
-			nzMapping:BlockSpawn(ent:GetPos(),ent:GetAngles(), data.model, ply)
+			nzMapping:BlockSpawn(ent:GetPos(),ent:GetAngles(), data.model, nil, ply)
 			ent:Remove()
 		else
-			nzMapping:BlockSpawn(tr.HitPos,Angle(90,(tr.HitPos - ply:GetPos()):Angle()[2] + 90,90), data.model, ply)
+			nzMapping:BlockSpawn(tr.HitPos,Angle(90,(tr.HitPos - ply:GetPos()):Angle()[2] + 90,90), data.model, nil, ply)
 		end
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
@@ -131,7 +131,7 @@ nzTools:CreateTool("block", {
 	end,
 	interface = function(frame, data, context)
 		local Scroll = vgui.Create( "DScrollPanel", frame )
-		Scroll:SetSize( 280, 300 )
+		Scroll:SetSize( 480, 450 )
 		Scroll:SetPos( 10, 10 )
 
 		function Scroll.CompileData()
@@ -143,7 +143,7 @@ nzTools:CreateTool("block", {
 		end
 
 		local List	= vgui.Create( "DIconLayout", Scroll )
-		List:SetSize( 340, 200 )
+		List:SetSize( 480, 200 )
 		List:SetPos( 0, 0 )
 		List:SetSpaceY( 5 )
 		List:SetSpaceX( 5 )

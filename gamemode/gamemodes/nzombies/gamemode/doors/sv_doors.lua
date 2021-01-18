@@ -11,24 +11,26 @@ end
 
 function nzDoors:ParseFlagString( flagsStr )
 
-	local tbl = {}
-	
-	flagsStr = string.lower(flagsStr)
-	
-	-- Translate the flags string into a table
-	local ex = string.Explode( ",", flagsStr )
-	
-	for k,v in pairs(ex) do
-		local ex2 = string.Explode( "=", v )
-		tbl[ex2[1]] = ex2[2]
-		-- If buyable is not set on a door, we default to on
-		if !tbl["buyable"] and k == #ex then
-			tbl["buyable"] = "1"
+	if (isstring(flagsStr)) then
+		local tbl = {}
+		
+		flagsStr = string.lower(flagsStr)
+		
+		-- Translate the flags string into a table
+		local ex = string.Explode( ",", flagsStr )
+		
+		for k,v in pairs(ex) do
+			local ex2 = string.Explode( "=", v )
+			tbl[ex2[1]] = ex2[2]
+			-- If buyable is not set on a door, we default to on
+			if !tbl["buyable"] and k == #ex then
+				tbl["buyable"] = "1"
+			end
 		end
+		
+		--PrintTable(tbl)
+		return tbl
 	end
-	
-	--PrintTable(tbl)
-	return tbl
 	
 end
 

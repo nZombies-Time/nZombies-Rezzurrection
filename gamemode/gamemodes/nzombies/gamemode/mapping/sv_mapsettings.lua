@@ -71,6 +71,42 @@ function nzMapping:LoadMapSettings(data)
 	if data.bosstype then
 		nzMapping.Settings.bosstype = data.bosstype or "Panzer"
 	end
+	if data.newwave1 then
+		nzMapping.Settings.newwave1 = tonumber(data.newwave1) or 20
+	end
+	if data.newtype1 then
+		nzMapping.Settings.newtype1 = data.newtype1 or "Hellhounds"
+	end
+	if data.newratio1 then
+		nzMapping.Settings.newratio1 = tonumber(data.newratio1) or 0.5
+	end
+	if data.newwave2 then
+		nzMapping.Settings.newwave2 = tonumber(data.newwave2) or 0
+	end
+	if data.newtype2 then
+		nzMapping.Settings.newtype2 = data.newtype2 or "None"
+	end
+	if data.newratio2 then
+		nzMapping.Settings.newratio2 = tonumber(data.newratio2) or 0
+	end
+	if data.newwave3 then
+		nzMapping.Settings.newwave3 = tonumber(data.newwave3) or 0
+	end
+	if data.newtype3 then
+		nzMapping.Settings.newtype3 = data.newtype3 or "None"
+	end
+	if data.newratio3 then
+		nzMapping.Settings.newratio3 = tonumber(data.newratio3) or 0
+	end
+		if data.newwave4 then
+		nzMapping.Settings.newwave4 = tonumber(data.newwave4) or 0
+	end
+	if data.newtype4 then
+		nzMapping.Settings.newtype4 = data.newtype4 or "None"
+	end
+	if data.newratio4 then
+		nzMapping.Settings.newratio4 = tonumber(data.newratio4) or 0
+	end
 	
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
 	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround

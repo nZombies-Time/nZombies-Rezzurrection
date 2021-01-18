@@ -1,5 +1,5 @@
-nzTools:CreateTool("zspecialspawn", {
-	displayname = "Special Spawn Creator",
+nzTools:CreateTool("zbossspawn", {
+	displayname = "Boss Spawn Creator",
 	desc = "LMB: Place Spawnpoint, RMB: Remove Spawnpoint",
 	condition = function(wep, ply)
 		-- Function to check whether a player can access this tool - always accessible
@@ -8,10 +8,10 @@ nzTools:CreateTool("zspecialspawn", {
 	PrimaryAttack = function(wep, ply, tr, data)
 		-- Create a new spawnpoint and set its data to the guns properties
 		local ent
-		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_special" then
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_boss" then
 			ent = tr.Entity -- No need to recreate if we shot an already existing one
 		else
-			ent = nzMapping:ZedSpecialSpawn(tr.HitPos, nil, ply)
+			ent = nzMapping:ZedBossSpawn(tr.HitPos, nil, ply)
 		end
 
 		ent.flag = data.flag
@@ -26,7 +26,7 @@ nzTools:CreateTool("zspecialspawn", {
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
 		-- Remove entity if it is a zombie spawnpoint
-		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_special" then
+		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_boss" then
 			tr.Entity:Remove()
 		end
 	end,
@@ -40,9 +40,9 @@ nzTools:CreateTool("zspecialspawn", {
 
 	end
 }, {
-	displayname = "Special Spawn Creator",
+	displayname = "Boss Spawn Creator",
 	desc = "LMB: Place Spawnpoint, RMB: Remove Spawnpoint",
-	icon = "icon16/user_red.png",
+	icon = "icon16/user_suit.png",
 	weight = 2,
 	condition = function(wep, ply)
 		return true
@@ -71,7 +71,7 @@ nzTools:CreateTool("zspecialspawn", {
 		end
 		
 		function DProperties.UpdateData(data)
-			nzTools:SendData(data, "zspecialspawn")
+			nzTools:SendData(data, "zbossspawn")
 		end
 
 		local Row1 = DProperties:CreateRow( "Zombie Spawn", "Enable Flag?" )
@@ -84,19 +84,11 @@ nzTools:CreateTool("zspecialspawn", {
 		Row2.DataChanged = function( _, val ) valz["Row2"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
 		local text = vgui.Create("DLabel", DProperties)
-		text:SetText("Special Spawnpoints apply to Hellhounds")
+		text:SetText("Boss Spawnpoints apply to the set boss")
 		text:SetFont("Trebuchet18")
 		text:SetTextColor( Color(50, 50, 50) )
 		text:SizeToContents()
 		text:Center()
-
-		local text2 = vgui.Create("DLabel", DProperties)
-		text2:SetText("and for respawning with Who's Who")
-		text2:SetFont("Trebuchet18")
-		text2:SetPos(0, 95)
-		text2:SetTextColor( Color(50, 50, 50) )
-		text2:SizeToContents()
-		text2:CenterHorizontal()
 
 		return DProperties
 	end,

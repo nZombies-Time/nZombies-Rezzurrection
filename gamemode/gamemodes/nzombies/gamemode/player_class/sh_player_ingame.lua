@@ -79,4 +79,17 @@ function PLAYER:Spawn()
 	self.Player:SetUsingSpecialWeapon(false)
 end
 
+function PLAYER:OnTakeDamage( dmginfo )
+
+			if dmginfo:IsDamageType( 64 ) and self.Player:HasPerk("phd")then
+		dmginfo:ScaleDamage( 0 )
+			end
+			
+			
+			if (dmginfo:IsDamageType( 8 ) or dmginfo:IsDamageType( 2097152 )) and self.Player:HasPerk("fire")then
+		dmginfo:ScaleDamage( 0 )
+			end
+			
+end
+
 player_manager.RegisterClass( "player_ingame", PLAYER, "player_default" )

@@ -52,7 +52,7 @@ nzTools:CreateTool("door", {
 		valz["Row6"] = data.rebuyable
 
 		local DProperties = vgui.Create( "DProperties", frame )
-		DProperties:SetSize( 280, 260 )
+		DProperties:SetSize( 480, 450 )
 		DProperties:SetPos( 10, 10 )
 		
 		function DProperties.CompileData()

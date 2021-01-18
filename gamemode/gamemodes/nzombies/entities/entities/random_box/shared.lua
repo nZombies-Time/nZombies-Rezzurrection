@@ -25,11 +25,11 @@ function ENT:Initialize()
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
 	self:SetModel( "models/nzr/motd/box.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
-	self:SetModel( "models/nzr/deadspace/kiosk3.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
+	self:SetModelScale( self:GetModelScale() * 1, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
 	self:SetModel( "models/nzr/re/box.mdl" )
@@ -265,6 +265,7 @@ function ENT:MarkForRemoval()
 		end)
 	end]]
 end
+
 
 if CLIENT then
 	function ENT:Draw()

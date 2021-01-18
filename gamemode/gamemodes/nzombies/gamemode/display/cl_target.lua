@@ -5,18 +5,42 @@ local traceents = {
 		local wepclass = ent:GetWepClass()
 		local price = ent:GetPrice()
 		local wep = weapons.Get(wepclass)
+		local upgrade = wep.NZPaPReplacement
+		local wep2 =  weapons.Get( wep.NZPaPReplacement)
+		local upgrade2 = wep2.NZPaPReplacement
 		if !wep then return "INVALID WEAPON" end
 		local name = wep.PrintName
 		local ammo_price = math.Round((price - (price % 10))/2)
 		local text = ""
-
-		if !LocalPlayer():HasWeapon( wepclass ) then
+		if  LocalPlayer():HasWeapon( upgrade ) then
+		 pap = true
+		end
+		if  LocalPlayer():HasWeapon( upgrade2 ) then
+		 pap = true
+		end
+		
+		if !LocalPlayer():HasWeapon( wepclass ) and !pap then
 			text = "Press E to buy " .. name .." for " .. price .. " points."
 		elseif string.lower(wep.Primary.Ammo) != "none" then
+			if pap then
+			if  LocalPlayer():HasWeapon( upgrade ) then
+			if LocalPlayer():GetWeapon( upgrade ):HasNZModifier("pap") then
+			text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
+			pap = false
+			end
+			
+			elseif LocalPlayer():HasWeapon( upgrade2 ) then
+			if LocalPlayer():GetWeapon( upgrade2 ):HasNZModifier("pap") then
+			text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
+			pap = false
+			end
+			end
+			else
 			if LocalPlayer():GetWeapon( wepclass ):HasNZModifier("pap") then
 				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
 			else
 				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. ammo_price .. " points."
+			end
 			end
 		else
 			text = "You already have this weapon."
@@ -90,6 +114,7 @@ local traceents = {
 	["player_spawns"] = function() if nzRound:InState( ROUND_CREATE ) then return "Player Spawn" end end,
 	["nz_spawn_zombie_normal"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Spawn" end end,
 	["nz_spawn_zombie_special"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Special Spawn" end end,
+	["nz_spawn_zombie_boss"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Boss Spawn" end end,
 	["pap_weapon_trigger"] = function(ent)
 		local wepclass = ent:GetWepClass()
 		local wep = weapons.Get(wepclass)
@@ -167,7 +192,7 @@ local function GetDoorText( ent )
 				text = "Press E to open for " .. price .. " points."
 			end
 		end
-	elseif door_data and tonumber(door_data.buyable) != 1 and nzRound:InState( ROUND_CREATE ) then
+		elseif ent:GetClass() != "wall_block" and door_data and tonumber(door_data.buyable) != 1 and nzRound:InState( ROUND_CREATE ) then
 		text = "This door is locked and cannot be bought in-game."
 		--PrintTable(door_data)
 	end

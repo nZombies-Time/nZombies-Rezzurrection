@@ -54,6 +54,38 @@ function nzRound:SetSpecialSpawner(spawner)
 	self.hSpecialSpawner = spawner
 end
 
+function nzRound:GetExtraSpawner1()
+	return self.hExtraSpawner1
+end
+
+function nzRound:SetExtraSpawner1(spawner)
+	self.hExtraSpawner1 = spawner
+end
+
+function nzRound:GetExtraSpawner2()
+	return self.hExtraSpawner2
+end
+
+function nzRound:SetExtraSpawner2(spawner)
+	self.hExtraSpawner2 = spawner
+end
+
+function nzRound:GetExtraSpawner3()
+	return self.hExtraSpawner3
+end
+
+function nzRound:SetExtraSpawner3(spawner)
+	self.hExtraSpawner3 = spawner
+end
+
+function nzRound:GetExtraSpawner4()
+	return self.hExtraSpawner4
+end
+
+function nzRound:SetExtraSpawner4(spawner)
+	self.hExtraSpawner4 = spawner
+end
+
 function nzRound:GetZombieSpeeds()
 	return self.ZombieSpeeds
 end

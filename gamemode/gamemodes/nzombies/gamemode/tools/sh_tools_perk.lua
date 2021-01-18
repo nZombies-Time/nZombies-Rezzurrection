@@ -42,7 +42,7 @@ nzTools:CreateTool("perk", {
 
 		local choices = vgui.Create( "DComboBox", frame )
 		choices:SetPos( 10, 10 )
-		choices:SetSize( 280, 30 )
+		choices:SetSize( 450, 30 )
 		choices:SetValue( nzPerks:Get(data.perk).name )
 		for k,v in pairs(nzPerks:GetList()) do
 			choices:AddChoice( v, k )

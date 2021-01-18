@@ -1,5 +1,7 @@
 AddCSLuaFile( )
 
+ENT.Base = "prop_buys" -- prop_buys are purchaseable props and this is an invisible prop, let's combine the functionality!
+
 ENT.Type = "anim"
  
 ENT.PrintName		= "wall_block"

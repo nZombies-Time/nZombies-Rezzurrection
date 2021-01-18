@@ -28,11 +28,20 @@ function ENT:DecideOutcomePerk(ply, specific)
 			["wunderfizz"] = true, -- lol, this would happen
 			["pap"] = true,
 		}
-		local available = nzMapping.Settings.wunderfizzperks or nzPerks:GetList()
+		local wunderfizzlist = {}
+		for k,v in pairs(nzPerks:GetList()) do
+			if k != "wunderfizz" and k != "pap" then
+				wunderfizzlist[k] = {true, v}
+			end
+		end
+
+		local available = nzMapping.Settings.wunderfizzperklist or wunderfizzlist
 		local tbl = {}
 		for k,v in pairs(available) do
 			if !self:GetUser():HasPerk(k) and !blockedperks[k] then
-				table.insert(tbl, k)
+				if (v[1] == nil || v[1] == true) then
+					table.insert(tbl, k)
+				end
 			end
 		end
 		if #tbl <= 0 then return hook.Call("OnPlayerBuyWunderfizz", nil, ply, "teddy") or "teddy" end -- Teddy bear for no more perks D:
@@ -156,6 +165,7 @@ function ENT:OnRemove()
 end
 
 function ENT:MoveLocation()
+	if (#ents.FindByClass("wunderfizz_machine") == 1) then return end -- NO! Don't move if there's nowhere to go
 	self:TurnOff()
 	self:SetPerkID("")
 	self:SetUser(nil)

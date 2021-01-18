@@ -42,6 +42,111 @@ function nzMapping:ZedSpecialSpawn(pos, link, ply)
 	return ent
 end
 
+function nzMapping:ZedBossSpawn(pos, link, ply)
+
+	local ent = ents.Create("nz_spawn_zombie_boss")
+	pos.z = pos.z - ent:OBBMaxs().z
+	ent:SetPos( pos )
+	ent:Spawn()
+	-- For the link displayer
+	if link != nil then
+		ent:SetLink(tostring(link))
+		ent.link = tostring(link)
+	end
+
+	if ply then
+		undo.Create( "Boss Zombie Spawnpoint" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ent )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ent
+end
+
+function nzMapping:ZedExtraSpawn1(pos, link, ply)
+
+	local ent = ents.Create("nz_spawn_zombie_extra1")
+	pos.z = pos.z - ent:OBBMaxs().z
+	ent:SetPos( pos )
+	ent:Spawn()
+	-- For the link displayer
+	if link != nil then
+		ent:SetLink(tostring(link))
+		ent.link = tostring(link)
+	end
+
+	if ply then
+		undo.Create( "Extra Zombie 1 Spawnpoint" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ent )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ent
+end
+
+function nzMapping:ZedExtraSpawn2(pos, link, ply)
+
+	local ent = ents.Create("nz_spawn_zombie_extra2")
+	pos.z = pos.z - ent:OBBMaxs().z
+	ent:SetPos( pos )
+	ent:Spawn()
+	-- For the link displayer
+	if link != nil then
+		ent:SetLink(tostring(link))
+		ent.link = tostring(link)
+	end
+
+	if ply then
+		undo.Create( "Extra Zombie 2 Spawnpoint" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ent )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ent
+end
+
+function nzMapping:ZedExtraSpawn3(pos, link, ply)
+
+	local ent = ents.Create("nz_spawn_zombie_extra3")
+	pos.z = pos.z - ent:OBBMaxs().z
+	ent:SetPos( pos )
+	ent:Spawn()
+	-- For the link displayer
+	if link != nil then
+		ent:SetLink(tostring(link))
+		ent.link = tostring(link)
+	end
+
+	if ply then
+		undo.Create( "Extra Zombie 3 Spawnpoint" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ent )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ent
+end
+
+function nzMapping:ZedExtraSpawn4(pos, link, ply)
+
+	local ent = ents.Create("nz_spawn_zombie_extra4")
+	pos.z = pos.z - ent:OBBMaxs().z
+	ent:SetPos( pos )
+	ent:Spawn()
+	-- For the link displayer
+	if link != nil then
+		ent:SetLink(tostring(link))
+		ent.link = tostring(link)
+	end
+
+	if ply then
+		undo.Create( "Extra Zombie 4 Spawnpoint" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ent )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ent
+end
+
 function nzMapping:PlayerSpawn(pos, ply)
 
 	local ent = ents.Create("player_spawns")
@@ -186,7 +291,7 @@ function nzMapping:Electric(pos, ang, model, ply)
 	return ent
 end
 
-function nzMapping:BlockSpawn(pos, ang, model, ply)
+function nzMapping:BlockSpawn(pos, ang, model, flags, ply)
 	local block = ents.Create( "wall_block" )
 	
 	-- Replace with nZombies versions of the same model (if exist) which are grate-based (bullets go through)
@@ -203,6 +308,11 @@ function nzMapping:BlockSpawn(pos, ang, model, ply)
 	block:PhysicsInit( SOLID_VPHYSICS )
 	print(block:GetModel())
 
+	-- REMINDER APPLY FLAGS
+	if flags != nil then
+		nzDoors:CreateLink( block, flags )
+	end
+	
 	local phys = block:GetPhysicsObject()
 	if IsValid(phys) then
 		phys:EnableMotion(false)

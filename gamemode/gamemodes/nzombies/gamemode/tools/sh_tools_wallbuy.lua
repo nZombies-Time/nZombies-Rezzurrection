@@ -47,7 +47,7 @@ nzTools:CreateTool("wallbuy", {
 		valz["Row2"] = data.price
 
 		local DProperties = vgui.Create( "DProperties", frame )
-		DProperties:SetSize( 280, 180 )
+		DProperties:SetSize( 400, 200 )
 		DProperties:SetPos( 10, 10 )
 		
 		function DProperties.CompileData()

@@ -1105,7 +1105,7 @@ function ENT:Jump()
 	local bosstype =  self.BossType
 		if bosstype then
 			local data = nzRound:GetBossData(bosstype)
-			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" -- Check what spawnpoint type we're using
+			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" or "nz_spawn_zombie_boss" or "nz_spawn_zombie_extra1" or "nz_spawn_zombie_extra2" or "nz_spawn_zombie_extra3" or "nz_spawn_zombie_extra4"  -- Check what spawnpoint type we're using
 			local spawnpoints = {}
 			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
 				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then

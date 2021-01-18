@@ -54,7 +54,7 @@ nzTools:CreateTool("zspawn", {
 		valz["Row2"] = data.link
 
 		local DProperties = vgui.Create( "DProperties", frame )
-		DProperties:SetSize( 280, 180 )
+		DProperties:SetSize( 480, 450 )
 		DProperties:SetPos( 10, 10 )
 		
 		function DProperties.CompileData()

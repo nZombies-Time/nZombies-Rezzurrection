@@ -29,19 +29,19 @@ else
 		local tbl = net.ReadTable()
 		
 		local frame = vgui.Create("DFrame")
-		frame:SetSize(300, 300)
+		frame:SetSize(450, 300)
 		frame:SetTitle("Mark props for removal ...")
 		frame:Center()
 		frame:MakePopup()
 		
 		local entlist = vgui.Create("DScrollPanel", frame)
 		entlist:SetPos(10, 30)
-		entlist:SetSize(280, 230)
+		entlist:SetSize(450, 230)
 		entlist:SetPaintBackground(true)
 		entlist:SetBackgroundColor( Color(200, 200, 200) )
 		
 		local entchecklist = vgui.Create( "DIconLayout", entlist )
-		entchecklist:SetSize( 265, 250 )
+		entchecklist:SetSize( 450, 250 )
 		entchecklist:SetPos( 5, 5 )
 		entchecklist:SetSpaceY( 5 )
 		entchecklist:SetSpaceX( 5 )
@@ -69,7 +69,7 @@ else
 		end
 		
 		local submit = vgui.Create("DButton", frame)
-		submit:SetSize(200, 25)
+		submit:SetSize(400, 25)
 		submit:SetText("Submit")
 		submit:SetPos(50, 265)
 		submit.DoClick = function(self)

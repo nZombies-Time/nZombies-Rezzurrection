@@ -13,14 +13,12 @@ function ENT:Initialize()
 	if (nzMapping.Settings.boxtype =="Original") then
 	self:SetModel( "models/nzprops/mysterybox_pile.mdl" )
 	end
-	
-	
 	if (nzMapping.Settings.boxtype =="Origins") then
 	self:SetModel( "models/nzr/originsbox/base.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
 	self:SetModel( "models/nzr/motd/base.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
 	self:SetModel( "models/nzr/deadspace/kiosk_base.mdl" )

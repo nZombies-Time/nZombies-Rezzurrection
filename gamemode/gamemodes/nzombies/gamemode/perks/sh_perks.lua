@@ -115,7 +115,6 @@ nzPerks:NewPerk("dtap", {
 		end
 	end,
 	lostfunc = function(self, ply)
-		if !ply:HasPerk("dtap2") then
 			local tbl = {}
 			for k,v in pairs(ply:GetWeapons()) do
 				if v:IsFAS2() then
@@ -127,7 +126,6 @@ nzPerks:NewPerk("dtap", {
 					v:RevertNZModifier("dtap")
 				end
 			end
-		end
 	end,
 })
 
@@ -353,45 +351,38 @@ nzPerks:NewPerk("pap", {
 })
 
 nzPerks:NewPerk("dtap2", {
-	name = "Double Tap II",
-	name_skin = "Bang Bangs",
-	model = "models/yolojoenshit/bo3perks/doubletap2/mc_mtl_p7_zm_vending_doubletap2.mdl",
+	name = "Vigor Rush",
+	name_skin = "Bang Bangs (Triple Damage)",
+	model = "models/nzr/vigor.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	off_skin = 1,
 	on_skin = 0,
-	price = 2000,
+	price = 2500,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_dtap2",
+	material = "models/perk_bottle/c_perk_bottle_vigor",
 	icon = Material("perk_icons/chron/dtap2.png", "smooth unlitgeneric"),
 	icon_skin = Material("perk_icons/chron/bangs2.png", "smooth unlitgeneric"),
-	color = Color(255, 255, 100),
+	color = Color(128, 128, 64),
 	func = function(self, ply, machine)
-		local tbl = {}
-		for k,v in pairs(ply:GetWeapons()) do
-			if v:IsFAS2() then
-				table.insert(tbl, v)
-			end
-		end
-		if tbl[1] != nil then
-			for k,v in pairs(tbl) do
-				v:ApplyNZModifier("dtap")
-			end
-		end
 	end,
 	lostfunc = function(self, ply)
-		if !ply:HasPerk("dtap") then
-			local tbl = {}
-			for k,v in pairs(ply:GetWeapons()) do
-				if v:IsFAS2() then
-					table.insert(tbl, v)
-				end
-			end
-			if tbl[1] != nil then
-				for k,v in pairs(tbl) do
-					v:RevertNZModifier("dtap")
-				end
-			end
-		end
+	end,
+})
+
+nzPerks:NewPerk("fire", {
+	name = "Napalm Nectar",
+	name_skin = "Firestarter Fizzy",
+	model = "models/nzr/firestarter/firestarter.mdl",
+	model_off = "models/nzr/firestarter/firestarter_off.mdl",
+	price = 2000,
+	price_skin = 2000,
+	material = "models/perk_bottle/c_perk_bottle_fire",
+	icon = Material("perk_icons/chron/fire.png", "smooth unlitgeneric"),
+	icon_skin = Material("perk_icons/chron/fire.png", "smooth unlitgeneric"),
+	color = Color(222, 69, 2),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
 	end,
 })
 

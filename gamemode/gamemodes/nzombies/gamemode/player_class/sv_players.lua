@@ -77,6 +77,7 @@ function GM:PlayerNoClip( ply, desiredState )
 	return nzPlayers.PlayerNoClip(ply, desiredState)
 end
 
+
 hook.Add( "PlayerInitialSpawn", "nzPlayerInitialSpawn", initialSpawn )
 hook.Add( "PlayerShouldTakeDamage", "nzFriendlyFire", friendlyFire )
 hook.Add( "EntityRemoved", "nzPlayerLeft", playerLeft )

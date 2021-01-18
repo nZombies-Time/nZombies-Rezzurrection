@@ -72,6 +72,100 @@ nzMapping:AddSaveModule("ZedSpecialSpawns", {
 	cleanents = {"nz_spawn_zombie_special"},
 })
 
+nzMapping:AddSaveModule("ZedBossSpawn", {
+	savefunc = function()
+		local zed_boss_spawns = {}
+		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_boss")) do
+			table.insert(zed_boss_spawns, {
+			pos = v:GetPos(),
+			link = v.link
+			})
+		end
+		return zed_boss_spawns
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:ZedBossSpawn(v.pos, v.link)
+		end
+	end,
+	cleanents = {"nz_spawn_zombie_boss"},
+})
+
+nzMapping:AddSaveModule("ZedExtraSpawn1", {
+	savefunc = function()
+		local zed_add_spawns1 = {}
+		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra1")) do
+			table.insert(zed_add_spawns1, {
+			pos = v:GetPos(),
+			link = v.link
+			})
+		end
+		return zed_add_spawns1
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:ZedExtraSpawn1(v.pos, v.link)
+		end
+	end,
+	cleanents = {"nz_spawn_zombie_extra1"},
+})
+
+nzMapping:AddSaveModule("ZedExtraSpawn2", {
+	savefunc = function()
+		local zed_add_spawns2 = {}
+		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra2")) do
+			table.insert(zed_add_spawns2, {
+			pos = v:GetPos(),
+			link = v.link
+			})
+		end
+		return zed_add_spawns2
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:ZedExtraSpawn2(v.pos, v.link)
+		end
+	end,
+	cleanents = {"nz_spawn_zombie_extra2"},
+})
+
+nzMapping:AddSaveModule("ZedExtraSpawn3", {
+	savefunc = function()
+		local zed_add_spawns3 = {}
+		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra3")) do
+			table.insert(zed_add_spawns3, {
+			pos = v:GetPos(),
+			link = v.link
+			})
+		end
+		return zed_add_spawns3
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:ZedExtraSpawn3(v.pos, v.link)
+		end
+	end,
+	cleanents = {"nz_spawn_zombie_extra3"},
+})
+
+nzMapping:AddSaveModule("ZedExtraSpawn4", {
+	savefunc = function()
+		local zed_add_spawns4 = {}
+		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra4")) do
+			table.insert(zed_add_spawns4, {
+			pos = v:GetPos(),
+			link = v.link
+			})
+		end
+		return zed_add_spawns4
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:ZedExtraSpawn4(v.pos, v.link)
+		end
+	end,
+	cleanents = {"nz_spawn_zombie_extra4"},
+})
 nzMapping:AddSaveModule("PlayerSpawns", {
 	savefunc = function()
 		local player_spawns = {}
@@ -236,17 +330,29 @@ nzMapping:AddSaveModule("BlockSpawns", {
 	savefunc = function()
 		local block_spawns = {}
 		for _, v in pairs(ents.FindByClass("wall_block")) do
+			-- Convert the table to a flag string - if it even has any
+			local data = v:GetDoorData()
+			local flagstr
+			if data then
+				flagstr = ""
+				for k2, v2 in pairs(data) do
+					flagstr = flagstr .. k2 .."=" .. v2 .. ","
+				end
+				flagstr = string.Trim(flagstr, ",")
+			end
+
 			table.insert(block_spawns, {
 			pos = v:GetPos(),
 			angle = v:GetAngles(),
 			model = v:GetModel(),
+			flags = flagstr,
 			})
 		end
 		return block_spawns
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:BlockSpawn(v.pos, v.angle, v.model)
+			nzMapping:BlockSpawn(v.pos, v.angle, v.model, v.flags)
 		end
 	end,
 	cleanents = {"wall_block"},

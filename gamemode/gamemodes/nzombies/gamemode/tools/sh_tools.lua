@@ -20,7 +20,7 @@ function nzTools:EnableProperties(id, label, icon, order, spacer, filterfunc, da
 		Action = function( self, ent )
 			local frame = vgui.Create("DFrame")
 			frame:SetPos( 100, 100 )
-			frame:SetSize( 300, 280 )
+			frame:SetSize( 480, 450 )
 			frame:SetTitle( label )
 			frame:SetVisible( true )
 			frame:SetDraggable( true )

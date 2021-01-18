@@ -151,6 +151,10 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:ScaleDamage(zombie:Health()/10) 
 			return end
 			
+			if attacker:IsPlayer() and attacker:HasPerk("fire") and (dmginfo:IsDamageType( 2097152 ) or dmginfo:IsDamageType(  8 )) then
+				dmginfo:ScaleDamage(2) 
+			return end
+			
 			if attacker:IsPlayer() and dmginfo:IsDamageType( 268435456 ) then
 				dmginfo:ScaleDamage(zombie:Health()) 
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
@@ -170,9 +174,13 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				zombie:Ignite((dmginfo:GetDamage()/10))
 			return end
 			
-			if attacker:IsPlayer()  and attacker:HasPerk("dtap2")  and dmginfo:GetDamageType() == DMG_BULLET then dmginfo:ScaleDamage(1.5) end -- dtap2 bullet damage buff
+			if attacker:IsPlayer()  then
+			if attacker:HasPerk("dtap2")  and dmginfo:GetDamageType() == DMG_BULLET then 
+			dmginfo:ScaleDamage(3)
+			end -- dtap2 bullet damage buff
+			end
 
-			if hitgroup == HITGROUP_HEAD and !dmginfo:IsDamageType( 128 ) and !dmginfo:IsDamageType( 4 ) then dmginfo:ScaleDamage(1.5) end
+			--if hitgroup == HITGROUP_HEAD and !dmginfo:IsDamageType( 128 ) and !dmginfo:IsDamageType( 4 ) then dmginfo:ScaleDamage(1.5) end Why do this again?
 
 			--  Pack-a-Punch doubles damage...hell no it doesnt
 

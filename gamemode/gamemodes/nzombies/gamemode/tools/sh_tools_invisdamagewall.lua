@@ -100,7 +100,7 @@ nzTools:CreateTool("damagewall", {
 		
 		local properties = vgui.Create("DProperties", pnl)
 		properties:SetPos(5, 50)
-		properties:SetSize(290, 100)
+		properties:SetSize(480, 450)
 		
 		local dmg = properties:CreateRow( "Damage Properties", "Damage" )
 		dmg:Setup( "Int", {min = 1, max = 250} )

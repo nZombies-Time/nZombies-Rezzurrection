@@ -8,6 +8,7 @@ local WeaponModificationFunctionsDefaults = {
 		
 		--print("Weapon reload modified")
 		
+		
 		wep.Reload = function( self, ... )
 			if self.ReloadFinish and self.ReloadFinish > CurTime() then return end
 			local ply = self.Owner

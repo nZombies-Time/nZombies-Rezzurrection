@@ -64,7 +64,7 @@ end
 
 function meta:IsBuyableProp()
 	if not IsValid(self) then return false end
-	return self:GetClass() == "prop_buys"
+	return self:GetClass() == "prop_buys" or self:GetClass() == "wall_block"
 end
 
 function meta:IsPropDoorType()

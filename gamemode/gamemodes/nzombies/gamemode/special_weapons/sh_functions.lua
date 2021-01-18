@@ -374,6 +374,69 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	if id and (ply:GetNotDowned() or id == "knife") and !ply:GetUsingSpecialWeapon() then
 		
 	end
+	
+	--Emergency Sake
+	if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_bowieknife") then
+	ply:StripWeapon( "nz_quickknife_crowbar" )
+								ply:Give("nz_yamato")
+	end
+	
+	--[[Recode Comment Wolfkann:"Same issue when playing sound effects with stasis, 
+	this should be more reliable, because DoAnimationEvent is Third person ONLY, 
+	this is why it broke in single player" --]]
+	
+	--Electric Cherry Bits
+	
+	local wep = ply:GetActiveWeapon()
+	if !IsValid(wep) then return end
+	
+	local ammocount = wep:GetPrimaryAmmoType()
+	
+	if wep:Clip1() >= wep:GetMaxClip1() then
+		ply.nzCherryReload = false
+	end
+	
+	local reloadId = ply:GetInfoNum("+reload", KEY_R)
+
+		if but == reloadId and ply.nzCherryReload == false then
+			
+			
+			if ply:HasPerk("cherry") then
+
+				if IsValid(wep) and wep:Clip1() < wep:GetMaxClip1() and ply:GetAmmoCount(ammocount) > 1 then
+					ply.nzCherryReload = true
+					local pct = 1 - (wep:Clip1()/wep:GetMaxClip1())
+					local pos, ang = ply:GetPos() + ply:GetAimVector()*10 + Vector(0,0,50), ply:GetAimVector()
+				
+					if SERVER then --Occasionally spits errors in single player console if I DONT do this
+					nzEffects:Tesla( {
+						pos = ply:GetPos() + Vector(0,0,50),
+						ent = ply,
+						turnOn = true,
+						dieTime = 1,
+						lifetimeMin = 0.05*pct,
+						lifetimeMax = 0.1*pct,
+						intervalMin = 0.01,
+						intervalMax = 0.02,
+					})
+					end	
+					--print(pct)
+					local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
+					local d = DamageInfo()
+					d:SetDamage( 300*pct )
+					d:SetDamageType( DMG_BULLET )
+					d:SetAttacker(ply)
+					d:SetInflictor(ply)
+					
+					for k,v in pairs(zombies) do
+						if nzConfig.ValidEnemies[v:GetClass()] then
+							v:TakeDamageInfo(d)
+						end
+					end
+				end
+			end
+		end
+		
 end)
 
 hook.Add("PlayerButtonUp", "nzSpecialWeaponsThrow", function(ply, but)

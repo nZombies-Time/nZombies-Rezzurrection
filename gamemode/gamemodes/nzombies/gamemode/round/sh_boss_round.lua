@@ -41,7 +41,7 @@ if SERVER then
 		local bosstype = id or self.BossType
 		if bosstype then
 			local data = nzRound:GetBossData(bosstype)
-			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" -- Check what spawnpoint type we're using
+			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" or "nz_spawn_zombie_boss"  -- Check what spawnpoint type we're using
 			local spawnpoints = {}
 			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
 				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then

@@ -101,47 +101,6 @@ if SERVER then
 	end
 	hook.Add("WeaponEquip", "nzModifyAimDownSights", ReplaceAimDownSight)
 	
-	hook.Add("DoAnimationEvent", "nzReloadCherry", function(ply, event, data)
-		--print(ply, event, data)
-
-		if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_bowieknife") then
-	ply:StripWeapon( "nz_quickknife_crowbar" )
-								ply:Give("nz_yamato")
-		end
-		if event == PLAYERANIMEVENT_RELOAD then
-			if ply:HasPerk("cherry") then
-				local wep = ply:GetActiveWeapon()
-				if IsValid(wep) and wep:Clip1() < wep:GetMaxClip1() then
-					local pct = 1 - (wep:Clip1()/wep:GetMaxClip1())
-					local pos, ang = ply:GetPos() + ply:GetAimVector()*10 + Vector(0,0,50), ply:GetAimVector()
-					nzEffects:Tesla( {
-						pos = ply:GetPos() + Vector(0,0,50),
-						ent = ply,
-						turnOn = true,
-						dieTime = 1,
-						lifetimeMin = 0.05*pct,
-						lifetimeMax = 0.1*pct,
-						intervalMin = 0.01,
-						intervalMax = 0.02,
-					})
-					--print(pct)
-					local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
-					local d = DamageInfo()
-					d:SetDamage( 300*pct )
-					d:SetDamageType( DMG_BULLET )
-					d:SetAttacker(ply)
-					d:SetInflictor(ply)
-					
-					for k,v in pairs(zombies) do
-						if nzConfig.ValidEnemies[v:GetClass()] then
-							v:TakeDamageInfo(d)
-						end
-					end
-				end
-			end
-		end
-	end)
-	
 	function GM:GetFallDamage( ply, speed )
 		local dmg = speed / 10
 		if ply:HasPerk("phd") and dmg >= 25 then

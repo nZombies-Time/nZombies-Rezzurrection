@@ -251,7 +251,15 @@ nzRound:AddZombieType("Zetsubou no Shima", "nz_zombie_walker_zetsubou", {
 }) 
 nzRound:AddZombieType("Origins", "nz_zombie_walker_origins", {
 }) 
+nzRound:AddZombieType("World War 1 Soldiers", "nz_zombie_walker_origins_soldier", {
+}) 
+nzRound:AddZombieType("Crusader Zombies", "nz_zombie_walker_origins_templar", {
+}) 
 nzRound:AddZombieType("Moon", "nz_zombie_walker_moon", {
+}) 
+nzRound:AddZombieType("Area 51 Guard", "nz_zombie_walker_moon_guard", {
+}) 
+nzRound:AddZombieType("Moon Tech", "nz_zombie_walker_moon_tech", {
 }) 
 nzRound:AddZombieType("Der Eisendrache", "nz_zombie_walker_eisendrache", {
 }) 
@@ -325,8 +333,23 @@ function nzRound:GetZombieType(id)
 	if id == "Origins" then
 	return "nz_zombie_walker_origins"
 	end
+	if id == "World War 1 Soldiers" then
+	return "nz_zombie_walker_origins_soldier"
+	end
+	if id == "Origins" then
+	return "nz_zombie_walker_origins"
+	end
+	if id == "Crusader Zombies" then
+	return "nz_zombie_walker_origins_templar"
+	end
 	if id == "Moon" then
 	return "nz_zombie_walker_moon"
+	end
+	if id == "Moon Tech" then
+	return "nz_zombie_walker_moon_guard"
+	end
+	if id == "Area 51 Guard" then
+	return "nz_zombie_walker_moon_guard"
 	end
 	if id == "Buried" then
 	return "nz_zombie_walker_buried"
@@ -522,3 +545,259 @@ nzRound:AddSpecialRoundType("Burning Zombies", {
 	normalDelay = 0.75,
 	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
 }) -- No special functions or anything really
+
+nzRound.AdditionalZombieData = nzRound.AdditionalZombieData or {}
+function nzRound:AddAdditionalZombieType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.AdditionalZombieData[id] = data
+		else
+			nzRound.AdditionalZombieData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.AdditionalZombieData[id] = class
+	end
+end
+
+nzRound:AddAdditionalZombieType("Nazi Zombies", "nz_zombie_walker", {
+}) 
+nzRound:AddAdditionalZombieType("Ascension Zombies", "nz_zombie_walker_ascension", {
+}) 
+nzRound:AddAdditionalZombieType("Siberian Zombies", "nz_zombie_walker_cotd", {
+}) 
+nzRound:AddAdditionalZombieType("Pentagon Zombies", "nz_zombie_walker_five", {
+}) 
+nzRound:AddAdditionalZombieType("Gorod Krovi Zombies", "nz_zombie_walker_gorodkrovi", {
+}) 
+nzRound:AddAdditionalZombieType("Mob of the Dead Zombies", "nz_zombie_walker_motd", {
+})
+nzRound:AddAdditionalZombieType("Shadows of Evil Zombies", "nz_zombie_walker_soemale", {
+}) 
+nzRound:AddAdditionalZombieType("Zetsubou no Shima Zombies", "nz_zombie_walker_zetsubou", {
+}) 
+nzRound:AddAdditionalZombieType("Origins Zombies", "nz_zombie_walker_origins", {
+}) 
+nzRound:AddAdditionalZombieType("World War 1 Soldiers", "nz_zombie_walker_origins_soldier", {
+}) 
+nzRound:AddAdditionalZombieType("Crusader Zombies", "nz_zombie_walker_origins_templar", {
+}) 
+nzRound:AddAdditionalZombieType("Moon Zombies", "nz_zombie_walker_moon", {
+}) 
+nzRound:AddAdditionalZombieType("Moon Tech Zombies", "nz_zombie_walker_moon_tech", {
+})
+nzRound:AddAdditionalZombieType("Area 51 Guard Zombies", "nz_zombie_walker_moon_guard", {
+})
+nzRound:AddAdditionalZombieType("Der Eisendrache Zombies", "nz_zombie_walker_eisendrache", {
+}) 
+nzRound:AddAdditionalZombieType("Western Zombies", "nz_zombie_walker_buried", {
+}) 
+nzRound:AddAdditionalZombieType("Vietnamese Zombies", "nz_zombie_walker_shangrila", {
+}) 
+nzRound:AddAdditionalZombieType("Shi no Numa Zombies", "nz_zombie_walker_sumpf", {
+}) 
+nzRound:AddAdditionalZombieType("Tranzit Zombies", "nz_zombie_walker_greenrun", {
+}) 
+nzRound:AddAdditionalZombieType("Nuketown Zombies", "nz_zombie_walker_nuketown", {
+}) 
+nzRound:AddAdditionalZombieType("Clowns", "nz_zombie_walker_clown", {
+}) 
+nzRound:AddAdditionalZombieType("Deathtroopers", "nz_zombie_walker_deathtrooper", {
+}) 
+nzRound:AddAdditionalZombieType("Skeletons", "nz_zombie_walker_skeleton", {
+}) 
+nzRound:AddAdditionalZombieType("Xenomorphs", "nz_zombie_walker_xeno", {
+}) 
+nzRound:AddAdditionalZombieType("Necromorphs", "nz_zombie_walker_necromorph", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie", "nz_zombie_special_burning", {
+}) 
+nzRound:AddAdditionalZombieType("Spiders", "nz_zombie_special_spooder", {
+}) 
+nzRound:AddAdditionalZombieType("The Pack (Dead Space)", "nz_zombie_special_pack", {
+}) 
+nzRound:AddAdditionalZombieType("Facehuggers", "nz_zombie_special_facehugger", {
+}) 
+nzRound:AddAdditionalZombieType("Raptors", "nz_zombie_special_raptor", {
+}) 
+nzRound:AddAdditionalZombieType("Lickers", "nz_zombie_special_licker", {
+}) 
+nzRound:AddAdditionalZombieType("Nova Crawlers", "nz_zombie_special_nova", {
+}) 
+nzRound:AddAdditionalZombieType("Keepers", "nz_zombie_special_keeper", {
+}) 
+nzRound:AddAdditionalZombieType("Hellhounds", "nz_zombie_special_dog", {
+}) 
+nzRound:AddAdditionalZombieType("Panzer", "nz_zombie_boss_panzer", {
+}) 
+nzRound:AddAdditionalZombieType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
+}) 
+nzRound:AddAdditionalZombieType("Brute (Dead Space)", "nz_zombie_boss_brute", {
+})
+nzRound:AddAdditionalZombieType("Brutus", "nz_zombie_boss_brutus", {
+}) 
+nzRound:AddAdditionalZombieType("Divider (Dead Space)", "nz_zombie_boss_Divider", {
+}) 
+nzRound:AddAdditionalZombieType("William Birkin", "nz_zombie_boss_G1", {
+}) 
+nzRound:AddAdditionalZombieType("The Mangler", "nz_zombie_boss_mangler", {
+})
+nzRound:AddAdditionalZombieType("The Margwa", "nz_zombie_boss_margwa", {
+})
+nzRound:AddAdditionalZombieType("Napalm Zombie", "nz_zombie_boss_napalm", {
+})
+nzRound:AddAdditionalZombieType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
+})
+nzRound:AddAdditionalZombieType("Nemesis", "nz_zombie_boss_nemesis", {
+})
+nzRound:AddAdditionalZombieType("Thrasher", "nz_zombie_boss_thrasher", {
+})    
+function nzRound:GetSpecialType(id)
+	if id == "Burning Zombie" then
+	return "nz_zombie_special_burning"
+	end
+		if id == "Spiders" then
+	return "nz_zombie_special_spooder"
+	end
+		if id == "The Pack (Dead Space)" then
+	return "nz_zombie_special_pack"
+	end
+		if id == "Facehuggers" then
+	return "nz_zombie_special_facehugger" 
+	end
+		if id == "Raptors" then
+	return "nz_zombie_special_raptor" 
+	end
+		if id == "Lickers" then
+	return "nz_zombie_special_licker"
+	end
+	if id == "Nova Crawlers" then
+	return "nz_zombie_special_nova"
+	end
+	if id == "Keepers" then
+	return "nz_zombie_special_keeper"
+	end
+	if id == "Hellhounds" then
+	return "nz_zombie_special_dog"
+	end
+	if id == "Panzer" then
+	return "nz_zombie_boss_panzer"
+	end
+	if id == "Dilophosaurus" then
+	return "nz_zombie_boss_dilophosaurus"
+	end
+	if id == "Brute (Dead Space)" then
+	return "nz_zombie_boss_brute"
+	end
+	if id == "Brutus" then
+	return "nz_zombie_boss_brutus"
+	end
+	if id == "Divider (Dead Space)" then
+	return "nz_zombie_boss_Divider"
+	end
+	if id == "William Birkin" then
+	return "nz_zombie_boss_G1"
+	end
+	if id == "The Mangler" then
+	return "nz_zombie_boss_mangler"
+	end
+	if id == "The Margwa" then
+	return "nz_zombie_boss_margwa"
+	end
+	if id == "Napalm Zombie" then
+	return "nz_zombie_boss_Napalm"
+	end
+	if id == "Nemesis" then
+	return "nz_zombie_boss_Nemesis"
+	end
+	if id == "George Romero" then
+	return "nz_zombie_boss_romero"
+	end
+	if id == "Shrieker Zombie" then
+	return "nz_zombie_boss_shrieker"
+	end
+	if id == "Thrasher" then
+	return "nz_zombie_boss_thrasher"
+	end
+	if id == "Skeletons" then
+	return "nz_zombie_walker_skeleton"
+	end
+		if id == "Deathtroopers" then
+	return "nz_zombie_walker_deathtrooper"
+	end
+		if id == "Clowns" then
+	return "nz_zombie_walker_clown"
+	end
+		if id == "Tranzit Zombies" then
+	return "nz_zombie_walker_greenrun" 
+	end
+		if id == "Mob of the Dead Zombies" then
+	return "nz_zombie_walker_motd" 
+	end
+		if id == "Nuketown Zombies" then
+	return "nz_zombie_walker_nuketown"
+	end
+	if id == "Ascension Zombies" then
+	return "nz_zombie_walker_ascension"
+	end
+	if id == "Siberian Zombies" then
+	return "nz_zombie_walker_cotd"
+	end
+	if id == "Pentagon Zombies" then
+	return "nz_zombie_walker_five"
+	end
+	if id == "Gorod Krovi Zombies" then
+	return "nz_zombie_walker_gorodkrovi"
+	end
+	if id == "Shadows of Evil Zombies" then
+	return "nz_zombie_walker_soemale"
+	end
+	if id == "Zetsubou no Shima Zombies" then
+	return "nz_zombie_walker_zetsubou"
+	end
+	if id == "Xenomorphs" then
+	return "nz_zombie_walker_xeno"
+	end
+	if id == "Necromorphs" then
+	return "nz_zombie_walker_necromorph"
+	end
+	if id == "Nazi Zombies" then
+	return "nz_zombie_walker"
+	end
+	if id == "Origins Zombies" then
+	return "nz_zombie_walker_origins"
+	end
+	if id == "World War 1 Zombies" then
+	return "nz_zombie_walker_origins_soldier"
+	end
+	if id == "Crusader Zombies" then
+	return "nz_zombie_walker_origins_templar"
+	end
+	if id == "Moon Zombies" then
+	return "nz_zombie_walker_moon"
+	end
+	if id == "Moon Tech Zombies" then
+	return "nz_zombie_walker_moon_tech"
+	end
+	if id == "Area 51 Guard Zombies" then
+	return "nz_zombie_walker_moon_guard"
+	end
+	if id == "Western Zombies" then
+	return "nz_zombie_walker_buried"
+	end
+	if id == "Der Eisendrache Zombies" then
+	return "nz_zombie_walker_eisendrache"
+	end
+	if id == "Vietnamese Zombies" then
+	return "nz_zombie_walker_shangrila"
+	end
+	if id == "Shi no Numa Zombies" then
+	return "nz_zombie_walker_sumpf"
+	end
+	if id == nil then
+	return "nz_zombie_special_dog"
+	end
+end

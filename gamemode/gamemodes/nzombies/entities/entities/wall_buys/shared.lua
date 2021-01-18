@@ -18,6 +18,7 @@ end
 local flipscale = Vector(1.5, 0.01, 1.5) 	-- Decides on which axis it flattens the outline
 local normalscale = Vector(0.01, 1.5, 1.5) 	-- based on the bool self:GetFlipped()
 
+
 CreateClientConVar("nz_outlinedetail", "4", true) -- Controls the outline creation
 
 chalkmaterial = Material("chalk.png", "VertexLitGeneric")
@@ -181,6 +182,7 @@ if SERVER then
 		-- Add a special check for FAS weps
 		local price = price or self:GetPrice()
 		local wep = weapons.Get(weapon)
+		self.wop = wep
 		local model
 		if !wep then
 			model = "models/weapons/w_crowbar.mdl"
@@ -194,6 +196,13 @@ if SERVER then
 		self.Price = price
 		self:SetWepClass(weapon)
 		self:SetPrice(price)
+		self.upgrade = wep.NZPaPReplacement
+		print(self.upgrade)
+		local wep2 =  weapons.Get( wep.NZPaPReplacement)
+		self.upgrade2 = wep2.NZPaPReplacement
+		self.savegun = 0
+		--print(upgrade)
+		--self.upgrade2  = nzWeps:GetReplacement(upgrade)
 	end
 	
 	function ENT:ToggleRotate()
@@ -222,8 +231,29 @@ if SERVER then
 		local give_ammo = nzWeps:CalculateMaxAmmo(self.WeaponGive) - curr_ammo
 		
 		--print(ammo_type, curr_ammo, give_ammo)
-
-		if !activator:HasWeapon( self.WeaponGive ) then
+	--	local ReplacementTable = {}
+	--	table.Empty(ReplacementTable )
+	  --   table.Add( ReplacementTable, nzWeps:GetAllReplacements(self.WeaponGive) )
+		 
+		 if activator:HasWeapon(self.upgrade) then
+		 self.saveGun = 1
+		 
+		 giveboolet = true
+		 end
+		 if activator:HasWeapon(self.upgrade2) then
+		 giveboolet = true
+	
+		 self.saveGun = 2
+		 end
+		--for i = 1,  table.Count(ReplacementTable ) do
+		--print(tostring(ReplacementTable[i]))
+		--if activator:HasWeapon( tostring(ReplacementTable[i])) then
+		--giveboolet = true
+		--local saveGun = ReplacementTable[i]
+		--end
+		--end
+		if !activator:HasWeapon( self.WeaponGive ) and !giveboolet then
+		
 			activator:Buy(price, self, function()
 				local wep = activator:Give(self.WeaponGive)
 				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
@@ -231,11 +261,33 @@ if SERVER then
 				return true
 			end)
 		elseif string.lower(ammo_type) != "none" and ammo_type != -1 then
-			local wep = activator:GetWeapon(self.WeaponGive)
-			if wep:HasNZModifier("pap") then
+				if giveboolet then
+				if self.saveGun == 1 then
+				--local wep = weapons.Get(weapon)
+				--local wep = activator:GetWeapon(self.upgrade)
+				self.wop = activator:GetWeapon(self.upgrade)
+				print("lv1")
+				end
+				if self.saveGun == 2 then
+				--local wep = activator:GetWeapon(self.upgrade2)
+				self.wop = activator:GetWeapon(self.upgrade2)
+				print("lv2")
+				end
+				else
+			self.wop = activator:GetWeapon(self.WeaponGive)
+			
+			end
+			print(self.WeaponGive)
+			print(self.upgrade)
+			print(self.upgrade2)
+			print(self.wop)
+			--local String = table.ToString( activator:GetWeapon(weapons.Get(self.WeaponGive).NZPaPReplacement), "fucking gmod", true )
+			--print(table.HasValue(activator:GetWeapons(), "apple"), table.HasValue(mytable, "test"))
+			--print( String )
+			if self.wop:HasNZModifier("pap") then
 				activator:Buy(ammo_price_pap, self, function()
 					if give_ammo != 0 then
-						wep:GiveMaxAmmo()
+						self.wop:GiveMaxAmmo()
 						return true
 					else
 						print("Max Clip!")
@@ -245,7 +297,7 @@ if SERVER then
 			else	-- Refill ammo
 				activator:Buy(ammo_price, self, function()
 					if give_ammo != 0 then
-						wep:GiveMaxAmmo()
+						self.wop:GiveMaxAmmo()
 						return true
 					else
 						print("Max Clip!")
@@ -254,6 +306,7 @@ if SERVER then
 				end)
 			end
 		end
+		giveboolet = false
 		return
 	end
 end

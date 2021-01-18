@@ -72,6 +72,7 @@ function nzRandomBox.DecideWep(ply)
 			if v.ClassName then
 				blacklist[v.ClassName] = true
 				if v.ClassName == "nz_touchedlast" then found = true end
+				
 			end
 		end
 		if !found and ply.nz_InSteamGroup then guns["nz_touchedlast"] = 20 end
@@ -114,7 +115,34 @@ function nzRandomBox.DecideWep(ply)
 	end
 
 	local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+	local wep = weapons.Get(gun)
+	local upgrade = wep.NZPaPReplacement
+	local wep2 = weapons.Get(upgrade)
+	local upgrade2 = wep2.NZPaPReplacement
+	print(gun)
+	local badRoll = false
+	if  ply:HasWeapon( gun ) or ply:HasWeapon(upgrade) or ply:HasWeapon(upgrade2) then
+	badRoll = true
+	end
+	while(badRoll) do
+	gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+	wep = weapons.Get(gun)
+	upgrade = wep.NZPaPReplacement
+	wep2 = weapons.Get(upgrade)
+	upgrade2 = wep2.NZPaPReplacement
+	if  !ply:HasWeapon( gun ) and  !ply:HasWeapon( upgrade )and !ply:HasWeapon( upgrade2 ) then
+	badRoll = false
+	end
+	end
+	if  ply:HasWeapon( gun ) or ply:HasWeapon(upgrade) or ply:HasWeapon(upgrade2) then
+	print("we did it")
+	gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
+	wep = weapons.Get(gun)
+	upgrade = wep.NZPaPReplacement
+	wep2 = weapons.Get(upgrade)
+	upgrade2 = wep2.NZPaPReplacement
+	else
 	gun = hook.Call("OnPlayerBuyBox", nil, ply, gun) or gun
-	
+	end
 	return gun
 end
