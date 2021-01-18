@@ -192,7 +192,7 @@ local function GetDoorText( ent )
 				text = "Press E to open for " .. price .. " points."
 			end
 		end
-		elseif ent:GetClass() != "wall_block" and door_data and tonumber(door_data.buyable) != 1 and nzRound:InState( ROUND_CREATE ) then
+		elseif door_data and tonumber(door_data.buyable) != 1 and nzRound:InState( ROUND_CREATE ) then
 		text = "This door is locked and cannot be bought in-game."
 		--PrintTable(door_data)
 	end
