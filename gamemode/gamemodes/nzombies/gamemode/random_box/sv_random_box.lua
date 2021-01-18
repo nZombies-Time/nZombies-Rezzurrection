@@ -116,9 +116,17 @@ function nzRandomBox.DecideWep(ply)
 
 	local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
 	local wep = weapons.Get(gun)
-	local upgrade = wep.NZPaPReplacement
-	local wep2 = weapons.Get(upgrade)
-	local upgrade2 = wep2.NZPaPReplacement
+	local upgrade = ""
+	local upgrade2 =  ""
+	if wep.NZPaPReplacement then
+		local upgrade  = wep.NZPaPReplacement
+		local wep2 =  weapons.Get( wep.NZPaPReplacement)
+		if  wep2.NZPaPReplacement then
+		local upgrade2 = wep2.NZPaPReplacement
+		else
+		end
+		else
+		end
 	print(gun)
 	local badRoll = false
 	if  ply:HasWeapon( gun ) or ply:HasWeapon(upgrade) or ply:HasWeapon(upgrade2) then

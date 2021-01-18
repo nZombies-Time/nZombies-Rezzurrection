@@ -5,9 +5,19 @@ local traceents = {
 		local wepclass = ent:GetWepClass()
 		local price = ent:GetPrice()
 		local wep = weapons.Get(wepclass)
-		local upgrade = wep.NZPaPReplacement
+		upgrade= ""
+		upgrade2=""
+		if wep.NZPaPReplacement then
+		upgrade = wep.NZPaPReplacement
 		local wep2 =  weapons.Get( wep.NZPaPReplacement)
-		local upgrade2 = wep2.NZPaPReplacement
+		if  wep2.NZPaPReplacement then
+		 upgrade2 = wep2.NZPaPReplacement
+		else
+		 upgrade2 = ""
+		end
+		else
+		 upgrade = ""
+		end
 		if !wep then return "INVALID WEAPON" end
 		local name = wep.PrintName
 		local ammo_price = math.Round((price - (price % 10))/2)

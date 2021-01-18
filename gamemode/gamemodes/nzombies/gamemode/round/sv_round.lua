@@ -207,6 +207,7 @@ function nzRound:Prepare( time )
 		-- after round 20 spawn some hellhounds aswell (half of the round number 21: 10, 22: 11, 23: 11, 24: 12 ...)
 		
 		if nzMapping.Settings.newwave1 then
+		if nzMapping.Settings.newwave1 > 0 then
 			if 0 > nzMapping.Settings.newwave1 and nzElec:IsOn() then
 			local amount1 = math.floor(self:GetNumber() * nzMapping.Settings.newratio1)
 			local specialSpawner = Spawner("nz_spawn_zombie_special", {[nzRound:GetSpecialType(nzMapping.Settings.newtype1)] = {chance = 100}}, amount1, 2)
@@ -232,10 +233,12 @@ function nzRound:Prepare( time )
 				self:SetZombiesMax(self:GetZombiesMax() + amount)
 			end
 		end
+		end
 		
 		
 		
-		
+		if nzMapping.Settings.newwave2 then
+		if nzMapping.Settings.newwave2 > 0 then
 		if self:GetNumber() > nzMapping.Settings.newwave2 then
 			local amount2 = math.floor(self:GetNumber() * nzMapping.Settings.newratio2)
 			local addSpawner2 = Spawner("nz_spawn_zombie_extra2", {[nzRound:GetSpecialType(nzMapping.Settings.newtype2)] = {chance = 100}}, amount2,0.25)
@@ -244,9 +247,12 @@ function nzRound:Prepare( time )
 			self:SetZombiesMax(self:GetZombiesMax() + amount2)
 			
 		end
+		end
+		end
 		
 		
-	
+	if nzMapping.Settings.newwave3 then
+	if nzMapping.Settings.newwave3 > 0 then
 		if self:GetNumber() > nzMapping.Settings.newwave3 then
 			local amount3 = math.floor(self:GetNumber() * nzMapping.Settings.newratio3)
 			local addSpawner3 = Spawner("nz_spawn_zombie_extra3", {[nzRound:GetSpecialType(nzMapping.Settings.newtype3)] = {chance = 100}}, amount3,0.25)
@@ -255,9 +261,11 @@ function nzRound:Prepare( time )
 			self:SetZombiesMax(self:GetZombiesMax() + amount3)
 			
 		end
+		end
+		end
 		
-		
-		
+		if nzMapping.Settings.newwave4 then
+		if nzMapping.Settings.newwave4 > 0 then
 		if self:GetNumber() > nzMapping.Settings.newwave4 then
 			local amount4 = math.floor(self:GetNumber() * nzMapping.Settings.newratio4)
 			local addSpawner4 = Spawner("nz_spawn_zombie_extra4", {[nzRound:GetSpecialType(nzMapping.Settings.newtype4)] = {chance = 100}}, amount4,0.25)
@@ -266,7 +274,8 @@ function nzRound:Prepare( time )
 			self:SetZombiesMax(self:GetZombiesMax() + amount4)
 			
 		end
-		
+		end
+		end
 		
 		
 		--if self:GetNumber() > 20 then

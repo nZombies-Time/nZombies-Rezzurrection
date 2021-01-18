@@ -196,10 +196,19 @@ if SERVER then
 		self.Price = price
 		self:SetWepClass(weapon)
 		self:SetPrice(price)
+		self.upgrade = ""
+		self.upgrade2 = ""
+		if wep.NZPaPReplacement then
 		self.upgrade = wep.NZPaPReplacement
-		print(self.upgrade)
 		local wep2 =  weapons.Get( wep.NZPaPReplacement)
+		if  wep2.NZPaPReplacement then
 		self.upgrade2 = wep2.NZPaPReplacement
+		else
+		self.upgrade2 = ""
+		end
+		else
+		self.upgrade = ""
+		end
 		self.savegun = 0
 		--print(upgrade)
 		--self.upgrade2  = nzWeps:GetReplacement(upgrade)
