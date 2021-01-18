@@ -992,14 +992,20 @@ nzTools:CreateTool("settings", {
 			local sndheight, sndwidth = sheet:GetSize()
 			sndPanel:SetSize(sndheight, (sndwidth - 50))
 			sheet:AddSheet("Custom Sounds", sndPanel, "icon16/sound_add.png", false, false, "Customize the sounds that play for certain events.")
-			
+
 			AddEyeStuff()
 			AddBoxStuff()
+
+			local wrapper = vgui.Create("DPanel", sndPanel)
+			wrapper:SetSize(500, 363)
+			wrapper:SetPos(0, 0)
 			
 			-- A modifiable list of all sounds bound to currently selected event:
-			local curSndList = vgui.Create("DListView", sndPanel)
+			local curSndList = vgui.Create("DListView", wrapper)
 			curSndList:Dock(RIGHT)
-			curSndList:SetSize(110, 200)
+			curSndList:SetSize(330, 200)
+			curSndList:SetMultiSelect(false)
+			curSndList:SetSortable(false)
 		
 			local curSndTbl = nil -- All sounds for currently selected Event Item
 			local function DeleteNewItem(text, line)
@@ -1060,27 +1066,42 @@ nzTools:CreateTool("settings", {
 			local selectedData = {}
 			if (ispanel(sndFilePanel)) then sndFilePanel:Remove() end
 			sndFilePanel = nil -- We want to keep this reference so only 1 file menu exists at a time
+			sndFileMenu = nil -- Keep this so we don't restructure and reset the file menu EVERY TIME
+
 			local function ChooseSound() -- Menu to make selecting mounted sounds effortless
 				local eventItem = theList:GetLine(theList:GetSelectedLine())
 				if (!list || !eventItem) then return end
 
 				sndFilePanel = vgui.Create("DFrame", frame)
 				sndFilePanel:SetSize(500, 475)
+				--sndFilePanel:Dock(FILL)
 				sndFilePanel:SetTitle(eventItem:GetColumnText(1) .. " Sound")
 				sndFilePanel:SetDeleteOnClose(true)
 				sndFilePanel.OnClose = function()
+					-- Pretend to close it so users can continue where they left off when adding another sound
+					sndFileMenu:SetParent(frame)
+					sndFileMenu:Hide()
+					
 					sndFilePanel = nil
 				end
 
-				fileMenu = vgui.Create("DFileBrowser", sndFilePanel)
-				fileMenu:Dock(FILL)	
-				fileMenu:SetPath("GAME")
-				fileMenu:SetFileTypes("*.wav *.mp3 *.ogg")
-				fileMenu:SetBaseFolder("sound")
-				fileMenu:SetOpen(true)
+				if (!ispanel(sndFileMenu)) then
+					fileMenu = vgui.Create("DFileBrowser", sndFilePanel)
+					fileMenu:Dock(FILL)	
+					fileMenu:SetPath("GAME")
+					fileMenu:SetFileTypes("*.wav *.mp3 *.ogg")
+					fileMenu:SetBaseFolder("sound")
+					fileMenu:SetOpen(true)
+					sndFileMenu = fileMenu
+				else
+					sndFileMenu:SetParent(sndFilePanel)
+					sndFileMenu:Show()
+				end
 
 				local soundsPlayed = {}
 				function fileMenu:OnRightClick(filePath, selectedPnl)
+					lastPath = fileMenu:GetCurrentFolder()
+
 					if (SERVER) then return end
 					filePath = string.Replace(filePath, "sound/", "")
 					local fileSubMenu = DermaMenu()
@@ -1113,7 +1134,7 @@ nzTools:CreateTool("settings", {
 				end
 			end
 
-			local catList = vgui.Create("DCategoryList", sndPanel)
+			local catList = vgui.Create("DCategoryList", wrapper)
 			catList:Dock(FILL)
 			catList:Center()
 
@@ -1133,6 +1154,10 @@ nzTools:CreateTool("settings", {
 			local mainSnds = vgui.Create("DListView", mainCat)
 			local powerUpSnds = vgui.Create("DListView", powerupCat)
 			local boxSnds = vgui.Create("DListView", boxCat)
+
+			mainSnds:SetSortable(false)
+			powerUpSnds:SetSortable(false)
+			boxSnds:SetSortable(false)
 
 			local function AddDList(listView)
 				listView:Dock(LEFT)
@@ -1187,7 +1212,7 @@ nzTools:CreateTool("settings", {
 			end
 			AddCollapseCB(mainCat)
 			AddCollapseCB(powerupCat)
-			AddCollapseCB(boxCat)		
+			AddCollapseCB(boxCat)	
 			------------------------------------------------------------------------
 			------------------------------------------------------------------------
 			local perklist = {}
