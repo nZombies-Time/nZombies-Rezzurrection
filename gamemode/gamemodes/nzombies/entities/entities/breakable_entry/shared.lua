@@ -17,7 +17,7 @@ function ENT:Initialize()
 	self:SetModel("models/props_c17/fence01b.mdl")
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
-	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	self:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	--self:SetHealth(0)
 	self:SetCustomCollisionCheck(true)
 	self.NextPlank = CurTime()
@@ -40,6 +40,7 @@ end
 function ENT:AddPlank(nosound)
 	if !self:GetHasPlanks() then return end
 	self:SpawnPlank()
+	self:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
 	if !nosound then
 		self:EmitSound("nz/effects/board_slam_0"..math.random(0,5)..".wav")
@@ -71,6 +72,9 @@ function ENT:RemovePlank()
 	
 	table.RemoveByValue(self.Planks, plank)
 	self:SetNumPlanks( self:GetNumPlanks() - 1 )
+	if self:GetNumPlanks() == 0 then
+	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	end
 end
 
 function ENT:ResetPlanks(nosoundoverride)
@@ -119,14 +123,14 @@ end
 hook.Add("ShouldCollide", "zCollisionHook", function(ent1, ent2)
 	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent2:GetClass()] and !ent1:GetTriggerJumps() and ent1:GetNumPlanks() < 1 then
 		if !ent1.CollisionResetTime then
-			ent1:SetSolid(SOLID_NONE)
+			--ent1:SetSolid(SOLID_NONE)
 		end
 		ent1.CollisionResetTime = CurTime() + 0.25
 	end
 	
 	if IsValid(ent2) and ent2:GetClass() == "breakable_entry" and nzConfig.ValidEnemies[ent1:GetClass()] and !ent2:GetTriggerJumps() and ent2:GetNumPlanks() < 1 then
 		if !ent2.CollisionResetTime then
-			ent2:SetSolid(SOLID_NONE)
+			--ent2:SetSolid(SOLID_NONE)
 		end
 		ent2.CollisionResetTime = CurTime() + 0.25
 	end
