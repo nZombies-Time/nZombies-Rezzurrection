@@ -84,7 +84,7 @@ nzTools:CreateTool("settings", {
 
 
 		local sheet = vgui.Create( "DPropertySheet", frame )
-		sheet:SetSize( 480, 450 )
+		sheet:SetSize( 480, 430 )
 		sheet:SetPos( 10, 10 )
 
 		local DProperties = vgui.Create( "DProperties", DProperySheet )
@@ -358,7 +358,7 @@ nzTools:CreateTool("settings", {
 			Row31.DataChanged = function( _, val ) valz["Row31"] = val end
 			Row31:SetTooltip("Sets what type of new enemy will appear on the fourth new enemy interval")
 			
-		local Row32 = DProperties:CreateRow( "Map Settings", "Extra Enemy 4 Ratio" )
+			local Row32 = DProperties:CreateRow( "Map Settings", "Extra Enemy 4 Ratio" )
 		Row32:Setup( "Integer" )
 		Row32:SetValue( valz["Row32"] )
 		Row32.DataChanged = function( _, val ) valz["Row32"] = val end

@@ -208,14 +208,7 @@ function nzRound:Prepare( time )
 		
 		if nzMapping.Settings.newwave1 then
 		if nzMapping.Settings.newwave1 > 0 then
-			if 0 > nzMapping.Settings.newwave1 and nzElec:IsOn() then
-			local amount1 = math.floor(self:GetNumber() * nzMapping.Settings.newratio1)
-			local specialSpawner = Spawner("nz_spawn_zombie_special", {[nzRound:GetSpecialType(nzMapping.Settings.newtype1)] = {chance = 100}}, amount1, 2)
-
-			self:SetSpecialSpawner(specialSpawner)
-			self:SetZombiesMax(self:GetZombiesMax() + amount1)
-		
-			else
+			
 			if self:GetNumber() > nzMapping.Settings.newwave1 and nzMapping.Settings.newwave1 > -1  then
 				local amount1 = math.floor(self:GetNumber() * nzMapping.Settings.newratio1)
 				local addSpawner1 = Spawner("nz_spawn_zombie_extra1", {[nzRound:GetSpecialType(nzMapping.Settings.newtype1)] = {chance = 100}}, amount1,0.25)
@@ -223,15 +216,24 @@ function nzRound:Prepare( time )
 				self:SetExtraSpawner1(addSpawner1)
 				self:SetZombiesMax(self:GetZombiesMax() + amount1)
 				end
-			end
 		else
-			if self:GetNumber() > 20 then
+		if 0 > nzMapping.Settings.newwave1 and nzElec:IsOn() then
+			local amount1 = math.floor(self:GetNumber() * nzMapping.Settings.newratio1)
+			local specialSpawner = Spawner("nz_spawn_zombie_special", {[nzRound:GetSpecialType(nzMapping.Settings.newtype1)] = {chance = 100}}, amount1, 2)
+
+			self:SetSpecialSpawner(specialSpawner)
+			self:SetZombiesMax(self:GetZombiesMax() + amount1)
+		
+
+			end
+			if self:GetNumber() > 20 and nzMapping.Settings.newwave1 == 0 then
 				local amount = math.floor(self:GetNumber() / 2)
 				local specialSpawner = Spawner("nz_spawn_zombie_special", {["nz_zombie_special_dog"] = {chance = 100}}, amount, 2)
 
 				self:SetSpecialSpawner(specialSpawner)
 				self:SetZombiesMax(self:GetZombiesMax() + amount)
-			end
+				
+		end
 		end
 		end
 		
