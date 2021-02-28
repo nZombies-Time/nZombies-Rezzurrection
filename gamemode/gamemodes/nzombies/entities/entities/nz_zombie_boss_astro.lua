@@ -1,27 +1,27 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Shrieker"
+ENT.PrintName = "Astronaut"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
+ENT.Models = { "models/roach/bo1_overhaul/astronaut.mdl" }
 
-ENT.AttackRange = 250
+ENT.AttackRange = 55
 ENT.DamageLow = 30
 ENT.DamageHigh = 32
 
 
 ENT.AttackSequences = {
-	{seq = "shriek1"}
+	{seq = "attack"}
 }
 
 ENT.DeathSequences = {
-	"death1"
+	"death1", "death2"
 }
 
 ENT.AttackSounds = {
-	"bo1_overhaul/son/scream.mp3",
+	"empty.wav"
 }
 
 ENT.PainSounds = {
@@ -41,27 +41,25 @@ ENT.AttackHitSounds = {
 
 
 ENT.WalkSounds = {
-	"bo1_overhaul/son/amb1.mp3",
-	"bo1_overhaul/son/amb2.mp3",
-	"bo1_overhaul/son/amb3.mp3"
+"empty.wav"
 }
 
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 600,
+		minspeed = 50,
 	},
 	[2] = {
 		act = ACT_WALK_ANGRY,
-		minspeed = 600,
+		minspeed = 90,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 1,
+		minspeed = 100,
 	},
 	[4] = {
 		act = ACT_RUN,
-		minspeed = 500
+		minspeed = 100
 	}
 }
 
@@ -133,10 +131,13 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(500)
-		self:SetHealth(350)
-		self:SetMaxHealth(10000)
-		screaming = false
+		self:SetRunSpeed(52)
+		self:SetHealth(10000)
+		self:SetMaxHealth(100000)
+		counting = true
+		grabbing = false
+		dying = false
+		teleporting = false
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -168,41 +169,27 @@ function ENT:InitDataTables()
 end
 
 function ENT:OnSpawn()
-	self:SetSkin(1)
-	self:SetBodygroup(3,1)
-	self:SetBodygroup(2,1)
-	
-	local seq = "drg_jump"
+	local seq = "land"
 	local tr = util.TraceLine({
 		start = self:GetPos() + Vector(0,0,500),
 		endpos = self:GetPos(),
 		filter = self,
 		mask = MASK_SOLID_BRUSHONLY,
 	})
-	if tr.Hit then seq = "drg_jump" end
+	if tr.Hit then seq = "land" end
 	local _, dur = self:LookupSequence(seq)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
 		
-		local pos = self:GetPos() + (seq == "drg_jump" and Vector(0,0,100) or Vector(0,0,450))
-		
-		local effectData = EffectData()
-		effectData:SetStart( pos )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude(1)
-		local entParticle = ents.Create("info_particle_system")
-		entParticle:SetKeyValue("start_active", "1")
-		entParticle:SetKeyValue("effect_name", "sonic_emerge")
-		entParticle:SetPos(self:GetPos())
-		entParticle:SetAngles(self:GetAngles())
-		entParticle:Spawn()
-		entParticle:Activate()
-		entParticle:Fire("kill","",2)
-		self:EmitSound("bo1_overhaul/dirtintro"..math.random(2)..".mp3")
-		
-		self:SetInvulnerable(true)
+		local pos = self:GetPos() + (seq == "land" and Vector(0,0,100) or Vector(0,0,450))
+		for i=1,2 do
+			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
+		end
+		self:EmitSound("bo1_overhaul/ast/headbutt.mp3",511)
+		counting = true
+	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
@@ -212,20 +199,21 @@ function ENT:OnSpawn()
 		
 		self:TimedEvent(dur, function()
 			--dust cloud
-			
+			self:SetPos(self:GetPos() + Vector(0,0,0))
 			self:SetInvulnerable(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:EmitSound("bo1_overhaul/son/spawn.mp3",511)
+			counting = false
+			
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -238,7 +226,7 @@ function ENT:OnZombieDeath(dmgInfo)
 
 	timer.Simple(dur - 0.5, function()
 		if IsValid(self) then
-			self:EmitSound("bo1_overhaul/son/explode.mp3")
+			self:EmitSound("bo1_overhaul/ast/pop.mp3")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -261,7 +249,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 5 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 600 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 5 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 600 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -286,8 +274,8 @@ atkData.dmglow = 1
     atkData.dmgforce = Vector( 0, 0, 0 )
 	atkData.dmgdelay = 1
 		self:Attack( atkData )
-		screaming = false
-		self.loco:SetDesiredSpeed(300)
+		grabbin = false
+		self.loco:SetDesiredSpeed(51)
 	
 end
 
@@ -313,25 +301,7 @@ if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
 		
-		local dlight = DynamicLight( self:EntIndex() )
-		if ( dlight ) then
-			local bone = self:LookupBone("j_spinelower")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos + ang:Right()*-8 + ang:Forward()*25
-			dlight.pos = pos
-			dlight.r = 255
-			dlight.g = 255
-			dlight.b = 255
-			dlight.brightness = 10
-			dlight.Decay = 1000
-			dlight.Size = 16
-			dlight.DieTime = CurTime() + 1
-			dlight.dir = ang:Right() + ang:Forward()
-			dlight.innerangle = 1
-			dlight.outerangle = 1
-			dlight.style = 0
-			dlight.noworld = true
-		end
+		
 
 	end
 end
@@ -352,33 +322,56 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
+if !self:IsAttacking() and !counting and !dying and !grabbing then
+counting = true
+timer.Simple(9,function()
+self:EmitSound("bo1_overhaul/ast/breathe_loop_hq.wav")
+counting = false
+end)
+			end
+			
  if self:IsAttacking() then
  	self.loco:SetDesiredSpeed(0)
-	if !screaming then
-
-	screaming = true
-		timer.Simple(0.6,function() 
-			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
-						if v:IsPlayer() then
-						local walk = v:GetWalkSpeed()
-						local run = v:GetRunSpeed()
-						v:SetDSP(34, false)
-							local d = DamageInfo()
-						d:SetDamage( 15 )
-						d:SetAttacker( self )
-						d:SetDamageType( DMG_SONIC ) 
-						v:TakeDamageInfo( d )
-							v:SetRunSpeed(25)
-							v:SetWalkSpeed(25)
-							timer.Simple(1.5,function()
-								v:SetRunSpeed(run)
-							v:SetWalkSpeed(walk)
-							end)
+	if !grabbing and !teleporting then
+	grabbing = true
+			local firstplayer = false
+			local stuckplayer 
+			for k,v in pairs(ents.FindInSphere(self:GetPos(),80)) do
+					if v:IsPlayer() then
+						if !firstPlayer then
+						stuckplayer = v
+						firstplayer = true
 						end
-	end
-		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,55)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
-			end)
+						
+					end
+					if stuckplayer then
+						
+						local walk = stuckplayer:GetWalkSpeed()
+						local run = stuckplayer:GetRunSpeed()
+							stuckplayer:SetRunSpeed(25)
+							stuckplayer:SetWalkSpeed(25)
+							timer.Simple(2,function()
+							if !teleporting then
+							stuckplayer:SetRunSpeed(run)
+							stuckplayer:SetWalkSpeed(walk)
+							teleporting = true
+							 if self:GetPos():Distance( stuckplayer:GetPos() )< 75 then
+							self:EmitSound("bo1_overhaul/ast/pop.mp3",511)
+							local d = DamageInfo()
+						d:SetDamage( stuckplayer:Health() - 35 )
+						d:SetAttacker( self )
+						d:SetDamageType( DMG_RADIATION ) 
+						stuckplayer:TakeDamageInfo( d )
+						end
+						end
+						end)
+						timer.Simple(3,function()
+								
+							grabbing = false
+							teleporting = false
+							end)
+							end
+			end
 	end
 	
  end

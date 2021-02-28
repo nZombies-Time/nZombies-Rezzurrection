@@ -20,7 +20,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 			end
 		end
 		if attacker:HasPerk("everclear") then
-		if math.random(7) == 1 then
+		if math.random(14) == 1 then
 			enemy:EmitSound("bo1_overhaul/nap/explode.mp3",511)
             local ent = ents.Create("env_explosion")
         ent:SetPos(enemy:GetPos())
@@ -58,7 +58,9 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
         ent:SetKeyValue("imagnitude", "100")
         ent:Fire("explode")
 			end
-		
+		if attacker:HasPerk("deadshot") and hitgroup == HITGROUP_HEAD then
+	
+		end
 	end
 
 	-- Run on-killed function to give points if the hook isn't blocking it
@@ -68,7 +70,32 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				if meleetypes[dmginfo:GetDamageType()] then
 					attacker:GivePoints(130)
 				elseif hitgroup == HITGROUP_HEAD then
+				enemy:EmitSound("nz/zombies/death/headshot_"..math.random(0,4)..".wav", 511)
 					attacker:GivePoints(100)
+					if attacker:HasPerk("deadshot") and math.random(6) == 1 then
+					enemy:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
+					enemy:EmitSound("divider/divider_merge_18.wav", 94, math.random(90,100))
+					enemy:EmitSound("divider/divider_merge_18.wav", 94, math.random(90,100))
+					ParticleEffect("divider_slash3",enemy:GetPos()+Vector(0,0,50), enemy:GetAngles(), nil )
+					local zombies = ents.FindInSphere(enemy:GetPos(), 200)
+					for k,v in pairs(zombies) do
+					if IsValid(v) and v:IsValidZombie() then
+					if v == enemy then
+					else
+					local d = DamageInfo()
+					d:SetDamage(500 )
+					d:SetAttacker( attacker )
+					d:SetDamageType(DMG_AIRBOAT) 
+					v:TakeDamageInfo( d )
+					end
+					local d = DamageInfo()
+					d:SetDamage(500 )
+					d:SetAttacker( attacker )
+					d:SetDamageType(DMG_PHYSGUN) 
+					--v:TakeDamageInfo( d )
+					end
+				end
+					end
 				else
 					attacker:GivePoints(50)
 				end

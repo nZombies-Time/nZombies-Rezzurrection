@@ -393,6 +393,105 @@ function nzMapping:PerkMachine(pos, ang, id, ply)
 		return perk
 	end
 end
+function nzMapping:LoadBench(pos,ang,reward,parts,craft)
+print("loadbench")
+		local bench = ents.Create("buildable_table")
+		bench:SetPos(pos)
+		bench:SetAngles(ang)
+		bench:Spawn()
+		bench:Activate()
+		bench:PhysicsInit( SOLID_VPHYSICS )
+		bench.Craftables = reward
+		bench.ValidItems = parts
+		
+end
+function nzMapping:Bench(postbl, angtbl, wepn, hudtext, modelreward, entbool, perkbool, code, itempos, entpos,id1,mat1a,mat1b,mat1c,id2,mat2a,mat2b,mat2c,id3,mat3a,mat3b,mat3c,angl,name,ply)
+		local bench = ents.Create("buildable_table")
+		bench:SetPos(postbl)
+		bench:SetAngles(angtbl)
+		bench:PhysicsInit( SOLID_VPHYSICS )
+		if entbool and code then
+		if perkbool then
+		local buildabletbl = {
+	model = modelreward,
+	pos = itempos,
+	ang = angl,
+	parts = {
+		[id1] = {mat1a},
+		[id2] = {mat2a},
+		[id3] = {mat3a},
+		-- You can have as many as you want
+	},
+	usefunc = function(self, ply) -- When it's completed and a player presses E (optional)
+	nzMapping:PerkMachine(entpos,Angle(0,0,0), code, ply)
+	end,
+	text = hudtext
+}
+
+		else
+		local buildabletbl = {
+	model = modelreward,
+	pos = itempos,
+	ang = angl,
+	parts = {
+		[id1] = {mat1a},
+		[id2] = {mat2a},
+		[id3] = {mat3a},
+	},
+	usefunc = function(self, ply) -- When it's completed and a player presses E (optional)
+		if code =="power" then
+		print("power switch")
+		end
+		if code == "teleporter" then
+		print("teleporter")
+		end
+	end,
+	text = hudtext
+}
+end
+		
+		else
+		local wep = weapons.Get(wepn)
+		local inputang = angl
+		local angTBL = string.Explode( ",", inputang )
+		local inputpos = itempos
+		local posTBL = string.Explode( ",", inputpos )
+		local buildabletbl = {
+		
+	model = wep.WorldModel,
+	pos = Vector(tonumber(posTBL[1]),tonumber(posTBL[2]),tonumber(posTBL[3])),
+	ang =Angle(tonumber(angTBL[1]),tonumber(angTBL[2]),tonumber(angTBL[3])),
+	parts = {
+		[id1] = {mat1a,mat1b,mat1c},
+		[id2] = {mat2a,mat2b,mat2c},
+		[id3] = {mat3a,mat3b,mat3c},
+		-- You can have as many as you want
+	},
+	usefunc = function(self, ply) -- When it's completed and a player presses E (optional)
+		if !ply:HasWeapon(wepn) then
+			ply:Give(wepn)
+		end
+	end, 
+	text = hudtext
+}
+bench:AddValidCraft(name, buildabletbl)
+end
+
+		
+		local phys = bench:GetPhysicsObject()
+		if phys:IsValid() then
+			phys:EnableMotion(false)
+		end
+		bench:Spawn()
+		if ply then
+			undo.Create( "Bench" )
+				undo.SetPlayer( ply )
+				undo.AddEntity( bench )
+			undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+		end
+		return bench
+	
+end
 
 function nzMapping:BreakEntry(pos, ang, planks, jump, ply)
 	local planks = planks
@@ -439,6 +538,32 @@ function nzMapping:SpawnEffect( pos, ang, model, ply )
 		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
 	end
 	return e
+
+end
+	
+function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype, ply )
+
+	local tele = ents.Create("nz_teleporter")
+	tele:SetPos(pos)
+	tele:SetAngles( ang )
+	tele:SetDestination(dest)
+	tele:SetID(id)
+	tele:SetPrice(price)
+	tele:SetModelType(modeltype)
+	tele:TurnOff()
+	tele:Spawn()
+	local phys = tele:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:EnableMotion(false)
+	end
+
+	if ply then
+		undo.Create( "Teleporter" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( tele )
+		undo.Finish( "Teleporter (" .. tostring( model ) .. ")" )
+	end
+	return tele
 
 end
 

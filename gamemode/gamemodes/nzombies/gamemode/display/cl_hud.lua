@@ -581,7 +581,6 @@ hook.Add("HUDPaint", "perksHUD", PerksHud )
 hook.Add("HUDPaint", "vultureVision", VultureVision )
 hook.Add("HUDPaint", "roundnumHUD", RoundHud )
 hook.Add("HUDPaint", "grenadeHUD", DrawGrenadeHud )
-
 hook.Add("OnRoundPreparation", "BeginRoundHUDChange", StartChangeRound)
 hook.Add("OnRoundStart", "EndRoundHUDChange", EndChangeRound)
 

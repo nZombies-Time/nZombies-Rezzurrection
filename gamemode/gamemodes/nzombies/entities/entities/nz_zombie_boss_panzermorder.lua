@@ -1,27 +1,43 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Shrieker"
+ENT.PrintName = "Panzermordar"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
+ENT.Models = { "models/roach/codz_megapack/ww2/panzermorder.mdl"}
 
-ENT.AttackRange = 250
-ENT.DamageLow = 30
-ENT.DamageHigh = 32
+ENT.AttackRange = 200
+ENT.DamageLow = 90
+ENT.DamageHigh = 95
 
 
 ENT.AttackSequences = {
-	{seq = "shriek1"}
+	{seq = "s2_zom_brt_walk_attack_ground_v1" , dmgtimes = {1.9}},
+	{seq = "s2_zom_brt_walk_attack_v1" , dmgtimes = {1.7} },
+	{seq = "s2_zom_brt_walk_attack_v2" , dmgtimes = {2.3}},
+	{seq = "s2_zom_brt_stand_atk_v1" , dmgtimes = {0.9}},
+	{seq = "s2_zom_brt_walk_attack_ground_v2" , dmgtimes = {1.5}}
 }
 
 ENT.DeathSequences = {
-	"death1"
+	"s2_zom_brt_stun_down_v1"
 }
 
+
 ENT.AttackSounds = {
-	"bo1_overhaul/son/scream.mp3",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_03.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_03.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_03.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_03.wav"
 }
 
 ENT.PainSounds = {
@@ -33,35 +49,35 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"roach/bo3/thrasher/bite_04.mp3",
+	"roach/bo3/thrasher/bite_01.mp3",
+	"roach/bo3/thrasher/bite_02.mp3",
+	"roach/bo3/thrasher/bite_03.mp3",
 }
 
-
 ENT.WalkSounds = {
-	"bo1_overhaul/son/amb1.mp3",
-	"bo1_overhaul/son/amb2.mp3",
-	"bo1_overhaul/son/amb3.mp3"
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_03.wav"
+	
 }
 
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 600,
+		minspeed = 1,
 	},
 	[2] = {
-		act = ACT_WALK_ANGRY,
-		minspeed = 600,
+		act = ACT_WALK,
+		minspeed = 130,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 1,
+		minspeed = 200,
 	},
 	[4] = {
 		act = ACT_RUN,
-		minspeed = 500
+		minspeed = 200
 	}
 }
 
@@ -85,11 +101,11 @@ function ENT:Initialize()
 	self:SetLastPostionSave( CurTime() )
 	self:SetStuckAt( self:GetPos() )
 	self:SetStuckCounter( 0 )
-	
+
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(2000) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -99,7 +115,7 @@ function ENT:Initialize()
 	self:SetRunSpeed( self.RunSpeed ) --fallback
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
 
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+	self:SetCollisionBounds(Vector(-90,-40, 0), Vector(90, 40, 250))
 
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
@@ -133,10 +149,16 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(500)
-		self:SetHealth(350)
-		self:SetMaxHealth(10000)
-		screaming = false
+		self.loco:SetDesiredSpeed(90)
+		self:SetRunSpeed(90)
+		self:SetHealth(200)
+		self:SetMaxHealth(100000)
+		counting = true
+		dying = false
+		fullHP = true
+		halfHP = false
+		lowHP = false
+		scaledHP = 100
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -168,41 +190,33 @@ function ENT:InitDataTables()
 end
 
 function ENT:OnSpawn()
-	self:SetSkin(1)
-	self:SetBodygroup(3,1)
-	self:SetBodygroup(2,1)
-	
-	local seq = "drg_jump"
+	local seq = "s2_zom_brt_roar"
 	local tr = util.TraceLine({
 		start = self:GetPos() + Vector(0,0,500),
 		endpos = self:GetPos(),
 		filter = self,
 		mask = MASK_SOLID_BRUSHONLY,
 	})
-	if tr.Hit then seq = "drg_jump" end
+	if tr.Hit then seq = "s2_zom_brt_roar" end
 	local _, dur = self:LookupSequence(seq)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
 		
-		local pos = self:GetPos() + (seq == "drg_jump" and Vector(0,0,100) or Vector(0,0,450))
+		local pos = self:GetPos() + (seq == "s2_zom_brt_roar" and Vector(0,0,100) or Vector(0,0,450))
 		
 		local effectData = EffectData()
 		effectData:SetStart( pos )
 		effectData:SetOrigin( pos )
 		effectData:SetMagnitude(1)
-		local entParticle = ents.Create("info_particle_system")
-		entParticle:SetKeyValue("start_active", "1")
-		entParticle:SetKeyValue("effect_name", "sonic_emerge")
-		entParticle:SetPos(self:GetPos())
-		entParticle:SetAngles(self:GetAngles())
-		entParticle:Spawn()
-		entParticle:Activate()
-		entParticle:Fire("kill","",2)
-		self:EmitSound("bo1_overhaul/dirtintro"..math.random(2)..".mp3")
-		
-		self:SetInvulnerable(true)
+		for i=1,8 do
+			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
+		end
+		self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_roar_0"..math.random(1,5)..".wav",511)
+		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+		self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(1,5)..".mp3",511)
+	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
@@ -210,22 +224,25 @@ function ENT:OnSpawn()
 		effectData:SetMagnitude( 0.75 )
 		util.Effect("lightning_strike", effectData)]]
 		
-		self:TimedEvent(dur, function()
+		self:TimedEvent(dur - 2.1, function()
 			--dust cloud
-			
+			self:SetNoDraw(false)
 			self:SetInvulnerable(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:EmitSound("bo1_overhaul/son/spawn.mp3",511)
 		end)
+		scaledHP = self:Health()
+		print(scaledHP)
+		counting = false
 		self:PlaySequenceAndWait(seq)
+		self.loco:SetDesiredSpeed(90)
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -236,11 +253,9 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:ResetSequence(seq)
 	self:SetCycle(0)
 
-	timer.Simple(dur - 0.5, function()
 		if IsValid(self) then
-			self:EmitSound("bo1_overhaul/son/explode.mp3")
+			self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".wav",511)
 		end
-	end)
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -248,6 +263,7 @@ function ENT:OnZombieDeath(dmgInfo)
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(2)
+			ParticleEffect("nbnz_gib_explosion",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		end
 	end)
 
@@ -261,7 +277,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 5 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 600 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 200 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -280,19 +296,91 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
-local atkData = {}
-atkData.dmglow = 1
-    atkData.dmghigh = 1
+    local atkData = {}
+    atkData.dmglow = 90
+    atkData.dmghigh = 95
     atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 1
-		self:Attack( atkData )
-		screaming = false
-		self.loco:SetDesiredSpeed(300)
+    self:Attack( atkData )
 	
 end
 
 function ENT:OnPathTimeOut()
+
+	local target = self:GetTarget()
+	if CurTime() < self.NextAction then return end
 	
+	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
+		-- Roar
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+		
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
+			 local atkData = {}
+					self.AttackSequences = {
+						{seq = "enrage"}
+										}
+			 
+				atkData.dmglow = 40
+				atkData.dmghigh = 60
+				atkData.dmgforce = Vector( 0, 0, 0 )
+				atkData.dmgdelay = 0.5
+				self:Attack( atkData )
+		
+				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
+					local id, dur = self:LookupSequence("enrage")
+			
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur, function()
+			self:SetAttackRange(140)
+			self.AttackSequences = {
+						{seq = "melee1"},
+						{seq = "melee2"}
+										}
+				self.loco:SetDesiredSpeed(350)
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextClawTime = CurTime() + math.random(3, 15)
+			end
+		end
+	elseif math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
+		-- Useless Removed flamethrower
+		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
+			self:Stop()
+			self:PlaySequenceAndWait("nz_flamethrower_aim")
+			self.loco:SetDesiredSpeed(0)
+			local ang = (target:GetPos() - self:GetPos()):Angle()
+			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+			
+			self:StartFlames()
+			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
+			local id, dur = self:LookupSequence(seq)
+			self:ResetSequence(id)
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur, function()
+				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+			self.NextAction = CurTime() + math.random(1, 5)
+			self.NextFlameTime = CurTime() + math.random(1, 10)
+		end
+	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -312,26 +400,6 @@ if CLIENT then
 	local clawred = Color( 255, 100, 100, 255 )
 	function ENT:Draw()
 		self:DrawModel()
-		
-		local dlight = DynamicLight( self:EntIndex() )
-		if ( dlight ) then
-			local bone = self:LookupBone("j_spinelower")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos + ang:Right()*-8 + ang:Forward()*25
-			dlight.pos = pos
-			dlight.r = 255
-			dlight.g = 255
-			dlight.b = 255
-			dlight.brightness = 10
-			dlight.Decay = 1000
-			dlight.Size = 16
-			dlight.DieTime = CurTime() + 1
-			dlight.dir = ang:Right() + ang:Forward()
-			dlight.innerangle = 1
-			dlight.outerangle = 1
-			dlight.style = 0
-			dlight.noworld = true
-		end
 
 	end
 end
@@ -351,37 +419,79 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnThink()
- if self:IsAttacking() then
- 	self.loco:SetDesiredSpeed(0)
-	if !screaming then
+function ENT:OnInjured(dmg)
+print(self:Health())
+if self:Health() < scaledHP/2 and self:Health()> scaledHP/5 then
+self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_roar_0"..math.random(1,5)..".wav")
+fullHP = false
+halfHP = true
+self.loco:SetDesiredSpeed(210)
+self:SetRunSpeed(210)
+self.AttackSequences = {
+	{seq = "s2_zom_brt_run_attack_v1" , dmgtimes = {0.75,1.2,1.5}}
+}
+self.AttackSounds  = {
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_03.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_04.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_05.wav"
+}
 
-	screaming = true
-		timer.Simple(0.6,function() 
-			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
-						if v:IsPlayer() then
-						local walk = v:GetWalkSpeed()
-						local run = v:GetRunSpeed()
-						v:SetDSP(34, false)
-							local d = DamageInfo()
-						d:SetDamage( 15 )
-						d:SetAttacker( self )
-						d:SetDamageType( DMG_SONIC ) 
-						v:TakeDamageInfo( d )
-							v:SetRunSpeed(25)
-							v:SetWalkSpeed(25)
-							timer.Simple(1.5,function()
-								v:SetRunSpeed(run)
-							v:SetWalkSpeed(walk)
-							end)
-						end
-	end
-		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,55)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
-			end)
-	end
-	
- end
+self.WalkSounds = {
+"codz_megapack/ww2/brute/vox/s2_zom_brt_run_01.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_run_02.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_run_03.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_run_04.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_run_05.wav"
+}
+				
+else if self:Health() < scaledHP/5 and !lowHP then
+lowHP = true
+halfHP = false
+fullHP = false
+self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".wav")
+self.loco:SetDesiredSpeed(95)
+self:SetRunSpeed(95)
+self:SetAttackRange(250)
+self.AttackSequences = {
+	{seq = "s2_zom_brt_stand_atk_lurch_v1" , dmgtimes = {1.2}}
+}
+
+self.WalkSounds = {
+"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_01.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_02.wav",
+"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_03.wav"
+}
+
+self.AttackSounds  = {
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_01.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_02.wav",
+	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_03.wav"
+}
+end
+end
+end
+
+function ENT:OnThink()
+if !counting and !self:IsAttacking() and !dying and self:Health() > 0 then
+counting = true
+--Walking MS
+if halfHP then
+timer.Simple(0.43,function()
+self:EmitSound("codz_megapack/ww2/brute/zmb_fs_run_brute_default2_0"..math.random(1,9)..".wav")
+util.ScreenShake(self:GetPos(),3,1000,0.5,2048)
+counting = false
+end)	
+else
+timer.Simple(0.91,function()
+self:EmitSound("codz_megapack/ww2/brute/zmb_fs_walk_brute_default2_0"..math.random(1,9)..".wav")
+util.ScreenShake(self:GetPos(),3,1000,0.5,2048)
+counting = false
+end)
+end
+
+end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

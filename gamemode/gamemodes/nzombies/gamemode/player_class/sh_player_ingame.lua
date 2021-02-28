@@ -84,6 +84,11 @@ function PLAYER:OnTakeDamage( dmginfo )
 			if dmginfo:IsDamageType( 64 ) and self.Player:HasPerk("phd")then
 		dmginfo:ScaleDamage( 0 )
 			end
+			if dmginfo:IsDamageType( 8388608 ) then
+		dmginfo:ScaleDamage( 0 )
+			end
+			
+			
 			
 			
 			if (dmginfo:IsDamageType( 8 ) or dmginfo:IsDamageType( 2097152 )) and self.Player:HasPerk("fire")then

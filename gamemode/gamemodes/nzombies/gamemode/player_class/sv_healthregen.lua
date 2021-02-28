@@ -18,4 +18,63 @@ hook.Add( "EntityTakeDamage", "PreventHealthRegen", function(ent, dmginfo)
 	if ent:IsPlayer() and ent:GetNotDowned() then
 		ent.lasthit = CurTime()
 	end
+	if  ent:IsPlayer() and dmginfo:IsDamageType( 8388608 ) then
+		dmginfo:ScaleDamage( 0 )
+			end
+	attacker = dmginfo:GetAttacker()
+	if ent:IsPlayer() and dmginfo:IsDamageType( 262144 ) and !attacker:IsPlayer() then
+			
+			if  ent:GetPerks()  then
+			perks = ent:GetPerks()
+			if not table.IsEmpty(perks) then
+			perkLost = perks[math.random(1, #perks)]
+		print("You will lose " .. perkLost .. ".")
+				ent:RemovePerk(perkLost, true)
+			else
+			print("Poor nigga detected")
+			end
+			end
+			dmginfo:SetDamage( ent:Health()- 25 )
+		 -- Taken from whoswho.
+        local pos = nil
+		local spawns = {}
+		local plypos = ent:GetPos()
+		local maxdist = 1500^2
+		local mindist = 500^2
+
+		local available = ents.FindByClass("nz_spawn_zombie_special")
+		if IsValid(available[1]) then
+			for k,v in pairs(available) do
+				local dist = plypos:DistToSqr(v:GetPos())
+				if v.link == nil or nzDoors:IsLinkOpened( v.link ) then -- Only for rooms that are opened (using links)
+					if dist < maxdist and dist > mindist then -- Within the range we set above
+						if v:IsSuitable() then -- And nothing is blocking it
+							table.insert(spawns, v)
+						end
+					end
+				end
+			end
+			if !IsValid(spawns[1]) then
+				for k,v in pairs(available) do -- Retry, but without the range check (just use all of them)
+					local dist = plypos:DistToSqr(v:GetPos())
+					if v.link == nil or nzDoors:IsLinkOpened( v.link ) then
+						if v:IsSuitable() then
+							table.insert(spawns, v)
+						end
+					end
+				end
+			end
+			if !IsValid(spawns[1]) then -- Still no open linked ones?! Spawn at a random player spawnpoint
+				local pspawns = ents.FindByClass("player_spawns")
+					pos = pspawns[math.random(#pspawns)]:GetPos()
+			else
+				pos = spawns[math.random(#spawns)]:GetPos()
+			end
+		else
+			-- There exists no special spawnpoints - Use regular player spawns
+			local pspawns = ents.FindByClass("player_spawns")
+				pos = pspawns[math.random(#pspawns)]:GetPos()
+		end
+	if pos then ent:SetPos(pos) end            
+			end
 end)

@@ -24,6 +24,10 @@ function nzElec:Activate(nochat)
 		v:TurnOn()
 	end
 	
+	for k,v in pairs(ents.FindByClass("nz_teleporter")) do
+		v:TurnOn()
+	end
+	
 	for k,v in pairs(ents.FindByClass("wunderfizz_machine")) do
 		v:TurnOff() -- Reset all Wunderfizz's
 	end
@@ -61,6 +65,10 @@ function nzElec:Reset(nochat)
 	
 	-- Turn off all perk machines
 	for k,v in pairs(ents.FindByClass("perk_machine")) do
+		v:TurnOff()
+	end
+	
+	for k,v in pairs(ents.FindByClass("nz_teleporter")) do
 		v:TurnOff()
 	end
 	

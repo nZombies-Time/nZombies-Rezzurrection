@@ -812,7 +812,7 @@ function ENT:ChaseTargetPath( options )
 	options = options or {}
 
 	local path = Path( "Follow" )
-	path:SetMinLookAheadDistance( options.lookahead or 300 )
+	path:SetMinLookAheadDistance( options.lookahead or 200 )
 	path:SetGoalTolerance( options.tolerance or 30 )
 
 	--[[local targetPos = options.target:GetPos()

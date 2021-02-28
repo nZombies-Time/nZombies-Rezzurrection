@@ -121,6 +121,23 @@ local traceents = {
 
 		return text
 	end,
+	["nz_teleporter"] = function(ent)
+		local text = ""
+		if !ent:IsOn() then
+			text = "No Power."
+		elseif ent:GetBeingUsed() then
+			text = "Currently in use."
+		elseif ent:GetCooldown() then
+			text = "Teleporter on cooldown!"
+		else
+				-- Its on
+						text = "Press E to Teleport for " .. ent:GetPrice() .. " points."
+				-- Check if they already own it
+			
+		end
+
+		return text
+	end,
 	["player_spawns"] = function() if nzRound:InState( ROUND_CREATE ) then return "Player Spawn" end end,
 	["nz_spawn_zombie_normal"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Spawn" end end,
 	["nz_spawn_zombie_special"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Special Spawn" end end,

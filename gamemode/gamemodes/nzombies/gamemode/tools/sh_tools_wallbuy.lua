@@ -90,6 +90,7 @@ nzTools:CreateTool("wallbuy", {
 	}
 })
 
+
 nzTools:EnableProperties("wallbuy", "Edit Wallbuy...", "icon16/cart_edit.png", 9004, true, function( self, ent, ply )
 	if ( !IsValid( ent ) or !IsValid(ply) ) then return false end
 	if ( ent:GetClass() != "wall_buys" ) then return false end

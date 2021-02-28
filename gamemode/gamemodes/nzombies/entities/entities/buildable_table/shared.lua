@@ -24,7 +24,8 @@ function ENT:Initialize()
 	self.Craftables = self.Craftables or {}
 	self.ValidItems = self.ValidItems or {}
 	self.Crafting = self.Crafting
-
+	--PrintTable(self.ValidItems)
+	--print(self.ValidItems)
 end
 
 function ENT:SetupDataTables()
@@ -64,6 +65,7 @@ function ENT:AddValidCraft(id, tbl)
 	if !self.Craftables then self.Craftables = {} end
 	if !self.ValidItems then self.ValidItems = {} end
 	if id then
+	PrintTable(tbl.parts)
 		if tbl and tbl.parts then
 			self.Craftables[id] = tbl
 			for k,v in pairs(tbl.parts) do

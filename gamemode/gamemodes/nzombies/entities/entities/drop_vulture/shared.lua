@@ -19,7 +19,7 @@ local vulturedrops = {
 		id = "points",
 		model = Model("models/props_junk/garbage_bag001a.mdl"),
 		effect = function(ply)
-			ply:GivePoints(math.random(5,20))
+			ply:GivePoints(math.random(50,150))
 			return true
 		end,
 		timer = 30,

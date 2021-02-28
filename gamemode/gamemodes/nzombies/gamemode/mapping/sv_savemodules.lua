@@ -212,6 +212,91 @@ nzMapping:AddSaveModule("WallBuys", {
 	end,
 })
 
+nzMapping:AddSaveModule("Teleporter", {
+	savefunc = function()
+		local teleporters = {}
+		for _, v in pairs(ents.FindByClass("nz_teleporter")) do
+			table.insert(teleporters, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			desti = v:GetDestination(),
+			id = v:GetID(),
+			price = v:GetPrice(),
+			mdltype = v:GetModelType()
+			})
+		end
+		return teleporters
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:Teleporter(v.pos,v.angle, v.desti, v.id, v.price, v.mdltype)
+		end
+	end,
+	cleanents = {"nz_teleporter"},
+	postrestorefunc = function(data) -- Post-map cleanup restoration (game reset)
+		for k,v in pairs(ents.FindByClass("nz_teleporter")) do
+			v:TurnOff()
+		end
+	end,
+})
+
+nzMapping:AddSaveModule("Benches", {
+	savefunc = function()
+		local buildable_table = {}
+		for _, v in pairs(ents.FindByClass("buildable_table")) do
+			table.insert(buildable_table, {
+			postbl = v:GetPos(),
+			angtbl = v:GetAngles(),
+			reward = v.Craftables,
+			parts = v.ValidItems
+			})
+		end
+		return buildable_table
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:LoadBench(v.postbl,v.angtbl,v.reward,v.parts)
+		end
+	end,
+	cleanents = {"buildable_table"},
+})
+		
+		
+nzMapping:AddSaveModule("Buildable_Parts", {
+	savefunc = function()
+		
+		local buildable_parts = {}
+		for _, v in pairs(ents.FindByClass("nz_script_prop")) do
+		local itm = v:GetNWString("NZItemCategory")
+		print(itm)
+		local itmdata = nzItemCarry.Items[itm]
+		PrintTable(itmdata)
+			table.insert(buildable_parts, {
+			model = v:GetModel(),
+			angle = v:GetAngles(),
+			pos = v:GetPos(),
+			id = itmdata.id,
+			text = itmdata.text,
+			icon = itmdata.icon,
+			shared = itmdata.shared,
+			drop = itmdata.dropondowned
+			})
+		end
+		return buildable_parts
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			print(v.id)
+			print(v.text)
+			print(v.icon)
+			--nzMapping:SpawnEntity(v.pos, v.angle, v.model)
+			nzDoors:AddBuildable( v.model, v.angle, v.pos, v.id, v.text, v.icon, v.shared, v.drop, 0)
+		end
+	end,
+	cleanents = {"nz_script_prop"},
+})
+
+
 nzMapping:AddSaveModule("BuyablePropSpawns", {
 	savefunc = function()
 		local buyableprop_spawns = {}
