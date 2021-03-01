@@ -28,10 +28,8 @@ hook.Add( "EntityTakeDamage", "PreventHealthRegen", function(ent, dmginfo)
 			perks = ent:GetPerks()
 			if not table.IsEmpty(perks) then
 			perkLost = perks[math.random(1, #perks)]
-		print("You will lose " .. perkLost .. ".")
 				ent:RemovePerk(perkLost, true)
 			else
-			print("Poor nigga detected")
 			end
 			end
 			dmginfo:SetDamage( ent:Health()- 25 )
