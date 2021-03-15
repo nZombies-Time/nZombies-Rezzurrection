@@ -43,9 +43,10 @@ function ENT:Use( activator, caller )
 				if activator:HasPerk("politan") then
 				weapon:ApplyNZModifier("rando")
 				end
-				if (activator:HasPerk("dtap")  then
+				if activator:HasPerk("dtap")  then
 					weapon:ApplyNZModifier("dtap")
 				end
+				
 				weapon:ApplyNZModifier("pap")
 				weapon:SetClip1(weapon.Primary.ClipSize)
 				if IsValid(self.wep) then
