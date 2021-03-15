@@ -537,21 +537,15 @@ end, function(wep)
 		wep.PrimaryAttackOld(wep, ...)
 		if wep:GetNextPrimaryFire() <= npfold then return end
 		
-		local dtap1,dtap2 = wep.Owner:HasPerk("dtap"), wep.Owner:HasPerk("dtap2")
-		if dtap1 or dtap2 then
+		local dtap1 = wep.Owner:HasPerk("dtap")
+		if dtap1  then
 			local delay = wep:GetNextPrimaryFire() - CurTime()
-			if dtap2 then
-				delay = delay * 0.8
-			end
 			if dtap1 then
 				delay = delay * 0.8
 			end
 			wep:SetNextPrimaryFire(CurTime() + delay)
 			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
 				delay = wep:GetStatusEnd() - CurTime()
-				if dtap2 then
-					delay = delay * 0.8
-				end
 				if dtap1 then
 					delay = delay * 0.8
 				end
@@ -565,21 +559,15 @@ end, function(wep)
 		wep.SecondaryAttackOld(wep, ...)
 		if wep:GetNextPrimaryFire() <= npfold then return end
 
-		local dtap1,dtap2 = wep.Owner:HasPerk("dtap"), wep.Owner:HasPerk("dtap2")
-		if dtap1 or dtap2 then
+		local dtap1 = wep.Owner:HasPerk("dtap")
+		if dtap1  then
 			local delay = wep:GetNextPrimaryFire() - CurTime()
-			if dtap2 then
-				delay = delay * 0.8
-			end
 			if dtap1 then
 				delay = delay * 0.8
 			end
 			wep:SetNextPrimaryFire(CurTime() + delay)
 			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
 				delay = wep:GetStatusEnd() - CurTime()
-				if dtap2 then
-					delay = delay * 0.8
-				end
 				if dtap1 then
 					delay = delay * 0.8
 				end

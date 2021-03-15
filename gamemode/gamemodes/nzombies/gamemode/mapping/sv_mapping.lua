@@ -185,11 +185,12 @@ function nzMapping:EasterEgg(pos, ang, model, ply)
 	return egg
 end
 
-function nzMapping:BuyableEnding(pos, ang, model, ply)
+function nzMapping:BuyableEnding(pos, ang, model,price, ply)
 	local ending = ents.Create( "buyable_ending" )
 	ending:SetModel( model )
 	ending:SetPos( pos )
 	ending:SetAngles( ang )
+	ending:SetPrice( price )
 	ending:Spawn()
 
 	local phys = ending:GetPhysicsObject()
@@ -198,7 +199,7 @@ function nzMapping:BuyableEnding(pos, ang, model, ply)
 	end
 
 	if ply then
-		undo.Create( "Easter Egg" )
+		undo.Create( "Ending" )
 			undo.SetPlayer( ply )
 			undo.AddEntity( ending )
 		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
@@ -541,7 +542,7 @@ function nzMapping:SpawnEffect( pos, ang, model, ply )
 
 end
 	
-function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype, ply )
+function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype,anim,cd,kino, kinodur, ply )
 
 	local tele = ents.Create("nz_teleporter")
 	tele:SetPos(pos)
@@ -550,6 +551,10 @@ function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype, ply )
 	tele:SetID(id)
 	tele:SetPrice(price)
 	tele:SetModelType(modeltype)
+	tele:SetGifType(anim)
+	tele:SetCooldownTime(cd)
+	tele:SetKino(kino)
+	tele:SetKinodelay(kinodur)
 	tele:TurnOff()
 	tele:Spawn()
 	local phys = tele:GetPhysicsObject()

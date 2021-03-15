@@ -16,6 +16,12 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 2, "Cooldown")
 	self:NetworkVar("Int", 0, "Price")
 	self:NetworkVar("Int", 3, "ModelType")
+	self:NetworkVar("Int", 4, "CooldownTime")
+	self:NetworkVar("Vector", 0, "DestPos")
+	self:NetworkVar("String", 0, "GifType")
+	self:NetworkVar("Bool", 3, "Kino")
+	self:NetworkVar("Int", 5, "Kinodelay")
+	self:NetworkVar("Bool", 4, "Giftoggle")
 end
 
 function ENT:Initialize()
@@ -30,6 +36,7 @@ function ENT:Initialize()
 	end
 end
 
+
 function ENT:TurnOn()
 
 	self:SetActive(true)
@@ -43,9 +50,8 @@ end
 
 
 function ENT:Update()
-
 self:SetModel("models/nz_der_riese_waw/zombie_teleporter_pad.mdl")
-
+self:SetModelType(1)
 		--if self:GetModelType() == 1 then
 		--if self:IsOn() then
 			--self:SetModel(FIVEON)
@@ -61,6 +67,7 @@ self:SetModel("models/nz_der_riese_waw/zombie_teleporter_pad.mdl")
 		--end	
 end
 
+
 function ENT:IsOn()
 	return self:GetActive()
 end
@@ -73,6 +80,12 @@ function ENT:Use(activator, caller)
 		local walk = activator:GetWalkSpeed()
 		local run = activator:GetRunSpeed()
 		if activator:GetPoints() > price and self:GetCooldown()==false  then
+		self:SetBeingUsed(true)
+		for k,v in pairs(ents.FindByClass("nz_teleporter")) do
+		if(v:GetID() == self:GetDestination()) then
+		self:SetDestPos(v:GetPos() +  Vector(0, 0, 21))
+		end
+		end
 		timer.Simple(1, function()
 		local effectData = EffectData()
 			effectData:SetOrigin( self:GetPos()+ Vector(0, 0, 100) )
@@ -82,28 +95,32 @@ function ENT:Use(activator, caller)
 			end)
 			-- If they have enough money
 			activator:TakePoints(price)
-			--playsound(zap and shit)
-			activator:GodEnable()
-			activator:SetRunSpeed(1)
-			activator:SetWalkSpeed(1)
-			self:SetModelType(0)
+			
+			for k, v in pairs ( ents.FindInSphere( self:GetPos(), 200 ) ) do 
+			if v:IsValid() and v:IsPlayer() then
+			v:GodEnable()
+			v:SetRunSpeed(1)
+			v:SetWalkSpeed(1)
+			timer.Simple(2.5,function()
+			self:SetGiftoggle(true)
+			v:EmitSound( "teleport.mp3" )
+			end)
 			timer.Simple(2.5,function()
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() + Vector(0, 0, 1000) )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude( 1 )
 			util.Effect("lightning_strike", effectData)
-				self:SetBeingUsed(true)
-				
+			
 					end)
 					timer.Simple(5, function()
-					self:SetModelType(1)
-					activator:GodDisable()
+					self:SetGiftoggle(false)
+					v:SetPos(self:GetDestPos() )
+					v:SetRunSpeed(run)
+					v:SetWalkSpeed(walk)
+					v:GodDisable()
 					for k,v in pairs(ents.FindByClass("nz_teleporter")) do
 								if(v:GetID() == self:GetDestination()) then
-								activator:SetPos(v:GetPos() +  Vector(0, 0, 21) )
-									activator:SetRunSpeed(run)
-									activator:SetWalkSpeed(walk)
 									local effectData = EffectData()
 									effectData:SetStart( v:GetPos() + Vector(0, 0, 1000) )
 									effectData:SetOrigin( v:GetPos() )
@@ -111,49 +128,81 @@ function ENT:Use(activator, caller)
 									util.Effect("lightning_strike", effectData)
 								self:SetCooldown(true)
 								v:SetCooldown(true)
+								if(self:GetKino() == false) then
 								self:SetBeingUsed(false)
-								timer.Simple(32,function()
+								end
+								timer.Simple((self:GetCooldownTime()+self:GetKinodelay()),function()
 								self:SetCooldown(false)
 								v:SetCooldown(false)
-								
 								end)
 					end
 					end
 					end)
+					if(self:GetKino() == true) then
+					timer.Simple(self:GetKinodelay()-1, function()
+					local effectData = EffectData()
+					effectData:SetOrigin( self:GetPos()+ Vector(0, 0, 100) )
+					effectData:SetMagnitude( 2 )
+					effectData:SetEntity(nil)
+					util.Effect("lightning_prespawn", effectData)
+					local effectData = EffectData()
+					effectData:SetOrigin( v:GetPos()+ Vector(0, 0, 100) )
+					effectData:SetMagnitude( 2 )
+					effectData:SetEntity(nil)
+					util.Effect("lightning_prespawn", effectData)
+					end)
+					timer.Simple(self:GetKinodelay(), function()
+					self:SetGiftoggle(true)
+					v:GodEnable()
+					v:SetRunSpeed(1)
+					v:SetWalkSpeed(1)
+					v:EmitSound( "teleport.mp3" )
+					
+					end)
+					timer.Simple(self:GetKinodelay() + 3,function()
+					local effectData = EffectData()
+					effectData:SetStart( v:GetPos() + Vector(0, 0, 1000) )
+					effectData:SetOrigin( v:GetPos() )
+					effectData:SetMagnitude( 1 )
+					util.Effect("lightning_strike", effectData)
+					v:SetPos(self:GetPos()+  Vector(0, 0, 21) )
+					v:SetRunSpeed(run)
+					v:SetWalkSpeed(walk)
+					self:SetGiftoggle(false)
+					v:GodDisable()
+					self:SetBeingUsed(false)
+					end)
+					end
 					
 			--take points, start revving up, wait 3 seconds, check player distance, if within circle,lock, play gif on screen, setpos to destination id,put teleporter on cooldown for 30 seconds
 			else
 			--It smells like poor in here
 			
 			end
+		end
 			
 	
 		end
 	end
+end
 
 if CLIENT then
-	
-	
+			
+			
 	function ENT:Draw()
-	
-			if self:IsValid() then
-			hook.Add( "DrawOverlay", "TeleporterImage", function()
-			local teleportermat = Material( "codtele" )
-			if self:IsValid() and self:GetBeingUsed() then
-			if self:GetModelType()< 1 then
-			--local teleportermat = Material( "teleportHD2.png", "unlitgeneric smooth" )
-			--if self:GetModelType()< 1 then
-			--surface.SetMaterial(teleportermat)
-			--surface.SetDrawColor(255,255,255,255)
-			--surface.DrawTexturedRectRotated(ScrW()/2+50, ScrH()/2+50, ScrW()*2, ScrH()*2, CurTime()*720)
-			surface.SetMaterial(teleportermat)
-			surface.SetDrawColor(255,255,255,255)
-			surface.DrawTexturedRect( -10, -10, ScrW()+50, ScrH()+50 )
-			surface.PlaySound("teleport.mp3" )
+		self:DrawModel()
+		hook.Add( "DrawOverlay", "TeleporterImage", function()
+			if self:IsValid()  then
+			if self:GetGiftoggle() == true then
+			if LocalPlayer():GetRunSpeed() < 5 then
+			if (self:GetGifType() =="Der Riese") then
+			DrawMaterialOverlay("codtele", 0.03)
+			else
+			DrawMaterialOverlay("soe", 0.03)
+			end
+			end
 			end
 			end
 			end)
-		end
-		self:DrawModel()
 	end
 end

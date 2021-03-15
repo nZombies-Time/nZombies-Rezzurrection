@@ -5,9 +5,7 @@ nzTools:CreateTool("buildable", {
 		return true
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
-		PrintTable(data)
 		local tblX = string.Explode( ",", data.flags )
-		PrintTable(tblX)
 		local ent = tr.Entity
 		if !IsValid(ent) then return end
 		if ent:IsDoor() or ent:IsBuyableProp() or ent:IsButton() then

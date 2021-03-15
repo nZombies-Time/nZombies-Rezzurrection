@@ -22,7 +22,7 @@ hook.Add( "EntityTakeDamage", "PreventHealthRegen", function(ent, dmginfo)
 		dmginfo:ScaleDamage( 0 )
 			end
 	attacker = dmginfo:GetAttacker()
-	if ent:IsPlayer() and dmginfo:IsDamageType( 262144 ) and !attacker:IsPlayer() then
+	if ent:IsPlayer() and dmginfo:IsDamageType( 16 ) and !attacker:IsPlayer() then
 			
 			if  ent:GetPerks()  then
 			perks = ent:GetPerks()

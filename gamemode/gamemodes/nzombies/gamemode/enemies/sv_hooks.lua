@@ -64,7 +64,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 	end
 
 	-- Run on-killed function to give points if the hook isn't blocking it
-	if !hook.Call("OnZombieKilled", nil, enemy, attacker, dmginfo, hitgroup) then
+	--if !hook.Call("OnZombieKilled", nil, enemy, attacker, dmginfo, hitgroup) then
 		if enemy:IsValidZombie() then
 			if attacker:IsPlayer() and attacker:GetNotDowned() then
 				if meleetypes[dmginfo:GetDamageType()] then
@@ -101,7 +101,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				end
 			end
 		end
-	end
+	--end
 
 	if nzRound:InProgress() then
 		nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 )
@@ -203,7 +203,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			
 			if attacker:IsPlayer()  then
 			if attacker:HasPerk("dtap2")  and dmginfo:GetDamageType() == DMG_BULLET then 
-			dmginfo:ScaleDamage(3)
+			dmginfo:ScaleDamage(2.5)
 			end -- dtap2 bullet damage buff
 			end
 

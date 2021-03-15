@@ -205,22 +205,6 @@ nzRound:AddBossType("Cosmonaut(Round 7-8)", "nz_zombie_boss_astro", {
 	end,
 }) -- No onhit function, we don't give points on hit for this guy
 
-nzRound:AddBossType("Cosmonaut(Round 1)", "nz_zombie_boss_astro", {
-	specialspawn = true,
-	initfunc = function()
-		nzRound:SetNextBossRound(1) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(panzer)
-		panzer:SetHealth(nzRound:GetNumber() * 2000 + 18000)
-	end,
-	deathfunc = function(panzer, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(4,6)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
 nzRound:AddBossType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
 	specialspawn = true,
 	initfunc = function()
@@ -385,6 +369,22 @@ nzRound:AddBossType("George Romero (Round 1)", "nz_zombie_boss_romero", {
 	specialspawn = true,
 	initfunc = function()
 		nzRound:SetNextBossRound(1) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(panzer)
+		panzer:SetHealth(15625* #player.GetAllPlaying())
+	end,
+	deathfunc = function(panzer, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,8)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Cosmonaut (Round 2)", "nz_zombie_boss_astro", {
+	specialspawn = true,
+	initfunc = function()
+		nzRound:SetNextBossRound(2) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(panzer)
 		panzer:SetHealth(15625* #player.GetAllPlaying())

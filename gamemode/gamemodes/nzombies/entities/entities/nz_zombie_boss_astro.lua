@@ -214,6 +214,7 @@ end
 
 function ENT:OnZombieDeath(dmgInfo)
 	dying = true
+	self:StopSound("bo1_overhaul/ast/breathe_loop_hq.wav" )
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -232,10 +233,6 @@ function ENT:OnZombieDeath(dmgInfo)
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
-			local effectData = EffectData()
-			effectData:SetStart( self:GetPos() )
-			effectData:SetOrigin( self:GetPos() )
-			effectData:SetMagnitude(2)
 		end
 	end)
 
@@ -360,7 +357,7 @@ end)
 							local d = DamageInfo()
 						d:SetDamage( stuckplayer:Health() - 35 )
 						d:SetAttacker( self )
-						d:SetDamageType( DMG_RADIATION ) 
+						d:SetDamageType( DMG_VEHICLE ) 
 						stuckplayer:TakeDamageInfo( d )
 						end
 						end

@@ -138,6 +138,11 @@ local traceents = {
 
 		return text
 	end,
+	["buyable_ending"] = function(ent)
+		local text = ""
+		text = "Press E to end the game for " .. ent:GetPrice() .. " points."
+		return text
+	end,
 	["player_spawns"] = function() if nzRound:InState( ROUND_CREATE ) then return "Player Spawn" end end,
 	["nz_spawn_zombie_normal"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Spawn" end end,
 	["nz_spawn_zombie_special"] = function() if nzRound:InState( ROUND_CREATE ) then return "Zombie Special Spawn" end end,

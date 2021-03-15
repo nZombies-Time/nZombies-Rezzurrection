@@ -1,0 +1,19 @@
+"UnlitGeneric"
+{
+	"$basetexture" "coldwartp"
+
+	// light in the dark 
+  	$selfillum 1
+    	$selfillummask "coldwartp"
+
+                     "Proxies"
+             		  {
+   	   	"AnimatedTexture"
+    		  {
+     		    "animatedtexturevar" "$basetexture"
+      		    "animatedtextureframenumvar" "$frame"
+         		    "animatedtextureframerate" "12"
+     		  }
+  	 }
+	
+}

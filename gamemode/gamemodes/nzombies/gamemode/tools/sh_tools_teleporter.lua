@@ -7,10 +7,10 @@ nzTools:CreateTool("teleporter", {
 	PrimaryAttack = function(wep, ply, tr, data)
 		local ent = tr.Entity
 		if IsValid(ent) and ent:GetClass() == "nz_teleporter" then
-			nzMapping:Teleporter(ent:GetPos(), ent:GetAngles(), data.destination, data.id,data.price,data.mdl, ply)
+			nzMapping:Teleporter(ent:GetPos(), ent:GetAngles(), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
 			ent:Remove()
 		else
-			nzMapping:Teleporter(tr.HitPos, Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.destination, data.id,data.price,data.mdl, ply)
+			nzMapping:Teleporter(tr.HitPos, Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
 		end
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
@@ -41,6 +41,11 @@ nzTools:CreateTool("teleporter", {
 		valz["Row2"] = data.id
 		valz["Row3"] = data.price
 		valz["Row4"] = data.mdl
+		valz["Row5"] = data.gif
+		valz["Row6"] = data.cooldown
+		valz["Row7"] = data.kino
+		valz["Row8"] = data.kinodelay
+		
 
 		local DProperties = vgui.Create( "DProperties", frame )
 		DProperties:SetSize( 480, 450 )
@@ -51,6 +56,10 @@ nzTools:CreateTool("teleporter", {
 			data.id = valz["Row2"]
 			data.price = valz["Row3"]
 			data.mdl = valz["Row4"]
+			data.gif = valz["Row5"]
+			data.cooldown = valz["Row6"]
+			data.kino = valz["Row7"]
+			data.kinodelay = valz["Row8"]
 
 			--PrintTable(data)
 			
@@ -77,6 +86,22 @@ nzTools:CreateTool("teleporter", {
 		Row4:Setup( "Integer" )
 		Row4:SetValue( valz["Row4"] )
 		Row4.DataChanged = function( _, val ) valz["Row4"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		local Row5 = DProperties:CreateRow( "Teleporter", "Teleporting Animation" )
+		Row5:Setup( "String" )
+		Row5:SetValue( valz["Row5"] )
+		Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		local Row6 = DProperties:CreateRow( "Teleporter", "Cooldown" )
+		Row6:Setup( "Integer" )
+		Row6:SetValue( valz["Row6"] )
+		Row6.DataChanged = function( _, val ) valz["Row6"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		local Row7 = DProperties:CreateRow( "Teleporter", "Kino Type?" )
+		Row7:Setup( "Boolean" )
+		Row7:SetValue( valz["Row7"] )
+		Row7.DataChanged = function( _, val ) valz["Row7"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		local Row8 = DProperties:CreateRow( "Teleporter", "Kino Delay" )
+		Row8:Setup( "Integer" )
+		Row8:SetValue( valz["Row8"] )
+		Row8.DataChanged = function( _, val ) valz["Row8"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
 		return DProperties
 	end,
@@ -84,6 +109,10 @@ nzTools:CreateTool("teleporter", {
 		destination = 1,
 		id = 0,
 		price = 1500,
-		mdl = 0
+		mdl = 0,
+		gif ="Der Riese",
+		cooldown = 30,
+		kino = false,
+		kinodelay = 0
 	}
 })

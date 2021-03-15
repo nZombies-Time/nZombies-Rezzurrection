@@ -21,6 +21,7 @@ hook.Add("TFAVOX_InitializePlayer","TFAVOX_nZombiesIP",function(ply)
 				ply.TFAVOX_Sounds['nzombies'].boss = mdtbl.nzombies.boss -- Not implemented yet
 				ply.TFAVOX_Sounds['nzombies'].powerup = mdtbl.nzombies.powerup
 				ply.TFAVOX_Sounds['nzombies'].facility = mdtbl.nzombies.facility
+				ply.TFAVOX_Sounds.murder = mdtbl.murder
 			end
 
 		end
@@ -286,6 +287,47 @@ hook.Add( "OnPlayerBuyPackAPunch", "TFAVOX_nZombies_Packapunch", function(ply, g
 			if sndtbl and sndtbl['packapunch'] then
 				TFAVOX_PlayVoicePriority( ply, sndtbl['packapunch'], 0 )
 			end
+		end
+	end
+end)
+
+hook.Add("OnZombieKilled", "TFAVOX_nZombies_Kill", function(zombie, dmgi)
+	local ply = dmgi:GetAttacker()
+	if ply:IsPlayer() then
+	if IsValid(ply) and TFAVOX_IsValid(ply) then
+		if ply.TFAVOX_Sounds then
+			local sndtbl = ply.TFAVOX_Sounds.murder
+			if !sndtbl then return end
+
+			if dmgi then		
+				if math.random(1, 4) == 3 then
+					TFAVOX_PlayVoicePriority(ply, sndtbl['zombie'], 100, 10)
+				end
+			end
+		end
+	end
+	end
+end)
+
+-- Surrounded sounds added by Ethorbit and requested by DoorMatt
+local nextsearch = 0
+hook.Add("PlayerTick", "NZSurroundedSounds", function(ply)
+	if CurTime() > nextsearch then
+		nextsearch = CurTime() + 3
+		local zombiecount = 0
+		for k,v in pairs(ents.FindInBox(ply:GetPos() - Vector(195, 195, 195), ply:GetPos() + Vector(195, 195, 195))) do
+			if v.Type == "nextbot" then
+				zombiecount = zombiecount + 1
+			end
+		end
+
+		if (zombiecount >= 12) then -- Crowd close to player
+			if (!ply.TFAVOX_Sounds) then return end
+			sndtbl = ply.TFAVOX_Sounds.callouts
+			if !sndtbl then return end
+			TFAVOX_PlayVoicePriority(ply, sndtbl['surrounded'], 100)
+			--ply.TFAVOX_ImportantSnd = CurTime() + 5
+			nextsearch = CurTime() + math.random(10, 20) -- Increase the delay to prevent quote spamming
 		end
 	end
 end)
