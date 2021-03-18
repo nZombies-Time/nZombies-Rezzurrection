@@ -18,7 +18,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int", 3, "ModelType")
 	self:NetworkVar("Int", 4, "CooldownTime")
 	self:NetworkVar("Vector", 0, "DestPos")
-	self:NetworkVar("String", 0, "GifType")
+	self:NetworkVar("Int", 6, "GifType")
 	self:NetworkVar("Bool", 3, "Kino")
 	self:NetworkVar("Int", 5, "Kinodelay")
 	self:NetworkVar("Bool", 4, "Giftoggle")
@@ -70,6 +70,26 @@ end
 
 function ENT:IsOn()
 	return self:GetActive()
+end
+
+function ENT:Animation(id)
+	local selectedmat
+	if id == 1 then
+	selectedmat = "codtele"
+	end
+	if id == 2 then
+	selectedmat = "coldwartp"
+	end
+	if id == 3 then
+	selectedmat = "bo3tp"
+	end
+	if id == 4 then
+	selectedmat = "soe"
+	end
+	if id == 5 then
+	selectedmat = "originstp"
+	end
+	return selectedmat
 end
 
 function ENT:Use(activator, caller)
@@ -195,11 +215,8 @@ if CLIENT then
 			if self:IsValid()  then
 			if self:GetGiftoggle() == true then
 			if LocalPlayer():GetRunSpeed() < 5 then
-			if (self:GetGifType() =="Der Riese") then
-			DrawMaterialOverlay("codtele", 0.03)
-			else
-			DrawMaterialOverlay("soe", 0.03)
-			end
+			local tpgif = self:Animation(self:GetGifType())
+			DrawMaterialOverlay(tpgif, 0.03)
 			end
 			end
 			end

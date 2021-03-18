@@ -43,7 +43,7 @@ function ENT:Use( activator, caller )
 				if activator:HasPerk("politan") then
 				weapon:ApplyNZModifier("rando")
 				end
-				if activator:HasPerk("dtap")  then
+				if 	activator:HasPerk("dtap")  then
 					weapon:ApplyNZModifier("dtap")
 				end
 				

@@ -9,6 +9,7 @@ local WeaponModificationFunctionsDefaults = {
 		--print("Weapon reload modified")
 		
 		
+		
 		wep.Reload = function( self, ... )
 			if self.ReloadFinish and self.ReloadFinish > CurTime() then return end
 			local ply = self.Owner
@@ -63,11 +64,20 @@ local WeaponModificationFunctionsDefaults = {
 	end,
 	dtap = function(wep)
 		local oldpfire = wep.PrimaryAttack
+		local ply = wep.Owner
 		if oldpfire then
 			wep.PrimaryAttack = function(...)
 				oldpfire(wep, ...)
-				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.8
+				if not ply:HasPerk("dtap") then
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.9
 				wep:SetNextPrimaryFire(CurTime() + delay)
+				elseif not ply:HasPerk("dtap2") then
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.75
+				wep:SetNextPrimaryFire(CurTime() + delay)
+				else
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.6
+				wep:SetNextPrimaryFire(CurTime() + delay)
+				end
 			end
 		end
 		
@@ -538,17 +548,26 @@ end, function(wep)
 		if wep:GetNextPrimaryFire() <= npfold then return end
 		
 		local dtap1 = wep.Owner:HasPerk("dtap")
-		if dtap1  then
+		local dtap2 = wep.Owner:HasPerk("dtap2")
+		if dtap1 or dtap2  then
 			local delay = wep:GetNextPrimaryFire() - CurTime()
-			if dtap1 then
-				delay = delay * 0.8
+			if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
 			end
 			wep:SetNextPrimaryFire(CurTime() + delay)
 			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
 				delay = wep:GetStatusEnd() - CurTime()
-				if dtap1 then
-					delay = delay * 0.8
-				end
+				if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
 				wep:SetStatusEnd( CurTime() + delay )
 			end
 		end
@@ -560,17 +579,26 @@ end, function(wep)
 		if wep:GetNextPrimaryFire() <= npfold then return end
 
 		local dtap1 = wep.Owner:HasPerk("dtap")
-		if dtap1  then
+		local dtap2 = wep.Owner:HasPerk("dtap2")
+		if dtap1 or dtap2  then
 			local delay = wep:GetNextPrimaryFire() - CurTime()
-			if dtap1 then
-				delay = delay * 0.8
+			if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
 			end
 			wep:SetNextPrimaryFire(CurTime() + delay)
 			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
 				delay = wep:GetStatusEnd() - CurTime()
-				if dtap1 then
-					delay = delay * 0.8
-				end
+				if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
 				wep:SetStatusEnd( CurTime() + delay )
 			end
 		end

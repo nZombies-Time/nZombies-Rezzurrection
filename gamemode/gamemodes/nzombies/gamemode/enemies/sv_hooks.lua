@@ -182,6 +182,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:ScaleDamage(2) 
 			return end
 			
+			
 			if attacker:IsPlayer() and dmginfo:IsDamageType( 268435456 ) then
 				dmginfo:ScaleDamage(zombie:Health()) 
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
@@ -202,8 +203,14 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			return end
 			
 			if attacker:IsPlayer()  then
-			if attacker:HasPerk("dtap2")  and dmginfo:GetDamageType() == DMG_BULLET then 
-			dmginfo:ScaleDamage(2.5)
+			if (attacker:HasPerk("dtap2") or attacker:HasPerk("vigor"))  and dmginfo:GetDamageType() == DMG_BULLET then 
+			if (attacker:HasPerk("dtap2") and attacker:HasPerk("vigor")) then
+			dmginfo:ScaleDamage(3)
+			elseif attacker:HasPerk("dtap2") then
+			dmginfo:ScaleDamage(2)
+			elseif attacker:HasPerk("vigor") then
+			dmginfo:ScaleDamage(3)
+			end
 			end -- dtap2 bullet damage buff
 			end
 

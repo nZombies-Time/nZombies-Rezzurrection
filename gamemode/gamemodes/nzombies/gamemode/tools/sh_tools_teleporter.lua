@@ -6,8 +6,10 @@ nzTools:CreateTool("teleporter", {
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
 		local ent = tr.Entity
+		print(data.gif)
 		if IsValid(ent) and ent:GetClass() == "nz_teleporter" then
 			nzMapping:Teleporter(ent:GetPos(), ent:GetAngles(), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
+			
 			ent:Remove()
 		else
 			nzMapping:Teleporter(tr.HitPos, Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
@@ -86,9 +88,17 @@ nzTools:CreateTool("teleporter", {
 		Row4:Setup( "Integer" )
 		Row4:SetValue( valz["Row4"] )
 		Row4.DataChanged = function( _, val ) valz["Row4"] = val DProperties.UpdateData(DProperties.CompileData()) end
-		local Row5 = DProperties:CreateRow( "Teleporter", "Teleporting Animation" )
-		Row5:Setup( "String" )
-		Row5:SetValue( valz["Row5"] )
+		--local Row5 = DProperties:CreateRow( "Teleporter", "Teleporting Animation" )
+		--Row5:Setup( "String" )
+		--Row5:SetValue( valz["Row5"] )
+		--Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		local Row5 = DProperties:CreateRow( "Teleporter", "Animation" )
+		Row5:Setup( "Combo" )
+		Row5:AddChoice("Der Riese",1)
+        Row5:AddChoice("Cold War",2)
+        Row5:AddChoice("Black Ops 3",3)
+        Row5:AddChoice("Shadows of Evil",4)
+		Row5:AddChoice("Origins (Black Ops 3)",5)
 		Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
 		local Row6 = DProperties:CreateRow( "Teleporter", "Cooldown" )
 		Row6:Setup( "Integer" )
@@ -110,7 +120,7 @@ nzTools:CreateTool("teleporter", {
 		id = 0,
 		price = 1500,
 		mdl = 0,
-		gif ="Der Riese",
+		gif =1,
 		cooldown = 30,
 		kino = false,
 		kinodelay = 0

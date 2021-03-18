@@ -104,9 +104,7 @@ nzPerks:NewPerk("dtap", {
 	func = function(self, ply, machine)
 		local tbl = {}
 		for k,v in pairs(ply:GetWeapons()) do
-			if v:IsFAS2() then
 				table.insert(tbl, v)
-			end
 		end
 		if tbl[1] != nil then
 			for k,v in pairs(tbl) do
@@ -117,15 +115,52 @@ nzPerks:NewPerk("dtap", {
 	lostfunc = function(self, ply)
 			local tbl = {}
 			for k,v in pairs(ply:GetWeapons()) do
-				if v:IsFAS2() then
 					table.insert(tbl, v)
-				end
 			end
 			if tbl[1] != nil then
 				for k,v in pairs(tbl) do
 					v:RevertNZModifier("dtap")
 				end
 			end
+	end,
+})
+
+nzPerks:NewPerk("dtap2", {
+	name = "Double Tap II",
+	off_model = "models/alig96/perks/doubletap2/doubletap2_off.mdl",
+	on_model = "models/alig96/perks/doubletap2/doubletap2.mdl",
+	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
+	off_skin = 1,
+	on_skin = 0,
+	price = 2000,
+	price_skin = 2000,
+	material = "models/perk_bottle/c_perk_bottle_dtap2",
+	icon = Material("perk_icons/dtap2.png", "smooth unlitgeneric"),
+	icon_skin = Material("perk_icons/chron/bangs2.png", "smooth unlitgeneric"),
+	color = Color(255, 255, 100),
+	func = function(self, ply, machine)
+		local tbl = {}
+		for k,v in pairs(ply:GetWeapons()) do
+				table.insert(tbl, v)
+		end
+		if tbl[1] != nil then
+			for k,v in pairs(tbl) do
+				v:ApplyNZModifier("dtap")
+			end
+		end
+	end,
+	lostfunc = function(self, ply)
+		if !ply:HasPerk("dtap") then
+			local tbl = {}
+			for k,v in pairs(ply:GetWeapons()) do
+					table.insert(tbl, v)
+			end
+			if tbl[1] != nil then
+				for k,v in pairs(tbl) do
+					v:RevertNZModifier("dtap")
+				end
+			end
+		end
 	end,
 })
 
@@ -350,9 +385,9 @@ nzPerks:NewPerk("pap", {
 	end,
 })
 
-nzPerks:NewPerk("dtap2", {
+nzPerks:NewPerk("vigor", {
 	name = "Vigor Rush",
-	name_skin = "Bang Bangs (Triple Damage)",
+	name_skin = "Bang Bangs (Big Damage)",
 	model = "models/nzr/vigor.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	off_skin = 1,
@@ -360,7 +395,7 @@ nzPerks:NewPerk("dtap2", {
 	price = 2500,
 	price_skin = 2000,
 	material = "models/perk_bottle/c_perk_bottle_vigor",
-	icon = Material("perk_icons/chron/dtap2.png", "smooth unlitgeneric"),
+	icon = Material("perk_icons/chron/vigor.png", "smooth unlitgeneric"),
 	icon_skin = Material("perk_icons/chron/bangs2.png", "smooth unlitgeneric"),
 	color = Color(128, 128, 64),
 	func = function(self, ply, machine)
