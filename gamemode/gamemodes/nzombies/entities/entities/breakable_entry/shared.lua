@@ -94,7 +94,11 @@ function ENT:Use( activator, caller )
 	if CurTime() > self.NextPlank then
 		if self:GetHasPlanks() and self:GetNumPlanks() < GetConVar("nz_difficulty_barricade_planks_max"):GetInt() then
 			self:AddPlank()
+					if activator:HasPerk("amish") then
+					activator:GivePoints(30)
+					else
                   activator:GivePoints(10)
+				  end
 				  activator:EmitSound("nz/effects/repair_ching.wav")
 			self.NextPlank = CurTime() + 1
 		end

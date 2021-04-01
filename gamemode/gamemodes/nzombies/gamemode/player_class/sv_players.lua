@@ -41,7 +41,11 @@ local function friendlyFire( ply, ent )
 			return !ply:HasPerk("phd") and !ply.SELFIMMUNE
 		else
 			--Friendly fire is disabled for all other players TODO make hardcore setting?
+			if ent:HasPerk("gum") then
+			return true
+			else
 			return false
+			end
 		end
 	elseif ent:IsValidZombie() then
 		if ply:HasPerk("widowswine") and ply:GetAmmoCount(GetNZAmmoID("grenade")) > 0 then -- WIDOWS WINE TAKE DAMAGE EFFECT

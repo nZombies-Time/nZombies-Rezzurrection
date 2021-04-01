@@ -48,7 +48,9 @@ function ENT:Initialize()
 		if offmodel then
 		self:SetModel(offmodel)
 		end
-		
+		if self:GetPerkID() == "gum" then
+		self:SetModelScale( self:GetModelScale() * 0.5, 0 )
+		end
 	end
 end
 
@@ -93,6 +95,9 @@ function ENT:Update()
 		else
 		self:SetModel(PerkData and (self:IsOn() and PerkData.on_model or PerkData.off_model) or "")
 	end
+	--if self:GetPerkID() == "gum" then
+		--self:SetModelScale( self:GetModelScale() * 0.5, 0 )
+		--end
 end
 
 function ENT:IsOn()

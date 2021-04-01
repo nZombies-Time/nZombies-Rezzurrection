@@ -7,15 +7,15 @@ surface.CreateFont( "nz.display.hud.main", {
 } )
 
 surface.CreateFont( "nz.display.hud.small", {
-	font = "Reckoner2", //Avenir Next
+	font = "COMIC", //Avenir Next
 	extended = true,
-	size = 42,
+	size = 35,
 	weight = 300,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.medium", {
-	font = "Reckoner2", //Avenir Next
+	font = "Comic Sans", //Avenir Next
 	extended = true,
 	size = 54,
 	weight = 300,
@@ -23,7 +23,7 @@ surface.CreateFont( "nz.display.hud.medium", {
 } )
 
 surface.CreateFont( "nz.display.hud.points", {
-	font = "Reckoner2",
+	font = "Comic Sans",
 	extended = true,
 	size = 20,
 	weight = 5000,
@@ -31,35 +31,35 @@ surface.CreateFont( "nz.display.hud.points", {
 } )
 
 surface.CreateFont( "nz.display.hud.ammo", {
-	font = "Calibri",
+	font = "Comic Sans",
 	size = 60,
 	weight = 50,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.ammo2", {
-	font = "Calibri",
-	size = 40,
+	font = "Comic Sans",
+	size = 30,
 	weight = 50,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.ammo3", {
-	font = "Calibri",
+	font = "Comic Sans",
 	size = 20,
 	weight = 50,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.ammo4", {
-	font = "Calibri",
+	font = "Comic Sans",
 	size = 15,
 	weight = 50,
 	antialias = true,
 } )
 
 surface.CreateFont( "nz.display.hud.smaller", {
-	font = "Reckoner2", //Avenir Next
+	font = "Comic Sans", //Avenir Next
 	extended = true,
 	size = 36,
 	weight = 300,

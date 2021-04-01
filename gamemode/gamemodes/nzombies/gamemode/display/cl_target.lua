@@ -32,6 +32,9 @@ local traceents = {
 		if !LocalPlayer():HasWeapon( wepclass ) and !pap then
 			text = "Press E to buy " .. name .." for " .. price .. " points."
 		elseif string.lower(wep.Primary.Ammo) != "none" then
+		 if LocalPlayer():HasPerk("gum") then
+		 text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 69420 .. " points."
+		 else
 			if pap then
 			if  LocalPlayer():HasWeapon( upgrade ) then
 			if LocalPlayer():GetWeapon( upgrade ):HasNZModifier("pap") then
@@ -50,6 +53,7 @@ local traceents = {
 				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
 			else
 				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. ammo_price .. " points."
+			end
 			end
 			end
 		else

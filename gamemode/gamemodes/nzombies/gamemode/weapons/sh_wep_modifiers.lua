@@ -2,6 +2,7 @@ local WeaponModificationFunctions = {}
 
 -- Defaults are run if no other modifiers were added (or they all allowed the next one to be added)
 local WeaponModificationFunctionsDefaults = {
+
 	speed = function(wep)
 		local oldreload = wep.Reload
 		if !oldreload then return end

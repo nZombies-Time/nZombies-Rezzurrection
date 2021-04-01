@@ -113,36 +113,37 @@ local function GunHud()
 					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", "nz.display.hud.smaller", w - 240*scale, h - 90*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black)
 				else
 					local name = wep:GetPrintName()					
-					local x = 250
+					local x = 300
 					local y = 165
 					if wep:GetPrimaryAmmoType() != -1 then
 						local clip
 						if wep.Primary.ClipSize and wep.Primary.ClipSize != -1 then
-							draw.SimpleTextOutlined("/"..wep:Ammo1(), "nz.display.hud.ammo2", ScrW() - 310*scale, ScrH() - 120*scale, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined(wep:Clip1().."/"..wep:Ammo1(), "nz.display.hud.ammo2", ScrW() - 350*scale, ScrH() - 120*scale, Color( 72, 192, 247, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
 							clip = wep:Clip1()
 							x = 315
 							y = 155
 						else
 							clip = wep:Ammo1()
 						end
-						draw.SimpleTextOutlined(clip, "nz.display.hud.ammo", ScrW() - x*scale, ScrH() - 115*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
-						x = x + 80
+						--draw.SimpleTextOutlined(clip, "nz.display.hud.ammo", ScrW() - x*scale, ScrH() - 115*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+						x = x + 120
 					end
 					
-					draw.SimpleTextOutlined(name, "nz.display.hud.small", ScrW() - x*scale, ScrH() - 120*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+					draw.SimpleTextOutlined(name, "nz.display.hud.small", ScrW() - x*scale, ScrH() - 120*scale,Color( 72, 192, 247, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 3, color_black)
 					
-					x = 270
+					x = 280
 					if wep:GetSecondaryAmmoType() != -1 then
 						local clip
 						if wep.Secondary.ClipSize and wep.Secondary.ClipSize != -1 then
-							draw.SimpleTextOutlined("/"..wep:Ammo2(), "nz.display.hud.ammo4", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined("/"..wep:Ammo2(), "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
 							clip = wep:Clip2()
 							x = x + 3
 						else
-							clip = wep:Ammo2()
+							--clip = wep:Ammo2()
+							draw.SimpleTextOutlined(wep:Ammo2(), "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						end
-						draw.SimpleTextOutlined(clip, "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
-						x = x + 80
+						--draw.SimpleTextOutlined(clip, "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+						--x = x + 80
 					end
 					
 					--[[if clip >= 0 then

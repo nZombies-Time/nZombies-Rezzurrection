@@ -284,6 +284,7 @@ nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
 nzRound:AddZombieType("Necromorph", "nz_zombie_walker_necromorph", {
 }) 
 
+
 function nzRound:GetZombieType(id)
 	if id == "Skeleton" then
 	return "nz_zombie_walker_skeleton"
