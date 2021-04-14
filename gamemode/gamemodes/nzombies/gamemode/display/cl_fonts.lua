@@ -77,7 +77,7 @@ surface.CreateFont( "nz.points.blackops2", {
 } )
 surface.CreateFont( "nz.ammo.blackops2", {
 	font = "Agency FB" ,
-	size =  30,
+	size =  45,
 	weight =  50,
 	antialias = true,
 } )
