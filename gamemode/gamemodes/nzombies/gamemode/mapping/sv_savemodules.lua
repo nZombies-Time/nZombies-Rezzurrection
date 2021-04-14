@@ -222,14 +222,18 @@ nzMapping:AddSaveModule("Teleporter", {
 			desti = v:GetDestination(),
 			id = v:GetID(),
 			price = v:GetPrice(),
-			mdltype = v:GetModelType()
+			mdltype = v:GetModelType(),
+			gif = v:GetGifType(),
+			cd = v:GetCooldownTime(),
+			kino = v:GetKino(),
+			delay = v:GetKinodelay(),
 			})
 		end
 		return teleporters
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:Teleporter(v.pos,v.angle, v.desti, v.id, v.price, v.mdltype)
+			nzMapping:Teleporter(v.pos,v.angle, v.desti, v.id, v.price, v.mdltype, v.gif, v.cd, v.kino, v.delay)
 		end
 	end,
 	cleanents = {"nz_teleporter"},

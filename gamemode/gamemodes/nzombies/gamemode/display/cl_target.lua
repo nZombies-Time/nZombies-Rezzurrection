@@ -290,11 +290,65 @@ local function GetMapScriptEntityText()
 	return text
 end
 
+function GetFontType(id)
+	if id == "Classic NZ" then
+	return "classic"
+	end
+	if id == "Old Treyarch" then
+	return "waw"
+	end
+	if id == "BO2/3" then
+	return "blackops2"
+	end
+		if id == "Comic Sans" then
+	return "xd"
+	end
+		if id == "Warprint" then
+	return "grit"
+	end
+		if id == "Road Rage" then
+	return "rage"
+	end
+		if id == "Black Rose" then
+	return "rose"
+	end
+		if id == "Reborn" then
+	return "reborn"
+	end
+		if id == "Rio Grande" then
+	return "rio"
+	end
+		if id == "Bad Signal" then
+	return "signal"
+	end
+		if id == "Infection" then
+	return "infected"
+	end
+		if id == "Brutal World" then
+	return "brutal"
+	end
+		if id == "Generic Scifi" then
+	return "ugly"
+	end
+		if id == "Tech" then
+	return "tech"
+	end
+		if id == "Krabby" then
+	return "krabs"
+	end
+		if id == "Default NZR" then
+	return "default"
+	end
+	if id == nil then
+	return "default"
+	end
+end
+
 local function DrawTargetID( text )
 
 	if !text then return end
 
-	local font = "nz.display.hud.small"
+	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
 	surface.SetFont( font )
 	local w, h = surface.GetTextSize( text )
 

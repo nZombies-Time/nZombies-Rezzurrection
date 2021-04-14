@@ -34,6 +34,60 @@ function MenuFrame:Init()
 
 end
 
+function GetFontType(id)
+	if id == "Classic NZ" then
+	return "classic"
+	end
+	if id == "Old Treyarch" then
+	return "waw"
+	end
+	if id == "BO2/3" then
+	return "blackops2"
+	end
+		if id == "Comic Sans" then
+	return "xd"
+	end
+		if id == "Warprint" then
+	return "grit"
+	end
+		if id == "Road Rage" then
+	return "rage"
+	end
+		if id == "Black Rose" then
+	return "rose"
+	end
+		if id == "Reborn" then
+	return "reborn"
+	end
+		if id == "Rio Grande" then
+	return "rio"
+	end
+		if id == "Bad Signal" then
+	return "signal"
+	end
+		if id == "Infection" then
+	return "infected"
+	end
+		if id == "Brutal World" then
+	return "brutal"
+	end
+		if id == "Generic Scifi" then
+	return "ugly"
+	end
+		if id == "Tech" then
+	return "tech"
+	end
+		if id == "Krabby" then
+	return "krabs"
+	end
+		if id == "Default NZR" then
+	return "default"
+	end
+	if id == nil then
+	return "default"
+	end
+end
+
 function MenuFrame:Think()
 	local ply = LocalPlayer()
 	if ply:Alive() then return end
@@ -72,7 +126,7 @@ function MenuToolBar:Init()
 
 	self.Logo = vgui.Create( "DLabel", self )
 	self.Logo:SetPos( 14, 14 )
-	self.Logo:SetFont( "nz.display.hud.main" )
+	self.Logo:SetFont("nz.main."..GetFontType(nzMapping.Settings.mainfont))
 	self.Logo:SetColor( Color( 255, 255, 255 ) )
 	self.Logo:SetText( "nZombies" )
 	self.Logo:SizeToContents()
@@ -413,7 +467,7 @@ function PlayerList:Paint(w, h)
 					text = "Not ready"
 				end
 			end
-			draw.SimpleText(ply:Nick() .. " - " .. text, "nz.display.hud.small", 25, h / 2 - n * 17.5 + 35 * c + 15, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
+			draw.SimpleText(ply:Nick() .. " - " .. text, ("nz.small."..GetFontType(nzMapping.Settings.smallfont)), 25, h / 2 - n * 17.5 + 35 * c + 15, Color(255,255,255,255), TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER)
 			c = c + 1
 		end
 	end

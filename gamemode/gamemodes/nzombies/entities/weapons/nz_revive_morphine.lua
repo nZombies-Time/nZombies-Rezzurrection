@@ -18,17 +18,17 @@ if CLIENT then
 end
 
 
-SWEP.Author			= "Zet0r"
-SWEP.Contact		= "youtube.com/Zet0r"
-SWEP.Purpose		= "Fancy Viewmodel Animations"
-SWEP.Instructions	= "Let the gamemode give you it"
+SWEP.Author			= ""
+SWEP.Contact		= ""
+SWEP.Purpose		= ""
+SWEP.Instructions	= "revive a teammate"
 
 SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 
 SWEP.HoldType = "slam"
 
-SWEP.ViewModel	= "models/weapons/c_revive_morphine.mdl"
+SWEP.ViewModel	= "models/weapons/vm_reviveplr_morphine.mdl"
 SWEP.WorldModel	= ""
 SWEP.UseHands = true
 SWEP.vModel = true
@@ -81,16 +81,4 @@ function SWEP:OnRemove()
 		self.WepOwner:SetActiveWeapon(nil)
 		self.WepOwner:EquipPreviousWeapon()
 	end
-end
-
-function SWEP:GetViewModelPosition( pos, ang )
- 
- 	local newpos = LocalPlayer():EyePos()
-	local newang = LocalPlayer():EyeAngles()
-	local up = newang:Up()
-	
-	newpos = newpos + LocalPlayer():GetAimVector()*6 - up*63
-	
-	return newpos, newang
- 
 end

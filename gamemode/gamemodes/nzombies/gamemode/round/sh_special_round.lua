@@ -58,6 +58,103 @@ nzRound:AddMachineType("Original", "nz_zombie_walker", {
 nzRound:AddMachineType("Infinite Warfare", "nz_zombie_walker", {
 }) 
 
+nzRound.IconSelectData = nzRound.IconSelectData or {}
+function nzRound:AddIconType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.IconSelectData[id] = data
+		else
+			nzRound.IconSelectData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.IconSelectData[id] = class
+	end
+end
+
+nzRound:AddIconType("Rezzurrection", "nz_zombie_walker", {}) 
+nzRound:AddIconType("World at War/ Black Ops 1", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Black Ops 2", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Black Ops 3", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Infinite Warfare", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Modern Warfare", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Cold War", "nz_zombie_walker", {}) 
+nzRound:AddIconType("April Fools", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Secret Code Required", "nz_zombie_walker", {}) 
+
+function nzRound:GetIconType(id)
+	if id == "Rezzurrection" then
+	return "Rezzurrection"
+	end
+	if id == "World at War/ Black Ops 1" then
+	return "World at War/ Black Ops 1"
+	end
+	if id == "Black Ops 2" then
+	return "Black Ops 2"
+	end
+	if id == "Black Ops 3" then
+	return "Black Ops 3"
+	end
+	if id == "Infinite Warfare" then
+	return "Infinite Warfare"
+	end
+	if id == "Modern Warfare" then
+	return "Modern Warfare"
+	end
+		if id == "Cold War" then
+	return "Cold War"
+	end
+		if id == "April Fools" then
+	return "April Fools"
+	end
+		if id == "Secret Code Required" then
+	return "Rezzurrection"
+	end
+	if id == "Code Accepted" then
+	return "Laby's Secret Perk Icons"
+	end
+	if id == nil then
+	return  "Rezzurrection"
+	end
+end
+
+nzRound.FontSelection = nzRound.FontSelection or {}
+function nzRound:AddFontType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.FontSelection[id] = data
+		else
+			nzRound.FontSelection[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.FontSelection[id] = class
+	end
+end
+
+nzRound:AddFontType("Classic NZ", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Old Treyarch", "nz_zombie_walker", {}) 
+nzRound:AddFontType("BO2/3", "nz_zombie_walker", {})  
+nzRound:AddFontType("Comic Sans", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Warprint", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Road Rage", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Black Rose", "nz_zombie_walker", {})  
+nzRound:AddFontType("Reborn", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Rio Grande", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Bad Signal", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Infection", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Brutal World", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Generic Scifi", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Tech", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Krabby", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Default NZR", "nz_zombie_walker", {}) 
+
 nzRound.BoxSkinData = nzRound.BoxSkinData or {}
 function nzRound:AddBoxType(id, class)
 	if SERVER then

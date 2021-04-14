@@ -107,7 +107,32 @@ function nzMapping:LoadMapSettings(data)
 	if data.newratio4 then
 		nzMapping.Settings.newratio4 = tonumber(data.newratio4) or 0
 	end
-	
+	if data.mainfont then
+		nzMapping.Settings.mainfont = (data.mainfont) or "Default NZR"
+	end
+	if data.smallfont then
+		nzMapping.Settings.smallfont = (data.smallfont) or "Default NZR"
+	end
+	if data.mediumfont then
+		nzMapping.Settings.mediumfont = (data.mediumfont) or "Default NZR"
+	end
+	if data.roundfont then
+		nzMapping.Settings.roundfont = (data.roundfont) or "Classic NZ"
+	end
+	if data.ammofont then
+		nzMapping.Settings.ammofont = (data.ammofont) or "Default NZR"
+	end
+	if data.ammo2font then
+		nzMapping.Settings.ammo2font = (data.ammo2font) or "Default NZR"
+	end
+	if data.fontthicc then
+		nzMapping.Settings.fontthicc = tonumber(data.fontthicc) or 2
+	end
+	if data.icontype then
+		nzMapping.Settings.icontype = (data.icontype) or "Rezzurrection"
+	end
+
+
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
 	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround
 	nzMapping.Settings.maxspawns = data.maxspawns == nil and 35 or data.maxspawns
@@ -117,7 +142,7 @@ function nzMapping:LoadMapSettings(data)
 	
 	nzMapping.Settings.zombieeyecolor = data.zombieeyecolor == nil and Color(0, 255, 255, 255) or Color(data.zombieeyecolor.r, data.zombieeyecolor.g, data.zombieeyecolor.b)
 	nzMapping.Settings.boxlightcolor = data.boxlightcolor == nil and Color(0, 150,200,255) or Color(data.boxlightcolor.r, data.boxlightcolor.g, data.boxlightcolor.b) 
-	
+	nzMapping.Settings.textcolor = data.textcolor == nil and Color(0, 255, 255, 255) or Color(data.textcolor.r, data.textcolor.g, data.textcolor.b) 
 	-- More compact and less messy:
 	for k,v in pairs(nzSounds.struct) do
 		nzMapping.Settings[v] = data[v] or {}

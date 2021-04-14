@@ -57,6 +57,15 @@ nzTools:CreateTool("settings", {
 		valz["Row30"] = data.newwave4 or 0
 		valz["Row31"] = data.newtype4 or "None"
 		valz["Row32"] = data.newratio4 or 0
+		valz["Row33"] = data.mainfont or "Default NZR"
+		valz["Row34"] = data.smallfont or "Default NZR"
+		valz["Row35"] = data.mediumfont or "Default NZR"
+		valz["Row36"] = data.roundfont or "Classic NZ"
+		valz["Row37"] = data.ammofont or "Default NZR"
+		valz["Row38"] = data.ammo2font or "Default NZR"
+		valz["Row39"] = data.textcolor == nil and Color(0, 255, 255, 255) or data.textcolor
+		valz["Row40"] = data.fontthicc or 2
+		valz["Row41"] = data.icontype or "Rezzurrection"
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -263,12 +272,17 @@ nzTools:CreateTool("settings", {
 			Row19.DataChanged = function( _, val ) valz["Row19"] = val end
 			Row19:SetTooltip("Sets the Mystery Box Skin")
 			
-		local Row21 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 1" )
+			local DProperties3 = vgui.Create( "DProperties", enemysheet )
+		DProperties3:SetSize( 280, 220 )
+		DProperties3:SetPos( 0, 0 )
+		sheet:AddSheet( "Extra Enemy Settings", DProperties3, "icon16/user_gray.png", false, false, "Change extra enemy settings")
+		
+		local Row21 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy Interval 1" )
 		Row21:Setup( "Integer" )
 		Row21:SetValue( valz["Row21"] )
 		Row21.DataChanged = function( _, val ) valz["Row21"] = val end
 		
-		local Row22 = DProperties:CreateRow("Map Settings", "Extra Enemy 1")
+		local Row22 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 1")
 			Row22:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.AdditionalZombieData) do
@@ -283,17 +297,17 @@ nzTools:CreateTool("settings", {
 			Row22.DataChanged = function( _, val ) valz["Row22"] = val end
 			Row22:SetTooltip("Sets what type of new enemy will appear on the first new enemy interval")
 			
-		local Row23 = DProperties:CreateRow( "Map Settings", "Extra Enemy 1 Ratio" )
+		local Row23 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 1 Ratio" )
 		Row23:Setup( "Integer" )
 		Row23:SetValue( valz["Row23"] )
 		Row23.DataChanged = function( _, val ) valz["Row23"] = val end
 		
-		local Row24 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 2" )
+		local Row24 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy Interval 2" )
 		Row24:Setup( "Integer" )
 		Row24:SetValue( valz["Row24"] )
 		Row24.DataChanged = function( _, val ) valz["Row24"] = val end
 		
-		local Row25 = DProperties:CreateRow("Map Settings", "Extra Enemy 2")
+		local Row25 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 2")
 			Row25:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.AdditionalZombieData) do
@@ -308,17 +322,17 @@ nzTools:CreateTool("settings", {
 			Row25.DataChanged = function( _, val ) valz["Row25"] = val end
 			Row25:SetTooltip("Sets what type of new enemy will appear on the second new enemy interval")
 			
-		local Row26 = DProperties:CreateRow( "Map Settings", "Extra Enemy 2 Ratio" )
+		local Row26 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 2 Ratio" )
 		Row26:Setup( "Integer" )
 		Row26:SetValue( valz["Row26"] )
 		Row26.DataChanged = function( _, val ) valz["Row26"] = val end
 		
-		local Row27 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 3" )
+		local Row27 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy Interval 3" )
 		Row27:Setup( "Integer" )
 		Row27:SetValue( valz["Row27"] )
 		Row27.DataChanged = function( _, val ) valz["Row27"] = val end
 		
-		local Row28 = DProperties:CreateRow("Map Settings", "Extra Enemy 3")
+		local Row28 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 3")
 			Row28:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.AdditionalZombieData) do
@@ -333,17 +347,17 @@ nzTools:CreateTool("settings", {
 			Row28.DataChanged = function( _, val ) valz["Row28"] = val end
 			Row28:SetTooltip("Sets what type of new enemy will appear on the third new enemy interval")
 			
-		local Row29 = DProperties:CreateRow( "Map Settings", "Extra Enemy 3 Ratio" )
+		local Row29 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 3 Ratio" )
 		Row29:Setup( "Integer" )
 		Row29:SetValue( valz["Row29"] )
 		Row29.DataChanged = function( _, val ) valz["Row29"] = val end
 		
-		local Row30 = DProperties:CreateRow( "Map Settings", "Extra Enemy Interval 4" )
+		local Row30 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy Interval 4" )
 		Row30:Setup( "Integer" )
 		Row30:SetValue( valz["Row30"] )
 		Row30.DataChanged = function( _, val ) valz["Row30"] = val end
 		
-		local Row31 = DProperties:CreateRow("Map Settings", "Extra Enemy 4")
+		local Row31 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 4")
 			Row31:Setup( "Combo" )
 			local found = false
 			for k,v in pairs(nzRound.AdditionalZombieData) do
@@ -358,10 +372,118 @@ nzTools:CreateTool("settings", {
 			Row31.DataChanged = function( _, val ) valz["Row31"] = val end
 			Row31:SetTooltip("Sets what type of new enemy will appear on the fourth new enemy interval")
 			
-			local Row32 = DProperties:CreateRow( "Map Settings", "Extra Enemy 4 Ratio" )
+			local Row32 = DProperties3:CreateRow( "Dynamic Enemy System", "Extra Enemy 4 Ratio" )
 		Row32:Setup( "Integer" )
 		Row32:SetValue( valz["Row32"] )
 		Row32.DataChanged = function( _, val ) valz["Row32"] = val end
+		
+		local DProperties2 = vgui.Create( "DProperties", fontsheet )
+		DProperties2:SetSize( 280, 220 )
+		DProperties2:SetPos( 0, 0 )
+		sheet:AddSheet( "Font Settings", DProperties2, "icon16/font.png", false, false, "Change font settings")
+		
+		local Row33 = DProperties2:CreateRow("Font Settings", "Main Menu Font")
+			Row33:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row33"] then
+					Row33:AddChoice(k, k, true)
+					found = true
+				else
+					Row33:AddChoice(k, k, false)
+				end
+			end
+			Row33.DataChanged = function( _, val ) valz["Row33"] = val end
+			Row33:SetTooltip("Changes the font of the main font")
+			
+		local Row34 = DProperties2:CreateRow("Font Settings", "Gun Name and Pickup Font")
+			Row34:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row34"] then
+					Row34:AddChoice(k, k, true)
+					found = true
+				else
+					Row34:AddChoice(k, k, false)
+				end
+			end
+			Row34.DataChanged = function( _, val ) valz["Row34"] = val end
+			Row34:SetTooltip("Changes the font of the name of your gun and interactibles")
+		
+		local Row35 = DProperties2:CreateRow("Font Settings", "Point Display Font")
+			Row35:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row35"] then
+					Row35:AddChoice(k, k, true)
+					found = true
+				else
+					Row35:AddChoice(k, k, false)
+				end
+			end
+			Row35.DataChanged = function( _, val ) valz["Row35"] = val end
+			Row35:SetTooltip("Changes the font of the point displays")
+		
+		local Row36 = DProperties2:CreateRow("Font Settings", "Round Font")
+			Row36:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row36"] then
+					Row36:AddChoice(k, k, true)
+					found = true
+				else
+					Row36:AddChoice(k, k, false)
+				end
+			end
+			Row36.DataChanged = function( _, val ) valz["Row36"] = val end
+			Row36:SetTooltip("Changes the font of the round")
+		
+		local Row37 = DProperties2:CreateRow("Font Settings", "Ammo Font")
+			Row37:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row37"] then
+					Row37:AddChoice(k, k, true)
+					found = true
+				else
+					Row37:AddChoice(k, k, false)
+				end
+			end
+			Row37.DataChanged = function( _, val ) valz["Row37"] = val end
+			Row37:SetTooltip("Changes the font of points gained")
+		
+		local Row38 = DProperties2:CreateRow("Font Settings", "Ammo 2 Font")
+			Row38:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.FontSelection) do
+				if k == valz["Row38"] then
+					Row38:AddChoice(k, k, true)
+					found = true
+				else
+					Row38:AddChoice(k, k, false)
+				end
+			end
+			Row38.DataChanged = function( _, val ) valz["Row38"] = val end
+			Row38:SetTooltip("Changes the font of points gained")
+		
+		local Row40 = DProperties2:CreateRow( "Font Settings", "Font Thickness" )
+		Row40:Setup( "Integer" )
+		Row40:SetValue( valz["Row40"] )
+		Row40.DataChanged = function( _, val ) valz["Row40"] = val end
+			
+		local Row41 = DProperties:CreateRow("Map Settings", "Perk Icons")
+			Row41:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.IconSelectData) do
+				if k == valz["Row41"] then
+					Row41:AddChoice(k, k, true)
+					found = true
+				else
+					Row41:AddChoice(k, k, false)
+				end
+			end
+			Row41.DataChanged = function( _, val ) valz["Row41"] = val end
+			Row41:SetTooltip("Changes the style of the perk icons")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -396,6 +518,15 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row30"]) then data.newwave4 = 0 else data.newwave4 = tonumber(valz["Row30"]) end
 			if !valz["Row31"] then data.newtype4 = "None" else data.newtype4 = valz["Row31"] end
 			if !tonumber(valz["Row32"]) then data.newratio4 = 0 else data.newratio4 = tonumber(valz["Row32"]) end
+			if !valz["Row33"] then data.mainfont = "Default NZR" else data.mainfont = valz["Row33"] end
+			if !valz["Row34"] then data.smallfont = "Default NZR" else data.smallfont = valz["Row34"] end
+			if !valz["Row35"] then data.mediumfont = "Default NZR" else data.mediumfont = valz["Row35"] end
+			if !valz["Row36"] then data.roundfont = "Classic NZ" else data.roundfont = valz["Row36"] end
+			if !valz["Row37"] then data.ammofont = "Default NZR" else data.ammofont = valz["Row37"] end
+			if !valz["Row38"] then data.ammo2font = "Default NZR" else data.ammo2font = valz["Row38"] end
+			if !istable(valz["Row39"]) then data.textcolor = Color(0, 255, 255, 255) else data.textcolor = valz["Row39"] end
+			if !tonumber(valz["Row40"]) then data.fontthicc  = 2 else data.fontthicc  = tonumber(valz["Row40"]) end
+			if !valz["Row41"] then data.icontype = "Rezzurrection" else data.icontype = valz["Row41"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -404,6 +535,7 @@ nzTools:CreateTool("settings", {
 			if valz["ACRow4"] == nil then data.actptime = 5 else data.actptime = valz["ACRow4"] end
 			if valz["ACRow5"] == nil then data.acpreventboost = true else data.acpreventboost = tobool(valz["ACRow5"]) end
 			if valz["ACRow6"] == nil then data.acpreventcjump = false else data.acpreventcjump = tobool(valz["ACRow6"]) end
+
 
 			for k,v in pairs(nzSounds.struct) do
 				if (valz["SndRow" .. k] == nil) then
@@ -500,16 +632,41 @@ nzTools:CreateTool("settings", {
 			end
 		end
 		
+		local function AddFontColor()
+			local fontPanel = vgui.Create("DPanel", sheet)
+			sheet:AddSheet("Font Color", fontPanel, "icon16/palette.png", false, false, "Set the color of the various fonts.")
+			fontPanel:DockPadding(5, 5, 5, 5)
+			local fontColorChoice = vgui.Create("DColorMixer", fontPanel)
+			fontColorChoice:SetColor(valz["Row39"])
+			fontColorChoice:SetPalette(false)
+			fontColorChoice:SetAlphaBar(false)
+			fontColorChoice:Dock(TOP)
+			fontColorChoice:SetSize(150, 150)
+			
+			local presets = vgui.Create("DComboBox", fontPanel)
+			presets:SetSize(60, 20)
+			presets:Dock(BOTTOM)
+			presets:AddChoice("Default")
+			presets.OnSelect = function(self, index, value)
+				if (value == "Default") then
+					fontColorChoice:SetColor(Color(255,255,255))
+				end
+
+				fontColorChoice:ValueChanged(nil)
+			end
+
+			fontColorChoice.ValueChanged = function(col)
+				valz["Row39"] = fontColorChoice:GetColor()
+				print(valz["Row39"])
+			end
+		end
+		
 		local acPanel = vgui.Create("DPanel", sheet)
 		sheet:AddSheet("Anti-Cheat", acPanel, "icon16/script_gear.png", false, false, "Automatically teleport players from cheating spots.")
 		local acProps = vgui.Create("DProperties", acPanel)
 		local acheight, acwidth = sheet:GetSize()
 		acProps:SetSize(acwidth, acwidth - 50)
 
-		if (!nzTools.Advanced) then
-			AddEyeStuff()
-			AddBoxStuff()
-		end
 		
 		local ACRow1 = acProps:CreateRow("Anti-Cheat Settings", "Enabled?")
 		ACRow1:Setup("Boolean")
@@ -995,7 +1152,7 @@ nzTools:CreateTool("settings", {
 
 			AddEyeStuff()
 			AddBoxStuff()
-
+			AddFontColor()
 			local wrapper = vgui.Create("DPanel", sndPanel)
 			wrapper:SetSize(500, 363)
 			wrapper:SetPos(0, 0)

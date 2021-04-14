@@ -16,22 +16,78 @@ local bloodline_gun = Material("bloodline_score2.png", "unlitgeneric smooth")
 	nil
 }]]
 
+function GetFontType(id)
+	if id == "Classic NZ" then
+	return "classic"
+	end
+	if id == "Old Treyarch" then
+	return "waw"
+	end
+	if id == "BO2/3" then
+	return "blackops2"
+	end
+		if id == "Comic Sans" then
+	return "xd"
+	end
+		if id == "Warprint" then
+	return "grit"
+	end
+		if id == "Road Rage" then
+	return "rage"
+	end
+		if id == "Black Rose" then
+	return "rose"
+	end
+		if id == "Reborn" then
+	return "reborn"
+	end
+		if id == "Rio Grande" then
+	return "rio"
+	end
+		if id == "Bad Signal" then
+	return "signal"
+	end
+		if id == "Infection" then
+	return "infected"
+	end
+		if id == "Brutal World" then
+	return "brutal"
+	end
+		if id == "Generic Scifi" then
+	return "ugly"
+	end
+		if id == "Tech" then
+	return "tech"
+	end
+		if id == "Krabby" then
+	return "krabs"
+	end
+		if id == "Default NZR" then
+	return "default"
+	end
+	if id == nil then
+	return "default"
+	end
+end
+
 CreateClientConVar( "nz_hud_points_show_names", "1", true, false )
 
 local function StatesHud()
 	if GetConVar("cl_drawhud"):GetBool() then
 		local text = ""
-		local font = "nz.display.hud.main"
+		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
 		local w = ScrW() / 2
 		if nzRound:InState( ROUND_WAITING ) then
 			text = "Waiting for players. Type /ready to ready up."
-			font = "nz.display.hud.small"
+			font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
 		elseif nzRound:InState( ROUND_CREATE ) then
 			text = "Creative Mode"
 		elseif nzRound:InState( ROUND_GO ) then
 			text = "Game Over"
 		end
-		draw.SimpleText(text, font, w, ScrH() * 0.85, Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		local defaultColor = Color(200, 0, 0,255)
+		local fontColor = !IsColor(nzMapping.Settings.textcolor) and defaultColor or nzMapping.Settings.textcolor
+		draw.SimpleText(text, font, w, ScrH() * 0.85, fontColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 end
 
@@ -62,16 +118,16 @@ local function ScoreHud()
 						nameoffset = 10
 					end
 
-					local font = "nz.display.hud.small"
+					local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
 
 					surface.SetFont(font)
 
 					local textW, textH = surface.GetTextSize(text)
 
 					if LocalPlayer() == v then
-						offset = offset + textH + 5 -- change this if you change the size of nz.display.hud.medium
+						offset = offset + 60 -- change this if you change the size of nz.display.hud.medium
 					else
-						offset = offset + textH
+						offset = offset + 60
 					end
 					
 
@@ -82,15 +138,29 @@ local function ScoreHud()
 					--for i = 0, 8 do
 						--surface.SetMaterial(bloodDecals[((index + i - 1) % #bloodDecals) + 1 ])
 						surface.SetMaterial(blood)
-						surface.DrawTexturedRect(ScrW() - textW - 180, ScrH() - 275 * scale - offset, textW + 150, 45)
+						surface.DrawTexturedRect(ScrW() - 250, ScrH() - 275 * scale - offset, 350, 45)
 					--end
 					--surface.DrawTexturedRect(ScrW() - 325*scale - numname * 10, ScrH() - 285*scale - (30*k), 250 + numname*10, 35)
-					if text then draw.SimpleText(text, font, ScrW() - textW - 60, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER) end
+					--if text then draw.SimpleText(text, font, ScrW() - textW - 60, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER) end
 					if LocalPlayer() == v then
-						font = "nz.display.hud.medium"
+						font = ("nz.points."..GetFontType(nzMapping.Settings.mediumfont))
 					end
-					draw.SimpleText(v:GetPoints(), font, ScrW() - textW - 60 - nameoffset, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
-					v.PointsSpawnPosition = {x = ScrW() - textW - 170, y = ScrH() - 255 * scale - offset}
+					draw.SimpleText(v:GetPoints(), font, ScrW() - 65, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+					v.PointsSpawnPosition = {x = ScrW() - 170, y = ScrH() - 255 * scale - offset}
+					//-----------ICON-------------//
+					local pmpath = Material("spawnicons/"..string.gsub(v:GetModel(),".mdl",".png"), "unlitgeneric smooth")
+					if pmpath:IsError() then
+						local genicon = vgui.Create("SpawnIcon")
+						genicon:SetModel(v:GetModel())
+						genicon:SetPos(35,ScrH() - 175 * scale - offset)
+						genicon:SetSize(49,49)
+						timer.Simple(1,function() genicon:Remove() end)
+					end
+					surface.SetDrawColor(255,255,255)
+					surface.SetMaterial(pmpath)
+					surface.DrawTexturedRect(ScrW() - 55, ScrH() - 280 * scale - offset, 50, 50)
+					surface.SetDrawColor(color)
+					surface.DrawOutlinedRect(ScrW() - 58, ScrH() - 283 * scale - offset, 53, 53, 3)
 				end
 			end
 		end
@@ -103,14 +173,16 @@ local function GunHud()
 			local wep = LocalPlayer():GetActiveWeapon()
 			local w,h = ScrW(), ScrH()
 			local scale = ((w/1920)+1)/2
+			local defaultColor = Color(200, 0, 0,255)
+			local fontColor = !IsColor(nzMapping.Settings.textcolor) and defaultColor or nzMapping.Settings.textcolor
 
 			surface.SetMaterial(Material(nzRound:GetHUDType(nzMapping.Settings.hudtype), "unlitgeneric smooth"))
 			surface.SetDrawColor(200,200,200)
 			surface.DrawTexturedRect(w - 630*scale, h - 225*scale, 600*scale, 225*scale)
 			if IsValid(wep) then
 				if wep:GetClass() == "nz_multi_tool" then
-					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, "nz.display.hud.small", w - 240*scale, h - 125*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
-					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", "nz.display.hud.smaller", w - 240*scale, h - 90*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black)
+					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, ("nz.small."..GetFontType(nzMapping.Settings.smallfont)), w - 240*scale, h - 125*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", "nz.smaller", w - 240*scale, h - 90*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black)
 				else
 					local name = wep:GetPrintName()					
 					local x = 300
@@ -118,7 +190,7 @@ local function GunHud()
 					if wep:GetPrimaryAmmoType() != -1 then
 						local clip
 						if wep.Primary.ClipSize and wep.Primary.ClipSize != -1 then
-							draw.SimpleTextOutlined(wep:Clip1().."/"..wep:Ammo1(), "nz.display.hud.ammo2", ScrW() - 350*scale, ScrH() - 120*scale, Color( 72, 192, 247, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined(wep:Clip1().."/"..wep:Ammo1(), ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont)), ScrW() - 350*scale, ScrH() - 120*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 3, color_black)
 							clip = wep:Clip1()
 							x = 315
 							y = 155
@@ -129,18 +201,18 @@ local function GunHud()
 						x = x + 120
 					end
 					
-					draw.SimpleTextOutlined(name, "nz.display.hud.small", ScrW() - x*scale, ScrH() - 120*scale,Color( 72, 192, 247, 255 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 3, color_black)
+					draw.SimpleTextOutlined(name, ("nz.small."..GetFontType(nzMapping.Settings.smallfont)), ScrW() - x*scale, ScrH() - 120*scale,fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 					
 					x = 280
 					if wep:GetSecondaryAmmoType() != -1 then
 						local clip
 						if wep.Secondary.ClipSize and wep.Secondary.ClipSize != -1 then
-							draw.SimpleTextOutlined("/"..wep:Ammo2(), "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined("/"..wep:Ammo2(), ("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
 							clip = wep:Clip2()
 							x = x + 3
 						else
 							--clip = wep:Ammo2()
-							draw.SimpleTextOutlined(wep:Ammo2(), "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined(wep:Ammo2(),("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						end
 						--draw.SimpleTextOutlined(clip, "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						--x = x + 80
@@ -200,11 +272,13 @@ end)
 
 local function PowerUpsHud()
 	if nzRound:InProgress() or nzRound:InState(ROUND_CREATE) then
-		local font = "nz.display.hud.main"
+		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
 		local w = ScrW() / 2
 		local offset = 40
 		local c = 0
 		local text_w = 745
+		local defaultColor = Color(200, 0, 0,255)
+		local fontColor = !IsColor(nzMapping.Settings.textcolor) and defaultColor or nzMapping.Settings.textcolor
 
 		---------icon--------------
 		local scale = (ScrW()/1920 + 1)/1.25
@@ -234,7 +308,7 @@ local function PowerUpsHud()
 			surface.SetMaterial(material)
 			surface.SetDrawColor(255,255,255)
 			surface.DrawTexturedRect(width - 30, ScrH() - 98, 60, 60)
-			draw.SimpleText(math.Round(time - CurTime()), font, width - 5, height, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw.SimpleText(math.Round(time - CurTime()), font, width - 5, height, fontColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			powerupsActive = powerupsActive + 1
 		end
 
@@ -345,7 +419,8 @@ local function DrawPointsNotification()
 		end
 	end
 
-	local font = "nz.display.hud.points"
+	local font =  "nz.pointsmall"
+	
 
 	for k,v in pairs(PointsNotifications) do
 		local fade = math.Clamp((CurTime()-v.time), 0, 1)
@@ -384,17 +459,41 @@ end
 local function PerksHud()
 	local scale = (ScrW()/1920 + 1)/2
 	local w = -20
-	local size = 50
+	local size = 60
 	for k,v in pairs(LocalPlayer():GetPerks()) do
-	if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
-						surface.SetMaterial(nzPerks:Get(v).icon_skin)
-						else
-						surface.SetMaterial(nzPerks:Get(v).icon)
-						end
+	local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
+			if iconType == "Rezzurrection" then
+				surface.SetMaterial(nzPerks:Get(v).icon)
+			end
+			if iconType == "Infinite Warfare" then
+				surface.SetMaterial(nzPerks:Get(v).icon_iw)
+			end
+			if iconType == "World at War/ Black Ops 1" then
+				surface.SetMaterial(nzPerks:Get(v).icon_waw)
+			end
+			if iconType == "Black Ops 2" then
+				surface.SetMaterial(nzPerks:Get(v).icon_bo2)
+			end
+			if iconType == "Black Ops 3" then
+				surface.SetMaterial(nzPerks:Get(v).icon_bo3)
+			end
+			if iconType == "Modern Warfare" then
+				surface.SetMaterial(nzPerks:Get(v).icon_mw)
+			end
+			if iconType == "Cold War" then
+				surface.SetMaterial(nzPerks:Get(v).icon_cw)
+			end
+			if iconType == "April Fools" then
+				surface.SetMaterial(nzPerks:Get(v).icon_dumb)
+			end
+			if iconType == "Laby's Secret Perk Icons" then
+				surface.SetMaterial(nzPerks:Get(v).icon_holo)
+			end
 		surface.SetDrawColor(255,255,255)
-		surface.DrawTexturedRect(w + k*(size*scale + 10), ScrH() - 245, size*scale, size*scale)
+		surface.DrawTexturedRect(w + k*(size*scale + 4), ScrH() - 280, size*scale, size*scale)
 	end
 end
+
 
 local vulture_textures = {
 	["wall_buys"] = Material("vulture_icons/wall_buys.png", "smooth unlitgeneric"),
@@ -440,7 +539,7 @@ local infmat = Material("materials/round_-1.png", "smooth")
 local function RoundHud()
 
     local text = ""
-    local font = "nz.display.hud.rounds"
+    local font = ("nz.rounds."..GetFontType(nzMapping.Settings.roundfont))
     local w = 35
     local h = ScrH() - 15
     local round = round_num

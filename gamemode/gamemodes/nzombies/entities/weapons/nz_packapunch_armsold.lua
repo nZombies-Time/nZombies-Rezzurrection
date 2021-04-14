@@ -7,7 +7,7 @@ end
 
 if CLIENT then
 
-	SWEP.PrintName     	    = "PAP Hands"			
+	SWEP.PrintName     	    = "Hands"			
 	SWEP.Slot				= 1
 	SWEP.SlotPos			= 1
 	SWEP.DrawAmmo			= false
@@ -18,17 +18,17 @@ if CLIENT then
 end
 
 
-SWEP.Author			= ""
-SWEP.Contact		= ""
-SWEP.Purpose		= ""
-SWEP.Instructions	= "pap your gun"
+SWEP.Author			= "Zet0r"
+SWEP.Contact		= "youtube.com/Zet0r"
+SWEP.Purpose		= "Fancy Viewmodel Animations"
+SWEP.Instructions	= "Let the gamemode give you it"
 
 SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 
 SWEP.HoldType = "slam"
 
-SWEP.ViewModel	= "models/weapons/jax_pap_hands.mdl"
+SWEP.ViewModel	= "models/weapons/c_packapunch_arms.mdl"
 SWEP.WorldModel	= ""
 SWEP.UseHands = true
 SWEP.vModel = true
@@ -93,4 +93,16 @@ end
 
 function SWEP:OnRemove()
 	
+end
+
+function SWEP:GetViewModelPosition( pos, ang )
+ 
+ 	local newpos = LocalPlayer():EyePos()
+	local newang = LocalPlayer():EyeAngles()
+	local up = newang:Up()
+	
+	newpos = newpos + LocalPlayer():GetAimVector()*6 - up*63
+	
+	return newpos, newang
+ 
 end
