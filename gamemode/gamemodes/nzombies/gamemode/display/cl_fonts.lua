@@ -1,3 +1,40 @@
+--DEPRECATED FONTS, USE NOT RECOMMENDED 
+surface.CreateFont( "nz.display.hud.main", {
+	font = "Call Of Ops Duty", //Avenir Next
+	size = 48,
+	weight = 300,
+	antialias = true,
+} )
+
+surface.CreateFont( "nz.display.hud.small", {
+	font = "Reckoner2", //Avenir Next
+	extended = true,
+	size = 42,
+	weight = 300,
+	antialias = true,
+} )
+
+surface.CreateFont( "nz.display.hud.medium", {
+	font = "Reckoner2", //Avenir Next
+	extended = true,
+	size = 54,
+	weight = 300,
+	antialias = true,
+} )
+
+surface.CreateFont( "nz.display.hud.ammo", {
+	font = "Calibri",
+	size = 60,
+	weight = 50,
+	antialias = true,
+} )
+
+surface.CreateFont( "nz.display.hud.ammo2", {
+	font = "Calibri",
+	size = 40,
+	weight = 50,
+	antialias = true,
+} )
 //Main Text
 
 surface.CreateFont( "nz.pointsmall", {
