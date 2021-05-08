@@ -68,6 +68,7 @@ end
 nzPerks:NewPerk("jugg", {
 	name = "Juggernog",
 	name_skin = "Tuff 'Nuff",
+	name_holo = "Dragon's Blood",
 	model = "models/yolojoenshit/bo3perks/juggernog/mc_mtl_p7_zm_vending_jugg.mdl",
 	skin = "models/IWperks/tuff/mc_mtl_p7_zm_vending_jugg.mdl",
 	off_skin = 1,
@@ -93,6 +94,10 @@ nzPerks:NewPerk("jugg", {
 	lostfunc = function(self, ply)
 		ply:SetMaxHealth(100)
 		if ply:Health() > 100 then ply:SetHealth(100) end
+	end,
+	upgradefunc = function(self, ply, machine)
+			ply:SetMaxHealth(350)
+			ply:SetHealth(350)
 	end,
 })
 
@@ -312,6 +317,7 @@ nzPerks:NewPerk("gum", {
 nzPerks:NewPerk("dtap", {
 	name = "Double Tap",
 	name_skin = "Bang Bangs",
+	name_holo ="Sora Tap",
 	model = "models/alig96/perks/doubletap/doubletap_on.mdl",
 	model_off = "models/alig96/perks/doubletap/doubletap_off.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
@@ -347,16 +353,20 @@ nzPerks:NewPerk("dtap", {
 					table.insert(tbl, v)
 			end
 			if tbl[1] != nil then
-				for k,v in pairs(tbl) do
+				if v:HasNZModifier("dtap") then
 					v:RevertNZModifier("dtap")
-				end
 			end
+			end
+	end,
+	upgradefunc  = function(self, ply)
+	
 	end,
 })
 
 nzPerks:NewPerk("amish", {
 	name = "Amish Ale",
 	name_skin = "Hippie Hops",
+	name_holo ="Monoe Mai Tai",
 	model = "models/alig96/perks/amish/amish_off.mdl",
 	model_off = "models/alig96/perks/amish/amish_off.mdl",
 	skin =  "models/alig96/perks/amish/amish_off.mdl",
@@ -379,10 +389,15 @@ nzPerks:NewPerk("amish", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("dtap2", {
 	name = "Double Tap II",
+	name_skin = "Bang Bangs",
+	name_holo ="Melfissa Mountain Dew",
 	off_model = "models/alig96/perks/doubletap2/doubletap2_off.mdl",
 	on_model = "models/alig96/perks/doubletap2/doubletap2.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
@@ -408,7 +423,7 @@ nzPerks:NewPerk("dtap2", {
 		end
 		if tbl[1] != nil then
 			for k,v in pairs(tbl) do
-				v:ApplyNZModifier("dtap")
+				v:ApplyNZModifier("dtap2")
 			end
 		end
 	end,
@@ -420,16 +435,22 @@ nzPerks:NewPerk("dtap2", {
 			end
 			if tbl[1] != nil then
 				for k,v in pairs(tbl) do
-					v:RevertNZModifier("dtap")
+				if v:HasNZModifier("dtap2") then
+					v:RevertNZModifier("dtap2")
+					end
 				end
 			end
 		end
+	end,
+	upgradefunc  = function(self, ply)
+	
 	end,
 })
 
 nzPerks:NewPerk("revive", {
 	name = "Quick Revive",
 	name_skin = "Up N' Atoms",
+	name_holo = "Gorilla Revive",
 	model = "models/yolojoenshit/bo3perks/revivesoda/mc_mtl_p7_zm_vending_revive.mdl",
 	skin = "models/IWperks/atoms/mc_mtl_p7_zm_vending_revive.mdl",
 	off_skin = 1,
@@ -460,11 +481,15 @@ nzPerks:NewPerk("revive", {
 	lostfunc = function(self, ply)
 
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("speed", {
 	name = "Speed Cola",
 	name_skin = "Quickies",
+	name_holo = "Boing Boing Redbull",
 	model = "models/yolojoenshit/bo3perks/speedcola/mc_mtl_p7_zm_vending_speedcola.mdl",
 	skin = "models/IWperks/quickies/mc_mtl_p7_zm_vending_speedcola.mdl",
 	off_skin = 1,
@@ -509,6 +534,9 @@ nzPerks:NewPerk("speed", {
 				v:RevertNZModifier("speed")
 			end
 		end
+	end,
+	upgradefunc  = function(self, ply)
+	
 	end,
 })
 
@@ -665,6 +693,7 @@ nzPerks:NewPerk("pap", {
 nzPerks:NewPerk("vigor", {
 	name = "Vigor Rush",
 	name_skin = "Bang Bangs (Big Damage)",
+	name_holo = "Horny Highballer",
 	model = "models/nzr/vigor.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	off_skin = 1,
@@ -686,11 +715,15 @@ nzPerks:NewPerk("vigor", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("fire", {
 	name = "Napalm Nectar",
 	name_skin = "Firestarter Fizzy",
+	name_holo = "KFP Sprite",
 	model = "models/nzr/firestarter/firestarter.mdl",
 	model_off = "models/nzr/firestarter/firestarter_off.mdl",
 	price = 2000,
@@ -710,11 +743,15 @@ nzPerks:NewPerk("fire", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("staminup", {
 	name = "Stamin-Up",
 	name_skin = "Racin' Stripes",
+	name_holo ="Tea Kettle Tequila",
 	model = "models/yolojoenshit/bo3perks/staminup/mc_mtl_p7_zm_vending_marathon.mdl",
 	skin = "models/IWperks/stripes/mc_mtl_p7_zm_vending_marathon.mdl",
 	off_skin = 1,
@@ -744,11 +781,18 @@ nzPerks:NewPerk("staminup", {
 		ply:SetStamina( 100 )
 		ply:SetMaxStamina( 100 )
 	end,
+	upgradefunc  = function(self, ply)
+	ply:SetRunSpeed(350)
+		ply:SetMaxRunSpeed( 350 )
+		ply:SetStamina( 300 )
+		ply:SetMaxStamina( 300 )
+	end,
 })
 
 nzPerks:NewPerk("politan", {
 	name = "Random-o-Politan",
 	name_skin = "Random-o-Politan",
+	name_holo = "Kureiji Cola",
 	model = "models/alig96/perks/random/random_on.mdl",
 	model_off = "models/alig96/perks/random/random_off.mdl",
 	price = 5000,
@@ -784,11 +828,15 @@ nzPerks:NewPerk("politan", {
 			end
 		
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("sake", {
 	name = "Slasher's Sake",
 	name_skin = "Slappy Taffy",
+	name_holo ="Shogun Sake",
 	skin = "models/IWperks/taffy/sake.mdl",
 	model = "models/alig96/perks/sake/sake.mdl",
 	off_skin = 1,
@@ -812,11 +860,15 @@ nzPerks:NewPerk("sake", {
 	ply:StripWeapon( "nz_yamato" )
 	ply:Give("nz_quickknife_crowbar")
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("wall", {
 	name = "Wall Power Whiskey Sour",
 	name_skin = "Wall Power Whiskey Sour",
+	name_holo = "Auto Tune Ale",
 	model_off = "models/alig96/perks/wall/wall_off.mdl",
 	model = "models/alig96/perks/wall/wall.mdl",
 	price = 8000,
@@ -836,11 +888,15 @@ nzPerks:NewPerk("wall", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("danger", {
 	name = "Danger Costa-Rican",
 	name_skin = "Danger Costa-Rican",
+	name_holo = "FAQ Bombaid",
 	model_off = "models/alig96/perks/danger/danger_off.mdl",
 	model = "models/alig96/perks/danger/danger_on.mdl",
 	price = 2000,
@@ -860,11 +916,15 @@ nzPerks:NewPerk("danger", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("everclear", {
 	name = "Explosive Everclear",
 	name_skin = "Trail Blazers",
+	name_holo = "Brat Bomb Beer",
 	skin = "models/IWperks/trailblazer/everclear.mdl",
 	off_skin = 1,
 	on_skin = 0,
@@ -887,11 +947,15 @@ nzPerks:NewPerk("everclear", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("gin", {
 	name = "Juicer's Gin",
 	name_skin = "Juicer's Gin",
+	name_holo = "Lamy's Long Island Iced Tea",
 	model_off = "models/alig96/perks/gin/gin.mdl",
 	model = "models/alig96/perks/gin/gin.mdl",
 	price = 2000,
@@ -913,7 +977,7 @@ nzPerks:NewPerk("gin", {
 	GetConVar("nz_difficulty_perks_max"):SetInt(perks+3)
 	else
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
-	GetConVar("nz_difficulty_perks_max"):SetInt(perks+1)
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+2)
 	end
 	end,
 	lostfunc = function(self, ply)
@@ -922,7 +986,16 @@ nzPerks:NewPerk("gin", {
 	GetConVar("nz_difficulty_perks_max"):SetInt(perks-3)
 	else
 	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
-	GetConVar("nz_difficulty_perks_max"):SetInt(perks-1)
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks-2)
+	end
+	end,
+		upgradefunc  = function(self, ply)
+		if #player.GetAllPlaying() <= 1 then
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+1)
+	else
+	local perks =   GetConVar("nz_difficulty_perks_max"):GetInt()
+	GetConVar("nz_difficulty_perks_max"):SetInt(perks+1)
 	end
 	end,
 })
@@ -930,6 +1003,7 @@ nzPerks:NewPerk("gin", {
 nzPerks:NewPerk("phd", {
 	name = "PhD Flopper",
 	name_skin = "Bombstoppers",
+	name_holo ="Desk Slam Daquiri",
 	skin = "models/IWperks/bomb/phdflopper.mdl", 
 	off_skin = 1,
 	on_skin = 0,
@@ -952,11 +1026,15 @@ nzPerks:NewPerk("phd", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("deadshot", {
 	name = "Deadshot Daiquiri",
 	name_skin = "Deadeye Dewdrops",
+	name_holo = "Poi Poi Puree",
 	model = "models/yolojoenshit/bo3perks/deadshot/mc_mtl_p7_zm_vending_deadshot.mdl",
 	skin = "models/IWperks/deadeye/mc_mtl_p7_zm_vending_deadshot.mdl",
 	off_skin = 1,
@@ -978,11 +1056,15 @@ nzPerks:NewPerk("deadshot", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("mulekick", {
 	name = "Mule Kick",
 	name_skin = "Mule Munchies",
+	name_holo ="Lich's Gunslinger Brew",
 	model = "models/yolojoenshit/bo3perks/mulekick/mc_mtl_p7_zm_vending_mulekick.mdl",
 	skin = "models/IWperks/munchies/mc_mtl_p7_zm_vending_mulekick.mdl",
 	off_skin = 1,
@@ -1009,11 +1091,15 @@ nzPerks:NewPerk("mulekick", {
 			end
 		end
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("tombstone", {
 	name = "Tombstone Soda",
 	name_skin = "Tombstone Soda",
+	name_holo = "Spirytus of the Reaper",
 	model_off = "models/alig96/perks/tombstone/tombstone_off.mdl",
 	model = "models/alig96/perks/tombstone/tombstone.mdl",
 	price = 2000,
@@ -1033,11 +1119,15 @@ nzPerks:NewPerk("tombstone", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("whoswho", {
 	name = "Who's Who",
 	name_skin = "Who's Who",
+	name_holo = "T-Spin Tornado",
 	model_off = "models/alig96/perks/whoswho/whoswho_off.mdl",
 	model = "models/alig96/perks/whoswho/whoswho.mdl",
 	price = 2000,
@@ -1057,11 +1147,43 @@ nzPerks:NewPerk("whoswho", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
+})
+
+nzPerks:NewPerk("pop", {
+	name = "Elemental Pop",
+	name_skin = "Elemental Pop",
+	name_holo = "Elemental Pop",
+	model_off = "models/epop/1950cokemachine.mdl",
+	model = "models/epop/1950cokemachine.mdl",
+	price = 3000,
+	price_skin = 3000,
+	material = "models/perk_bottle/c_perk_bottle_wall",
+	icon = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_iw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_waw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_bo2 = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_bo3 = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_mw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_dumb = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	color = Color(243, 127, 250),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("cherry", {
 	name = "Electric Cherry",
 	name_skin = "Blue Bolts",
+	name_holo = "Sharknado Scotch",
 	skin = "models/IWperks/bolts/cherry.mdl",
 	off_skin = 1,
 	on_skin = 0,
@@ -1084,11 +1206,15 @@ nzPerks:NewPerk("cherry", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("vulture", {
 	name = "Vulture Aid Elixir",
 	name_skin = "Vulture Aid Elixir",
+	name_holo = "Duck Hunter",
 	model_off = "models/alig96/perks/vulture/vultureaid_off.mdl",
 	model = "models/alig96/perks/vulture/vultureaid.mdl",
 	price = 3000,
@@ -1108,6 +1234,9 @@ nzPerks:NewPerk("vulture", {
 	end,
 	lostfunc = function(self, ply)
 	end,
+		upgradefunc  = function(self, ply)
+	
+	end,
 })
 
 nzPerks:NewPerk("wunderfizz", {
@@ -1118,6 +1247,7 @@ nzPerks:NewPerk("wunderfizz", {
 nzPerks:NewPerk("widowswine", {
 	name = "Widow's Wine",
 	name_skin = "Widow's Wine",
+	name_holo = "Big Web Heart",
 	model = "models/yolojoenshit/bo3perks/widows_wine/mc_mtl_p7_zm_vending_widows_wine.mdl",
 	skin = "models/yolojoenshit/bo3perks/widows_wine/mc_mtl_p7_zm_vending_widows_wine.mdl",
 	off_skin = 1,
@@ -1138,5 +1268,8 @@ nzPerks:NewPerk("widowswine", {
 	func = function(self, ply, machine)
 	end,
 	lostfunc = function(self, ply)
+	end,
+		upgradefunc  = function(self, ply)
+	
 	end,
 })

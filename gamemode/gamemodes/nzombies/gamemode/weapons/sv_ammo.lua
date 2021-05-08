@@ -88,7 +88,13 @@ function meta:GiveMaxAmmo(papoverwrite)
 	if !IsValid(ply) then return end
 	
 	local ammo_type = self:GetPrimaryAmmoType() or self.Primary.Ammo
-	local max_ammo = self:CalculateMaxAmmo(papoverwrite)
+	   local max_ammo = 0
+    if self:GetClass() == "nz_grenade" then
+        max_ammo = 4
+        ammo_type = "nz_grenade"
+    else
+        max_ammo = self:CalculateMaxAmmo(papoverwrite)
+    end
 
 	local curr_ammo = ply:GetAmmoCount( ammo_type )
 	local give_ammo = max_ammo - curr_ammo

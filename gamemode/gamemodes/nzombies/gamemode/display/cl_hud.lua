@@ -118,7 +118,7 @@ local function ScoreHud()
 						nameoffset = 10
 					end
 
-					local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+					local font = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
 
 					surface.SetFont(font)
 

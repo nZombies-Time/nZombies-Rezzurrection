@@ -238,7 +238,14 @@ if SERVER then
 		local ammo_price_pap = 4500
 		local curr_ammo = activator:GetAmmoCount( ammo_type )
 		local give_ammo = nzWeps:CalculateMaxAmmo(self.WeaponGive) - curr_ammo
-		
+		  if (self:GetWepClass() == "nz_grenade") then 
+            local nade = activator:GetItem("grenade")
+            if (activator:HasPerk("widowswine") and (!nade or nade and nade.price < 4000)) then
+                ammo_price = 4000
+            elseif (nade and ammo_price < nade.price) then
+                ammo_price = nade.price
+            end
+        end 
 		--print(ammo_type, curr_ammo, give_ammo)
 	--	local ReplacementTable = {}
 	--	table.Empty(ReplacementTable )
@@ -264,10 +271,25 @@ if SERVER then
 		if !activator:HasWeapon( self.WeaponGive ) and !giveboolet then
 		
 			activator:Buy(price, self, function()
-				local wep = activator:Give(self.WeaponGive)
-				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
-				self:SetBought(true)
-				return true
+				 if (self.WeaponGive == "nz_grenade") then   -- This can mess up grenade pricing, don't give them it
+                    local wep = activator:GetItem("grenade")
+                    if (istable(wep)) then
+                        activator:SetAmmo(wep.ammo, "nz_grenade")
+                    end
+
+                    activator:TakePoints(ammo_price)
+                    return false
+                else
+                    local wep = activator:Give(self.WeaponGive)
+                    if (wep:GetSpecialCategory() == "specialgrenade") then
+                        activator:SetAmmo(3, "nz_specialgrenade")
+                    end
+    
+                    timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
+                end
+
+                self:SetBought(true)
+                return true
 			end)
 		elseif string.lower(ammo_type) != "none" and ammo_type != -1 then
 				if giveboolet then

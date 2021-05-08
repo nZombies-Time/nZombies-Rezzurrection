@@ -20,9 +20,29 @@ if SERVER then
 		end
 	end
 	
+	function playerMeta:GiveUpgrade(id, machine)
+		local block = hook.Call("OnPlayerBuyPerk", nil, self, id, machine)
+	
+		if block or self:HasUpgrade(id) then return end
+		local perkData = nzPerks:Get(id)
+		if !perkData or !perkData.upgradefunc then return false end
+		
+		perkData.upgradefunc(id, self, machine)
+		
+		-- Specialmachine blocks the networking and storing of the perk
+		if !perkData.specialmachine then
+			if nzPerks.PlayerUpgrades[self] == nil then nzPerks.PlayerUpgrades[self] = {} end
+			
+			table.insert(nzPerks.PlayerUpgrades[self], id)
+			nzPerks:SendUpgradeSync(self)
+			hook.Call("OnPlayerGetPerk", nil, self, id, machine)
+		end
+	end
+	
 	local exceptionperks = {
 		["whoswho"] = true,
 	}
+	
 	
 	function playerMeta:RemovePerk(id, forced)
 		local block = hook.Call("OnPlayerRemovePerk", nil, self, id, forced)
@@ -59,6 +79,12 @@ if SERVER then
 			nzPerks.Players[self] = {}
 		end
 		nzPerks:SendSync(self)
+	end
+	
+		function playerMeta:RemoveUpgrades()
+	
+			nzPerks.PlayerUpgrades[self] = {}
+		nzPerks:SendUpgradeSync(self)
 	end
 	
 	function playerMeta:GiveRandomPerk(maponly)
@@ -105,9 +131,23 @@ function playerMeta:HasPerk(id)
 	return false
 end
 
+function playerMeta:HasUpgrade(id)
+	if nzPerks.PlayerUpgrades[self] == nil then nzPerks.PlayerUpgrades[self] = {} end
+	if table.HasValue(nzPerks.PlayerUpgrades[self], id) then
+		return true
+	end
+	return false
+end
+
 function playerMeta:GetPerks()
 	if nzPerks.Players[self] == nil then nzPerks.Players[self] = {} end
 	local tbl = table.Copy(nzPerks.Players[self])
 	if table.HasValue(tbl, "pap") then table.RemoveByValue(tbl, "pap") end
+	return tbl
+end
+
+function playerMeta:GetUpgrades()
+	if nzPerks.PlayerUpgrades[self] == nil then nzPerks.PlayerUpgrades[self] = {} end
+	local tbl = table.Copy(nzPerks.PlayerUpgrades[self])
 	return tbl
 end

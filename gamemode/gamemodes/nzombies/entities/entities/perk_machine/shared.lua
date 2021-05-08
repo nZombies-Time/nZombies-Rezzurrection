@@ -114,8 +114,8 @@ function ENT:Use(activator, caller)
 	if self:IsOn() then
 		local price = self:GetPrice()
 		-- As long as they have less than the max perks, unless it's pap
-		if #activator:GetPerks() < GetConVar("nz_difficulty_perks_max"):GetInt() or self:GetPerkID() == "pap" then
 			-- If they have enough money
+			print("it isnt pap")
 			local func = function()
 				local id = self:GetPerkID()
 				if !activator:HasPerk(id) then
@@ -157,14 +157,70 @@ function ENT:Use(activator, caller)
 				end
 			end
 			
+			local upgradefunc = function()
+				local id = self:GetPerkID()
+				if not activator:HasUpgrade(id) then
+					local given = true
+					
+					
+					-- Call a hook for it
+					local hookblock = hook.Call("OnPlayerBuyPerkMachine", nil, activator, self)
+					if hookblock != nil then -- Only if the hook returned true/false
+						given = hookblock
+					end
+					
+					if given then
+						if !PerkData.specialmachine then
+							local wep = activator:Give("nz_perk_bottle")
+							if IsValid(wep) then wep:SetPerk(id) end
+							timer.Simple(3, function()
+								if IsValid(activator) and activator:GetNotDowned() then
+								print("giving upgrade")
+									activator:GiveUpgrade(id, self)
+								end
+							end)
+						else
+							activator:GiveUpgrade(id, self)
+						end
+						
+						if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						self:EmitSound("nz/machines/jingle/IW/"..id.."_get.wav", 75)
+						else
+						self:EmitSound("nz/machines/jingle/"..id.."_get.wav", 75)
+						end
+						return true
+					end
+				else
+					print("Already have upgrade")
+					return false
+				end
+			end
+			
 			-- If a perk has NoBuy true, then it won't run a Buy on it but just run the func directly
 			-- (Allows stuff like dynamic pricing and conditional checks, similar to PaP)
-			if PerkData.nobuy then func() else activator:Buy(price, self, func) end
-		else
+			local id = self:GetPerkID()
+			if not PerkData.nobuy then
+			
+			if not activator:HasPerk(id) then
+			if #activator:GetPerks() < GetConVar("nz_difficulty_perks_max"):GetInt() then
+				print("has slots")
+				activator:Buy(price, self, func)
+			else
 			print(activator:Nick().." already has max perks")
-		end
-	end
+			end
+			else
+					if tobool(nzMapping.Settings.perkupgrades) then
+				activator:Buy((price*2), self, upgradefunc)
+				end
+			end
+			else
+			func()
+			end
+else
+print("that shit off")
 end
+end
+
 
 if CLIENT then
 	local usedcolor = Color(255,255,255)

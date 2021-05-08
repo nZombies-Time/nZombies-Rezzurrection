@@ -86,6 +86,9 @@ if SERVER then
 
 	net.Receive("nz_TombstoneSuicide", function(len, ply)
 		if ply:GetDownedWithTombstone() then
+		if ply:HasUpgrade("tombstone") then
+		ply:GivePoints(6000)
+		end
 			local tombstone = ents.Create("drop_tombstone")
 			tombstone:SetPos(ply:GetPos() + Vector(0,0,50))
 			tombstone:Spawn()

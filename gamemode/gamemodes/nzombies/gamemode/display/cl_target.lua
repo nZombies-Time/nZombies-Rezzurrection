@@ -29,11 +29,24 @@ local traceents = {
 		 pap = true
 		end
 		
-		if !LocalPlayer():HasWeapon( wepclass ) and !pap then
+		if !LocalPlayer():HasWeapon( wepclass ) then
+		if !pap then
 			text = "Press E to buy " .. name .." for " .. price .. " points."
 		elseif string.lower(wep.Primary.Ammo) != "none" then
-		 if LocalPlayer():HasPerk("gum") then
-		 text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 69420 .. " points."
+		
+    text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. newPrice .. " points."
+
+
+if wepclass == "nz_grenade" then
+    local nade = LocalPlayer():GetItem("grenade")
+    if (LocalPlayer():HasPerk("widowswine") and (!nade or nade and nade.price < 4000)) then
+        text = "Press E to refill primary grenades for 4000 points."
+    elseif (nade and ammo_price < nade.price) then
+	 text = "Press E to refill primary grenades" .. nade.price .. " points."
+    else
+	text = "Press E to refill primary grenades" .. ammo_price .. " points."
+    end
+end
 		 else
 			if pap then
 			if  LocalPlayer():HasWeapon( upgrade ) then
@@ -59,6 +72,7 @@ local traceents = {
 		else
 			text = "You already have this weapon."
 		end
+
 
 		return text
 	end,
@@ -110,15 +124,26 @@ local traceents = {
 				end
 			else
 				local perkData = nzPerks:Get(ent:GetPerkID())
-				-- Its on
+				-- Its on local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
 				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
 						text = "Press E to buy " .. perkData.name_skin .. " for " .. ent:GetPrice() .. " points."
+						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Laby's Secret Perk Icons" then
+						text = "Press E to buy " .. perkData.name_holo .. " for " .. ent:GetPrice() .. " points."
 						else
 						text = "Press E to buy " .. perkData.name .. " for " .. ent:GetPrice() .. " points."
 						end
 				-- Check if they already own it
-				if LocalPlayer():HasPerk(ent:GetPerkID()) then
+				if LocalPlayer():HasPerk(ent:GetPerkID()) and (LocalPlayer():HasUpgrade(ent:GetPerkID()) or tobool(nzMapping.Settings.perkupgrades) == false) then
+				
 					text = "You already own this perk."
+					elseif LocalPlayer():HasPerk(ent:GetPerkID()) and !LocalPlayer():HasUpgrade(ent:GetPerkID()) then
+					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						text = "Press E to upgrade " .. perkData.name_skin .. " for " .. ent:GetPrice()*2 .. " points."
+						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Laby's Secret Perk Icons" then
+						text = "Press E to upgrade " .. perkData.name_holo .. " for " .. ent:GetPrice()*2 .. " points."
+						else
+						text = "Press E to upgrade " .. perkData.name .. " for " .. ent:GetPrice()*2 .. " points."
+						end
 				end
 			end
 		end
@@ -136,7 +161,6 @@ local traceents = {
 		else
 				-- Its on
 						text = "Press E to Teleport for " .. ent:GetPrice() .. " points."
-				-- Check if they already own it
 			
 		end
 

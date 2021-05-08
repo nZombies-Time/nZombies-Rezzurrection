@@ -91,6 +91,34 @@ local WeaponModificationFunctionsDefaults = {
 			end
 		end
 	end,
+	dtap2 = function(wep)
+		local oldpfire = wep.PrimaryAttack
+		local ply = wep.Owner
+		if oldpfire then
+			wep.PrimaryAttack = function(...)
+				oldpfire(wep, ...)
+				if not ply:HasPerk("dtap") then
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.9
+				wep:SetNextPrimaryFire(CurTime() + delay)
+				elseif not ply:HasPerk("dtap2") then
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.75
+				wep:SetNextPrimaryFire(CurTime() + delay)
+				else
+				local delay = (wep:GetNextPrimaryFire() - CurTime())*0.6
+				wep:SetNextPrimaryFire(CurTime() + delay)
+				end
+			end
+		end
+		
+		local oldsfire = wep.SecondaryAttack
+		if oldsfire then
+			wep.SecondaryAttack = function(...)
+				oldsfire(wep, ...)
+				local delay = (wep:GetNextSecondaryFire() - CurTime())*0.8
+				wep:SetNextSecondaryFire(CurTime() + delay)
+			end
+		end
+	end,
 	pap = function(wep)
 		if wep.Primary and wep.Primary.ClipSize > 0 then
 			local newammo = wep.Primary.ClipSize + (wep.Primary.ClipSize*0.5)
@@ -540,6 +568,73 @@ end)
 
 
 nzWeps:AddWeaponModification("dtap_tfa", "dtap", function(wep)
+	return wep:IsTFA()
+end, function(wep)
+	wep.PrimaryAttackOld = wep.PrimaryAttackOld or wep.PrimaryAttack
+	wep.PrimaryAttack = function(self, ...)
+		local npfold = wep:GetNextPrimaryFire()
+		wep.PrimaryAttackOld(wep, ...)
+		if wep:GetNextPrimaryFire() <= npfold then return end
+		
+		local dtap1 = wep.Owner:HasPerk("dtap")
+		local dtap2 = wep.Owner:HasPerk("dtap2")
+		if dtap1 or dtap2  then
+			local delay = wep:GetNextPrimaryFire() - CurTime()
+			if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
+			wep:SetNextPrimaryFire(CurTime() + delay)
+			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
+				delay = wep:GetStatusEnd() - CurTime()
+				if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
+				wep:SetStatusEnd( CurTime() + delay )
+			end
+		end
+	end
+	wep.SecondaryAttackOld = wep.SecondaryAttackOld or wep.SecondaryAttack
+	wep.SecondaryAttack = function(self, ...)
+		local npfold = wep:GetNextPrimaryFire()
+		wep.SecondaryAttackOld(wep, ...)
+		if wep:GetNextPrimaryFire() <= npfold then return end
+
+		local dtap1 = wep.Owner:HasPerk("dtap")
+		local dtap2 = wep.Owner:HasPerk("dtap2")
+		if dtap1 or dtap2  then
+			local delay = wep:GetNextPrimaryFire() - CurTime()
+			if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
+			wep:SetNextPrimaryFire(CurTime() + delay)
+			if ( wep:GetStatus() == TFA.GetStatus("shooting") or wep:GetStatus()  == TFA.GetStatus("bashing") ) then
+				delay = wep:GetStatusEnd() - CurTime()
+				if dtap1 and dtap2 then
+				delay = delay * 0.6
+				elseif dtap1 and not dtap2 then
+				delay = delay * 0.75
+				elseif dtap2 and not dtap1 then
+				delay = delay * 0.9
+			end
+				wep:SetStatusEnd( CurTime() + delay )
+			end
+		end
+	end
+end)
+
+nzWeps:AddWeaponModification("dtap2_tfa", "dtap2", function(wep)
 	return wep:IsTFA()
 end, function(wep)
 	wep.PrimaryAttackOld = wep.PrimaryAttackOld or wep.PrimaryAttack

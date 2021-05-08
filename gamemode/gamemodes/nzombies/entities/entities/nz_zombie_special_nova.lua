@@ -145,7 +145,7 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	if (dmgInfo:IsDamageType( 2 ) and !hasExploded) then
+	if not hasExploded then
 			for k,v in pairs(ents.FindInSphere(self:GetPos(),100)) do
 						if v:IsPlayer() then
 						local walk = v:GetWalkSpeed()

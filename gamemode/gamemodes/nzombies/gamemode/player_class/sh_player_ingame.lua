@@ -60,7 +60,7 @@ function PLAYER:Spawn()
 
 	-- Reset their perks
 	self.Player:RemovePerks()
-
+	nzPerks.PlayerUpgrades[self] = {}
 	-- activate zombie targeting
 	self.Player:SetTargetPriority(TARGET_PRIORITY_PLAYER)
 

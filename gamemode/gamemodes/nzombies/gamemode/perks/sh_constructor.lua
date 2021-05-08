@@ -5,3 +5,4 @@ nzPerks.Data = nzPerks.Data or {}
 -- Variables
 
 nzPerks.Players = nzPerks.Players or {}
+nzPerks.PlayerUpgrades = nzPerks.PlayerUpgrades or {}

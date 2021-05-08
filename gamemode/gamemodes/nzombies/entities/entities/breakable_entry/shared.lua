@@ -95,6 +95,9 @@ function ENT:Use( activator, caller )
 		if self:GetHasPlanks() and self:GetNumPlanks() < GetConVar("nz_difficulty_barricade_planks_max"):GetInt() then
 			self:AddPlank()
 					if activator:HasPerk("amish") then
+					if activator:HasUpgrade("amish") and math.random(1,4) == 2 then
+					activator:GivePoints(115)
+					end
 					activator:GivePoints(30)
 					else
                   activator:GivePoints(10)

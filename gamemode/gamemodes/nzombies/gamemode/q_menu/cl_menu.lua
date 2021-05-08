@@ -504,7 +504,12 @@ function nzQMenu:CreatePropsMenu( )
 		end
 	end
 	
-	if !file.Exists( "nz/spawnlist.txt", "DATA" ) then
+	 local empty = !file.Exists( "nz/spawnlist.txt", "DATA" )
+  if !empty then
+    empty = #file.Read("nz/spawnlist.txt") == 0
+  end    
+  
+  if empty then
 		if !file.Exists( "nz/", "DATA" ) then
 			file.CreateDir( "nz" )
 		end

@@ -41,6 +41,7 @@ if SERVER then
 		self.OldPerks = self:GetPerks()
 
 		self:RemovePerks()
+		self:RemoveUpgrades()
 
 		self.DownPoints = math.Round(self:GetPoints()*0.05, -1)
 		if self.DownPoints >= self:GetPoints() then

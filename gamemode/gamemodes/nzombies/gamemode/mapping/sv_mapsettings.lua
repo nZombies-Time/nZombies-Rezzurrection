@@ -131,6 +131,9 @@ function nzMapping:LoadMapSettings(data)
 	if data.icontype then
 		nzMapping.Settings.icontype = (data.icontype) or "Rezzurrection"
 	end
+	if data.perkupgrades then
+		nzMapping.Settings.perkupgrades = (data.perkupgrades) or nil
+	end
 
 
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns

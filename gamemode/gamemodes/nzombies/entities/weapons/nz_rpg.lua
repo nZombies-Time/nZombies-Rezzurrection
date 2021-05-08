@@ -39,7 +39,7 @@ SWEP.VMPos_Additive = false --Set to false for an easier time using VMPos. If tr
 SWEP.Primary.ClipSize		= -1
 SWEP.Primary.DefaultClip	= -1
 SWEP.Primary.Automatic		= false
-SWEP.Primary.Ammo			= "none"
+SWEP.Primary.Ammo			= "nz_specialgrenade"
 SWEP.Primary.Sound			= Sound("robotnik_bo1_law.Single")	
 
 SWEP.Secondary.ClipSize		= -1

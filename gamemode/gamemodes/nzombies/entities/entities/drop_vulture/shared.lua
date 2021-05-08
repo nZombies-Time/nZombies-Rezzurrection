@@ -19,7 +19,11 @@ local vulturedrops = {
 		id = "points",
 		model = Model("models/props_junk/garbage_bag001a.mdl"),
 		effect = function(ply)
+		if ply:HasUpgrade("vulture") then
+			ply:GivePoints(math.random(200,400))
+			else
 			ply:GivePoints(math.random(50,150))
+		end
 			return true
 		end,
 		timer = 30,
@@ -38,6 +42,9 @@ local vulturedrops = {
 			if IsValid(wep) then
 				local max = nzWeps:CalculateMaxAmmo(wep:GetClass())
 				local give = max/math.Rand(9,11)
+				if ply:HasUpgrade("vulture") then
+				give = max/math.Rand(20,25)
+				end
 				local ammo = wep.Primary.Ammo
 				local cur = ply:GetAmmoCount(ammo)
 

@@ -66,6 +66,7 @@ nzTools:CreateTool("settings", {
 		valz["Row39"] = data.textcolor == nil and Color(0, 255, 255, 255) or data.textcolor
 		valz["Row40"] = data.fontthicc or 2
 		valz["Row41"] = data.icontype or "Rezzurrection"
+		valz["Row42"] = data.perkupgrades or false
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -484,6 +485,12 @@ nzTools:CreateTool("settings", {
 			end
 			Row41.DataChanged = function( _, val ) valz["Row41"] = val end
 			Row41:SetTooltip("Changes the style of the perk icons")
+			
+			local Row42 = DProperties:CreateRow( "Map Settings", "Perk Upgrades?" )
+			Row42:Setup( "Boolean" )
+			Row42:SetValue( valz["Row42"] )
+			Row42.DataChanged = function( _, val ) valz["Row42"] = val end
+			Row42:SetTooltip("Enable upgradeable perks on this config")
 		end
 
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
@@ -527,6 +534,7 @@ nzTools:CreateTool("settings", {
 			if !istable(valz["Row39"]) then data.textcolor = Color(0, 255, 255, 255) else data.textcolor = valz["Row39"] end
 			if !tonumber(valz["Row40"]) then data.fontthicc  = 2 else data.fontthicc  = tonumber(valz["Row40"]) end
 			if !valz["Row41"] then data.icontype = "Rezzurrection" else data.icontype = valz["Row41"] end
+			if !valz["Row42"] then data.perkupgrades = nil else data.perkupgrades = valz["Row42"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end

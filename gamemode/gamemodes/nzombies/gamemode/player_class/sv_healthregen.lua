@@ -3,13 +3,24 @@ local HealthRegen = {
 	Delay = 2.5,
 	Rate = 0.05
 }
+local HealthRegenFast = {
+	Amount = 15,
+	Delay = 1.5,
+	Rate = 0.07
+}
 
 hook.Add( "Think", "RegenHealth", function()
 	for k,v in pairs( player.GetAll() ) do
-
+		if v:HasUpgrade("revive") then
+		if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegenFast.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegenFast.Delay) then
+			v.lastregen = CurTime()
+			v:SetHealth( math.Clamp(v:Health() + HealthRegenFast.Amount, 0, v:GetMaxHealth() ) )
+		end
+		else
 		if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegen.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegen.Delay) then
 			v.lastregen = CurTime()
 			v:SetHealth( math.Clamp(v:Health() + HealthRegen.Amount, 0, v:GetMaxHealth() ) )
+		end
 		end
 	end
 end )
