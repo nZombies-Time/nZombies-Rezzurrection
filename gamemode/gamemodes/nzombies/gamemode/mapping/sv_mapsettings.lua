@@ -5,6 +5,10 @@ function nzMapping:LoadMapSettings(data)
 	if data.startwep then
 		nzMapping.Settings.startwep = weapons.Get(data.startwep) and data.startwep or "robotnik_bo1_1911"
 	end
+	
+	if data.knife then
+		nzMapping.Settings.knife = weapons.Get(data.knife) and data.knife or "nz_knife_boring"
+	end
 	if data.startpoints then
 		nzMapping.Settings.startpoints = tonumber(data.startpoints) or 500
 	end

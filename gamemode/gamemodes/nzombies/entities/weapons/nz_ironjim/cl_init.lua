@@ -3,7 +3,7 @@ include('shared.lua')
 
 
 SWEP.PrintName			= "The Classic"
-SWEP.ClassName			= "nz_buzz"
+SWEP.ClassName			= "nz_ironjim"
 SWEP.Slot				= 0
 SWEP.SlotPos			= 0
 SWEP.DrawAmmo			= false

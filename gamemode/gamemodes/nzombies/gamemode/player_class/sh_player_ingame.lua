@@ -37,7 +37,12 @@ function PLAYER:Loadout()
 			self.Player:FAS2_PickUpAttachment(v.key)
 		end
 	end
-	self.Player:Give("nz_quickknife_crowbar")
+	if nzMapping.Settings.knife then
+		self.Player:Give( nzMapping.Settings.knife )
+	else
+		-- A setting does not exist, give default starting weapons
+			self.Player:Give("nz_knife_boring" )
+	end
 	
 	-- We need this to disable the grenades for those that it causes problems with until they've been remade :(
 	if !GetConVar("nz_failsafe_preventgrenades"):GetBool() then

@@ -63,8 +63,11 @@ local function OnWeaponAdded( weapon )
 						if ply:HasPerk("speed") then
 							weapon:ApplyNZModifier("speed")
 						end
-						if ply:HasPerk("dtap") or ply:HasPerk("dtap2")  then
+						if ply:HasPerk("dtap") then
 							weapon:ApplyNZModifier("dtap")
+						end
+						if ply:HasPerk("dtap2") then
+							weapon:ApplyNZModifier("dtap2")
 						end
 						if ply:HasPerk("politan") then
 							weapon:ApplyNZModifier("rando")

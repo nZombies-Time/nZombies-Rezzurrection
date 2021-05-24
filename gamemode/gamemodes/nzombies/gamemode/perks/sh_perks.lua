@@ -86,6 +86,7 @@ nzPerks:NewPerk("jugg", {
 	icon_dumb = Material("AF/juggular.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/jugg.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/jugg.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/jugg.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
 			ply:SetMaxHealth(250)
@@ -121,7 +122,7 @@ nzPerks:NewPerk("gum", {
 	icon_cw = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
 	icon_dumb = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
-	icon_holo = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
 		local rand = math.random(3,20)
@@ -335,6 +336,7 @@ nzPerks:NewPerk("dtap", {
 	icon_cw = Material("perk_icons/cw/dtap.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dtap.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/dtap.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/dtap.png", "smooth unlitgeneric"),
 	color = Color(255, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -353,9 +355,9 @@ nzPerks:NewPerk("dtap", {
 					table.insert(tbl, v)
 			end
 			if tbl[1] != nil then
-				if v:HasNZModifier("dtap") then
+				for k,v in pairs(tbl) do
 					v:RevertNZModifier("dtap")
-			end
+				end
 			end
 	end,
 	upgradefunc  = function(self, ply)
@@ -384,6 +386,7 @@ nzPerks:NewPerk("amish", {
 	icon_cw =  Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
 	icon_dumb =  Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/amish.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
 	color = Color(255, 255, 100),
 	func = function(self, ply, machine)
 	end,
@@ -415,6 +418,7 @@ nzPerks:NewPerk("dtap2", {
 	icon_cw = Material("perk_icons/waw/dtap2.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dtap2.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/dtap2.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/dtap2.png", "smooth unlitgeneric"),
 	color = Color(255, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -428,19 +432,15 @@ nzPerks:NewPerk("dtap2", {
 		end
 	end,
 	lostfunc = function(self, ply)
-		if !ply:HasPerk("dtap") then
 			local tbl = {}
 			for k,v in pairs(ply:GetWeapons()) do
 					table.insert(tbl, v)
 			end
 			if tbl[1] != nil then
 				for k,v in pairs(tbl) do
-				if v:HasNZModifier("dtap2") then
 					v:RevertNZModifier("dtap2")
-					end
 				end
 			end
-		end
 	end,
 	upgradefunc  = function(self, ply)
 	
@@ -467,6 +467,7 @@ nzPerks:NewPerk("revive", {
 	icon_cw = Material("perk_icons/cw/revive.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/quack.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/revive.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/revive.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 255),
 	func = function(self, ply, machine)
 			if #player.GetAllPlaying() <= 1 then
@@ -506,6 +507,7 @@ nzPerks:NewPerk("speed", {
 	icon_cw = Material("perk_icons/cw/speed.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/spud.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/speed.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/speed.png", "smooth unlitgeneric"),
 	color = Color(100, 255, 100),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -710,6 +712,7 @@ nzPerks:NewPerk("vigor", {
 	icon_cw = Material("perk_icons/cw/dtap2.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/vigor.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/vigor.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/vigor.png", "smooth unlitgeneric"),
 	color = Color(128, 128, 64),
 	func = function(self, ply, machine)
 	end,
@@ -738,6 +741,7 @@ nzPerks:NewPerk("fire", {
 	icon_cw = Material("perk_icons/cw/fire.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/napalm.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/fire.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/fire.png", "smooth unlitgeneric"),
 	color = Color(222, 69, 2),
 	func = function(self, ply, machine)
 	end,
@@ -768,6 +772,7 @@ nzPerks:NewPerk("staminup", {
 	icon_cw = Material("perk_icons/cw/staminup.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dorito.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/staminup.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/staminup.png", "smooth unlitgeneric"),
 	color = Color(200, 255, 100),
 	func = function(self, ply, machine)
 		ply:SetRunSpeed(321)
@@ -807,6 +812,7 @@ nzPerks:NewPerk("politan", {
 	icon_cw = Material("perk_icons/cw/random.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/random.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/random.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/random.png", "smooth unlitgeneric"),
 	color = Color(255, 172, 224),
 	func = function(self, ply, machine)
 		local tbl = {}
@@ -853,6 +859,7 @@ nzPerks:NewPerk("sake", {
 	icon_cw = Material("perk_icons/cw/sake.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/sake.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/sake.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/sake.png", "smooth unlitgeneric"),
 	color = Color(185, 214, 0),
 	func = function(self, ply, machine)
 	end,
@@ -883,6 +890,7 @@ nzPerks:NewPerk("wall", {
 	icon_cw = Material("perk_icons/cw/wall.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/flaccid.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/wall.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/wall.png", "smooth unlitgeneric"),
 	color = Color(230, 104, 167),
 	func = function(self, ply, machine)
 	end,
@@ -911,6 +919,7 @@ nzPerks:NewPerk("danger", {
 	icon_cw = Material("perk_icons/cw/danger.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/danger.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/danger.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/danger.png", "smooth unlitgeneric"),
 	color = Color(232, 116, 116),
 	func = function(self, ply, machine)
 	end,
@@ -942,6 +951,7 @@ nzPerks:NewPerk("everclear", {
 	icon_cw = Material("perk_icons/cw/everclear.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/everclear.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/everclear.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/everclear.png", "smooth unlitgeneric"),
 	color = Color(222, 222, 222),
 	func = function(self, ply, machine)
 	end,
@@ -970,6 +980,7 @@ nzPerks:NewPerk("gin", {
 	icon_cw = Material("perk_icons/cw/gin.png", "smooth unlitgeneric"),
 	icon_dumb = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/gin.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/gin.png", "smooth unlitgeneric"),
 	color = Color(75, 158, 188),
 	func = function(self, ply, machine)
 	if #player.GetAllPlaying() <= 1 then
@@ -1021,6 +1032,7 @@ nzPerks:NewPerk("phd", {
 	icon_cw = Material("perk_icons/cw/phd.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/phd.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/phd.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/phd.png", "smooth unlitgeneric"),
 	color = Color(255, 50, 255),
 	func = function(self, ply, machine)
 	end,
@@ -1051,6 +1063,7 @@ nzPerks:NewPerk("deadshot", {
 	icon_cw = Material("perk_icons/cw/deadshot.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dragunov.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/deadshot.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/deadshot.png", "smooth unlitgeneric"),
 	color = Color(150, 200, 150),
 	func = function(self, ply, machine)
 	end,
@@ -1081,6 +1094,7 @@ nzPerks:NewPerk("mulekick", {
 	icon_cw = Material("perk_icons/cw/mulekick.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/mule.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/mulekick.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/mule.png", "smooth unlitgeneric"),
 	color = Color(100, 200, 100),
 	func = function(self, ply, machine)
 	end,
@@ -1114,6 +1128,7 @@ nzPerks:NewPerk("tombstone", {
 	icon_cw = Material("perk_icons/cw/tombstone.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/tombstone.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/tombstone.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/tombstone.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 100),
 	func = function(self, ply, machine)
 	end,
@@ -1142,6 +1157,7 @@ nzPerks:NewPerk("whoswho", {
 	icon_cw = Material("perk_icons/cw/whoswho.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/who.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/whoswho.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/whoswho.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 255),
 	func = function(self, ply, machine)
 	end,
@@ -1170,6 +1186,7 @@ nzPerks:NewPerk("pop", {
 	icon_cw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
 	icon_dumb = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/pop.png", "smooth unlitgeneric"),
 	color = Color(243, 127, 250),
 	func = function(self, ply, machine)
 	end,
@@ -1201,6 +1218,7 @@ nzPerks:NewPerk("cherry", {
 	icon_cw = Material("perk_icons/cw/cherry.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/ec.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/cherry.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/cherry.png", "smooth unlitgeneric"),
 	color = Color(50, 50, 200),
 	func = function(self, ply, machine)
 	end,
@@ -1229,6 +1247,7 @@ nzPerks:NewPerk("vulture", {
 	icon_cw = Material("perk_icons/cw/vulture.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/vultureaid.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/vulture.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/vulture.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
 	end,
@@ -1264,6 +1283,7 @@ nzPerks:NewPerk("widowswine", {
 	icon_cw = Material("perk_icons/cw/widows_wine.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/widowswine.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/widows.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/nobg/widowswine.png", "smooth unlitgeneric"),
 	color = Color(255, 50, 200),
 	func = function(self, ply, machine)
 	end,

@@ -324,6 +324,9 @@ function GetFontType(id)
 	if id == "BO2/3" then
 	return "blackops2"
 	end
+	if id == "BO4" then
+	return "blackops4"
+	end
 		if id == "Comic Sans" then
 	return "xd"
 	end

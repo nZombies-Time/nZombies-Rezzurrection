@@ -377,7 +377,7 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	
 	--Emergency Sake
 	if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_bowieknife") and !ply:HasWeapon("nz_perk_bottle") then
-	ply:StripWeapon( "nz_quickknife_crowbar" )
+	ply:StripWeapon( "nz_knife_butterfly" )
 								ply:Give("nz_yamato")
 	end
 	

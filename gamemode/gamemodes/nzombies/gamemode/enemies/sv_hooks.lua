@@ -196,6 +196,14 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 	
 	local attacker = dmginfo:GetAttacker()
 
+  if !attacker:IsPlayer() then
+        if IsValid(zombie) and zombie:IsValidZombie() and zombie:Health() > 0 then
+            if (attacker:GetClass() == "nz_trap_projectiles" or attacker:GetClass() == "nz_trap_turret") then 
+                zombie:Kill()
+            end
+        end
+    return end
+	
 	if !attacker:IsValid() then return end
 	if IsValid(zombie) then
 		if zombie.NZBossType then
@@ -376,7 +384,10 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			--if hitgroup == HITGROUP_HEAD and !dmginfo:IsDamageType( 128 ) and !dmginfo:IsDamageType( 4 ) then dmginfo:ScaleDamage(1.5) end Why do this again?
 
 			--  Pack-a-Punch doubles damage...hell no it doesnt
-
+			if dmginfo:GetDamageType() == DMG_CRUSH then
+				dmginfo:SetDamage(80)
+			end
+			
 			if zombie:Health() > dmginfo:GetDamage() then
 				if zombie.HasTakenDamageThisTick then return end
 				if attacker:IsPlayer() and attacker:GetNotDowned() and !hook.Call("OnZombieShot", nil, zombie, attacker, dmginfo, hitgroup) then
@@ -385,6 +396,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 					end
 					attacker:GivePoints(10)
 				end
+				
 				zombie.HasTakenDamageThisTick = true
 				--  Prevent multiple damages in one tick (FA:S 2 Bullet penetration makes them hit 1 zombie 2-3 times per bullet)
 				timer.Simple(0, function() if IsValid(zombie) then zombie.HasTakenDamageThisTick = false end end)

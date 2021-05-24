@@ -1,3 +1,5 @@
+-- Fixed by Ethorbit
+
 nzTools:CreateTool("traps_logic", {
 	displayname = "Traps, Buttons, Logic",
 	desc = "LMB: Create Entity, RMB: Remove Entity, R: Duplicate Entity, C: Edit Properties",
@@ -13,9 +15,39 @@ nzTools:CreateTool("traps_logic", {
 			ent = ents.Create(data.classname)
 		end
 		ent:SetPos(tr.HitPos)
-		--ent:SetAngles(tr.HitNormal:Angle() + Angle(90,0,0))
+		
+		if (IsValid(ent)) then
+			if (ent:GetClass() == "nz_trap_propeller") then
+				ent:SetAngles((tr.HitNormal:Angle() + Angle(90,0,0)))
+				if (ent:GetAngles()[2] == 0) then
+					ent:SetAngles(ent:GetAngles() + Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2], 0))
+				end
+
+				ent:SetPos(ent:GetPos() + ent:GetUp() * 17)
+			elseif (ent:GetClass() == "nz_trap_particles") then
+				ent:SetAngles((tr.HitNormal:Angle()))
+			elseif (ent:GetClass() == "nz_button") then
+				ent:SetAngles(tr.HitNormal:Angle() + Angle(180,90,180)) 
+				ent:SetPos(ent:GetPos() - (ent:GetRight() * 5))
+			elseif (ent:GetClass() == "nz_trap_turret") then
+				ent:SetAngles(Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2] + 180,0))
+			else
+				ent:SetAngles(tr.HitNormal:Angle() + Angle(90,0,0)) 
+			end
+		end
+			
+		ent:SetMoveType( MOVETYPE_NONE )
+		ent:SetSolid( SOLID_VPHYSICS )
+
 		ent:Spawn()
 		ent:Activate()
+		ent:PhysicsInit( SOLID_VPHYSICS )
+		ent:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+
+		local phys = ent:GetPhysicsObject()
+		if IsValid(phys) then
+			phys:EnableMotion(false)
+		end
 		
 		if IsValid(ply) then
 			undo.Create( "Logic/Trap" )
@@ -34,7 +66,13 @@ nzTools:CreateTool("traps_logic", {
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
 		if IsValid(tr.Entity) then
-			tr.Entity:Remove()
+			if (nzTraps and nzTraps.Registry and table.HasValue(nzTraps.Registry, tr.Entity:GetClass())) then
+				tr.Entity:Remove()
+			end
+			
+			if (nzLogic and nzLogic.Registry and table.HasValue(nzLogic.Registry, tr.Entity:GetClass())) then
+				tr.Entity:Remove()
+			end
 		end
 	end,
 	Reload = function(wep, ply, tr, data)
@@ -105,12 +143,19 @@ nzTools:CreateTool("traps_logic", {
 			return list
 		end
 
+		local contWidth, contHeight = cont:GetSize()
+
 		local traps = vgui.Create( "DCollapsibleCategory", cont )
 		traps:SetExpanded( 1 )
 		traps:SetLabel( "Traps" )
 		traps:Dock(TOP)
 
-		genSpawnList(nzTraps:GetAll(), traps)
+		local trapsScroll = vgui.Create("DScrollPanel", traps)
+		trapsScroll:Dock(TOP)
+		trapsScroll:SetHeight(270)
+		trapsScroll:SetWidth(contWidth)
+
+		genSpawnList(nzTraps:GetAll(), trapsScroll)
 
 
 		local logic = vgui.Create( "DCollapsibleCategory", cont )
@@ -118,8 +163,12 @@ nzTools:CreateTool("traps_logic", {
 		logic:SetLabel( "Logic" )
 		logic:Dock(TOP)
 
-		PrintTable(nzLogic:GetAll())
-		genSpawnList(nzLogic:GetAll(), logic)
+		local logicScroll = vgui.Create("DScrollPanel", logic)
+		logicScroll:Dock(TOP)
+		logicScroll:SetHeight(180)
+		logicScroll:SetWidth(contWidth)
+
+		genSpawnList(nzLogic:GetAll(), logicScroll)
 
 		return cont
 	end,

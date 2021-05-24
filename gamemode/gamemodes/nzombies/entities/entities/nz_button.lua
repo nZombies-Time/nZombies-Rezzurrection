@@ -1,3 +1,5 @@
+-- Fixed by Ethorbit
+
 AddCSLuaFile( )
 
 ENT.Type = "anim"
@@ -31,6 +33,8 @@ ENT.ModelTranslate = {
 	{model = "models/maxofs2d/button_slider.mdl", gmod_button = true}
 }
 
+ENT.NZEntity = true
+
 DEFINE_BASECLASS("nz_activatable")
 
 function ENT:SetupDataTables()
@@ -47,20 +51,25 @@ function ENT:SetupDataTables()
 	modelTbl["Gmod Button 6"] = 8
 	modelTbl["Gmod Button 7"] = 9
 
-	self:NetworkVar( "Int", 1, "ModelID", {KeyName = "nz_model_id", Edit = {order = -1, type = "Combo", text = "Select a model!", values = modelTbl}} )
+	self:NetworkVar( "Int", 1, "ModelID", {KeyName = "nz_model_id", Edit = {title = "Model", order = -1, type = "Combo", text = "Select a model!", values = modelTbl}} )
+
+	self:SetCooldownActive(false)
 
 	self:NetworkVarNotify( "ModelID", self.OnModelChange)
 
 	self:SetModelID(1)
-
+	
 	--the name of the linked ents
 	self:ButtonSetupDataTables()
+
+	--self:SetCooldownActive(false)
+	--self:SetRemoteActivated(false)
 end
 
 function ENT:ButtonSetupDataTables()
-	self:NetworkVar( "String", 1, "LinkedNZName1", {KeyName = "nz_linked_name1", Edit = {order = 20, type = "Generic"}} )
-	self:NetworkVar( "String", 2, "LinkedNZName2", {KeyName = "nz_linked_name2", Edit = {order = 21, type = "Generic"}} )
-	self:NetworkVar( "String", 3, "LinkedNZName3", {KeyName = "nz_linked_name3", Edit = {order = 22, type = "Generic"}} )
+	self:NetworkVar( "String", 1, "LinkedNZName1", {KeyName = "nz_linked_name1", Edit = {title = "Trap Flag 1", order = 20, type = "Generic"}} )
+	self:NetworkVar( "String", 2, "LinkedNZName2", {KeyName = "nz_linked_name2", Edit = {title = "Trap Flag 2", order = 21, type = "Generic"}} )
+	self:NetworkVar( "String", 3, "LinkedNZName3", {KeyName = "nz_linked_name3", Edit = {title = "Trap Flag 3", order = 22, type = "Generic"}} )
 end
 
 function ENT:GetLinkedEnts()
@@ -73,18 +82,21 @@ function ENT:GetLinkedEnts()
 end
 
 function ENT:OnModelChange(name, old, new)
-	self:SetModel(self.ModelTranslate[new].model)
+	if (IsValid(self) and new and self.ModelTranslate[new] and self.ModelTranslate[new].model) then
+		self:SetModel(self.ModelTranslate[new].model)
+	end
 end
 
 function ENT:Initialize()
+	BaseClass.Initialize(self)
 	self:SetModel(self.ModelTranslate[self:GetModelID()].model)
-
-	self:PhysicsInit( SOLID_VPHYSICS )
-	self:SetSolid( SOLID_VPHYSICS )
-
-	local phys = self:GetPhysicsObject()
-	phys:EnableMotion(false)
 	self.PosePosition = 0
+	self:SetCooldownActive(false)
+	self:SetActive(false)
+
+	if (self:GetElectricityNeeded() and !nzElec:IsOn()) then
+		self:OnPoweredOff()
+	end
 end
 
 function ENT:Think()
@@ -97,11 +109,11 @@ function ENT:Think()
 	end
 end
 
-if CLIENT then
-	function ENT:Draw()
+if CLIENT then	
+	function ENT:Draw()	
 		BaseClass.Draw(self)
 
-		if ConVarExists("nz_creative_preview") and !GetConVar("nz_creative_preview"):GetBool() and nzRound:InState( ROUND_CREATE ) then
+		if ConVarExists("nz_creative_preview") and !GetConVar("nz_creative_preview"):GetBool() and nzRound:InState( ROUND_CREATE ) then		
 			-- draw "wires" in creative this is very resource intensive
 			for _, lEntsWithName in pairs(self:GetLinkedEnts()) do
 				for _, lEnt in pairs(lEntsWithName) do
@@ -116,18 +128,42 @@ if CLIENT then
 	end
 end
 
-function ENT:Activation(caller, duration, cooldown)
-	BaseClass.Activation(self, caller, duration, cooldown)
+function ENT:Activation(caller, duration, cooldown, creativeMode)
+	BaseClass.Activation(self, caller, duration, cooldown, creativeMode)
 
 	nzDoors:OpenLinkedDoors(self:GetLinkedNZName1())
 	nzDoors:OpenLinkedDoors(self:GetLinkedNZName2())
-	nzDoors:OpenLinkedDoors(self:GetLinkedNZName3())
+	nzDoors:OpenLinkedDoors(self:GetLinkedNZName3()) 
 
 	for _, lEntsWithName in pairs(self:GetLinkedEnts()) do
 		for _, lEnt in pairs(lEntsWithName) do
-			if IsValid(lEnt) and !lEnt:IsPlayer() then
-				lEnt:Activation(caller, duration, cooldown)
+			if IsValid(lEnt) and !lEnt:IsPlayer() and !lEnt:GetActive() then
+				lEnt:Activation(caller, duration, cooldown, creativeMode)
 			end
+		end
+	end
+
+	for _,v in pairs(ents.FindByClass("nz_button")) do 
+		if (#self:GetNZName() > 0 and v:GetNZName() == self:GetNZName() and !v:GetActive()) then
+			v:Activation(caller, duration, cooldown, creativeMode)
+		end
+	end
+end
+
+function ENT:Deactivation(creativeMode)
+	BaseClass.Deactivation(self, creativeMode)
+	
+	for _, lEntsWithName in pairs(self:GetLinkedEnts()) do
+		for _, lEnt in pairs(lEntsWithName) do
+			if IsValid(lEnt) and !lEnt:IsPlayer() and lEnt:GetActive() then
+				lEnt:Deactivation(creativeMode)
+			end
+		end
+	end
+
+	for _,v in pairs(ents.FindByClass("nz_button")) do 
+		if (#self:GetNZName() > 0 and v:GetNZName() == self:GetNZName() and v:GetActive()) then
+			v:Deactivation(creativeMode)
 		end
 	end
 end
@@ -137,8 +173,17 @@ function ENT:Ready()
 end
 
 -- IMPLEMENT ME
+
+function ENT:OnPoweredOff()
+	self:SetSkin(3)
+end
+
 function ENT:OnActivation(caller, duration, cooldown)
-	self:SetSkin(2)
+	self:SetSkin(3)
+end
+
+function ENT:OnCooldown()
+	self:SetSkin(3)
 end
 
 function ENT:OnDeactivation()

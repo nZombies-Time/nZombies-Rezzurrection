@@ -94,6 +94,47 @@ surface.CreateFont( "nz.rounds.blackops2", {
 	weight = 30,
 	antialias = true,
 } )
+
+--Black Ops 4
+surface.CreateFont( "nz.main.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	size =  58,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.small.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size = 55,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.points.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size =  48,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	size =  30,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo2.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	size = 20,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.rounds.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size = 400,
+	weight = 30,
+	antialias = true,
+} )
 --Old Treyarch
 surface.CreateFont( "nz.main.waw", {
 	font = "OPTIMA",

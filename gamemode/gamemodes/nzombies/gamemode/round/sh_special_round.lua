@@ -83,6 +83,7 @@ nzRound:AddIconType("Infinite Warfare", "nz_zombie_walker", {})
 nzRound:AddIconType("Modern Warfare", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Cold War", "nz_zombie_walker", {}) 
 nzRound:AddIconType("April Fools", "nz_zombie_walker", {}) 
+nzRound:AddIconType("No Background", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Secret Code Required", "nz_zombie_walker", {}) 
 
 function nzRound:GetIconType(id)
@@ -106,6 +107,9 @@ function nzRound:GetIconType(id)
 	end
 		if id == "Cold War" then
 	return "Cold War"
+	end
+		if id == "No Background" then
+	return "No Background"
 	end
 		if id == "April Fools" then
 	return "April Fools"
@@ -141,6 +145,7 @@ end
 nzRound:AddFontType("Classic NZ", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Old Treyarch", "nz_zombie_walker", {}) 
 nzRound:AddFontType("BO2/3", "nz_zombie_walker", {})  
+nzRound:AddFontType("BO4", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Comic Sans", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Warprint", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Road Rage", "nz_zombie_walker", {}) 
@@ -197,6 +202,8 @@ end
 
 nzRound:AddHUDType("Black Ops 3", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Cold War", "nz_zombie_walker", {
+}) 
 nzRound:AddHUDType("Division 9", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Mob of the Dead", "nz_zombie_walker", {
@@ -243,6 +250,9 @@ nzRound:AddHUDType("Simple (Outline)", "nz_zombie_walker", {
 function nzRound:GetHUDType(id)
 	if id == "Black Ops 3" then
 	return "b03_hud.png"
+	end
+	if id == "Cold War" then
+	return "cw_hud.png"
 	end
 	if id == "Division 9" then
 	return "D9.png"

@@ -19,6 +19,9 @@ function player:GetHUDPointsType(id)
 	if id == "Black Ops 3" then
 	 return "bo3_score1.png"
 	end
+	if id == "Cold War" then
+	 return "cw_score1.png"
+	end
 		if id == "Buried" then
 	return "buried_score1.png"
 	end

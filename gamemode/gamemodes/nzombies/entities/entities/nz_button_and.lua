@@ -1,3 +1,5 @@
+-- Fixed by Ethorbit
+
 AddCSLuaFile( )
 
 ENT.Type = "anim"
@@ -6,16 +8,18 @@ ENT.Base = "base_entity"
 nzLogic:Register("nz_button_and")
 ENT.SpawnIcon = "models/maxofs2d/button_03.mdl"
 ENT.PrintName = "AND Gate/Button"
-ENT.Description = "This Gate will trigger if all activators linked to this butoons are activate at the same time."
+ENT.Description = "This Gate will trigger if all activators linked to this buttons are activated at the same time."
+
+ENT.NZEntity = true
 
 DEFINE_BASECLASS("nz_button")
 
 function ENT:ButtonSetupDataTables()
 	self:SetModelID(5)
 
-	self:NetworkVar( "String", 1, "ActivatorNZName1", {KeyName = "nz_activator_name1", Edit = {order = 20, type = "Generic"}} )
-	self:NetworkVar( "String", 2, "ActivatorNZName2", {KeyName = "nz_activator_name2", Edit = {order = 21, type = "Generic"}} )
-	self:NetworkVar( "String", 3, "LinkedNZName", {KeyName = "nz_linked_name1", Edit = {order = 22, type = "Generic"}} )
+	self:NetworkVar( "String", 1, "ActivatorNZName1", {KeyName = "nz_activator_name1", Edit = {title = "Button Flag 1", order = 20, type = "Generic"}} )
+	self:NetworkVar( "String", 2, "ActivatorNZName2", {KeyName = "nz_activator_name2", Edit = {title = "Button Flag 2", order = 21, type = "Generic"}} )
+	self:NetworkVar( "String", 3, "LinkedNZName", {KeyName = "nz_linked_name1", Edit = {order = 23, type = "Generic"}} )
 
 	self:SetRemoteActivated(true)
 end
@@ -30,6 +34,7 @@ function ENT:GetActivatorEnts()
 	local result = {}
 	table.insert(result, self:GetEntsByNZName(self:GetActivatorNZName1()))
 	table.insert(result, self:GetEntsByNZName(self:GetActivatorNZName2()))
+	table.insert(result, self:GetEntsByNZName(self:GetActivatorNZName3()))
 	return result
 end
 

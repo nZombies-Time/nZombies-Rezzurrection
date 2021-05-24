@@ -1079,13 +1079,17 @@ nzConfig.AddWeaponToBlacklist( "nz_multi_tool" )
 nzConfig.AddWeaponToBlacklist( "nz_grenade" )
 nzConfig.AddWeaponToBlacklist( "nz_perk_bottle" )
 nzConfig.AddWeaponToBlacklist( "nz_quickknife_crowbar" )
+nzConfig.AddWeaponToBlacklist( "nz_knife_butterfly" )
+nzConfig.AddWeaponToBlacklist( "nz_knife_boring" )
+nzConfig.AddWeaponToBlacklist( "nz_knife_lukewarmconflict" )
+nzConfig.AddWeaponToBlacklist( "nz_knife_wrench" )
 nzConfig.AddWeaponToBlacklist( "nz_tool_base" )
 nzConfig.AddWeaponToBlacklist( "nz_one_inch_punch" ) -- Nope! You gotta give this with special map scripts
 
 nzConfig.AddWeaponToBlacklist( "cw_base" )
 
 nzConfig.WeaponWhiteList = {
-	"fas2_", "m9k_", "cw_",
+	"fas2_", "m9k_", "tfa_",
 }
 
 if SERVER then

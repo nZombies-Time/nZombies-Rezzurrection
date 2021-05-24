@@ -202,8 +202,7 @@ function ENT:Use(activator, caller)
 			if not PerkData.nobuy then
 			
 			if not activator:HasPerk(id) then
-			if #activator:GetPerks() < GetConVar("nz_difficulty_perks_max"):GetInt() then
-				print("has slots")
+			if #activator:GetPerks() < GetConVar("nz_difficulty_perks_max"):GetInt() or self:GetPerkID() == "pap" then
 				activator:Buy(price, self, func)
 			else
 			print(activator:Nick().." already has max perks")

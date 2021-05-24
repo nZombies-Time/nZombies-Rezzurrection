@@ -27,6 +27,7 @@ nzTools:CreateTool("settings", {
 		local data = table.Copy(nzMapping.Settings)
 		local valz = {}
 		valz["Row1"] = data.startwep or "Select ..."
+		valz["Knife"] = data.knife or "Select ..."
 		valz["Row2"] = data.startpoints or 500
 		valz["Row3"] = data.eeurl or ""
 		valz["Row4"] = data.script or false
@@ -126,6 +127,25 @@ nzTools:CreateTool("settings", {
 		end
 
 		Row1.DataChanged = function( _, val ) valz["Row1"] = val end
+		
+			local kniferow = DProperties:CreateRow( "Map Settings", "Knife" )
+		kniferow:Setup( "Combo" )
+		for k,v in pairs(weapons.GetList()) do
+				if v.Category and v.Category == "nZombies Knives" then
+					kniferow:AddChoice(v.PrintName and v.PrintName != "" and v.Category.. " - "..v.PrintName or v.ClassName, v.ClassName, false)
+				end
+		end
+		if data.knife then
+			local wep = weapons.Get(data.knife)
+			if !wep  then wep = weapons.Get("nz_knife_boring") end
+			if wep != nil then  
+				if wep.Category and wep.Category == "nzombies Knives" then
+					kniferow:AddChoice(wep.PrintName and wep.PrintName != "" and wep.Category.. " - "..wep.PrintName or wep.ClassName, wep.ClassName, false)
+				end
+			end
+		end
+
+		kniferow.DataChanged = function( _, val ) valz["Knife"] = val end
 
 		local Row2 = DProperties:CreateRow( "Map Settings", "Starting Points" )
 		Row2:Setup( "Integer" )
@@ -493,8 +513,10 @@ nzTools:CreateTool("settings", {
 			Row42:SetTooltip("Enable upgradeable perks on this config")
 		end
 
+
 		local function UpdateData() -- Will remain a local function here. There is no need for the context menu to intercept
 			if !weapons.Get( valz["Row1"] ) then data.startwep = nil else data.startwep = valz["Row1"] end
+			if !weapons.Get( valz["Knife"] ) then data.knife = nil else data.knife = valz["Knife"] end
 			if !tonumber(valz["Row2"]) then data.startpoints = 500 else data.startpoints = tonumber(valz["Row2"]) end
 			if !valz["Row3"] or valz["Row3"] == "" then data.eeurl = nil else data.eeurl = valz["Row3"] end
 			if !valz["Row4"] then data.script = nil else data.script = valz["Row4"] end

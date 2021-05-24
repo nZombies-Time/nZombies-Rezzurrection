@@ -65,6 +65,9 @@ function GetFontType(id)
 		if id == "Default NZR" then
 	return "default"
 	end
+	if id == "BO4" then
+	return "blackops4"
+	end
 	if id == nil then
 	return "default"
 	end
@@ -118,7 +121,7 @@ local function ScoreHud()
 						nameoffset = 10
 					end
 
-					local font = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
+					local font = ("nz.points."..GetFontType(nzMapping.Settings.mediumfont))
 
 					surface.SetFont(font)
 
@@ -467,6 +470,9 @@ local function PerksHud()
 			end
 			if iconType == "Infinite Warfare" then
 				surface.SetMaterial(nzPerks:Get(v).icon_iw)
+			end
+			if iconType == "No Background" then
+				surface.SetMaterial(nzPerks:Get(v).icon_glow)
 			end
 			if iconType == "World at War/ Black Ops 1" then
 				surface.SetMaterial(nzPerks:Get(v).icon_waw)
