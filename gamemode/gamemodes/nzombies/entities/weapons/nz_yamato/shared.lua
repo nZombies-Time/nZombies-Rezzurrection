@@ -6,14 +6,13 @@ SWEP.Author			= ""
 SWEP.Contact		= ""
 SWEP.Purpose		= ""
 SWEP.Instructions	= ""
-
 SWEP.ViewModelFOV	= 85
 SWEP.ViewModelFlip	= false
 SWEP.ViewModel = "models/weapons/yamato/yamato.mdl"
 SWEP.WorldModel = "models/weapons/w_yamato.mdl"
 --SWEP.AnimPrefix		= "crowbar"
-SWEP.HoldType		= "melee"
-
+SWEP.HoldType		= "melee2"
+SWEP.PrintName     	    = "Yamato)Old)"	
 SWEP.UseHands = true
 
 SWEP.Spawnable			= false

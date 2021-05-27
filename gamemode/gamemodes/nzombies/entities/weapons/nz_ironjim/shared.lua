@@ -1,11 +1,11 @@
 SWEP.Base = "tfa_melee_base"
-SWEP.Category = "nZombies"
+SWEP.Category = "nZombies Buyable Knives"
 SWEP.PrintName = "The Classic"
-SWEP.Author		= "Kamikaze" --Author Tooltip
-SWEP.ViewModel = "models/weapons/bo3/c_bo3_crowbar.mdl"
-SWEP.WorldModel = "models/weapons/bo3/w_bo3_crowbar.mdl"
+SWEP.Author		= "Laby" --Author Tooltip
+SWEP.ViewModel = "models/weapons/bo3_melees/crowbar/c_crowbar_nz.mdl"
+SWEP.WorldModel = "models/weapons/bo3_melees/crowbar/w_crowbar.mdl"
 SWEP.ViewModelFlip = false
-SWEP.ViewModelFOV = 80
+SWEP.ViewModelFOV = 70
 SWEP.UseHands = true
 SWEP.HoldType = "melee"
 SWEP.DrawCrosshair = true
@@ -15,100 +15,83 @@ SWEP.Primary.Directional = false
 SWEP.Spawnable = true
 SWEP.AdminOnly = false
 
-SWEP.DisableIdleAnimations = false
+SWEP.DisableIdleAnimations = true
 
 SWEP.Secondary.CanBash = false
-SWEP.Secondary.MaxCombo = -1
-SWEP.Primary.MaxCombo = -1
+SWEP.Secondary.MaxCombo = 0
+SWEP.Primary.MaxCombo = 0
 
 SWEP.VMPos = Vector(0,0,0) --The viewmodel positional offset, constantly.  Subtract this from any other modifications to viewmodel position.
 
 -- nZombies Stuff
-SWEP.NZWonderWeapon		= false	-- Is this a Wonder-Weapon? If true, only one player can have it at a time. Cheats aren't stopped, though.
---SWEP.NZRePaPText		= "your text here"	-- When RePaPing, what should be shown? Example: Press E to your text here for 2000 points.
---SWEP.NZPaPReplacement 	= "tfa_cso_dualinfinityfinal"	-- If Pack-a-Punched, replace this gun with the entity class shown here.-- if true, this gun can't be placed in the box, even manually, and can't be bought off a wall, even if placed manually. Only code can give this gun.
+SWEP.NZPreventBox		= true	-- If true, this gun won't be placed in random boxes GENERATED. Users can still place it in manually.
+SWEP.NZTotalBlackList	= true	-- if true, this gun can't be placed in the box, even manually, and can't be bought off a wall, even if placed manually. Only code can give this gun.
 
 
 SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
-		Pos = {
-		Up = -8.2,
-		Right = 1,
-		Forward = 3.5,
-		},
-		Ang = {
-		Up = 60,
-		Right = -70,
-		Forward = 10
-		},
+        Pos = {
+        Up = -2,
+        Right = 1.5,
+        Forward = 3.5,
+        },
+        Ang = {
+		Up = 45,
+        Right = 180,
+        Forward = 0
+        },
 		Scale = 1
 }
 
-
-sound.Add({
-	['name'] = "Ironjim.Attack",
-	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/jim/swing_1_01.wav", "weapons/nzr/jim/swing_1_02.wav" },
-	['pitch'] = {100,100}
-})
-sound.Add({
-	['name'] = "Ironjim.Meat",
-	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/jim/crowbar_impact_human_00.wav", "weapons/jim/zwei/crowbar_impact_human_01.wav" },
-	['pitch'] = {100,100}
-})
-sound.Add({
-	['name'] = "Ironjim.World",
-	['channel'] = CHAN_STATIC,
-	['sound'] = { "nz/knife/hit_object.wav" },
-	['pitch'] = {100,100}
-})
-
-
 function SWEP:Deploy()
-	self:SendWeaponAnim(ACT_VM_FIDGET)
-	self.HolsterTime = CurTime() + 1.8
-	self:EmitSound("weapons/nzr/jim/crowbar_first_raise.wav")
+	self:SendWeaponAnim(ACT_VM_DRAW_DEPLOYED)
+	self.HolsterTime = CurTime() + (45/30)
+			self:EmitSound("Weapon_BO3_CROWBAR.Draw")
+	
 end
-
 SWEP.Primary.Attacks = {
 	{
-		["act"] = ACT_VM_HITCENTER, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
-		["len"] = 13 * 10, -- Trace distance
-		["dir"] = Vector(0, 20, -70), -- Trace arc cast
-		["dmg"] = 250, --Damage
-		["dmgtype"] = bit.bor(DMG_GENERIC), --bit.bor(DMG_SLASH,DMG_ALWAYSGIB),DMG_CRUSH, etc.
-		["delay"] = 0.45, --Delay
-		["spr"] = true, --Allow attack while sprinting?
-		["snd"] = "Ironjim.Attack", -- Sound ID
-		["snd_delay"] = 0.26,
-		["viewpunch"] = Angle(1, -5, 0), --viewpunch angle
-		["end"] = 0.8, --time before next attack
-		["hull"] = 16, --Hullsize
-		["direction"] = "F", --Swing dir,
-		["hitflesh"] =  "Ironjim.Meat",
-		["hitworld"] = "Ironjim.World"
+		['act'] = ACT_VM_MISSCENTER, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['len'] = 17*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		["src"] = Vector(0, 0, 0), -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		["dir"] = Vector(45, 0, -2), -- Trace direction/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dmg'] = 260, --This isn't overpowered enough, I swear!!
+		["dmgtype"] = bit.bor(DMG_SLASH),  --DMG_SLASH,DMG_CRUSH, etc.
+		["delay"] = 10 / 30, --Delay
+		['snd_delay'] = 9 / 30,
+		['spr'] = true, --Allow attack while sprinting?
+		['snd'] = "Weapon_BO3_KATANA.Swing", -- Sound ID
+		["viewpunch"] = Angle(0, 0, 0), --viewpunch angle
+		["end"] = 1.3, --time before next attack
+		["hull"] = 1, --Hullsize
+		['hitflesh'] = "Weapon_BO3_CROWBAR.Hit_Flesh",
+		['hitworld'] ="Weapon_BO3_CROWBAR.Hit"
+	},
+	{
+		['act'] = ACT_VM_HITCENTER, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['len'] = 17*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		["src"] = Vector(0, 0, 0), -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		["dir"] = Vector(0, 35, 0), -- Trace direction/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
+		['dmg'] = 320, --This isn't overpowered enough, I swear!!
+		["dmgtype"] = bit.bor(DMG_SLASH),  --DMG_SLASH,DMG_CRUSH, etc.
+		["delay"] = 7 / 30, --Delay
+		['snd_delay'] = 6 / 30,
+		['spr'] = true, --Allow attack while sprinting?
+		['snd'] = "Weapon_BO3_KATANA.Swing", -- Sound ID
+		["viewpunch"] = Angle(0, 0, 0), --viewpunch angle
+		["end"] = 0.9, --time before next attack
+		["hull"] = 1, --Hullsize
+		['hitflesh'] = "Weapon_BO3_CROWBAR.Hit_Flesh",
+		['hitworld'] ="Weapon_BO3_CROWBAR.Hit"
 	}
 }
 
-SWEP.Secondary.Attacks = {
-		{
-		["act"] = ACT_VM_HITCENTER, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
-		["len"] = 13 * 10, -- Trace distance
-		["dir"] = Vector(0, 20, -70), -- Trace arc cast
-		["dmg"] = 250, --Damage
-		["dmgtype"] = bit.bor(DMG_GENERIC),  --bit.bor(DMG_SLASH,DMG_ALWAYSGIB),DMG_CRUSH, etc.
-		["delay"] = 0.45, --Delay
-		["spr"] = true, --Allow attack while sprinting?
-		["snd"] = "Ironjim.Attack", -- Sound ID
-		["snd_delay"] = 0.26,
-		["viewpunch"] = Angle(1, -5, 0), --viewpunch angle
-		["end"] = 0.8, --time before next attack
-		["hull"] = 16, --Hullsize
-		["direction"] = "F", --Swing dir,
-		["hitflesh"] =  "Ironjim.Meat",
-		["hitworld"] = "Ironjim.World"
-	}
+SWEP.ImpactDecal = "ManhackCut"
+
+SWEP.SequenceRateOverride = {
+	[ACT_VM_MISSCENTER] = 45 / 30
 }
+
+
 if CLIENT then
 	SWEP.WepSelectIconCSO = Material("vgui/killicons/tfa_cso_mastercombatknife")
 	SWEP.DrawWeaponSelection = TFA_CSO_DrawWeaponSelection

@@ -193,7 +193,8 @@ local function GunHud()
 					if wep:GetPrimaryAmmoType() != -1 then
 						local clip
 						if wep.Primary.ClipSize and wep.Primary.ClipSize != -1 then
-							draw.SimpleTextOutlined(wep:Clip1().."/"..wep:Ammo1(), ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont)), ScrW() - 350*scale, ScrH() - 120*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 3, color_black)
+						local ammoTotal = LocalPlayer():GetAmmoCount(wep:GetPrimaryAmmoType())
+							draw.SimpleTextOutlined(wep:Clip1().."/"..ammoTotal, ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont)), ScrW() - 350*scale, ScrH() - 120*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 3, color_black)
 							clip = wep:Clip1()
 							x = 315
 							y = 155

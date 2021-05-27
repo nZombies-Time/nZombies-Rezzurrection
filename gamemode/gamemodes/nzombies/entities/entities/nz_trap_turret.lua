@@ -260,7 +260,7 @@ function ENT:GetPriorityTarget()
 end
 
 local onColor = Color(255,0,0)
-local colorMat = Material("nzr/nz/zlight")
+local colorMat = Material("nz/zlight")
 
 function ENT:Draw()
 	BaseClass.Draw(self)

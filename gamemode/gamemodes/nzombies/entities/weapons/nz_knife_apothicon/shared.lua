@@ -25,7 +25,6 @@ SWEP.VMPos = Vector(0,0,0) --The viewmodel positional offset, constantly.  Subtr
 
 -- nZombies Stuff
 SWEP.NZPreventBox		= true	-- If true, this gun won't be placed in random boxes GENERATED. Users can still place it in manually.
-SWEP.NZTotalBlackList	= true	-- if true, this gun can't be placed in the box, even manually, and can't be bought off a wall, even if placed manually. Only code can give this gun.
 
 
 SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.

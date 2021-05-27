@@ -1,5 +1,5 @@
 SWEP.Base = "tfa_melee_base"
-SWEP.Category = "nZombies"
+SWEP.Category = "nZombies Buyable Knives"
 SWEP.PrintName = "O'Ren Ishii Katana"
 SWEP.Author		= "Kamikaze" --Author Tooltip
 SWEP.ViewModel = "models/weapons/tfa_l4d2/c_oren_katana.mdl"

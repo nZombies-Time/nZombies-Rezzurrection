@@ -1,5 +1,5 @@
 SWEP.Base = "tfa_melee_base"
-SWEP.Category = "nZombies"
+SWEP.Category = "nZombies Buyable Knives"
 SWEP.PrintName = "Zweihander"
 SWEP.Author		= "Kamikaze" --Author Tooltip
 SWEP.ViewModel	= "models/weapons/tfa_kf2/c_zweihander.mdl"
