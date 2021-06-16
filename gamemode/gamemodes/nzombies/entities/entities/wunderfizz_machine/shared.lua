@@ -117,7 +117,7 @@ function ENT:Use(activator, caller)
 		if !IsValid(self.Bottle) and !self:GetBeingUsed() then
 			local price = self:GetPrice()
 			-- Can only be bought if you have free perk slots
-			if #activator:GetPerks() < GetConVar("nz_difficulty_perks_max"):GetInt() then
+			if #activator:GetPerks() < activator:GetPerkLimit() then
 				-- If they have enough money
 				activator:Buy(price, self, function()
 					self:SetBeingUsed(true)
