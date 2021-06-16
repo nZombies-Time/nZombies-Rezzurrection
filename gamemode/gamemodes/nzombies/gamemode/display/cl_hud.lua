@@ -17,59 +17,30 @@ local bloodline_gun = Material("bloodline_score2.png", "unlitgeneric smooth")
 }]]
 
 function GetFontType(id)
-	if id == "Classic NZ" then
-	return "classic"
-	end
-	if id == "Old Treyarch" then
-	return "waw"
-	end
-	if id == "BO2/3" then
-	return "blackops2"
-	end
-		if id == "Comic Sans" then
-	return "xd"
-	end
-		if id == "Warprint" then
-	return "grit"
-	end
-		if id == "Road Rage" then
-	return "rage"
-	end
-		if id == "Black Rose" then
-	return "rose"
-	end
-		if id == "Reborn" then
-	return "reborn"
-	end
-		if id == "Rio Grande" then
-	return "rio"
-	end
-		if id == "Bad Signal" then
-	return "signal"
-	end
-		if id == "Infection" then
-	return "infected"
-	end
-		if id == "Brutal World" then
-	return "brutal"
-	end
-		if id == "Generic Scifi" then
-	return "ugly"
-	end
-		if id == "Tech" then
-	return "tech"
-	end
-		if id == "Krabby" then
-	return "krabs"
-	end
-		if id == "Default NZR" then
-	return "default"
-	end
-	if id == "BO4" then
-	return "blackops4"
-	end
+	local fontlist = {
+		["Classic NZ"] = "classic",
+		["Old Treyarch"] = "waw",
+		["BO2/3"] = "blackops2",
+		["Comic Sans"] = "xd",
+		["Warprint"] = "grit",
+		["Road Rage"] = "rage",
+		["Black Rose"] = "rose",
+		["Reborn"] = "reborn",
+		["Rio Grande"] = "rio",
+		["Bad Signal"] = "signal",
+		["Infection"] = "infected",
+		["Brutal World"] = "brutal",
+		["Generic Scifi"] = "ugly",
+		["Tech"] = "tech",
+		["Krabby"] = "krabs",
+		["Default NZR"] = "default",
+		["BO4"] = "blackops4",
+	}
+	
 	if id == nil then
-	return "default"
+		return "default"
+	else
+		return fontlist[id]
 	end
 end
 
@@ -465,37 +436,21 @@ local function PerksHud()
 	local w = -20
 	local size = 60
 	for k,v in pairs(LocalPlayer():GetPerks()) do
-	local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
-			if iconType == "Rezzurrection" then
-				surface.SetMaterial(nzPerks:Get(v).icon)
-			end
-			if iconType == "Infinite Warfare" then
-				surface.SetMaterial(nzPerks:Get(v).icon_iw)
-			end
-			if iconType == "No Background" then
-				surface.SetMaterial(nzPerks:Get(v).icon_glow)
-			end
-			if iconType == "World at War/ Black Ops 1" then
-				surface.SetMaterial(nzPerks:Get(v).icon_waw)
-			end
-			if iconType == "Black Ops 2" then
-				surface.SetMaterial(nzPerks:Get(v).icon_bo2)
-			end
-			if iconType == "Black Ops 3" then
-				surface.SetMaterial(nzPerks:Get(v).icon_bo3)
-			end
-			if iconType == "Modern Warfare" then
-				surface.SetMaterial(nzPerks:Get(v).icon_mw)
-			end
-			if iconType == "Cold War" then
-				surface.SetMaterial(nzPerks:Get(v).icon_cw)
-			end
-			if iconType == "April Fools" then
-				surface.SetMaterial(nzPerks:Get(v).icon_dumb)
-			end
-			if iconType == "Laby's Secret Perk Icons" then
-				surface.SetMaterial(nzPerks:Get(v).icon_holo)
-			end
+		local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
+		
+		local icontypes = {
+			["Rezzurrection"] = nzPerks:Get(v).icon,
+			["Infinite Warfare"] = nzPerks:Get(v).icon,
+			["No Background"] = nzPerks:Get(v).icon_glow,
+			["World at War/ Black Ops 1"] = nzPerks:Get(v).icon_waw,
+			["Black Ops 2"] = nzPerks:Get(v).icon_bo2,
+			["Black Ops 3"] = nzPerks:Get(v).icon_bo3,
+			["Modern Warfare"] = nzPerks:Get(v).icon_mw,
+			["Cold War"] = nzPerks:Get(v).icon_cw,
+			["April Fools"] = nzPerks:Get(v).icon_dumb,
+			["Laby's Secret Perk Icons"] = nzPerks:Get(v).icon_holo,
+		}
+		surface.SetMaterial(icontypes[iconType])
 		surface.SetDrawColor(255,255,255)
 		surface.DrawTexturedRect(w + k*(size*scale + 4), ScrH() - 280, size*scale, size*scale)
 	end
