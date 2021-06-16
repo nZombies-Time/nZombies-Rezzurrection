@@ -17,28 +17,16 @@ end
 
 function ENT:Initialize()
 		
-		if (nzMapping.Settings.boxtype =="Original") then
-	self:SetModel("models/hoff/props/mysterybox/box.mdl")
-	end
-	if (nzMapping.Settings.boxtype =="Origins") then
-	self:SetModel( "models/nzr/originsbox/box.mdl" )
-	end
-	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/nzr/motd/box.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.6, 0 )
-	end
-	if (nzMapping.Settings.boxtype =="Dead Space") then
-	self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
-	self:SetModelScale( self:GetModelScale() * 1, 0 )
-	end
-	if (nzMapping.Settings.boxtype =="Resident Evil") then
-	self:SetModel( "models/nzr/re/box.mdl" )
-	end
-	if (nzMapping.Settings.boxtype == nil) then
-	self:SetModel("models/hoff/props/mysterybox/box.mdl")
-	end
+	local models = {
+		["Original"] = "models/hoff/props/mysterybox/box.mdl",
+		["Origins"] = "models/nzr/originsbox/box.mdl",
+		["Mob of the Dead"] = "models/nzr/motd/box.mdl",
+		["Dead Space"] = "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl",
+		["Resident Evil"] = "models/nzr/re/box.mdl"
+	}
+	self:SetModel(models[nzMapping.Settings.boxtype] or "models/hoff/props/mysterybox/box.mdl")
 	
-		self:PhysicsInit( SOLID_VPHYSICS )
+	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	
