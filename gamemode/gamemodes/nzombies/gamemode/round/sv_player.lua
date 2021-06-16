@@ -100,6 +100,7 @@ function plyMeta:GiveCreativeMode()
 	player_manager.SetPlayerClass( self, "player_create" )
 	if !self:Alive() then
 		self:Spawn()
+		self:SetPerkLimit(GetConVar("nz_difficulty_perks_max"):GetInt())
 	end
 
 end
