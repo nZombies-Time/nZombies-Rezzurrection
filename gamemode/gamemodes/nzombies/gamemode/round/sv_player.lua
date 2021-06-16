@@ -90,6 +90,7 @@ function plyMeta:ReSpawn()
 	if !self:Alive() then
 		self:Spawn()
 		self:SetTeam( TEAM_PLAYERS )
+		self:SetPerkLimit(GetConVar("nz_difficulty_perks_max"):GetInt())
 	end
 
 end
