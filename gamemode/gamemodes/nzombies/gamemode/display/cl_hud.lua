@@ -16,7 +16,7 @@ local bloodline_gun = Material("bloodline_score2.png", "unlitgeneric smooth")
 	nil
 }]]
 
-function GetFontType(id)
+function nzDisplay.GetFontType(id)
 	local fontlist = {
 		["Classic NZ"] = "classic",
 		["Old Treyarch"] = "waw",
