@@ -49,11 +49,11 @@ CreateClientConVar( "nz_hud_points_show_names", "1", true, false )
 local function StatesHud()
 	if GetConVar("cl_drawhud"):GetBool() then
 		local text = ""
-		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
+		local font = ("nz.main."..nzDisplay.GetFontType(nzMapping.Settings.mainfont))
 		local w = ScrW() / 2
 		if nzRound:InState( ROUND_WAITING ) then
 			text = "Waiting for players. Type /ready to ready up."
-			font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+			font = ("nz.small."..nzDisplay.GetFontType(nzMapping.Settings.smallfont))
 		elseif nzRound:InState( ROUND_CREATE ) then
 			text = "Creative Mode"
 		elseif nzRound:InState( ROUND_GO ) then
@@ -92,7 +92,7 @@ local function ScoreHud()
 						nameoffset = 10
 					end
 
-					local font = ("nz.points."..GetFontType(nzMapping.Settings.mediumfont))
+					local font = ("nz.points."..nzDisplay.GetFontType(nzMapping.Settings.mediumfont))
 
 					surface.SetFont(font)
 
@@ -117,7 +117,7 @@ local function ScoreHud()
 					--surface.DrawTexturedRect(ScrW() - 325*scale - numname * 10, ScrH() - 285*scale - (30*k), 250 + numname*10, 35)
 					--if text then draw.SimpleText(text, font, ScrW() - textW - 60, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_LEFT, TEXT_ALIGN_CENTER) end
 					if LocalPlayer() == v then
-						font = ("nz.points."..GetFontType(nzMapping.Settings.mediumfont))
+						font = ("nz.points."..nzDisplay.GetFontType(nzMapping.Settings.mediumfont))
 					end
 					draw.SimpleText(v:GetPoints(), font, ScrW() - 65, ScrH() - 255 * scale - offset, color, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
 					v.PointsSpawnPosition = {x = ScrW() - 170, y = ScrH() - 255 * scale - offset}
@@ -155,7 +155,7 @@ local function GunHud()
 			surface.DrawTexturedRect(w - 630*scale, h - 225*scale, 600*scale, 225*scale)
 			if IsValid(wep) then
 				if wep:GetClass() == "nz_multi_tool" then
-					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, ("nz.small."..GetFontType(nzMapping.Settings.smallfont)), w - 240*scale, h - 125*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, ("nz.small."..nzDisplay.GetFontType(nzMapping.Settings.smallfont)), w - 240*scale, h - 125*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 					draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", "nz.smaller", w - 240*scale, h - 90*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black)
 				else
 					local name = wep:GetPrintName()					
@@ -165,7 +165,7 @@ local function GunHud()
 						local clip
 						if wep.Primary.ClipSize and wep.Primary.ClipSize != -1 then
 						local ammoTotal = LocalPlayer():GetAmmoCount(wep:GetPrimaryAmmoType())
-							draw.SimpleTextOutlined(wep:Clip1().."/"..ammoTotal, ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont)), ScrW() - 350*scale, ScrH() - 120*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 3, color_black)
+							draw.SimpleTextOutlined(wep:Clip1().."/"..ammoTotal, ("nz.ammo."..nzDisplay.GetFontType(nzMapping.Settings.ammofont)), ScrW() - 350*scale, ScrH() - 120*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 3, color_black)
 							clip = wep:Clip1()
 							x = 315
 							y = 155
@@ -176,18 +176,18 @@ local function GunHud()
 						x = x + 120
 					end
 					
-					draw.SimpleTextOutlined(name, ("nz.small."..GetFontType(nzMapping.Settings.smallfont)), ScrW() - x*scale, ScrH() - 120*scale,fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+					draw.SimpleTextOutlined(name, ("nz.small."..nzDisplay.GetFontType(nzMapping.Settings.smallfont)), ScrW() - x*scale, ScrH() - 120*scale,fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 					
 					x = 280
 					if wep:GetSecondaryAmmoType() != -1 then
 						local clip
 						if wep.Secondary.ClipSize and wep.Secondary.ClipSize != -1 then
-							draw.SimpleTextOutlined("/"..wep:Ammo2(), ("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined("/"..wep:Ammo2(), ("nz.ammo2."..nzDisplay.GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
 							clip = wep:Clip2()
 							x = x + 3
 						else
 							--clip = wep:Ammo2()
-							draw.SimpleTextOutlined(wep:Ammo2(),("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined(wep:Ammo2(),("nz.ammo2."..nzDisplay.GetFontType(nzMapping.Settings.ammo2font)), ScrW() - x*scale, ScrH() - y*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						end
 						--draw.SimpleTextOutlined(clip, "nz.display.hud.ammo3", ScrW() - x*scale, ScrH() - y*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						--x = x + 80
@@ -247,7 +247,7 @@ end)
 
 local function PowerUpsHud()
 	if nzRound:InProgress() or nzRound:InState(ROUND_CREATE) then
-		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
+		local font = ("nz.main."..nzDisplay.GetFontType(nzMapping.Settings.mainfont))
 		local w = ScrW() / 2
 		local offset = 40
 		local c = 0
@@ -501,7 +501,7 @@ local infmat = Material("materials/round_-1.png", "smooth")
 local function RoundHud()
 
     local text = ""
-    local font = ("nz.rounds."..GetFontType(nzMapping.Settings.roundfont))
+    local font = ("nz.rounds."..nzDisplay.GetFontType(nzMapping.Settings.roundfont))
     local w = 35
     local h = ScrH() - 15
     local round = round_num
