@@ -30,63 +30,6 @@ local fade = 1
 
 local mat_revive = Material("materials/Revive.png", "unlitgeneric smooth")
 
-function GetFontType(id)
-	if id == "Classic NZ" then
-	return "classic"
-	end
-	if id == "Old Treyarch" then
-	return "waw"
-	end
-	if id == "BO2/3" then
-	return "blackops2"
-	end
-	if id == "BO4" then
-	return "blackops4"
-	end
-		if id == "Comic Sans" then
-	return "xd"
-	end
-		if id == "Warprint" then
-	return "grit"
-	end
-		if id == "Road Rage" then
-	return "rage"
-	end
-		if id == "Black Rose" then
-	return "rose"
-	end
-		if id == "Reborn" then
-	return "reborn"
-	end
-		if id == "Rio Grande" then
-	return "rio"
-	end
-		if id == "Bad Signal" then
-	return "signal"
-	end
-		if id == "Infection" then
-	return "infected"
-	end
-		if id == "Brutal World" then
-	return "brutal"
-	end
-		if id == "Generic Scifi" then
-	return "ugly"
-	end
-		if id == "Tech" then
-	return "tech"
-	end
-		if id == "Krabby" then
-	return "krabs"
-	end
-		if id == "Default NZR" then
-	return "default"
-	end
-	if id == nil then
-	return "default"
-	end
-end
-
 function nzRevive:ResetColorFade()
 	tab = {
 		 [ "$pp_colour_addr" ] = 0,
@@ -198,7 +141,7 @@ local function DrawDownedNotify()
 
 	if !LocalPlayer():GetNotDowned() then
 		local text = "YOU NEED HELP!"
-		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
+		local font = ("nz.main."..nzDisplay.GetFontType(nzMapping.Settings.mainfont))
 		local rply = nzRevive.Players[LocalPlayer():EntIndex()].RevivePlayer
 		
 		if IsValid(rply) and rply:IsPlayer() then
@@ -225,7 +168,7 @@ function nzRevive:CustomNotify(text, time)
 end
 
 local function DrawDownedHeadsUp()
-	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+	local font = ("nz.small."..nzDisplay.GetFontType(nzMapping.Settings.smallfont))
 	local h = 40
 	local offset = 20
 	local max = 2
@@ -278,7 +221,7 @@ local function DrawDamagedOverlay()
 end
 
 local function DrawTombstoneNotify()
-	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+	local font = ("nz.small."..nzDisplay.GetFontType(nzMapping.Settings.smallfont))
 	
 	if LocalPlayer():GetDownedWithTombstone() then
 		local text = "Hold E to feed the zombies"
