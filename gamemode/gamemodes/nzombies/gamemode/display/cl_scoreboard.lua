@@ -244,7 +244,7 @@ local SCORE_BOARD = {
 		self.Header:SetHeight( 100 )
 
 		self.Name = self.Header:Add( "DLabel" )
-		self.Name:SetFont("nz.main."..GetFontType(nzMapping.Settings.mainfont))
+		self.Name:SetFont("nz.main."..nzDisplay.GetFontType(nzMapping.Settings.mainfont))
 		self.Name:SetTextColor( Color( 255, 255, 255, 255 ) )
 		self.Name:Dock( TOP )
 		self.Name:SetHeight( 40 )
