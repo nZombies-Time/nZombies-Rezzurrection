@@ -64,14 +64,25 @@
 
 @PointClass base(Targetname, Origin) = nz_carryitem_creator : "Lets you set up an item using nZombie's CarryItem/Inventory system. Will be removed if Map Extensions is not ticked in the loaded config."
 [
-	id(string) : "ID" : : "ID to associate with this item and to spawn it."
+	itemid(string) : "ID" : : "ID to associate with this item and to spawn it."
 	text(string) : "Pickup Text" : "Press E to pick up" : "Text to display when players are looking at the item."
 	icon(string) : "Icon path" : "spawnicons/models/props_junk/gascan001a.png" : "Filepath to the icon it should be represented by."
 	model(string) : "Model path" : "models/props_junk/gascan001a.mdl" : "Filepath to the model the item will be spawned with."
-	shared(integer) : "Shared" : 0 : "(0/1) Will be carried by all players when picked up by any player if set to 1."
-	notification(integer) : "Notify players" : 1 : "(0/1) Will notify all players when anyone has picked the item up."
-	dropondown(integer) : "Drop on downed" : 1 : "(0/1) Will drop the item when the carrying player gets downed."
-	
+	shared(choices) : "Shared" : 0 : "(0/1) Will be carried by all players when picked up by any player if set to 1." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	notification(choices) : "Notify players" : 1 : "Will notify all players when anyone has picked the item up." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]
+	dropondown(choices) : "Drop on downed" : 1 : "Will drop the item when the carrying player gets downed." =
+	[
+		0 : "No"
+		1 : "Yes"
+	]	
 	input Update(void) : "Create the item and/or edit its properties on-the-fly."
 	input RemoveAllInstances(void) : "Removes any dropped item of this ID and clears any player's inventory of it."
 	input SpawnRandomly(void) : "Randomly spawn the item on any set nz_carryitem_spawner with this ID."
@@ -83,15 +94,16 @@
 
 @PointClass base(Targetname, Origin, Angles) studioprop() = nz_carryitem_spawner : "Lets you spawn an item created by a nz_carryitem_creator. Will be removed if Map Extensions is not ticked in the loaded config."
 [
-	id(string) : "ID" : : "ID of the item to spawn."
+	itemid(string) : "ID" : "" : "ID of the item to spawn."
 	input SpawnItem(void) : "Spawn the item with this ID on this spawnpoint."
 ]
 
 @PointClass base(Targetname, Origin) = nz_carryitem_checker : "Lets you check if players are carrying this item. Will be removed if Map Extensions is not ticked in the loaded config."
 [
-	id(string) : "ID" : : "ID of the item to check for."
+	itemid(string) : "ID" : "" : "ID of the item to check for."
 	
 	input Check(void) : "Checks whether !activator is carrying the item of the set ID. Calls OnCheckSuccess when true, OnCheckFail otherwise."
+	input CheckAndTake(void) : "Same as Check, but takes the item from the inventory"
 	
 	output OnCheckSuccess(void) : "Fires when the check has successfully passed and !activator was carrying the item."
 	output OnCheckFail(void) : "Fires when the check failed to pass and !activator was not carrying the item."
