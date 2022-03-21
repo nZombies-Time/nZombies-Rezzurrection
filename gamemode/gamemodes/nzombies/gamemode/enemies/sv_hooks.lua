@@ -98,7 +98,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				end)
 		end
 		
-			if dmginfo:IsDamageType( 1024 ) then
+			if dmginfo:IsDamageType( 32768 ) then
 			enemy:EmitSound("pop_antimatter.wav", 94, math.random(90,100))
             local ent = ents.Create("env_explosion")
         ent:SetPos(enemy:GetPos())
@@ -170,8 +170,13 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 		if !nzPowerUps:IsPowerupActive("insta") and IsValid(enemy) then -- Don't spawn powerups during instakill
 			if !nzPowerUps:GetPowerUpChance() then nzPowerUps:ResetPowerUpChance() end
 			if math.Rand(0, 100) < nzPowerUps:GetPowerUpChance() then
+				--if(enemy:GetBarricade(false)) then
+				--nzPowerUps:SpawnPowerUp(enemy:GetPos())
+				--nzPowerUps:ResetPowerUpChance()
+				--elseif enemy:GetPassedBarricade(true) then
 				nzPowerUps:SpawnPowerUp(enemy:GetPos())
 				nzPowerUps:ResetPowerUpChance()
+				--end
 			else
 				nzPowerUps:IncreasePowerUpChance()
 			end
@@ -244,9 +249,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			  effect = math.random(1,4)
 			 end
 			 end
-			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 1 then
-			zombie:Ignite((dmginfo:GetDamage()/9))
-			 end
 			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 7 then
 			dmginfo:SetDamageType( 131072)
 			dmginfo:ScaleDamage(zombie:Health()) 
@@ -257,38 +259,11 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			 end
 			if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 2 then
 			zombie:EmitSound("pop_rad.mp3", 94, math.random(90,100))
-			dmginfo:ScaleDamage(zombie:Health()*0.07)
-			 end
-			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 3 then
-				dmginfo:ScaleDamage(1.2) 
-				zombie:EmitSound("pop_shock.wav", 94, math.random(90,100))
-							local zombies = ents.FindInSphere(zombie:GetPos(), 75)
-					for k,v in pairs(zombies) do
-					if IsValid(v) and v:IsValidZombie() then
-					if v == zombie then
-					else
-					local d = DamageInfo()
-					d:SetDamage(math.random(50,150) )
-					d:SetAttacker( zombie )
-					d:SetDamageType(DMG_SHOCK) 
-					v:TakeDamageInfo( d )
-					end
-					end
-				end
+			dmginfo:SetDamage(dmginfo:GetDamage() + zombie:Health()*0.07)
 			 end
 			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 5 then
-			dmginfo:SetDamageType( 1024)
+			dmginfo:SetDamageType( 32768)
 			 dmginfo:ScaleDamage(zombie:Health()) 
-			 end
-			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 4 then
-			 print("slow")
-			local zombiespeed = zombie.RunSpeed
-				zombie:SetRunSpeed(zombiespeed*0.25)
-				timer.Simple(5, function()
-					if IsValid(self) then
-						zombie:SetRunSpeed(zombiespeed)
-					end
-				end)
 			 end
 
 			if nzPowerUps:IsPowerupActive("insta") then
@@ -310,11 +285,15 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			end
 			
 			if attacker:IsPlayer() and dmginfo:IsDamageType( 262144 ) then
-				dmginfo:ScaleDamage(zombie:Health()*0.07) 
+				dmginfo:SetDamage( dmginfo:GetDamage() + zombie:Health()*0.07) 
 			 end
 			
-			if attacker:IsPlayer() and dmginfo:IsDamageType( 131072 ) then
-				dmginfo:ScaleDamage( 1.3 )
+		
+			 if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and attacker:GetActiveWeapon():HasNZModifier("pap") then
+			 local gun = attacker:GetActiveWeapon():GetClass()
+			 if not nzWeps:GetAllReplacements(gun) then
+				dmginfo:ScaleDamage( 2 )
+			 end
 			 end
 			
 			if attacker:IsPlayer() and dmginfo:IsDamageType( 1048576 ) then
@@ -324,23 +303,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			return end
 			end
 			
-			if attacker:IsPlayer() and dmginfo:IsDamageType( 256 ) then
-				dmginfo:ScaleDamage(1.2) 
-				zombie:EmitSound("pop_shock.wav", 94, math.random(90,100))
-						local zombies = ents.FindInSphere(zombie:GetPos(), 100)
-					for k,v in pairs(zombies) do
-					if IsValid(v) and v:IsValidZombie() then
-					if v == zombie then
-					else
-					local d = DamageInfo()
-					d:SetDamage(math.random(50,150) )
-					d:SetAttacker( zombie )
-					d:SetDamageType(DMG_SHOCK) 
-					v:TakeDamageInfo( d )
-					end
-					end
-				end
-			end
+			
 			
 			if attacker:IsPlayer() and attacker:HasPerk("fire") and (dmginfo:IsDamageType( 2097152 ) or dmginfo:IsDamageType(  8 )) then
 				dmginfo:ScaleDamage(2) 
@@ -352,15 +315,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 			return end
 			
-			if attacker:IsPlayer() and dmginfo:IsDamageType( 16777216 ) then
-			local zombiespeed = zombie.RunSpeed
-				zombie:SetRunSpeed(100)
-				timer.Simple(5, function()
-					if IsValid(self) then
-						zombie:SetRunSpeed(zombiespeed)
-					end
-				end)
-			end
 			
 			if attacker:IsPlayer() and dmginfo:IsDamageType( 2097152 ) then
 				zombie:Ignite((dmginfo:GetDamage()/16))

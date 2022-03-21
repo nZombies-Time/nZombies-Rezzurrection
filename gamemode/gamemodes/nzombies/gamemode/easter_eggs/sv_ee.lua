@@ -26,8 +26,9 @@ function nzEE:ActivateEgg( ent, ply )
 
 	-- What we should do when we have all the eggs
 	if self.Data.EggCount == self.Data.MaxEggCount then
-		print("All easter eggs found yay!")
-		hook.Call( "OnAllEasterEggsFound", ply, ent )
+		PrintMessage( HUD_PRINTTALK,"Assume all Easter Egg songs are copyrighted!")
+		nzSounds:Play("Music")
+		--hook.Call( "OnAllEasterEggsFound", ply, ent )
 	end
 end
 

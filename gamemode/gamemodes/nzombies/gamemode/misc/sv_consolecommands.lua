@@ -1,9 +1,9 @@
 -- Actual Commands
 
 -- Quick reload for dedicated severs
---concommand.Add("nz_qr", function()
---	RunConsoleCommand("changelevel", game.GetMap())
---end)
+concommand.Add("nz_qr", function()
+	RunConsoleCommand("changelevel", game.GetMap())
+end)
 
 concommand.Add( "nz_print_weps", function()
 	for k,v in pairs( weapons.GetList() ) do
@@ -16,11 +16,11 @@ concommand.Add("nz_door_id", function()
 	if IsValid( tr.Entity ) then print( tr.Entity:doorIndex() ) end
 end)
 
---concommand.Add("nz_test1", function()
---	nz.nzDoors.Functions.CreateMapDoorLink( 1236, "price=500,elec=0,link=1" )
---
---	timer.Simple(5, function() nz.nzDoors.Functions.RemoveMapDoorLink( 1236 ) end)
---end)
+concommand.Add("nz_test1", function()
+	nz.nzDoors.Functions.CreateMapDoorLink( 1236, "price=500,elec=0,link=1" )
+
+	timer.Simple(5, function() nz.nzDoors.Functions.RemoveMapDoorLink( 1236 ) end)
+end)
 
 concommand.Add("nz_forceround", function(ply, cmd, args, argStr)
 	if !IsValid(ply) or ply:IsSuperAdmin() then
@@ -40,6 +40,11 @@ concommand.Add("nz_forceround", function(ply, cmd, args, argStr)
 	end
 end)
 
+concommand.Add("nz_nodrugs", function()
+	for _, ply in pairs( player.GetAll() ) do
+		ply:StripWeapon("nz_revive_morphine")
+	end
+end)
 -- Isn't used anywhere, marked for removal
 function lmne(name, find, listall)
 	if !IsValid(ply) or ply:IsSuperAdmin() then

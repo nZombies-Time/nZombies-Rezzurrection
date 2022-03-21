@@ -1,11 +1,15 @@
 --
 
-function nzMapping:ZedSpawn(pos, link, ply)
+function nzMapping:ZedSpawn(pos, link,animskip,barricade, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_normal")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	
+	ent:SetSkip( animskip )
+	ent:SetBarricade(barricade)
 	ent:Spawn()
+	print(ent:GetSkip())
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
@@ -185,9 +189,8 @@ function nzMapping:EasterEgg(pos, ang, model, ply)
 	return egg
 end
 
-function nzMapping:BuyableEnding(pos, ang, model,price, ply)
+function nzMapping:Ending(pos, ang, price, ply)
 	local ending = ents.Create( "buyable_ending" )
-	ending:SetModel( model )
 	ending:SetPos( pos )
 	ending:SetAngles( ang )
 	ending:SetPrice( price )

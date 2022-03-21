@@ -31,7 +31,7 @@ nzTools:CreateTool("bench", {
 	icon = "icon16/bricks.png",
 	weight = 5,
 	condition = function(wep, ply)
-		return true
+		return nzTools.Advanced
 	end,
 	interface = function(frame, data)
 		local valz = {}

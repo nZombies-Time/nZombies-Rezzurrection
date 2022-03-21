@@ -32,7 +32,7 @@ function nzRandomBox.Spawn(exclude, first)
 		rand.Box = box
 		
 		rand:SetBodygroup(1,1)
-		if (nzMapping.Settings.boxtype =="Resident Evil") then
+		if (nzMapping.Settings.boxtype =="Resident Evil" or nzMapping.Settings.boxtype =="Call of Duty: WW2" or nzMapping.Settings.boxtype =="DOOM" or nzMapping.Settings.boxtype =="Chaos" ) then
 			rand:SetModelScale(0, 0 )
 			end
 		

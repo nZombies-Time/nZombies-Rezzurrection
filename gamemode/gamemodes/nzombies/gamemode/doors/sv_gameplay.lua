@@ -53,7 +53,7 @@ function nzDoors:CloseLinkedDoors( link, ply )
 		if v.flags then
 			local doorlink = v.flags.link
 			if doorlink and doorlink == link then
-				if v:IsButton() then
+				if v:IsButton() and v.ButtonLock then
 					v:ButtonLock()
 					v:SetUseType( SIMPLE_USE )
 				else
@@ -97,7 +97,7 @@ function nzDoors:LockAllDoors()
 				-- They now get that output through OpenDoor too, but for safety
 			end
 		-- Allow locking buttons
-		elseif v:IsButton() and self.MapDoors[v:DoorIndex()] then
+		elseif v:IsButton() and self.MapDoors[v:DoorIndex()] and v.ButtonLock then
 			v:ButtonLock()
 			v:SetUseType( SIMPLE_USE )
 		end

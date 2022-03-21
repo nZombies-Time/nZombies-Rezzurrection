@@ -50,8 +50,6 @@ ENT.AttackHitSounds = {
 	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
 	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
 	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
-	
-	
 }
 
 ENT.WalkSounds = {

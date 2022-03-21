@@ -17,7 +17,7 @@ AddCSLuaFile()
 
 function ENT:Initialize()
 
-	--self:SetModel( "models/hoff/props/teddy_bear/teddy_bear.mdl" )
+	self:SetModel( "models/hoff/props/teddy_bear/teddy_bear.mdl" )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
@@ -30,7 +30,7 @@ end
 function ENT:Use( activator, caller )
 	if nzRound:InProgress() then
 	local price = self:GetPrice()
-	if activator:GetPoints() > price then
+	if activator:GetPoints() >=  price then
 	activator:TakePoints(price)
 		 nzRound:Win()
 	end

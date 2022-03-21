@@ -34,7 +34,8 @@ nzTools:CreateTool("damagewall", {
 	icon = "icon16/shape_square_error.png",
 	weight = 17,
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		-- Client needs advanced editing on to see the tool
+		return true
 	end,
 	interface = function(frame, data)
 	end,

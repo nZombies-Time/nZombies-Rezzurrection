@@ -43,7 +43,7 @@ nzTools:CreateTool("buildable", {
 	icon = "icon16/wrench.png",
 	weight = 3,
 	condition = function(wep, ply)
-		return true
+		return nzTools.Advanced
 	end,
 	interface = function(frame, data, context)
 		local valz = {}

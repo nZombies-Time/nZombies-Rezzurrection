@@ -6,6 +6,7 @@ local PLAYER = {}
 -- See gamemodes/base/player_class/player_default.lua for all overridable variables
 --
 PLAYER.WalkSpeed 			= 200
+PLAYER.Health 			= nzMapping.Settings.hp
 PLAYER.RunSpeed				= 325
 PLAYER.CanUseFlashlight     = true
 
@@ -51,7 +52,7 @@ function PLAYER:Loadout()
 
 end
 function PLAYER:Spawn()
-
+	
 	if nzMapping.Settings.startpoints then
 		if !self.Player:CanAfford(nzMapping.Settings.startpoints) then
 			self.Player:SetPoints(nzMapping.Settings.startpoints)
@@ -62,7 +63,13 @@ function PLAYER:Spawn()
 			self.Player:SetPoints(500)
 		end
 	end
-
+	if nzMapping.Settings.hp then
+	self.Player:SetHealth( nzMapping.Settings.hp )
+	self.Player:SetMaxHealth( nzMapping.Settings.hp )
+	else
+	self.Player:SetHealth(100 )
+	self.Player:SetMaxHealth( 100 )
+	end
 	-- Reset their perks
 	self.Player:RemovePerks()
 	nzPerks.PlayerUpgrades[self] = {}

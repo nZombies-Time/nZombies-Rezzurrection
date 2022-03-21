@@ -84,11 +84,18 @@ function plyMeta:DropOut()
 end
 
 function plyMeta:ReSpawn()
-
+	
 	--Setup a player
 	player_manager.SetPlayerClass( self, "player_ingame" )
 	if !self:Alive() then
 		self:Spawn()
+		if nzMapping.Settings.hp  then
+		self:SetHealth( nzMapping.Settings.hp )
+		self:SetMaxHealth( nzMapping.Settings.hp )
+		else
+		self:SetHealth( 100 )
+		self:SetMaxHealth( 100 )
+		end
 		self:SetTeam( TEAM_PLAYERS )
 	end
 

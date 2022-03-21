@@ -107,7 +107,6 @@ nzTools:CreateTool("door", {
 		Row4:SetValue( valz["Row4"] )
 		Row4.DataChanged = function( _, val ) valz["Row4"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
-		if nzTools.Advanced then
 			local Row5 = DProperties:CreateRow( "Advanced Door Settings", "Purchaseable?" )
 			Row5:Setup( "Boolean" )
 			Row5:SetValue( valz["Row5"] )
@@ -116,14 +115,7 @@ nzTools:CreateTool("door", {
 			Row6:Setup( "Boolean" )
 			Row6:SetValue( valz["Row6"] )
 			Row6.DataChanged = function( _, val ) valz["Row6"] = val DProperties.UpdateData(DProperties.CompileData()) end
-		else
-			local text = vgui.Create("DLabel", DProperties)
-			text:SetText("Enable Advanced Mode for more options.")
-			text:SetFont("Trebuchet18")
-			text:SetTextColor( Color(50, 50, 50) )
-			text:SizeToContents()
-			text:Center()
-		end
+	
 
 		return DProperties
 	end,

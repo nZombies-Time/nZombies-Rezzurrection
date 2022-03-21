@@ -91,7 +91,7 @@ nzTools:CreateTool("navlock", {
 	weight = 40,
 	condition = function(wep, ply)
 		-- Client needs advanced editing on to see the tool
-		return nzTools.Advanced
+		return true
 	end,
 	interface = function(frame, data)
 		local panel = vgui.Create("DPanel", frame)

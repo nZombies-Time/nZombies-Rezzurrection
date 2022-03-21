@@ -487,14 +487,14 @@ local function PerksHud()
 			if iconType == "Modern Warfare" then
 				surface.SetMaterial(nzPerks:Get(v).icon_mw)
 			end
+			if iconType == "Hololive" then
+				surface.SetMaterial(nzPerks:Get(v).icon_holo)
+			end
 			if iconType == "Cold War" then
 				surface.SetMaterial(nzPerks:Get(v).icon_cw)
 			end
 			if iconType == "April Fools" then
 				surface.SetMaterial(nzPerks:Get(v).icon_dumb)
-			end
-			if iconType == "Laby's Secret Perk Icons" then
-				surface.SetMaterial(nzPerks:Get(v).icon_holo)
 			end
 		surface.SetDrawColor(255,255,255)
 		surface.DrawTexturedRect(w + k*(size*scale + 4), ScrH() - 280, size*scale, size*scale)

@@ -11,7 +11,7 @@ nzTools:CreateTool("zspawn", {
 		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_normal" then
 			ent = tr.Entity -- No need to recreate if we shot an already existing one
 		else
-			ent = nzMapping:ZedSpawn(tr.HitPos, tobool(data.flag) and data.link or nil, ply)
+			ent = nzMapping:ZedSpawn(tr.HitPos, tobool(data.flag) and data.link or nil, tobool(data.skip), tobool(data.barricade), ply)
 		end
 
 		ent.flag = data.flag
@@ -53,6 +53,7 @@ nzTools:CreateTool("zspawn", {
 		valz["Row1"] = data.flag
 		valz["Row2"] = data.link
 
+
 		local DProperties = vgui.Create( "DProperties", frame )
 		DProperties:SetSize( 480, 450 )
 		DProperties:SetPos( 10, 10 )
@@ -67,6 +68,7 @@ nzTools:CreateTool("zspawn", {
 				data.flag = 1
 			end
 			data.link = str
+	
 			
 			return data
 		end
@@ -88,6 +90,6 @@ nzTools:CreateTool("zspawn", {
 	end,
 	defaultdata = {
 		flag = 0,
-		link = 1,
+		link = 1
 	}
 })

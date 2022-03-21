@@ -58,6 +58,62 @@ nzRound:AddMachineType("Original", "nz_zombie_walker", {
 nzRound:AddMachineType("Infinite Warfare", "nz_zombie_walker", {
 }) 
 
+nzRound.PAPSelectData = nzRound.PAPSelectData or {}
+function nzRound:AddPAPType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.PAPSelectData[id] = data
+		else
+			nzRound.PAPSelectData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.PAPSelectData[id] = class
+	end
+end
+
+nzRound:AddPAPType("Original", "nz_zombie_walker", {
+}) 
+nzRound:AddPAPType("Black Ops Cold War", "nz_zombie_walker", {
+}) 
+nzRound:AddPAPType("World War II", "nz_zombie_walker", {
+})
+
+nzRound.PAPSoundData = nzRound.PAPSoundData or {}
+function nzRound:AddPAPsound(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.PAPSoundData[id] = data
+		else
+			nzRound.PAPSoundData[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.PAPSoundData[id] = class
+	end
+end
+
+nzRound:AddPAPsound("Classic", "nz_zombie_walker", {
+}) 
+
+nzRound:AddPAPsound("Black Ops 3", "nz_zombie_walker", {
+})
+
+nzRound:AddPAPsound("Black Ops Cold War", "nz_zombie_walker", {
+})
+
+nzRound:AddPAPsound("Infinite Warfare", "nz_zombie_walker", {
+})
+
+nzRound:AddPAPsound("Tyler1", "nz_zombie_walker", {
+})
+
 nzRound.IconSelectData = nzRound.IconSelectData or {}
 function nzRound:AddIconType(id, class)
 	if SERVER then
@@ -84,7 +140,7 @@ nzRound:AddIconType("Modern Warfare", "nz_zombie_walker", {})
 nzRound:AddIconType("Cold War", "nz_zombie_walker", {}) 
 nzRound:AddIconType("April Fools", "nz_zombie_walker", {}) 
 nzRound:AddIconType("No Background", "nz_zombie_walker", {}) 
-nzRound:AddIconType("Secret Code Required", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Hololive", "nz_zombie_walker", {}) 
 
 function nzRound:GetIconType(id)
 	if id == "Rezzurrection" then
@@ -114,11 +170,8 @@ function nzRound:GetIconType(id)
 		if id == "April Fools" then
 	return "April Fools"
 	end
-		if id == "Secret Code Required" then
-	return "Rezzurrection"
-	end
-	if id == "Code Accepted" then
-	return "Laby's Secret Perk Icons"
+	if id == "Hololive" then
+	return "Hololive"
 	end
 	if id == nil then
 	return  "Rezzurrection"
@@ -181,7 +234,11 @@ nzRound:AddBoxType("Original", "", {})
 nzRound:AddBoxType("Mob of the Dead", "", {}) 
 nzRound:AddBoxType("Origins", "", {}) 
 nzRound:AddBoxType("Dead Space", "", {}) 
+nzRound:AddBoxType("Call of Duty: WW2", "", {}) 
+nzRound:AddBoxType("Chaos", "", {}) 
+nzRound:AddBoxType("DOOM", "", {}) 
 nzRound:AddBoxType("Resident Evil", "", {}) 
+nzRound:AddBoxType("Shadows of Evil", "", {}) 
 
 nzRound.HudSelectData = nzRound.HudSelectData or {}
 function nzRound:AddHUDType(id, class)
@@ -201,6 +258,8 @@ function nzRound:AddHUDType(id, class)
 end
 
 nzRound:AddHUDType("Black Ops 3", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Infinite Warfare", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Cold War", "nz_zombie_walker", {
 }) 
@@ -253,6 +312,9 @@ function nzRound:GetHUDType(id)
 	end
 	if id == "Cold War" then
 	return "cw_hud.png"
+	end
+	if id == "Infinite Warfare" then
+	return "iw_hud.png"
 	end
 	if id == "Division 9" then
 	return "D9.png"
@@ -654,6 +716,152 @@ nzRound:AddSpecialRoundType("Burning Zombies", {
 	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
 }) -- No special functions or anything really
 
+nzRound:AddSpecialRoundType("Burning Zombies (Ascension)", {
+	normalTypes = {
+		["nz_zombie_special_burning_ascension"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Buried)", {
+	normalTypes = {
+		["nz_zombie_special_burning_buried"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Clowns", {
+	normalTypes = {
+		["nz_zombie_special_burning_clown"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Call of the Dead)", {
+	normalTypes = {
+		["nz_zombie_special_burning_cotd"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Der Eisendrache)", {
+	normalTypes = {
+		["nz_zombie_special_burning_eisendrache"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (FIVE)", {
+	normalTypes = {
+		["nz_zombie_special_burning_five"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Gorod Krovi)", {
+	normalTypes = {
+		["nz_zombie_special_burning_gorodkrovi"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (TranZit)", {
+	normalTypes = {
+		["nz_zombie_special_burning_greenrun"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Hazmat)", {
+	normalTypes = {
+		["nz_zombie_special_burning_hazmat"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Moon)", {
+	normalTypes = {
+		["nz_zombie_special_burning_moon"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Mob of the Dead)", {
+	normalTypes = {
+		["nz_zombie_special_burning_motd"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Nuketown)", {
+	normalTypes = {
+		["nz_zombie_special_burning_nuketown"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Origins)", {
+	normalTypes = {
+		["nz_zombie_special_burning_origins"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Shangri-La)", {
+	normalTypes = {
+		["nz_zombie_special_burning_shangrila"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Boney Bois", {
+	normalTypes = {
+		["nz_zombie_special_burning_skeleton"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+nzRound:AddSpecialRoundType("Burning Zombies (Shadows of Evil)", {
+	normalTypes = {
+		["nz_zombie_special_burning_soe"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Shi no Numa)", {
+	normalTypes = {
+		["nz_zombie_special_burning_sumpf"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Templar)", {
+	normalTypes = {
+		["nz_zombie_special_burning_templar"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+nzRound:AddSpecialRoundType("Burning Zombies (Zetsubou no Shima)", {
+	normalTypes = {
+		["nz_zombie_special_burning_zetsubou"] = {chance = 100}
+	},
+	normalDelay = 0.75,
+	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
+}) -- No special functions or anything really
+
+
 nzRound.AdditionalZombieData = nzRound.AdditionalZombieData or {}
 function nzRound:AddAdditionalZombieType(id, class)
 	if SERVER then
@@ -723,6 +931,44 @@ nzRound:AddAdditionalZombieType("Necromorphs", "nz_zombie_walker_necromorph", {
 }) 
 nzRound:AddAdditionalZombieType("Burning Zombie", "nz_zombie_special_burning", {
 }) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Ascension)", "nz_zombie_special_burning_ascension", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Buried)", "nz_zombie_special_burning_buried", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Clowns", "nz_zombie_special_burning_clown", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Call of the Dead)", "nz_zombie_special_burning_cotd", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Der Eisendrache)", "nz_zombie_special_burning_eisendrache", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (FIVE)", "nz_zombie_special_burning_five", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Gorod Krovi)", "nz_zombie_special_burning_gorodkrovi", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (TranZit)", "nz_zombie_special_burning_greenrun", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Hazmat)", "nz_zombie_special_burning_hazmat", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Moon)", "nz_zombie_special_burning_moon", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Mob of the Dead)", "nz_zombie_special_burning_motd", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Nuketown)", "nz_zombie_special_burning_nuketown", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Origins)", "nz_zombie_special_burning_origins", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Shangri-La)", "nz_zombie_special_burning_shangrila", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Boney Bois", "nz_zombie_special_burning_skeleton", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Shadows of Evil)", "nz_zombie_special_burning_soe", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Shi no Numa)", "nz_zombie_special_burning_sumpf", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Templar)", "nz_zombie_special_burning_templar", {
+}) 
+nzRound:AddAdditionalZombieType("Burning Zombie (Zetsubou no Shima)", "nz_zombie_special_burning_zetsubou", {
+}) 
 nzRound:AddAdditionalZombieType("Spiders", "nz_zombie_special_spooder", {
 }) 
 nzRound:AddAdditionalZombieType("The Pack (Dead Space)", "nz_zombie_special_pack", {
@@ -766,6 +1012,63 @@ nzRound:AddAdditionalZombieType("Thrasher", "nz_zombie_boss_thrasher", {
 function nzRound:GetSpecialType(id)
 	if id == "Burning Zombie" then
 	return "nz_zombie_special_burning"
+	end
+	if id == "Burning Zombie (Ascension)" then
+	return "nz_zombie_special_burning_ascension"
+	end
+	if id == "Burning Zombie (Buried)" then
+	return "nz_zombie_special_burning_buried"
+	end
+	if id == "Burning Clowns" then
+	return "nz_zombie_special_burning_clown"
+	end
+	if id == "Burning Zombie (Call of the Dead)" then
+	return "nz_zombie_special_burning_cotd"
+	end
+	if id == "Burning Zombie (Der Eisendrache)" then
+	return "nz_zombie_special_burning_eisendrache"
+	end
+	if id == "Burning Zombie (FIVE)" then
+	return "nz_zombie_special_burning_five"
+	end
+	if id == "Burning Zombie (Gorod Krovi)" then
+	return "nz_zombie_special_burning_gorodkrovi"
+	end
+	if id == "Burning Zombie (TranZit)" then
+	return "nz_zombie_special_burning_greenrun"
+	end
+	if id == "Burning Zombie (Hazmat)" then
+	return "nz_zombie_special_burning_hazmat"
+	end
+	if id == "Burning Zombie (Moon)" then
+	return "nz_zombie_special_burning_moon"
+	end
+	if id == "Burning Zombie (Mob of the Dead)" then
+	return "nz_zombie_special_burning_motd"
+	end
+	if id == "Burning Zombie (Nuketown)" then
+	return "nz_zombie_special_burning_nuketown"
+	end
+	if id == "Burning Zombie (Origins)" then
+	return "nz_zombie_special_burning_origins"
+	end
+	if id == "Burning Zombie (Shangri-La)" then
+	return "nz_zombie_special_burning_shangrila"
+	end
+	if id == "Burning Boney Bois" then
+	return "nz_zombie_special_burning_skeleton"
+	end
+	if id == "Burning Zombie (Shadows of Evil)" then
+	return "nz_zombie_special_burning_soe"
+	end
+	if id == "Burning Zombie (Shi no Numa)" then
+	return "nz_zombie_special_burning_sumpf"
+	end
+	if id == "Burning Zombie (Templar)" then
+	return "nz_zombie_special_burning_templar"
+	end
+	if id == "Burning Zombie (Zetsubou no Shima)" then
+	return "nz_zombie_special_burning_zetsubou"
 	end
 		if id == "Spiders" then
 	return "nz_zombie_special_spooder"

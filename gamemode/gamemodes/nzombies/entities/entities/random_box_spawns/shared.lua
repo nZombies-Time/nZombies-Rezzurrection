@@ -17,8 +17,8 @@ function ENT:Initialize()
 	self:SetModel( "models/nzr/originsbox/base.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/nzr/motd/base.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.6, 0 )
+	self:SetModel( "models/nzr/2022/box/motd_base.mdl" )
+	--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
 	self:SetModel( "models/nzr/deadspace/kiosk_base.mdl" )
@@ -27,9 +27,23 @@ function ENT:Initialize()
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
 	self:SetModel( "models/nzr/re/missing.mdl" )
 	end
+	
+	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
+	self:SetModel( "models/nzr/2022/box/ww2.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == "DOOM") then
+	self:SetModel( "models/nzr/2022/box/DOOM.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == "Chaos") then
+	self:SetModel( "models/nzr/2022/box/chaos_away.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
+	self:SetModel( "models/nzr/2022/box/soe_base.mdl" )
+	end
 	if (nzMapping.Settings.boxtype == nil) then
 	self:SetModel( "models/nzprops/mysterybox_pile.mdl" )
 	end
+	
 	--self:SetModelScale( self:GetModelScale() * 0.8, 0 )
 	self:SetColor( Color(255, 255, 255) )
 	--self:SetAngles( Color(255, 255, 255) )

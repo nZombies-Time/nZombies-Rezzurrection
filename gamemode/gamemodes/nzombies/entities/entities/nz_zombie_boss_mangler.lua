@@ -459,6 +459,7 @@ end
 
 
 function ENT:OnThink()
+self:RemoveAllDecals()
 if !self:IsAttacking() then
 if !counting and !dying and !shooting and self:Health() > 0 then
 counting = true

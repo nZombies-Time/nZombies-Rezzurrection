@@ -8,6 +8,7 @@ ENT.Author = "Lolle"
 function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "EmergeSequenceIndex")
 	self:NetworkVar("Bool", 1, "Decapitated")
+	self:NetworkVar("Bool", 2, "nospawn")
 end
 
 ENT.Models = {
@@ -238,12 +239,12 @@ function ENT:OnSpawn()
 	effectData:SetOrigin( self:GetPos() )
 	effectData:SetMagnitude(dur)
 	util.Effect("zombie_spawn_dust", effectData)
-
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
-	if coroutine.running() then
+	--if coroutine.running() and mySpawn:GetSkip(false) then
+	--if (spawn:GetSkip(false)) then
 		self:PlaySequenceAndWait(seq)
-	end
+	--end
 end
 
 function ENT:OnZombieDeath(dmgInfo)

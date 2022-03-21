@@ -138,7 +138,11 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(2000) -- 0 for no distance restriction (infinite)
+	if  nzMapping.Settings.range then
+	self:SetTargetCheckRange(nzMapping.Settings.range)
+else
+self:SetTargetCheckRange(2000)
+end	-- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -187,6 +191,9 @@ end
 
 function ENT:Think()
 	if SERVER then --think is shared since last update but all the stuff in here should be serverside
+	if (self:IsOnGround() and !self:GetTimedOut() and !self:GetClimbing() and !self:GetJumping() and !self:IsGettingPushed()) then
+            self.loco:SetVelocity(self:GetForward() * self:GetRunSpeed())
+        end
 		if !self:IsJumping() and !self:GetSpecialAnimation() and (self:GetSolidMask() == MASK_NPCSOLID_BRUSHONLY or self:GetSolidMask() == MASK_SOLID_BRUSHONLY) then
 			local occupied = false
 			local tr = util.TraceHull( {
@@ -242,8 +249,7 @@ function ENT:Think()
 					effectData:SetOrigin( self:GetPos() + Vector(0,0,32) )
 					effectData:SetMagnitude(1)
 					util.Effect("zombie_spawn_dust", effectData)
-
-					self:Jump()
+					self:Remove()
 				end
 
 				if self:GetStuckCounter() <= 3 then
@@ -254,8 +260,16 @@ function ENT:Think()
 				if self:GetStuckCounter() > 3 and self:GetStuckCounter() <= 5 then
 					--try to unstuck via jump
 					if self.NZBossType then
-	nzRound:SpawnBoss(self.NZBossType)
-	self:Remove()
+					local spawnpoints = {}
+			for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
+				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
+					table.insert(spawnpoints, v)
+				end
+			end
+			local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
+			self:SetPos(selected:GetPos())
+	--nzRound:SpawnBoss(self.NZBossType)
+	--self:Remove()
 	else
 	self:RespawnZombie()
 	end
@@ -793,10 +807,6 @@ function ENT:ChaseTarget( options )
 		if ( self.loco:IsStuck() ) then
 			self:HandleStuck()
 			return "stuck"
-		end
-
-		if self.loco:GetVelocity():Length() < 10 then
-			self:ApplyRandomPush()
 		end
 
 		coroutine.yield()
@@ -1398,6 +1408,7 @@ end
 function ENT:TriggerBarricadeJump( barricade, dir )
 	if !self:GetSpecialAnimation() and (!self.NextBarricade or CurTime() > self.NextBarricade) then
 		self:SetSpecialAnimation(true)
+		--self:SetPassedBarricade(true)
 		self:SetBlockAttack(true)
 		
 		local id, dur, speed
@@ -1500,13 +1511,23 @@ function ENT:TimedEvent(time, callback)
 	end)
 end
 
-function ENT:ApplyRandomPush( power )
-	if CurTime() < self:GetLastPush() + 0.2 or !self:IsOnGround() then return end
-	power = power or 100
-	local vec =  self.loco:GetVelocity() + VectorRand() * power
-	vec.z = math.random( 100 )
-	self.loco:SetVelocity( vec )
-	self:SetLastPush( CurTime() )
+function ENT:ApplyRandomPush( power ) -- Replace the other ApplyRandomPush with this
+    if CurTime() < self:GetLastPush() + 0.2 or !self:IsOnGround() then return end
+    power = power or 100
+    local vec =  self.loco:GetVelocity() + VectorRand() * power
+    vec.z = math.random( 100 )
+    self.GettingPushed = true
+    self.loco:SetVelocity( vec )
+
+    timer.Simple(0.5, function()
+        self.GettingPushed = false
+    end)
+
+    self:SetLastPush( CurTime() )
+end
+
+function ENT:IsGettingPushed() -- this is a new method
+    return self.GettingPushed
 end
 
 function ENT:ZombieWaterLevel()

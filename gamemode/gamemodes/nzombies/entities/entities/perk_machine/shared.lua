@@ -68,12 +68,27 @@ function ENT:Update()
 	local PerkData = nzPerks:Get(self:GetPerkID())
 	local skinmodel = PerkData.model
 	local iwskin = PerkData.skin
+	
+	if self:GetPerkID() == "pap"  then
+	local bocwmodel = PerkData.model_bocw
+	local nz_tomb = PerkData.model_origins
+	local ww2model = PerkData.model_ww2
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+		self:SetModel(bocwmodel)
+	end
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "nz_tomb" then
+		self:SetModel(nz_tomb)
+	end
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+		self:SetModel(ww2model)
+	end
+	end
 	if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
 	
 	else
 		local offmodel = PerkData.model_off
 		end
-	if skinmodel then
+	if skinmodel  then
 	if offmodel then
 	if self:IsOn() then
 			self:SetModel(skinmodel)
@@ -94,6 +109,20 @@ function ENT:Update()
 		end
 		else
 		self:SetModel(PerkData and (self:IsOn() and PerkData.on_model or PerkData.off_model) or "")
+	end
+		if self:GetPerkID() == "pap"  then
+	local bocwmodel = PerkData.model_bocw
+	local nz_tomb = PerkData.model_origins
+	local ww2model = PerkData.model_ww2
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+		self:SetModel(bocwmodel)
+	end
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "nz_tomb" then
+		self:SetModel(nz_tomb)
+	end
+	if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+		self:SetModel(ww2model)
+	end
 	end
 	--if self:GetPerkID() == "gum" then
 		--self:SetModelScale( self:GetModelScale() * 0.5, 0 )

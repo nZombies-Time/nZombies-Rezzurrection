@@ -20,6 +20,9 @@ end
 function ENT:SetupDataTables()
  
     self:NetworkVar( "String", 0, "Link" )
+	self:NetworkVar("Bool", 0, "Skip")
+	self:NetworkVar("Bool", 1, "Barricade")
+	self:NetworkVar("Bool", 2, "PassedBarricade")
  
 end
  
@@ -34,6 +37,7 @@ function ENT:Initialize()
     self:SetSpawnWeight(0)
     self:SetZombiesToSpawn(0)
     self:SetNextSpawn(CurTime())
+	self:SetPassedBarricade(false)
 end
  
 function ENT:IsSuitable()

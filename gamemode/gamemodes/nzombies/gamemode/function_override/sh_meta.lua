@@ -175,7 +175,7 @@ function GM:EntityFireBullets(ent, data)
 	if ent:IsPlayer() then
 		local wep = ent:GetActiveWeapon()
 		if IsValid(wep) and wep:HasNZModifier("pap") and !wep.IsMelee and !wep.IsKnife then
-			ent:EmitSound("nz/effects/pap_shoot_glock20.wav", 60, 100, 0.7)
+			nzSounds:PlayEnt("UpgradedShoot", ent)
 		end
 	end
 

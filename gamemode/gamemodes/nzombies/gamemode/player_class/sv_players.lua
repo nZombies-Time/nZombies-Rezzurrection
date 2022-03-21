@@ -74,6 +74,22 @@ local function friendlyFire( ply, ent )
 			
 			ply:SetAmmo(ply:GetAmmoCount(GetNZAmmoID("grenade")) - 1, GetNZAmmoID("grenade"))
 		end
+		
+		if ply:HasPerk("fire") then -- WIDOWS WINE TAKE DAMAGE EFFECT
+		
+		if math.random(1,5) == 4 then
+			local pos = ply:GetPos()
+			
+			local zombls = ents.FindInSphere(pos, 400)
+				
+			
+			for k,v in pairs(zombls) do
+				if IsValid(v) and v:IsValidZombie() then
+					v:Ignite(7)
+				end
+			end
+		end
+		end
 	end
 end
 

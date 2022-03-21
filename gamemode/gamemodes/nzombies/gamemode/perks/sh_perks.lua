@@ -65,6 +65,26 @@ function nzPerks:GetMachineType(id)
 end
 
 
+function nzPerks:GetPAPType(id)
+	if id == "Black Ops Cold War" then
+	return "bocw"
+	end
+	if id == "World War II" then
+	return "ww2"
+	end
+	if id == "Origins" then
+	return "nz_tomb"
+	end
+	if id == "Original" then
+	return "og"
+	end
+	if id == nil then
+	return "og"
+	end
+end
+
+
+
 nzPerks:NewPerk("jugg", {
 	name = "Juggernog",
 	name_skin = "Tuff 'Nuff",
@@ -75,36 +95,38 @@ nzPerks:NewPerk("jugg", {
 	on_skin = 0,
 	price = 2500,
 	price_skin = 2500,
-	material = "models/perk_bottle/c_perk_bottle_jugg",
+	desc = "Gain increased health.",
+	material = 7,
 	icon = Material("perk_icons/chron/jugg.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/tuff.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/jugg.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/jugg.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/jugg.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/jugg.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/jugg.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/jugg.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/juggular.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/jugg.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/jugg.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/jugg.png", "smooth unlitgeneric"),
 	color = Color(255, 100, 100),
 	func = function(self, ply, machine)
-			ply:SetMaxHealth(250)
-			ply:SetHealth(250)
+			ply:SetMaxHealth((nzMapping.Settings.hp) +150)
+			ply:SetHealth((nzMapping.Settings.hp) +150)
 	end,
 	lostfunc = function(self, ply)
-		ply:SetMaxHealth(100)
-		if ply:Health() > 100 then ply:SetHealth(100) end
+		ply:SetMaxHealth(nzMapping.Settings.hp)
+		if ply:Health() > nzMapping.Settings.hp then ply:SetHealth(nzMapping.Settings.hp) end
 	end,
 	upgradefunc = function(self, ply, machine)
-			ply:SetMaxHealth(350)
-			ply:SetHealth(350)
+			ply:SetMaxHealth((nzMapping.Settings.hp) +250)
+			ply:SetHealth((nzMapping.Settings.hp) +250)
 	end,
 })
 
 nzPerks:NewPerk("gum", {
 	name = "Gobbledumb(April Fools)",
 	name_skin = "Gobbledumb(April Fools)",
+	name_holo = "Masochism Generator",
 	model = "models/nzr/aprilfools/gobble.mdl",
 	skin = "models/nzr/aprilfools/gobble.mdl",
 	off_skin = 1,
@@ -112,7 +134,7 @@ nzPerks:NewPerk("gum", {
 	price = 500,
 	price_skin = 500,
 	specialmachine = true,
-	material = "models/perk_bottle/gum",
+	material = 0,
 	icon = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/chron/gum.png", "smooth unlitgeneric"),
@@ -318,7 +340,7 @@ nzPerks:NewPerk("gum", {
 nzPerks:NewPerk("dtap", {
 	name = "Double Tap",
 	name_skin = "Bang Bangs",
-	name_holo ="Sora Tap",
+	name_holo ="Reaper's Delight",
 	model = "models/alig96/perks/doubletap/doubletap_on.mdl",
 	model_off = "models/alig96/perks/doubletap/doubletap_off.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
@@ -326,14 +348,15 @@ nzPerks:NewPerk("dtap", {
 	on_skin = 0,
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_dtap",
+	desc = "Makes your weapons shoot significantly faster",
+	material = 0,
 	icon = Material("perk_icons/chron/dtap.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/bangs.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/dtap.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/dtap.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/dtap.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/dtap.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/dtap.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/dtap.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dtap.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/dtap.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/dtap.png", "smooth unlitgeneric"),
@@ -368,7 +391,7 @@ nzPerks:NewPerk("dtap", {
 nzPerks:NewPerk("amish", {
 	name = "Amish Ale",
 	name_skin = "Hippie Hops",
-	name_holo ="Monoe Mai Tai",
+	name_holo ="Board-Pounding Beer",
 	model = "models/alig96/perks/amish/amish_off.mdl",
 	model_off = "models/alig96/perks/amish/amish_off.mdl",
 	skin =  "models/alig96/perks/amish/amish_off.mdl",
@@ -376,7 +399,8 @@ nzPerks:NewPerk("amish", {
 	on_skin = 0,
 	price = 1000,
 	price_skin = 1000,
-	material = "models/perk_bottle/c_perk_bottle_amish",
+	desc = "Repairing barricades grants more points ",
+	material = 23,
 	icon = Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
 	icon_iw =  Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
 	icon_waw =  Material("perk_icons/chron/amish.png", "smooth unlitgeneric"),
@@ -400,22 +424,23 @@ nzPerks:NewPerk("amish", {
 nzPerks:NewPerk("dtap2", {
 	name = "Double Tap II",
 	name_skin = "Bang Bangs",
-	name_holo ="Melfissa Mountain Dew",
-	off_model = "models/alig96/perks/doubletap2/doubletap2_off.mdl",
-	on_model = "models/alig96/perks/doubletap2/doubletap2.mdl",
+	name_holo ="Seal Soda",
+	model = "models/alig96/perks/doubletap2/doubletap2.mdl",
+	model_off = "models/alig96/perks/doubletap2/doubletap2_off.mdl",
 	skin = "models/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_dtap2",
+	desc = "Gain increased damage and slightly increased rate of fire for your weapons",
+	material = 0,
 	icon = Material("perk_icons/dtap2.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/bangs2.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/dtap2.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/dtap2.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/dtap2.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/dtap2.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/waw/dtap2.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/dtap2.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dtap2.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/dtap2.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/dtap2.png", "smooth unlitgeneric"),
@@ -457,14 +482,15 @@ nzPerks:NewPerk("revive", {
 	on_skin = 0,
 	price = 1500,
 	price_skin = 1500,
-	material = "models/perk_bottle/c_perk_bottle_revive",
+	desc = "Revive downed teammates faster or yourself if playing solo.",
+	material = 13,
 	icon = Material("perk_icons/chron/revive.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/atoms.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/revive.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/revive.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/revive.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/revive.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/revive.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/revive.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/quack.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/revive.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/revive.png", "smooth unlitgeneric"),
@@ -490,21 +516,22 @@ nzPerks:NewPerk("revive", {
 nzPerks:NewPerk("speed", {
 	name = "Speed Cola",
 	name_skin = "Quickies",
-	name_holo = "Boing Boing Redbull",
+	name_holo = "Kronii Cola",
 	model = "models/yolojoenshit/bo3perks/speedcola/mc_mtl_p7_zm_vending_speedcola.mdl",
 	skin = "models/IWperks/quickies/mc_mtl_p7_zm_vending_speedcola.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 3000,
 	price_skin = 3000,
-	material = "models/perk_bottle/c_perk_bottle_speed",
+	desc = "Gain increased reload speed.",
+	material = 15,
 	icon = Material("perk_icons/chron/speed.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/quickies.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/speed.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/speed.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/speed.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/speed.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/speed.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/speed.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/spud.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/speed.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/speed.png", "smooth unlitgeneric"),
@@ -546,6 +573,9 @@ nzPerks:NewPerk("pap", {
 	name = "Pack-a-Punch",
 	name_skin = "Pack-a-Punch",
 	model = "models/yolojoenshit/extras/packapunch/mc_mtl_p7_packapunch.mdl",
+	model_bocw = "models/nzr/2022/pap/bocw.mdl",
+	model_ww2 = "models/nzr/2022/pap/ww2.mdl",
+	model_origins = "models/yolojoenshit/extras/packapunch/mc_mtl_p7_packapunch.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 0,
@@ -592,13 +622,35 @@ nzPerks:NewPerk("pap", {
 			local e = EffectData()
 			e:SetEntity(machine)
 			local ang = machine:GetAngles()
+			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+			e:SetOrigin(machine:GetPos() + ang:Up()*45 + ang:Forward()*20 - ang:Right()*2)
+			else
+			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+			e:SetOrigin(machine:GetPos() + ang:Up()*42 + ang:Forward()*15 - ang:Right()*2)
+			else
 			e:SetOrigin(machine:GetPos() + ang:Up()*35 + ang:Forward()*20 - ang:Right()*2)
+			end
+			end
 			e:SetMagnitude(3)
+			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+			ParticleEffect("bo3_mangler_pulse", machine:GetPos() + ang:Up()*44 + ang:Forward()*13, ang,machine)
+			else
 			util.Effect("pap_glow", e, true, true)
+			end
+			
 
 			wep:Remove()
+			local startpos
 			local wep = ents.Create("pap_weapon_fly")
-			local startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
+			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+			startpos = machine:GetPos() + (ang:Forward() + ang:Up()*50 + ang:Right()*-3) + (Vector(0,-5,0))
+			end
+			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+			startpos = machine:GetPos() + (ang:Forward()*11 + ang:Up()*50 + ang:Right()*4)
+			else
+			startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
+			end
+			--local startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
 			wep:SetPos(startpos)
 			wep:SetAngles(ang + Angle(0,90,0))
 			wep.WepClass = class
@@ -616,13 +668,23 @@ nzPerks:NewPerk("pap", {
 			--wep:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
 			timer.Simple(0.5, function()
 				if IsValid(wep) then
+				if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+				else
+				if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw"  then
+					wep:SetLocalVelocity(ang:Forward()*-15 + ang:Up()*-25)
+					else
 					wep:SetLocalVelocity(ang:Forward()*-30)
+					end
+					end
 				end
 			end)
 			timer.Simple(1.8, function()
 				if IsValid(wep) then
 					wep:SetMoveType(MOVETYPE_NONE)
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					else
 					wep:SetLocalVelocity(Vector(0,0,0))
+					end	
 				end
 			end)
 			timer.Simple(3, function()
@@ -650,11 +712,17 @@ nzPerks:NewPerk("pap", {
 					--print(wep, wep.WepClass, wep:GetModel())
 				
 					machine:EmitSound("nz/machines/pap_ready.wav")
+					 machine:StopParticles()
 					wep:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
 					wep:SetMoveType(MOVETYPE_FLY)
 					wep:SetGravity(0.000001)
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw"  then
+					wep:SetLocalVelocity(ang:Forward()*20 + ang:Up()*25)
+					else
 					wep:SetLocalVelocity(ang:Forward()*30)
-					--print(ang:Forward()*30, wep:GetVelocity())
+					end
+					print(ang:Forward()*30, wep:GetVelocity())
+					
 					wep:CreateTriggerZone(reroll)
 					--print(reroll)
 				end
@@ -665,13 +733,20 @@ nzPerks:NewPerk("pap", {
 					--print(wep:GetMoveType())
 					--print(ang:Forward()*30, wep:GetVelocity())
 					wep:SetMoveType(MOVETYPE_NONE)
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					else
 					wep:SetLocalVelocity(Vector(0,0,0))
+					end
 				end
 			end)
+			
 			timer.Simple(10, function()
 				if IsValid(wep) then
 					wep:SetMoveType(MOVETYPE_FLY)
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					else
 					wep:SetLocalVelocity(ang:Forward()*-2)
+					end
 				end
 			end)
 			timer.Simple(25, function()
@@ -702,14 +777,15 @@ nzPerks:NewPerk("vigor", {
 	on_skin = 0,
 	price = 2500,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_vigor",
+	desc = "Greatly increase the damage of bullet-based weapons.",
+	material = 17,
 	icon = Material("perk_icons/chron/vigor.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/vigor.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/vigor.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/vigor.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/vigor.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/vigor.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/dtap2.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/dtap2.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/vigor.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/vigor.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/vigor.png", "smooth unlitgeneric"),
@@ -726,19 +802,20 @@ nzPerks:NewPerk("vigor", {
 nzPerks:NewPerk("fire", {
 	name = "Napalm Nectar",
 	name_skin = "Firestarter Fizzy",
-	name_holo = "KFP Sprite",
-	model = "models/nzr/firestarter/firestarter.mdl",
-	model_off = "models/nzr/firestarter/firestarter_off.mdl",
+	name_holo = "Pheonix Elixir",
+	model = "models/nzr/2022/perk/napalm.mdl",
+	model_off = "models/nzr/2022/perk/napalm_off.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_fire",
+	desc = "Gain increased fire damage, resist fire damage, chance to damage zombies around you",
+	material = 5,
 	icon =Material("perk_icons/chron/fire.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/fire.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/fire.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/fire.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/fire.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/fire.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/fire.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/fire.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/napalm.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/fire.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/fire.png", "smooth unlitgeneric"),
@@ -752,24 +829,55 @@ nzPerks:NewPerk("fire", {
 	end,
 })
 
+nzPerks:NewPerk("mask", {
+	name = "Mask Moscato",
+	name_skin = "Mask Moscato",
+	name_holo = "Orca Old Fashioned",
+	model = "models/nzr/2022/perk/mask.mdl",
+	model_off = "models/nzr/2022/perk/mask.mdl",
+	price = 3000,
+	price_skin = 3000,
+	desc = "Gain immunity to Nova Gas and take reduced damage from map hazards.",
+	material = 8,
+	icon =Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_iw = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_waw = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_bo2 = Material("perk_icons/bo3/mask.jpg", "smooth unlitgeneric"),
+	icon_bo3 = Material("perk_icons/bo3/mask.jpg", "smooth unlitgeneric"),
+	icon_mw = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_dumb = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/holo/mask.png", "smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/bocw/mask.png", "smooth unlitgeneric"),
+	color = Color(92, 165, 30),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+	upgradefunc  = function(self, ply)
+	
+	end,
+})
+
 nzPerks:NewPerk("staminup", {
 	name = "Stamin-Up",
 	name_skin = "Racin' Stripes",
-	name_holo ="Tea Kettle Tequila",
+	name_holo ="GOD Speed Gatorade",
 	model = "models/yolojoenshit/bo3perks/staminup/mc_mtl_p7_zm_vending_marathon.mdl",
 	skin = "models/IWperks/stripes/mc_mtl_p7_zm_vending_marathon.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_stamin",
+	desc = "Move 7% faster",
+	material = 16,
 	icon = Material("perk_icons/chron/staminup.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/stripes.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/staminup.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/staminup.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/staminup.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/staminup.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/staminup.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/staminup.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dorito.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/staminup.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/staminup.png", "smooth unlitgeneric"),
@@ -798,18 +906,19 @@ nzPerks:NewPerk("politan", {
 	name = "Random-o-Politan",
 	name_skin = "Random-o-Politan",
 	name_holo = "Kureiji Cola",
-	model = "models/alig96/perks/random/random_on.mdl",
-	model_off = "models/alig96/perks/random/random_off.mdl",
+	model = "models/nzr/2022/perk/random.mdl",
+	model_off = "models/nzr/2022/perk/random.mdl",
 	price = 5000,
 	price_skin = 5000,
-	material = "models/perk_bottle/c_perk_bottle_random",
+	desc = "Replace your current weapon with a random one every reload.",
+	material = 12,
 	icon = Material("perk_icons/chron/random.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/random.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/random.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/random.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/random.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/random.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/random.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/random.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/random.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/random.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/random.png", "smooth unlitgeneric"),
@@ -844,19 +953,19 @@ nzPerks:NewPerk("sake", {
 	name_skin = "Slappy Taffy",
 	name_holo ="Shogun Sake",
 	skin = "models/IWperks/taffy/sake.mdl",
-	model = "models/alig96/perks/sake/sake.mdl",
-	off_skin = 1,
-	on_skin = 0,
+	model_off = "models/nzr/2022/perk/sake.mdl",
+	model = "models/nzr/2022/perk/sake.mdl",
 	price = 6000,
 	price_skin = 6000,
-	material = "models/perk_bottle/c_perk_bottle_sake",
+	desc = "Permanently one shot zombies with your melee.",
+	material = 14,
 	icon = Material("perk_icons/chron/sake.png", "smooth unlitgeneric"),
 	icon_iw =  Material("perk_icons/chron/taffy.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/sake.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/sake.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/sake.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/sake.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/sake.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/sake.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/sake.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/sake.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/sake.png", "smooth unlitgeneric"),
@@ -875,19 +984,20 @@ nzPerks:NewPerk("sake", {
 nzPerks:NewPerk("wall", {
 	name = "Wall Power Whiskey Sour",
 	name_skin = "Wall Power Whiskey Sour",
-	name_holo = "Auto Tune Ale",
-	model_off = "models/alig96/perks/wall/wall_off.mdl",
-	model = "models/alig96/perks/wall/wall.mdl",
-	price = 8000,
-	price_skin = 8000,
-	material = "models/perk_bottle/c_perk_bottle_wall",
+	name_holo = "Aloe Ale",
+	model_off = "models/nzr/2022/perk/wall.mdl",
+	model = "models/nzr/2022/perk/wall.mdl",
+	price = 10000,
+	price_skin = 10000,
+	desc = "Every new weapon obtained is Pack-A-Punched.",
+	material = 19,
 	icon = Material("perk_icons/chron/wall.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/wall.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/wall.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/wall.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/wall.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/wall.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/wall.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/wall.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/flaccid.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/wall.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/wall.png", "smooth unlitgeneric"),
@@ -904,19 +1014,20 @@ nzPerks:NewPerk("wall", {
 nzPerks:NewPerk("danger", {
 	name = "Danger Costa-Rican",
 	name_skin = "Danger Costa-Rican",
-	name_holo = "FAQ Bombaid",
-	model_off = "models/alig96/perks/danger/danger_off.mdl",
-	model = "models/alig96/perks/danger/danger_on.mdl",
+	name_holo = "Elvish Explosive Expresso",
+	model_off = "models/nzr/2022/perk/danger.mdl",
+	model = "models/nzr/2022/perk/danger.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_danger",
+	desc = "Deal greatly increased explosive damage.",
+	material = 2,
 	icon = Material("perk_icons/chron/danger.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/danger.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/danger.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/danger.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/danger.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/danger.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/danger.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/danger.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/danger.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/danger.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/danger.png", "smooth unlitgeneric"),
@@ -933,22 +1044,23 @@ nzPerks:NewPerk("danger", {
 nzPerks:NewPerk("everclear", {
 	name = "Explosive Everclear",
 	name_skin = "Trail Blazers",
-	name_holo = "Brat Bomb Beer",
+	name_holo = "FAQ Flavorade",
 	skin = "models/IWperks/trailblazer/everclear.mdl",
 	off_skin = 1,
 	on_skin = 0,
-	model_off = "models/alig96/perks/everclear/everclear.mdl",
-	model = "models/alig96/perks/everclear/everclear.mdl",
+	model_off = "models/nzr/2022/perk/everclear.mdl",
+	model = "models/nzr/2022/perk/everclear.mdl",
 	price = 3000,
 	price_skin = 3000,
-	material = "models/perk_bottle/c_perk_bottle_everclear",
+	desc = "Slain zombies have a chance to generate a Napalm Pit",
+	material = 4,
 	icon = Material("perk_icons/chron/everclear.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/blazers.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/everclear.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/everclear.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/everclear.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/everclear.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/everclear.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/everclear.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/everclear.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/everclear.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/everclear.png", "smooth unlitgeneric"),
@@ -966,18 +1078,19 @@ nzPerks:NewPerk("gin", {
 	name = "Juicer's Gin",
 	name_skin = "Juicer's Gin",
 	name_holo = "Lamy's Long Island Iced Tea",
-	model_off = "models/alig96/perks/gin/gin.mdl",
-	model = "models/alig96/perks/gin/gin.mdl",
+	model_off = "models/nzr/2022/perk/gin.mdl",
+	model = "models/nzr/2022/perk/gin.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_gin",
+	desc = "Every player gains an additional perk slot. Grants two slots in solo.",
+	material = 6,
 	icon = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/gin.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/gin.png", "smooth unlitgeneric"),
 	icon_dumb = Material("perk_icons/chron/gin.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/gin.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/gin.png", "smooth unlitgeneric"),
@@ -1022,14 +1135,15 @@ nzPerks:NewPerk("phd", {
 	model = "models/alig96/perks/phd/phdflopper.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_phd",
+	desc = "Gain immunity to explosives.",
+	material = 10,
 	icon = Material("perk_icons/chron/phd.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/bomb.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/phd.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/phd.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/phd.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/phd.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/phd.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/phd.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/phd.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/phd.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/phd.png", "smooth unlitgeneric"),
@@ -1046,21 +1160,22 @@ nzPerks:NewPerk("phd", {
 nzPerks:NewPerk("deadshot", {
 	name = "Deadshot Daiquiri",
 	name_skin = "Deadeye Dewdrops",
-	name_holo = "Poi Poi Puree",
+	name_holo = "Laplus Latte",
 	model = "models/yolojoenshit/bo3perks/deadshot/mc_mtl_p7_zm_vending_deadshot.mdl",
 	skin = "models/IWperks/deadeye/mc_mtl_p7_zm_vending_deadshot.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 2000,
 	price_skin = 1500,
-	material = "models/perk_bottle/c_perk_bottle_deadshot",
+	desc = "Zombies slain via headshot have a chance to damage other nearby zombies.",
+	material = 3,
 	icon = Material("perk_icons/chron/deadshot.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/deadeye.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/deadshot.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/deadshot.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/deadshot.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/deadshot.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/deadshot.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/deadshot.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/dragunov.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/deadshot.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/deadshot.png", "smooth unlitgeneric"),
@@ -1077,21 +1192,22 @@ nzPerks:NewPerk("deadshot", {
 nzPerks:NewPerk("mulekick", {
 	name = "Mule Kick",
 	name_skin = "Mule Munchies",
-	name_holo ="Lich's Gunslinger Brew",
+	name_holo ="Lion's Lemonade",
 	model = "models/yolojoenshit/bo3perks/mulekick/mc_mtl_p7_zm_vending_mulekick.mdl",
 	skin = "models/IWperks/munchies/mc_mtl_p7_zm_vending_mulekick.mdl",
 	off_skin = 1,
 	on_skin = 0,
 	price = 4000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_mulekick",
+	desc = "Gain an additional weapon slot.",
+	material = 9,
 	icon = Material("perk_icons/chron/mulekick.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/munchies.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/mule.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/mule.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/mule.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/mule.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/mulekick.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/mulekick.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/mule.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/mulekick.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/mule.png", "smooth unlitgeneric"),
@@ -1113,19 +1229,20 @@ nzPerks:NewPerk("mulekick", {
 nzPerks:NewPerk("tombstone", {
 	name = "Tombstone Soda",
 	name_skin = "Tombstone Soda",
-	name_holo = "Spirytus of the Reaper",
+	name_holo = "Don't disgrace me by buying this perk",
 	model_off = "models/alig96/perks/tombstone/tombstone_off.mdl",
 	model = "models/alig96/perks/tombstone/tombstone.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_tombstone",
+	desc = "Don't buy this trash",
+	material = 22,
 	icon = Material("perk_icons/chron/tombstone.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/tombstone.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/tombstone.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/tombstone.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/tombstone.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/tombstone.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/tombstone.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/tombstone.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/tombstone.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/tombstone.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/tombstone.png", "smooth unlitgeneric"),
@@ -1142,21 +1259,22 @@ nzPerks:NewPerk("tombstone", {
 nzPerks:NewPerk("whoswho", {
 	name = "Who's Who",
 	name_skin = "Who's Who",
-	name_holo = "T-Spin Tornado",
+	name_holo = "Bao Beer",
 	model_off = "models/alig96/perks/whoswho/whoswho_off.mdl",
 	model = "models/alig96/perks/whoswho/whoswho.mdl",
 	price = 2000,
 	price_skin = 2000,
-	material = "models/perk_bottle/c_perk_bottle_whoswho",
+	desc = "Clone yourself on death and attempt to revive yourself.",
+	material = 20,
 	icon = Material("perk_icons/chron/whoswho.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/whoswho.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/whoswho.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/whoswho.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/whoswho.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/whoswho.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/whoswho.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/whoswho.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/who.png", "smooth unlitgeneric"),
-	icon_holo = Material("perk_icons/holo/whoswho.png", "smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/holo/whoswho.jpg", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/whoswho.png", "smooth unlitgeneric"),
 	color = Color(100, 100, 255),
 	func = function(self, ply, machine)
@@ -1169,23 +1287,24 @@ nzPerks:NewPerk("whoswho", {
 })
 
 nzPerks:NewPerk("pop", {
-	name = "Elemental Pop",
-	name_skin = "Elemental Pop",
-	name_holo = "Elemental Pop",
-	model_off = "models/epop/1950cokemachine.mdl",
-	model = "models/epop/1950cokemachine.mdl",
-	price = 3000,
-	price_skin = 3000,
-	material = "models/perk_bottle/c_perk_bottle_wall",
-	icon = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_iw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_waw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_bo2 = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_bo3 = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_mw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_dumb = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
-	icon_holo = Material("perk_icons/cw/pop.png", "smooth unlitgeneric"),
+	name = "Chaos Colada",
+	name_skin = "Elemental Drops",
+	name_holo = "Chaos Rat Cola",
+	model_off = "models/nzr/2022/perk/chaos.mdl",
+	model = "models/nzr/2022/perk/chaos.mdl",
+	price = 2000,
+	price_skin = 2000,
+	desc = "Any damage you deal has a chance to cause elemental effects.",
+	material = 11,
+	icon = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_iw = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_waw = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_bo2 = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_bo3 = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_mw = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_dumb = Material("perk_icons/bocw/pop.png", "smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/holo/pop.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/pop.png", "smooth unlitgeneric"),
 	color = Color(243, 127, 250),
 	func = function(self, ply, machine)
@@ -1208,14 +1327,15 @@ nzPerks:NewPerk("cherry", {
 	model = "models/alig96/perks/cherry/cherry.mdl",
 	price = 2000,
 	price_skin = 1500,
-	material = "models/perk_bottle/c_perk_bottle_cherry",
+	desc = "Reloading deals damage to zombies around you.",
+	material = 1,
 	icon =  Material("perk_icons/chron/cherry.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/bolts.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/cherry.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/cherry.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/cherry.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/cherry.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/cherry.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/cherry.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/ec.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/cherry.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/cherry.png", "smooth unlitgeneric"),
@@ -1237,14 +1357,15 @@ nzPerks:NewPerk("vulture", {
 	model = "models/alig96/perks/vulture/vultureaid.mdl",
 	price = 3000,
 	price_skin = 3000,
-	material = "models/perk_bottle/c_perk_bottle_vulture",
+	desc = "Zombies slain can drop points and ammo.",
+	material = 18,
 	icon = Material("perk_icons/chron/vulture.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/vulture.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/vulture.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/vulture.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/vulture.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/vulture.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/vulture.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/vulture.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/vultureaid.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/vulture.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/vulture.png", "smooth unlitgeneric"),
@@ -1273,14 +1394,15 @@ nzPerks:NewPerk("widowswine", {
 	on_skin = 0,
 	price = 4000,
 	price_skin = 4000,
-	material = "models/perk_bottle/c_perk_bottle_widowswine",
+	desc = "When attacked, freeze every zombie around you and nullify the damage.",
+	material = 21,
 	icon = Material("perk_icons/chron/widows_wine.png", "smooth unlitgeneric"),
 	icon_iw = Material("perk_icons/chron/widows_wine.png", "smooth unlitgeneric"),
 	icon_waw = Material("perk_icons/waw/widows.png", "smooth unlitgeneric"),
 	icon_bo2 = Material("perk_icons/bo2/widows.png", "smooth unlitgeneric"),
 	icon_bo3 = Material("perk_icons/bo3/widows.png", "smooth unlitgeneric"),
 	icon_mw = Material("perk_icons/mw/widowswine.png", "smooth unlitgeneric"),
-	icon_cw = Material("perk_icons/cw/widows_wine.png", "smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/widows_wine.png", "smooth unlitgeneric"),
 	icon_dumb = Material("AF/widowswine.png", "smooth unlitgeneric"),
 	icon_holo = Material("perk_icons/holo/widows.png", "smooth unlitgeneric"),
 	icon_glow = Material("perk_icons/nobg/widowswine.png", "smooth unlitgeneric"),

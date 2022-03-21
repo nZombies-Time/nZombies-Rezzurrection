@@ -66,6 +66,21 @@ function nzMapping:LoadMapSettings(data)
 		else
 		nzMapping.Settings.perkmachinetype = "Original"
 	end
+	
+	if data.PAPtype then
+		nzMapping.Settings.PAPtype = data.PAPtype or "Original"
+		else
+		nzMapping.Settings.PAPtype = "Original"
+	end
+	
+	
+	if data.hp then
+		nzMapping.Settings.hp = tonumber(data.hp) or 100
+	end
+	
+	if data.range then
+		nzMapping.Settings.range = tonumber(data.range) or 2000
+	end
 	if data.hudtype then
 		nzMapping.Settings.hudtype = data.hudtype or "Origins (Black Ops 2)"
 	end
@@ -138,7 +153,10 @@ function nzMapping:LoadMapSettings(data)
 	if data.perkupgrades then
 		nzMapping.Settings.perkupgrades = (data.perkupgrades) or nil
 	end
-
+	
+	if data.sharing then
+		nzMapping.Settings.sharing = (data.sharing) or nil
+	end
 
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
 	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround

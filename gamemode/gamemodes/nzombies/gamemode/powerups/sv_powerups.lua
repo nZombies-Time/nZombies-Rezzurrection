@@ -33,6 +33,7 @@ function nzPowerUps:Nuke(pos, nopoints, noeffect)
 		for k,v in pairs(ents.GetAll()) do
 			if v:IsValidZombie() then
 				if IsValid(v) then
+				if not v.NZBossType then
 					v:SetBlockAttack(true) -- They cannot attack now!
 					local insta = DamageInfo()
 					insta:SetAttacker(Entity(0))
@@ -42,10 +43,11 @@ function nzPowerUps:Nuke(pos, nopoints, noeffect)
 					if time > highesttime then highesttime = time end
 					timer.Simple(time, function()
 						if IsValid(v) then
-							insta:SetDamage(v:Health())
-							v:TakeDamageInfo( insta )
+							v:Kill(insta)
+							v:SetDecapitated(true)
 						end
 					end)
+					end
 				end
 			end
 		end
@@ -54,16 +56,18 @@ function nzPowerUps:Nuke(pos, nopoints, noeffect)
 			if v:IsValidZombie() then
 				print(v, IsValid(v))
 				if IsValid(v) then
+				if not v.NZBossType then
 					local insta = DamageInfo()
 					insta:SetAttacker(Entity(0))
 					insta:SetInflictor(Entity(0))
 					insta:SetDamageType(DMG_BLAST_SURFACE)
 					timer.Simple(0.1, function()
 						if IsValid(v) then
-							insta:SetDamage(v:Health())
-							v:TakeDamageInfo( insta )
+							v:Kill(insta)
+							v:SetDecapitated(true)
 						end
 					end)
+				end
 				end
 			end
 		end
@@ -75,7 +79,11 @@ function nzPowerUps:Nuke(pos, nopoints, noeffect)
 			if nzRound:InProgress() then -- Only if the game is still going!
 				for k,v in pairs(player.GetAll()) do
 					if v:IsPlayer() then
+					if v:HasUpgrade("danger") then
+						v:GivePoints(800)
+						else
 						v:GivePoints(400)
+						end
 					end
 				end
 			end
@@ -164,7 +172,11 @@ function nzPowerUps:Carpenter(nopoints)
 	if !nopoints then
 		for k,v in pairs(player.GetAll()) do
 			if v:IsPlayer() then
+			 if v:HasUpgrade("amish") then
+				v:GivePoints(500)
+				else
 				v:GivePoints(200)
+				end
 			end
 		end
 	end

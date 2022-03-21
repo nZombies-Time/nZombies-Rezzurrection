@@ -93,6 +93,9 @@ if SERVER then
 
 		local id = specific and specific or nzMisc.WeightedRandom(choices)
 		if !id or id == "null" then return end --  Back out
+		if #player.GetAllPlaying() <= 1 and id == "zombieblood" then return end 
+
+		
 		
 		local ent = ents.Create("drop_powerup")
 		id = hook.Call("OnPowerUpSpawned", nil, id, ent) or id

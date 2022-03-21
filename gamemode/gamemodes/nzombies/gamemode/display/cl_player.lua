@@ -22,6 +22,10 @@ function player:GetHUDPointsType(id)
 	if id == "Cold War" then
 	 return "cw_score1.png"
 	end
+	
+	if id == "Infinite Warfare" then
+	 return "cw_score1.png"
+	end
 		if id == "Buried" then
 	return "buried_score1.png"
 	end

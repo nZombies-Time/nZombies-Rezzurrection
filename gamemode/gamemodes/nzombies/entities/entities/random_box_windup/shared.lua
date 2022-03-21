@@ -13,6 +13,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Bool", 0, "Winding" )
 	self:NetworkVar( "String", 0, "WepClass")
 	self:NetworkVar( "Bool", 1, "IsTeddy" )
+	self:NetworkVar( "Bool", 2, "Sharing" )
 
 end
 
@@ -27,6 +28,7 @@ function ENT:Initialize()
 
 	self:SetWinding(true)
 	self:SetIsTeddy(false)
+	self:SetSharing(false)
 	self.c = 0
 	self.s = -20
 	self.t = 0
@@ -56,6 +58,9 @@ function ENT:Initialize()
 			end
 			--print(self:GetModel())
 		end)
+		
+		timer.Simple(12, function() if IsValid(self) then self:SetSharing(true)  end end)
+		
 		-- If we time out, remove the object
 		timer.Simple(15, function() if IsValid(self) then self:SetLocalVelocity(self:GetAngles():Up()*-2) end end)
 		-- If we time out, remove the object
@@ -77,20 +82,35 @@ end
 
 function ENT:Use( activator, caller )
 	if !self:GetWinding() and self:GetWepClass() != "nz_box_teddy" then
-		if activator == self.Buyer then
+		if nzMapping.Settings.sharing then
+		
+			if activator == self.Buyer or  self:GetSharing() then
+				local class = self:GetWepClass()
+				activator:Give(class)
+				nzWeps:GiveMaxAmmoWep(activator, class)
+				self.Box:Close()
+				self:SetSharing(false)
+				self:Remove()
+			
+			end
+		
+		else
+			if activator == self.Buyer then
+			
 			local class = self:GetWepClass()
 			activator:Give(class)
 			nzWeps:GiveMaxAmmoWep(activator, class)
 			self.Box:Close()
+			self:SetSharing(false)
 			self:Remove()
-		else
-			if IsValid(self.Buyer) then
-				activator:PrintMessage( HUD_PRINTTALK, "This is " .. self.Buyer:Nick() .. "'s gun. You cannot take it." )
+			else
+			activator:PrintMessage( HUD_PRINTTALK, "This is " .. self.Buyer:Nick() .. "'s gun. You cannot take it." )
 			end
+		
 		end
 	end
 end
-
+		
 function ENT:WindUp( )
 	local gun
 	if self.ScrollWepList then

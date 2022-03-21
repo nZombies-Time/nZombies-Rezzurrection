@@ -12,12 +12,14 @@ nzSounds = {}
 nzSounds.struct = { -- For use with 'data' when creating config menu options
     "roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "dogroundsnd", "gameendsnd", -- main event sounds
     "spawnsnd", "grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
-    "boxshakesnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxopensnd", "boxclosesnd" -- mystery box sounds
+    "boxshakesnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxopensnd", "boxclosesnd",	-- mystery box sounds
+	"eesong","papshot" --new sounds as of 115 day
 }
 
 nzSounds.Sounds = {}
 nzSounds.Sounds.Custom = {}
 nzSounds.Sounds.Default = {}
+
 nzSounds.Sounds.Default.RoundStart = "nz/round/round_start.mp3"
 nzSounds.Sounds.Default.RoundEnd = "nz/round/round_end.mp3"
 nzSounds.Sounds.Default.SpecialRoundStart = "nz/round/special_round_start.wav"
@@ -41,10 +43,13 @@ nzSounds.Sounds.Default.Bye = "nz/randombox/Announcer_Teddy_Zombies.wav"
 nzSounds.Sounds.Default.Jingle = "nz/randombox/random_box_jingle.wav"
 nzSounds.Sounds.Default.Open = "nzr/announcer/mysterybox/box_open.mp3"
 nzSounds.Sounds.Default.Close = "nzr/announcer/mysterybox/box_close.mp3"
+nzSounds.Sounds.Default.Music = ""
+nzSounds.Sounds.Default.UpgradedShoot = "nz/effects/pap_shoot_glock20.wav"
 --nzSounds.MainEvents = {"RoundStart", "RoundEnd", "SpecialRoundStart", "SpecialRoundEnd", "GameEnd", "DogRound"}
 
 function nzSounds:RefreshSounds()
-    nzSounds.Sounds.Custom.RoundStart = nzMapping.Settings.roundstartsnd
+    
+	nzSounds.Sounds.Custom.RoundStart = nzMapping.Settings.roundstartsnd
     nzSounds.Sounds.Custom.RoundEnd = nzMapping.Settings.roundendsnd
     nzSounds.Sounds.Custom.SpecialRoundStart = nzMapping.Settings.specialroundstartsnd
     nzSounds.Sounds.Custom.SpecialRoundEnd = nzMapping.Settings.specialroundendsnd
@@ -67,6 +72,8 @@ function nzSounds:RefreshSounds()
     nzSounds.Sounds.Custom.Jingle = nzMapping.Settings.boxjinglesnd
     nzSounds.Sounds.Custom.Open = nzMapping.Settings.boxopensnd
     nzSounds.Sounds.Custom.Close = nzMapping.Settings.boxclosesnd
+	nzSounds.Sounds.Custom.Music = nzMapping.Settings.eesong
+	nzSounds.Sounds.Custom.UpgradedShoot = nzMapping.Settings.papshot
     if (!table.IsEmpty(nzMapping.Settings) and table.IsEmpty(nzSounds.Sounds.Custom)) then
         nzSounds.Sounds.Custom = table.Copy(nzSounds.Sounds.Default)
     end

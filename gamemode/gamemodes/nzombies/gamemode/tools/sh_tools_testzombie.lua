@@ -47,7 +47,8 @@ nzTools:CreateTool("testzombie", {
 	icon = "icon16/user_green.png",
 	weight = 400,
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		-- Client needs advanced editing on to see the tool
+		return true
 	end,
 	interface = function(frame, data)
 	

@@ -692,7 +692,7 @@ function nzQMenu:CreateToolsMenu( )
 	
 	local advanced = vgui.Create("DCheckBoxLabel", ToolInterface)
 	advanced:SetPos(400, 6)
-	advanced:SetText("Advanced Mode")
+	advanced:SetText("Broken Stuff")
 	advanced:SetValue(nzTools.Advanced)
 	advanced:SizeToContents()
 	advanced.OnChange = function(self)

@@ -68,6 +68,10 @@ nzTools:CreateTool("settings", {
 		valz["Row40"] = data.fontthicc or 2
 		valz["Row41"] = data.icontype or "Rezzurrection"
 		valz["Row42"] = data.perkupgrades or false
+		valz["Row43"] = data.PAPtype or "Original"
+		valz["Row45"] = data.hp or 100
+		valz["Row46"] = data.range or 2000
+		valz["Row47"] = data.sharing or false
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -152,13 +156,6 @@ nzTools:CreateTool("settings", {
 		Row2:SetValue( valz["Row2"] )
 		Row2.DataChanged = function( _, val ) valz["Row2"] = val end
 		
-		local Row3 = DProperties:CreateRow( "Map Settings", "Easter Egg Song URL" )
-		Row3:Setup( "Generic" )
-		Row3:SetValue( valz["Row3"] )
-		Row3.DataChanged = function( _, val ) valz["Row3"] = val end
-		Row3:SetTooltip("Add a link to a SoundCloud track to play this when all easter eggs have been found")
-
-		if nzTools.Advanced then
 			local Row4 = DProperties:CreateRow( "Map Settings", "Includes Map Script?" )
 			Row4:Setup( "Boolean" )
 			Row4:SetValue( valz["Row4"] )
@@ -277,7 +274,7 @@ nzTools:CreateTool("settings", {
 				end
 			end
 			Row18.DataChanged = function( _, val ) valz["Row18"] = val end
-			Row18:SetTooltip("Sets the Perk Machines")
+			Row18:SetTooltip("Sets the Perk Machines Appearance")
 			
 			local Row19 = DProperties:CreateRow("Map Settings", "Mystery Box Skin")
 			Row19:Setup( "Combo" )
@@ -511,6 +508,50 @@ nzTools:CreateTool("settings", {
 			Row42:SetValue( valz["Row42"] )
 			Row42.DataChanged = function( _, val ) valz["Row42"] = val end
 			Row42:SetTooltip("Enable upgradeable perks on this config")
+			
+			local Row43 = DProperties:CreateRow("Map Settings", "Pack-A-Punch Skins")
+			Row43:Setup( "Combo" )
+			local found = false
+			for k,v in pairs(nzRound.PAPSelectData) do
+				if k == valz["Row43"] then
+					Row43:AddChoice(k, k, true)
+					found = true
+				else
+					Row43:AddChoice(k, k, false)
+				end
+			end
+			Row43.DataChanged = function( _, val ) valz["Row43"] = val end
+			Row43:SetTooltip("Sets the Pack-A-Punch skin")
+			
+			
+			local Row45 = DProperties:CreateRow( "Map Settings", "Player Base Health" )
+		Row45:Setup( "Integer" )
+		Row45:SetValue( valz["Row45"] )
+		Row45.DataChanged = function( _, val ) valz["Row45"] = val end
+		
+
+		
+		local Row46 = DProperties:CreateRow( "Map Settings", "Zombie Search Range" )
+		Row46:Setup( "Integer" )
+		Row46:SetValue( valz["Row46"] )
+		Row46.DataChanged = function( _, val ) valz["Row46"] = val end
+		Row46:SetTooltip("Sets zombie search range. 0 is infinite search range and not recommended. Must be positive")
+		
+		local Row47 = DProperties:CreateRow( "Map Settings", "Mystery Box Sharing?" )
+			Row47:Setup( "Boolean" )
+			Row47:SetValue( valz["Row47"] )
+			Row47.DataChanged = function( _, val ) valz["Row47"] = val end
+			Row47:SetTooltip("To be a box communist or not to be a box communist")
+		
+		
+		
+		
+		if nzTools.Advanced then
+		local Row3 = DProperties:CreateRow( "Map Settings", "Easter Egg Song URL (deprecated)" )
+		Row3:Setup( "Generic" )
+		Row3:SetValue( valz["Row3"] )
+		Row3.DataChanged = function( _, val ) valz["Row3"] = val end
+		Row3:SetTooltip("The original way easter egg songs were played. Does not work, do not use.")
 		end
 
 
@@ -557,6 +598,10 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row40"]) then data.fontthicc  = 2 else data.fontthicc  = tonumber(valz["Row40"]) end
 			if !valz["Row41"] then data.icontype = "Rezzurrection" else data.icontype = valz["Row41"] end
 			if !valz["Row42"] then data.perkupgrades = nil else data.perkupgrades = valz["Row42"] end
+			if !valz["Row43"] then data.PAPtype = "Original" else data.PAPtype = valz["Row43"] end
+			if !tonumber(valz["Row45"]) then data.hp = 100 else data.hp = tonumber(valz["Row45"]) end
+			if !tonumber(valz["Row46"]) then data.range = 0 else data.range = tonumber(valz["Row46"]) end
+			if !valz["Row47"] then data.sharing = nil else data.sharing = valz["Row47"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end
@@ -708,7 +753,7 @@ nzTools:CreateTool("settings", {
 		-- DermaButton3:SetSize( 260, 30 )
 		-- DermaButton3.DoClick = UpdateData
 
-		if nzTools.Advanced then
+		
 			local ACRow2 = acProps:CreateRow("Anti-Cheat Settings", "Warn players?")
 			ACRow2:Setup("Boolean")
 			ACRow2:SetValue(valz["ACRow2"])
@@ -821,8 +866,10 @@ nzTools:CreateTool("settings", {
 					if v.PrintName and v.PrintName != "" and !nzConfig.WeaponBlackList[v.ClassName] and v.PrintName != "Scripted Weapon" and !v.NZPreventBox and !v.NZTotalBlacklist then
 						if v.Category and v.Category != "" then
 							InsertWeaponToList(v.PrintName != "" and v.PrintName or v.ClassName, v.ClassName, 10, v.ClassName.." ["..v.Category.."]")
+							break
 						else
 							InsertWeaponToList(v.PrintName != "" and v.PrintName or v.ClassName, v.ClassName, 10, v.ClassName.." [No Category]")
+							break
 						end
 					end
 					-- The rest are still available in the dropdown
@@ -1081,6 +1128,16 @@ nzTools:CreateTool("settings", {
 					["Title"] = "Game Over",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow6"]
+				},
+				[7] = {
+					["Title"] = "Easter Egg Song",
+					["ToolTip"] = "Remember to sail the seas safely",
+					["Bind"] = valz["SndRow24"]
+				},
+				[8] = {
+					["Title"] = "Pack-A-Punch Sound",
+					["ToolTip"] = "",
+					["Bind"] = valz["SndRow25"]
 				}
 			}
 
@@ -1423,7 +1480,7 @@ nzTools:CreateTool("settings", {
 			--for k,v in pairs(nzPerks:GetList()) do
 			--	if k != "wunderfizz" and k != "pap" then
 				for k,v in pairs(wunderfizzlist) do
-				if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
+				--if (!valz["Wunderfizz"] || !valz["Wunderfizz"][k]) then return end
 
 				local perkitem = perkchecklist:Add( "DPanel" )
 				perkitem:SetSize( 130, 20 )
@@ -1452,15 +1509,14 @@ nzTools:CreateTool("settings", {
 			end
 				--end
 			--end
-		else
-			local text = vgui.Create("DLabel", DProperties)
-			text:SetText("Enable Advanced Mode for more options.")
-			text:SetFont("Trebuchet18")
-			text:SetTextColor( Color(50, 50, 50) )
-			text:SizeToContents()
-			text:SetPos(0, 140)
-			text:CenterHorizontal()
-		end
+			--local text = vgui.Create("DLabel", DProperties)
+			--text:SetText("Enable this mode for broken stuff")
+			--text:SetFont("Trebuchet18")
+			--text:SetTextColor( Color(50, 50, 50) )
+			--text:SizeToContents()
+			--text:SetPos(0, 140)
+			--text:CenterHorizontal()
+		
 
 		return sheet
 	end,

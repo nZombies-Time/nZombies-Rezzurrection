@@ -6,7 +6,7 @@ SWEP.Instructions	= "Fancy Viewmodel Animations"
 SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 
-SWEP.ViewModel			= "models/weapons/c_perk_bottle.mdl"
+SWEP.ViewModel			= "models/nzr/2022/perks/v_perkbottle.mdl"
 SWEP.WorldModel			= "models/yolojoenshit/bo3perks/bottle/perk_bottle_bo3.mdl"
 
 SWEP.UseHands 			= true
@@ -35,22 +35,6 @@ SWEP.BobScale = 0
 
 SWEP.NZPreventBox = true -- Prevents from being in the box by default
 
-local oldmat
---[[local perk_materials = {
-	["jugg"] = "models/perk_bottle/c_perk_bottle_jugg",
-	["speed"] = "models/perk_bottle/c_perk_bottle_speed",
-	["dtap"] = "models/perk_bottle/c_perk_bottle_dtap",
-	["revive"] = "models/perk_bottle/c_perk_bottle_revive",
-	["dtap2"] = "models/perk_bottle/c_perk_bottle_dtap2",
-	["staminup"] = "models/perk_bottle/c_perk_bottle_stamin",
-	["phd"] = "models/perk_bottle/c_perk_bottle_phd",
-	["deadshot"] = "models/perk_bottle/c_perk_bottle_deadshot",
-	["mulekick"] = "models/perk_bottle/c_perk_bottle_mulekick",
-	["cherry"] = "models/perk_bottle/c_perk_bottle_cherry",
-	["tombstone"] = "models/perk_bottle/c_perk_bottle_tombstone",
-	["whoswho"] = "models/perk_bottle/c_perk_bottle_whoswho",
-	["vulture"] = "models/perk_bottle/c_perk_bottle_vulture",
-}]]
 
 if SERVER then
 	util.AddNetworkString("perk_blur_screen")
@@ -66,10 +50,10 @@ function SWEP:Initialize()
 	if CLIENT then
 		if self.Owner == LocalPlayer() then
 			local vm = LocalPlayer():GetViewModel()
-			print(self:GetPerk())
 			local mat = nzPerks:Get(self:GetPerk()).material --perk_materials[self:GetPerk()]
-			oldmat = vm:GetMaterial() or ""
-			vm:SetMaterial(mat)
+			print(mat)
+			vm:SetSkin(mat)
+			--vm:SetMaterial(mat)
 		end
 	end
 end
@@ -95,7 +79,7 @@ function SWEP:Deploy()
 		end
 	end)
 
-	timer.Simple(1.3,function()
+	timer.Simple(0.9,function()
 		if IsValid(self) and IsValid(self.Owner) then
 			if self.Owner:Alive() then
 				self:EmitSound("nz/perks/drink.wav")
@@ -104,7 +88,7 @@ function SWEP:Deploy()
 		end
 	end)
 
-	timer.Simple(2.3,function()
+	timer.Simple(2.1,function()
 		if IsValid(self) and IsValid(self.Owner) then
 			if self.Owner:Alive() then
 				self:EmitSound("nz/perks/smash.wav")
@@ -163,7 +147,7 @@ function SWEP:GetViewModelPosition( pos, ang )
 	local newang = ply:EyeAngles()
 	local up = newang:Up()
 	
-	newpos = newpos + ply:GetAimVector()*3 - up*65
+	--newpos = newpos + ply:GetAimVector()*3 - up*65
 	
 	return newpos, newang
  

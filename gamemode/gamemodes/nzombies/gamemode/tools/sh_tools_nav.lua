@@ -39,7 +39,8 @@ nzTools:CreateTool("navedit", {
 	icon = "icon16/map.png",
 	weight = 39,
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		-- Client needs advanced editing on to see the tool
+		return true
 	end,
 	interface = function(frame, data)
 

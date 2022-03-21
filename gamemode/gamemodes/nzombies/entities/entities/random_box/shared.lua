@@ -24,18 +24,31 @@ function ENT:Initialize()
 	self:SetModel( "models/nzr/originsbox/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/nzr/motd/box.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.6, 0 )
+	self:SetModel( "models/nzr/2022/box/motd.mdl" )
+	--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
 	self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
-	self:SetModelScale( self:GetModelScale() * 1, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
 	self:SetModel( "models/nzr/re/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == nil) then
 	self:SetModel("models/hoff/props/mysterybox/box.mdl")
+	end
+	
+	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
+	self:SetModel( "models/nzr/2022/box/ww2.mdl" )
+	end
+	
+	if (nzMapping.Settings.boxtype == "DOOM") then
+	self:SetModel( "models/nzr/2022/box/DOOM_on.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
+	self:SetModel( "models/nzr/2022/box/soe.mdl" )
+	end
+	if (nzMapping.Settings.boxtype == "Chaos") then
+	self:SetModel( "models/nzr/2022/box/chaos.mdl" )
 	end
 	
 		self:PhysicsInit( SOLID_VPHYSICS )
@@ -56,6 +69,7 @@ function ENT:Initialize()
 		self:SetUseType( SIMPLE_USE )
 	end
 	
+	
 	if CLIENT then
 		self.Light = ClientsideModel("models/effects/vol_light128x512.mdl")
 		local ang = self:GetAngles()
@@ -74,7 +88,7 @@ function ENT:Initialize()
 		mat:Scale( scale )
 		self.Light:EnableMatrix( "RenderMultiply", mat )
 		
-		self.Light:Spawn()
+			self.Light:Spawn()
 	end
 end
 
@@ -92,6 +106,8 @@ function ENT:BuyWeapon(ply)
         local class = nzRandomBox.DecideWep(ply)
         if class != nil then
       		--ply:TakePoints(nzPowerUps:IsPowerupActive("firesale") and 10 or 950)
+			local ang = self:GetAngles()
+			--ParticleEffect("bo3_napalm_fs", self:GetPos() + ang:Up()*44 + ang:Forward()*13, ang,self)
       		self:Open()
       		local wep = self:SpawnWeapon( ply, class )
 			wep.Buyer = ply
@@ -104,7 +120,56 @@ function ENT:BuyWeapon(ply)
 end
 
 function ENT:Open()
+if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+self.FlamesEnt = ents.Create("env_fire")
+self.FlamesEntL = ents.Create("env_fire")
+self.FlamesEntR = ents.Create("env_fire")
+		if IsValid( self.FlamesEnt ) then
+			self.FlamesEnt:SetParent(self)
+			self.FlamesEnt:SetOwner(self)
+			self.FlamesEnt:SetPos(self:GetPos())
+			--no glow + delete when out + start on + last forever
+			self.FlamesEnt:SetKeyValue("spawnflags", tostring(128 + 32 + 4 + 2 + 1))
+			self.FlamesEnt:SetKeyValue("firesize", (1 * math.Rand(0.7, 1.1)))
+			self.FlamesEnt:SetKeyValue("fireattack", 0)
+			self.FlamesEnt:SetKeyValue("health", 0)
+			self.FlamesEnt:SetKeyValue("damagescale", "-10") -- only neg. value prevents dmg
 
+			self.FlamesEnt:Spawn()
+			self.FlamesEnt:Activate()
+		end
+		
+		
+		if IsValid( self.FlamesEntR ) then
+			self.FlamesEntR:SetParent(self)
+			self.FlamesEntR:SetOwner(self)
+			self.FlamesEntR:SetPos(self:GetPos() +Vector( 0, 30, 0 ))
+			--no glow + delete when out + start on + last forever
+			self.FlamesEntR:SetKeyValue("spawnflags", tostring(128 + 32 + 4 + 2 + 1))
+			self.FlamesEntR:SetKeyValue("firesize", (1 * math.Rand(0.7, 1.1)))
+			self.FlamesEntR:SetKeyValue("fireattack", 0)
+			self.FlamesEntR:SetKeyValue("health", 0)
+			self.FlamesEntR:SetKeyValue("damagescale", "-10") -- only neg. value prevents dmg
+
+			self.FlamesEntR:Spawn()
+			self.FlamesEntR:Activate()
+		end
+		
+		if IsValid( self.FlamesEntL ) then
+			self.FlamesEntL:SetParent(self)
+			self.FlamesEntL:SetOwner(self)
+			self.FlamesEntL:SetPos(self:GetPos()  +Vector( 0, -30, 0 ))
+			--no glow + delete when out + start on + last forever
+			self.FlamesEntL:SetKeyValue("spawnflags", tostring(128 + 32 + 4 + 2 + 1))
+			self.FlamesEntL:SetKeyValue("firesize", (1 * math.Rand(0.7, 1.1)))
+			self.FlamesEntL:SetKeyValue("fireattack", 0)
+			self.FlamesEntL:SetKeyValue("health", 0)
+			self.FlamesEntL:SetKeyValue("damagescale", "-10") -- only neg. value prevents dmg
+
+			self.FlamesEntL:Spawn()
+			self.FlamesEntL:Activate()
+		end
+		end
 	local sequence = self:LookupSequence("Close")
 	--self:ResetSequence(sequence)
 	self:SetPlaybackRate( 0.1 )
@@ -115,6 +180,15 @@ function ENT:Open()
 end
 
 function ENT:Close()
+ --self:StopParticles()
+ if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+ self.FlamesEnt:Remove()
+		self.FlamesEnt = nil
+		self.FlamesEntL:Remove()
+		self.FlamesEntL = nil
+		self.FlamesEntR:Remove()
+		self.FlamesEntR = nil
+		end
 	local sequence = self:LookupSequence("Open")
 	--self:ResetSequence(sequence)
 	self:SetSequence( sequence )
@@ -156,7 +230,14 @@ end
 
 function ENT:MoveAway()
 	--nzNotifications:PlaySound("nz/randombox/Announcer_Teddy_Zombies.wav", 0)
-	
+	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+	self.FlamesEnt:Remove()
+		self.FlamesEnt = nil
+		self.FlamesEntL:Remove()
+		self.FlamesEntL = nil
+		self.FlamesEntR:Remove()
+		self.FlamesEntR = nil
+		end
 	self.Moving = true
 	self:SetSolid(SOLID_NONE)
 	local s = 0
@@ -270,6 +351,7 @@ end
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
+	
 	end
 
 	--[[hook.Add( "PostDrawOpaqueRenderables", "random_box_beam", function()
@@ -293,7 +375,7 @@ function ENT:OnRemove()
 	else
 		if IsValid(self.SpawnPoint) then
 			--self.SpawnPoint.Box = nil
-			if (nzMapping.Settings.boxtype =="Resident Evil") then
+			if (nzMapping.Settings.boxtype =="Resident Evil" or nzMapping.Settings.boxtype =="Call of Duty: WW2" or nzMapping.Settings.boxtype =="DOOM" or nzMapping.Settings.boxtype =="Chaos" ) then
 			self.SpawnPoint:SetModelScale(1, 0 )
 			end
 			self.SpawnPoint:SetBodygroup(1,0)

@@ -383,14 +383,14 @@ nzMapping:AddSaveModule("Endings", {
 			table.insert(endings, {
 			pos = v:GetPos(),
 			angle = v:GetAngles(),
-			model = v:GetModel(),
+			price = v:GetPrice()
 			})
 		end
 		return endings
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:BuyableEnding(v.pos, v.angle, v.model)
+			nzMapping:BuyableEnding(v.pos, v.angle, v.price)
 		end
 	end,
 	cleanents = {"buyable_ending"},

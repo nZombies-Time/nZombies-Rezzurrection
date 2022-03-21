@@ -90,7 +90,8 @@ nzTools:CreateTool("traps_logic", {
 	icon = "icon16/controller.png",
 	weight = 40,
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		-- Client needs advanced editing on to see the tool
+		return true
 	end,
 	interface = function(frame, data, context)
 

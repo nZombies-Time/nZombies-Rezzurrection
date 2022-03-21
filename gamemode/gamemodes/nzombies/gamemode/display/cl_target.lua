@@ -5,6 +5,7 @@ local traceents = {
 		local wepclass = ent:GetWepClass()
 		local price = ent:GetPrice()
 		local wep = weapons.Get(wepclass)
+		local pap = false
 		upgrade= ""
 		upgrade2=""
 		if wep.NZPaPReplacement then
@@ -32,9 +33,9 @@ local traceents = {
 		if !LocalPlayer():HasWeapon( wepclass ) then
 		if !pap then
 			text = "Press E to buy " .. name .." for " .. price .. " points."
-		elseif string.lower(wep.Primary.Ammo) != "none" then
+	
 		
-    text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. newPrice .. " points."
+   -- text = "Press E to buy " .. name .."  Ammo refill for " .. ammo_price .. " points."
 
 
 if wepclass == "nz_grenade" then
@@ -49,28 +50,15 @@ if wepclass == "nz_grenade" then
 end
 		 else
 			if pap then
-			if  LocalPlayer():HasWeapon( upgrade ) then
-			if LocalPlayer():GetWeapon( upgrade ):HasNZModifier("pap") then
-			text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
-			pap = false
-			end
-			
-			elseif LocalPlayer():HasWeapon( upgrade2 ) then
-			if LocalPlayer():GetWeapon( upgrade2 ):HasNZModifier("pap") then
-			text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
-			pap = false
-			end
-			end
-			else
-			if LocalPlayer():GetWeapon( wepclass ):HasNZModifier("pap") then
-				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. 4500 .. " points."
-			else
-				text = "Press E to buy " .. wep.Primary.Ammo .."  Ammo refill for " .. ammo_price .. " points."
-			end
+			text = "Press E to buy upgraded " .. name .."  Ammo refill for " .. 4500 .. " points."
 			end
 			end
 		else
+		if LocalPlayer():HasWeapon( wepclass ) then
+		text = "Press E to buy " .. name .."  Ammo refill for " .. ammo_price .. " points."
+		else
 			text = "You already have this weapon."
+			end
 		end
 
 
@@ -127,7 +115,7 @@ end
 				-- Its on local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
 				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
 						text = "Press E to buy " .. perkData.name_skin .. " for " .. ent:GetPrice() .. " points."
-						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Laby's Secret Perk Icons" then
+						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
 						text = "Press E to buy " .. perkData.name_holo .. " for " .. ent:GetPrice() .. " points."
 						else
 						text = "Press E to buy " .. perkData.name .. " for " .. ent:GetPrice() .. " points."
@@ -139,7 +127,7 @@ end
 					elseif LocalPlayer():HasPerk(ent:GetPerkID()) and !LocalPlayer():HasUpgrade(ent:GetPerkID()) then
 					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
 						text = "Press E to upgrade " .. perkData.name_skin .. " for " .. ent:GetPrice()*2 .. " points."
-						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Laby's Secret Perk Icons" then
+						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
 						text = "Press E to upgrade " .. perkData.name_holo .. " for " .. ent:GetPrice()*2 .. " points."
 						else
 						text = "Press E to upgrade " .. perkData.name .. " for " .. ent:GetPrice()*2 .. " points."
@@ -376,6 +364,7 @@ local function DrawTargetID( text )
 	if !text then return end
 
 	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+	local font2 = ("nz.ammo."..GetFontType(nzMapping.Settings.smallfont))
 	surface.SetFont( font )
 	local w, h = surface.GetTextSize( text )
 
@@ -393,7 +382,13 @@ local function DrawTargetID( text )
 
 	x = x - w / 2
 	y = y + 30
-
+	local ply = LocalPlayer()
+	local ent = ply:GetEyeTrace().Entity
+	local dist = ent:GetPos():Distance(ply:GetPos())
+	if IsValid(ent) and ent:GetClass() == "perk_machine" and dist<165 then
+	local perkData = nzPerks:Get(ent:GetPerkID())
+	draw.SimpleText( perkData.desc, font2, x-(string.len( perkData.desc )*3), y+60, perkData.color )
+	end
 	-- The fonts internal drop shadow looks lousy with AA on
 	draw.SimpleText( text, font, x+1, y+1, Color(255,255,255,255) )
 end
