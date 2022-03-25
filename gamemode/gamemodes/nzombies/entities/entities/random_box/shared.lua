@@ -272,7 +272,7 @@ function ENT:MoveAway()
 	end)
 
 	-- Move Up
-	if (nzMapping.Settings.boxtype =="Dead Space") then
+	if (nzMapping.Settings.boxtype =="Dead Space") or (nzMapping.Settings.boxtype =="Shadows of Evil")  then
 	self.Moving = false
 			timer.Destroy("moveAway")
 			timer.Destroy("shake")

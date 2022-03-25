@@ -808,7 +808,9 @@ function ENT:ChaseTarget( options )
 			self:HandleStuck()
 			return "stuck"
 		end
-
+		if self:IsMovingIntoObject() then
+            self:ApplyRandomPush(400)
+        end
 		coroutine.yield()
 
 	end
@@ -1511,23 +1513,92 @@ function ENT:TimedEvent(time, callback)
 	end)
 end
 
-function ENT:ApplyRandomPush( power ) -- Replace the other ApplyRandomPush with this
+function ENT:Push(vec)
     if CurTime() < self:GetLastPush() + 0.2 or !self:IsOnGround() then return end
-    power = power or 100
-    local vec =  self.loco:GetVelocity() + VectorRand() * power
-    vec.z = math.random( 100 )
+
     self.GettingPushed = true
     self.loco:SetVelocity( vec )
 
-    timer.Simple(0.5, function()
+    self:TimedEvent(0.5, function()
         self.GettingPushed = false
     end)
 
     self:SetLastPush( CurTime() )
 end
 
+function ENT:ApplyRandomPush( power )
+    power = power or 100
+    
+    local vec = self.loco:GetVelocity() + VectorRand() * power
+    vec.z = math.random( 100 )
+    self:Push(vec)
+end
+
 function ENT:IsGettingPushed() -- this is a new method
     return self.GettingPushed
+end
+
+function ENT:GetCenterBounds()
+    local mins = self:OBBMins()
+    local maxs = self:OBBMaxs()
+    mins[3] = mins[3] / 2
+    maxs[3] = maxs[3] / 2
+
+    return {["mins"] = mins, ["maxs"] = maxs}
+end
+
+function ENT:TraceSelf(start, endpos, dont_adjust, line_trace) -- Creates a hull trace the size of ourself, handy if you'd want to know if we'd get stuck from a position offset
+    local bounds = self:GetCenterBounds()
+
+    if !dont_adjust then
+        start = start and start + self:OBBCenter() / 1.01 or self:GetPos() + self:OBBCenter() / 2
+    end
+
+    --debugoverlay.Box(start, bounds.mins, bounds.maxs, 0, Color(255,0,0,55))
+
+    if endpos then
+        if !dont_adjust then
+            endpos = endpos + self:OBBCenter() / 1.01
+        end
+
+        --debugoverlay.Box(endpos, bounds.mins, bounds.maxs, 0, Color(255,0,0,55))
+    end
+
+    local tbl = {
+        start = start,
+        endpos = endpos or start,
+        filter = self,
+        mins = bounds.mins,
+        maxs = bounds.maxs,
+        collisiongroup = self:GetCollisionGroup(),
+        mask = MASK_NPCSOLID
+    }
+
+    return !line_trace and util.TraceHull(tbl) or util.TraceLine(tbl)
+end
+
+function ENT:IsMovingIntoObject() -- Added by Ethorbit as this can be helpful to know
+    local bounds = self:GetCenterBounds()
+    local stuck_tr = self:TraceSelf()
+    local startpos = self:GetPos() + self:OBBCenter() / 2
+    local endpos = startpos + self:GetForward() * 10
+    local tr = stuck_tr.Hit and stuck_tr or util.TraceHull({
+        ["start"] = startpos,
+        ["endpos"] = endpos,
+        ["filter"] = self,
+        ["mins"] = bounds.mins,
+        ["maxs"] = bounds.maxs,
+        ["collisiongroup"] = self:GetCollisionGroup(),
+        ["mask"] = MASK_NPCSOLID
+    })
+
+    -- debugoverlay.Box(startpos, mins, maxs, 0, Color(255,0,0) )
+    -- debugoverlay.Box(endpos, mins, maxs, 0, Color(255,0,0, 50))
+
+    local ent = tr.Entity
+    if IsValid(ent) and (ent:IsPlayer() or ent:IsScripted()) then return false end --ent:GetClass() == "breakable_entry") then return false end
+
+    return tr.Hit
 end
 
 function ENT:ZombieWaterLevel()

@@ -47,19 +47,11 @@ function SWEP:SetupDataTables()
 end
 
 function SWEP:Initialize()
-	if CLIENT then
-		if self.Owner == LocalPlayer() then
-			local vm = LocalPlayer():GetViewModel()
-			local mat = nzPerks:Get(self:GetPerk()).material --perk_materials[self:GetPerk()]
-			print(mat)
-			vm:SetSkin(mat)
-			--vm:SetMaterial(mat)
-		end
-	end
+
 end
 
+
 function SWEP:Equip( owner )
-	
 	timer.Simple(3.2,function()
 		owner:SetUsingSpecialWeapon(false)
 		owner:EquipPreviousWeapon()
@@ -69,7 +61,9 @@ function SWEP:Equip( owner )
 end
 
 function SWEP:Deploy()
-
+	
+		
+		
 	timer.Simple(0.5,function()
 		if IsValid(self) and IsValid(self.Owner) then
 			if self.Owner:Alive() then
@@ -132,7 +126,7 @@ function SWEP:OnRemove()
 		local ply = LocalPlayer()
 		if IsValid(ply) and self.Owner == ply then
 			local vm = ply:GetViewModel()
-			vm:SetMaterial(oldmat)
+			--vm:SetMaterial(oldmat)
 		end
 	end
 	
@@ -142,7 +136,16 @@ end
 
 function SWEP:GetViewModelPosition( pos, ang )
  
-	local ply = LocalPlayer()
+			local ply = LocalPlayer()
+			if self.Owner == ply then
+			local vm = ply:GetViewModel()
+			local mat = nzPerks:Get(self:GetPerk()).material --perk_materials[self:GetPerk()]
+			--oldmat = vm:GetMaterial() or ""
+			vm:SetSkin(mat)
+				end
+	
+	
+	
  	local newpos = ply:EyePos()
 	local newang = ply:EyeAngles()
 	local up = newang:Up()

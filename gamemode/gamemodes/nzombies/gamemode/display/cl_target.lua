@@ -384,10 +384,15 @@ local function DrawTargetID( text )
 	y = y + 30
 	local ply = LocalPlayer()
 	local ent = ply:GetEyeTrace().Entity
+	
+	if IsValid(ent) and ent:GetClass() == "perk_machine"  then
 	local dist = ent:GetPos():Distance(ply:GetPos())
-	if IsValid(ent) and ent:GetClass() == "perk_machine" and dist<165 then
+	if dist<165 then
 	local perkData = nzPerks:Get(ent:GetPerkID())
+	if perkData.desc then
 	draw.SimpleText( perkData.desc, font2, x-(string.len( perkData.desc )*3), y+60, perkData.color )
+	end
+	end
 	end
 	-- The fonts internal drop shadow looks lousy with AA on
 	draw.SimpleText( text, font, x+1, y+1, Color(255,255,255,255) )

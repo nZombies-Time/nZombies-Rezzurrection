@@ -34,9 +34,9 @@ end
 function ENT:RandomizeSkin()
 	local skin
 	if nzMapping.Settings.wunderfizzperks then
-		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperklist))).material
+		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperklist))).wfz
 	else
-		skin = nzPerks:Get(table.Random(table.GetKeys(nzPerks:GetList()))).material
+		skin = nzPerks:Get(table.Random(table.GetKeys(nzPerks:GetList()))).wfz
 	end
 	
 	if skin then
@@ -72,7 +72,7 @@ function ENT:Initialize()
 					end
 				end)
 			else
-				self:SetMaterial(nzPerks:Get(self.Perk).material)
+				self:SetMaterial(nzPerks:Get(self.Perk).wfz)
 			end
 			machine:SetPerkID(self.Perk)
 		end)

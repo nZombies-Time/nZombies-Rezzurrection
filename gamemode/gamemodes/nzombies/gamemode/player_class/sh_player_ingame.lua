@@ -96,6 +96,10 @@ function PLAYER:OnTakeDamage( dmginfo )
 			if dmginfo:IsDamageType( 64 ) and self.Player:HasPerk("phd")then
 		dmginfo:ScaleDamage( 0 )
 			end
+			
+			if dmginfo:IsDamageType( 65536 ) and self.Player:HasPerk("mask")then
+		dmginfo:ScaleDamage( 0 )
+			end
 			if dmginfo:IsDamageType( 8388608 ) then
 		dmginfo:ScaleDamage( 0 )
 			end

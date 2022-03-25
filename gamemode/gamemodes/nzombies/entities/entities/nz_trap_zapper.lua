@@ -245,10 +245,13 @@ function ENT:ZapTarget(ent, delay)
 	
 			if (self:TargetIsZombie(ent)) then
 				local dmg = DamageInfo()
-				dmg:SetDamage(ent:Health() * 1000)
-				dmg:SetDamageType(DMG_SHOCK) -- Let them play their electricuting animations
+				dmg:SetDamage(ent:Health() +80)
+				dmg:SetDamageType(DMG_BURN) -- Let them play their electricuting animations
 				dmg:SetAttacker(Entity(0))
 				ent:TakeDamageInfo(dmg)
+				if nzRound:InProgress() then
+	nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 )
+	end
 			end
 		end)
 	end

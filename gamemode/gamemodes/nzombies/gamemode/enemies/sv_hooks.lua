@@ -291,7 +291,8 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 		
 			 if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and attacker:GetActiveWeapon():HasNZModifier("pap") then
 			 local gun = attacker:GetActiveWeapon():GetClass()
-			 if not nzWeps:GetAllReplacements(gun) then
+			 local weapon = weapons.Get(gun)
+			 if not weapon.NZPaPReplacement then
 				dmginfo:ScaleDamage( 2 )
 			 end
 			 end
