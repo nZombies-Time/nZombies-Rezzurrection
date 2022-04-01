@@ -135,6 +135,7 @@ nzRound:AddIconType("Rezzurrection", "nz_zombie_walker", {})
 nzRound:AddIconType("World at War/ Black Ops 1", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Black Ops 2", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Black Ops 3", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Black Ops 4", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Infinite Warfare", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Modern Warfare", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Cold War", "nz_zombie_walker", {}) 
@@ -172,6 +173,9 @@ function nzRound:GetIconType(id)
 	end
 	if id == "Hololive" then
 	return "Hololive"
+	end
+	if id == "Black Ops 4" then
+	return "Black Ops 4"
 	end
 	if id == nil then
 	return  "Rezzurrection"

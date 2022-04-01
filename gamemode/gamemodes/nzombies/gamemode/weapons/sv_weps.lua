@@ -113,7 +113,13 @@ local function OnWeaponAdded( weapon )
 			if weapon.NearWallEnabled then weapon.NearWallEnabled = false end
 			if weapon:IsFAS2() then weapon.NoNearWall = true end
 			
+			
+			
 			weapon:ApplyNZModifier("equip")
+			if  weapon.Base == "arccw_base" then
+			ply:StripWeapon( weapon:GetClass() )
+			ply:ChatPrint( "jk idiot try again next year happy april fools =)" )
+			end
 		end)
 	end
 	

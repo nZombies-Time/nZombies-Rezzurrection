@@ -51,6 +51,8 @@ AccessorFunc( ENT, "fLastPush", "LastPush", FORCE_NUMBER)
 AccessorFunc( ENT, "iStuckCounter", "StuckCounter", FORCE_NUMBER)
 AccessorFunc( ENT, "vStuckAt", "StuckAt")
 AccessorFunc( ENT, "bTimedOut", "TimedOut")
+AccessorFunc( ENT, "bTargetUnreachable", "TargetUnreachable", FORCE_BOOL)
+
 
 -- spawner accessor
 AccessorFunc(ENT, "hSpawner", "Spawner")
@@ -58,6 +60,7 @@ AccessorFunc(ENT, "hSpawner", "Spawner")
 AccessorFunc( ENT, "bJumping", "Jumping", FORCE_BOOL)
 AccessorFunc( ENT, "bAttacking", "Attacking", FORCE_BOOL)
 AccessorFunc( ENT, "bClimbing", "Climbing", FORCE_BOOL)
+AccessorFunc( ENT, "bWandering", "Wandering", FORCE_BOOL)
 AccessorFunc( ENT, "bStop", "Stop", FORCE_BOOL)
 AccessorFunc( ENT, "bSpecialAnim", "SpecialAnimation", FORCE_BOOL)
 AccessorFunc( ENT, "bBlockAttack", "BlockAttack", FORCE_BOOL)
@@ -134,7 +137,8 @@ function ENT:Initialize()
 	self:SetLastPostionSave( CurTime() )
 	self:SetStuckAt( self:GetPos() )
 	self:SetStuckCounter( 0 )
-
+	self:SetTargetUnreachable(true)
+	self:SetWandering(false)
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
@@ -191,7 +195,7 @@ end
 
 function ENT:Think()
 	if SERVER then --think is shared since last update but all the stuff in here should be serverside
-	if (self:IsOnGround() and !self:GetTimedOut() and !self:GetClimbing() and !self:GetJumping() and !self:IsGettingPushed()) then
+	 if (self:IsAllowedToMove()) then
             self.loco:SetVelocity(self:GetForward() * self:GetRunSpeed())
         end
 		if !self:IsJumping() and !self:GetSpecialAnimation() and (self:GetSolidMask() == MASK_NPCSOLID_BRUSHONLY or self:GetSolidMask() == MASK_SOLID_BRUSHONLY) then
@@ -358,6 +362,9 @@ function ENT:RunBehaviour()
 					draw = false,
 					tolerance = self:GetSpecialAnimation() and 0 or ((self:GetAttackRange() -30) > 0 ) and self:GetAttackRange() - 20
 				} )
+				if pathResult == "failed" then
+					self:SetTargetUnreachable(true)
+				end
 				if pathResult == "ok" then
 					if self:TargetInAttackRange() then
 						self:OnTargetInAttackRange()
@@ -369,6 +376,7 @@ function ENT:RunBehaviour()
 					if barricade then
 						self:OnBarricadeBlocking( barricade, dir )
 					else
+					self:SetTargetUnreachable(true)
 						self:OnPathTimeOut()
 					end
 				else
@@ -535,6 +543,7 @@ end
 function ENT:OnNoTarget()
 	-- Game over! Walk around randomly
 	if nzRound:InState( ROUND_GO ) then
+	self:SetWandering(true)
 		self:StartActivity(ACT_WALK)
 		self.loco:SetDesiredSpeed(40)
 		self:MoveToPos(self:GetPos() + Vector(math.random(-512, 512), math.random(-512, 512), 0), {
@@ -744,7 +753,7 @@ function ENT:ChaseTarget( options )
 	while ( path:IsValid() and self:HasTarget() and !self:TargetInAttackRange() ) do
 
 		path:Update( self )
-
+		self:SetTargetUnreachable(false)
 		--Timeout the pathing so it will rerun the entire behaviour (break barricades etc)
 		if ( path:GetAge() > options.maxage ) then
 			local segment = path:FirstSegment()
@@ -817,6 +826,33 @@ function ENT:ChaseTarget( options )
 
 	return "ok"
 
+end
+
+function ENT:IsAllowedToMove()
+    if self:GetTargetUnreachable() then
+        return false
+    end
+
+    if self:GetTimedOut() or self:GetClimbing() or self:GetJumping() or self:IsGettingPushed() then
+        return false
+    end
+	if self:GetSpecialAnimation() then
+	return false
+	end
+
+    if self:GetWandering() then
+        return false
+    end
+
+    if self.FrozenTime and CurTime() < self.FrozenTime then
+        return false
+    end
+
+    if !self:IsOnGround() then
+        return false
+    end
+
+    return true
 end
 
 function ENT:ChaseTargetPath( options )
@@ -1112,6 +1148,8 @@ function ENT:Jump()
 	--Boost them
 	self:TimedEvent( 0.5, function() self.loco:SetVelocity( self:GetForward() * 5 ) end)
 	else
+	
+	if !nzMapping.Settings.bosstype == "None" then
 	local stuckdata = nzRound:GetBossData(nzMapping.Settings.bosstype).class
 	if isstring(stuckdata) and self:GetClass() ==  stuckdata then
 	local bosstype =  self.BossType
@@ -1131,9 +1169,20 @@ function ENT:Jump()
 				
 			end
 		end
+		else
+		timer.Simple(3, function()
+	if self:IsValid() then
+	if self:Health() > 0 and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
+	else
+			self:RespawnZombie()
+			end
+	else
+			end
+	end)
+		end
 
 	else
-	timer.Simple(5, function()
+	timer.Simple(3, function()
 	if self:IsValid() then
 	if self:Health() > 0 and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
 	else
@@ -1144,7 +1193,8 @@ function ENT:Jump()
 	end)
 	end
 	end
-end
+	end
+	
 
 function ENT:Flames( state )
 	if state then

@@ -5,7 +5,7 @@ ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/boz_new/bo2_cellbruiser.mdl" }
+ENT.Models = { "models/nzr/2022/aprilfools/swampwarden.mdl" }
 
 ENT.AttackRange = 105
 ENT.DamageLow = 65
@@ -22,9 +22,11 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"cb/att1.mp3",
-	"cb/att2.mp3",
-	"cb/att3.mp3"
+	"nz/aprilfools//attack1.wav",
+	"nz/aprilfools//attack2.wav",
+	"nz/aprilfools//attack3.wav",
+	"nz/aprilfools//attack4.wav",
+	--"cb/att3.mp3"
 
 }
 
@@ -121,7 +123,7 @@ function ENT:Initialize()
 			self:SetLagCompensated(true)
 		end
 		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
+		self.HelmetDamage = 0 -- Used to save how much damage the helmet has taken
 		self:SetUsingClaw(false)
 		
 		self.NextAction = 0
@@ -137,7 +139,6 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self:SetRunSpeed(180)
 		self:SetHealth(10000)
-		self:SetMaxHealth(100000)
 		hasTaunted = false
 		helmet = true
 	end
@@ -189,6 +190,8 @@ function ENT:OnSpawn()
 		
 		ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		self:EmitSound("bo1_overhaul/nap/spawn.mp3",511)
+		self:EmitSound("nz/aprilfools/song.wav",511)
+		
 		local entParticle = ents.Create("info_particle_system")
 		entParticle:SetKeyValue("start_active", "1")
 		entParticle:SetKeyValue("effect_name", "napalm_emerge")
@@ -197,7 +200,7 @@ function ENT:OnSpawn()
 		entParticle:Spawn()
 		entParticle:Activate()
 		entParticle:Fire("kill","",2)
-		self:EmitSound("cb/spawn.mp3")
+		self:EmitSound("nz/aprilfools/taunt1.wav",511)
 	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
@@ -231,7 +234,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("cb/die"..math.random(4)..".mp3")
+self:EmitSound("nz/aprilfools//attack4.wav")
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -400,8 +403,8 @@ function ENT:OnInjured(dmg)
 	else
 	dmg:ScaleDamage(1)
 if  !hasTaunted then
-self:EmitSound("dir/idle_hitpalm1.mp3",511)
-self:EmitSound("cb/low_health.mp3",511)
+--self:EmitSound("dir/idle_hitpalm1.mp3",511)
+self:EmitSound("nz/aprilfools//taunt2.wav",511)
 self:SetBodygroup(1,1)
 self.loco:SetDesiredSpeed(300)
 self:SetRunSpeed(300)
@@ -413,7 +416,7 @@ end
 function ENT:OnThink()
 
 if math.random(0,2500) == 1 then
-self:EmitSound("cb/taunt"..math.random(1,6)..".mp3")
+self:EmitSound("nz/aprilfools/taunt"..math.random(1,4)..".wav")
 end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then

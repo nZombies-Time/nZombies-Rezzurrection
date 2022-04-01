@@ -484,6 +484,9 @@ local function PerksHud()
 			if iconType == "Black Ops 3" then
 				surface.SetMaterial(nzPerks:Get(v).icon_bo3)
 			end
+			if iconType == "Black Ops 4" then
+				surface.SetMaterial(nzPerks:Get(v).icon_bo4)
+			end
 			if iconType == "Modern Warfare" then
 				surface.SetMaterial(nzPerks:Get(v).icon_mw)
 			end
