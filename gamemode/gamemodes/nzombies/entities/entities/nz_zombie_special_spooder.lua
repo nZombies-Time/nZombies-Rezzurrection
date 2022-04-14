@@ -140,7 +140,7 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(400)
+		self:SetRunSpeed(300)
 		self:SetHealth(140)
 		self:SetMaxHealth(140)
 	end
