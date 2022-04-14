@@ -33,7 +33,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -63,7 +63,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -93,7 +93,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -123,7 +123,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -153,7 +153,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -183,7 +183,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -213,7 +213,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -243,7 +243,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -273,7 +273,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -303,7 +303,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -334,7 +334,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -364,7 +364,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -394,7 +394,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -424,7 +424,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -454,7 +454,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -484,7 +484,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -514,7 +514,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -544,7 +544,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -574,7 +574,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -604,7 +604,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -634,7 +634,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -664,7 +664,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -694,7 +694,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -724,7 +724,7 @@ nzConfig.ValidEnemies = {
 		-- Allow you to scale damage on a per-hitgroup basis
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
 			-- Headshots for double damage
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		-- Function runs whenever the zombie is damaged (NOT when killed)
 		OnHit = function(zombie, dmginfo, hitgroup)
@@ -811,7 +811,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -835,7 +835,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_ascension"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -859,7 +859,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_buried"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -883,7 +883,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_clown"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -907,7 +907,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_cotd"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -931,7 +931,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_eisendrache"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -955,7 +955,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_five"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -979,7 +979,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_gorodkrovi"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1003,7 +1003,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_greenrun"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1027,7 +1027,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_hazmat"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1051,7 +1051,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_moon"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1075,7 +1075,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_motd"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1099,7 +1099,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_nuketown"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1123,7 +1123,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_burning_origins"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1147,7 +1147,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_shangrila"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1171,7 +1171,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_skeleton"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1195,7 +1195,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_soe"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1219,7 +1219,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_sumpf"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1243,7 +1243,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_templar"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1267,7 +1267,7 @@ nzConfig.ValidEnemies = {
 		["nz_zombie_special_burning_zetsubou"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1315,7 +1315,7 @@ nzConfig.ValidEnemies = {
 	["nz_zombie_special_nova"] = {
 		Valid = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1340,7 +1340,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1365,7 +1365,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1390,7 +1390,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1415,7 +1415,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1440,7 +1440,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()
@@ -1465,7 +1465,7 @@ nzConfig.ValidEnemies = {
 		Valid = true,
 		SpecialSpawn = true,
 		ScaleDMG = function(zombie, hitgroup, dmginfo)
-			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(2) end
+			if hitgroup == HITGROUP_HEAD then dmginfo:ScaleDamage(1) end
 		end,
 		OnHit = function(zombie, dmginfo, hitgroup)
 			local attacker = dmginfo:GetAttacker()

@@ -124,7 +124,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				if meleetypes[dmginfo:GetDamageType()] then
 					attacker:GivePoints(130)
 				elseif hitgroup == HITGROUP_HEAD then
-				enemy:EmitSound("nz/zombies/death/headshot_"..math.random(0,4)..".wav", 511)
+				enemy:EmitSound("nz/zombies/death/headshot_"..math.random(0,3)..".wav", 511)
 					attacker:GivePoints(100)
 					local chance = 7
 					local damage = 200
@@ -218,8 +218,8 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:ScaleDamage( 1.5 )
 			return end
 			
-			if attacker:IsPlayer() and attacker:HasPerk("sake") and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
-				dmginfo:ScaleDamage(math.random(2,6)) 
+			if attacker:IsPlayer() and attacker:HasUpgrade("sake") and (dmginfo:IsDamageType( 128 ) or dmginfo:IsDamageType( 4 )) then
+				dmginfo:ScaleDamage(4) 
 			return end
 			
 			local data = nzRound:GetBossData(zombie.NZBossType) -- Just in case it was switched mid-game, use the id stored on zombie
@@ -234,10 +234,20 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				end
 			end
 		elseif zombie:IsValidZombie() then
+		
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end
 			local hitgroup = util.QuickTrace( dmginfo:GetDamagePosition( ), dmginfo:GetDamagePosition( ) ).HitGroup
-			local effect = 0
+			
+			if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and hitgroup == HITGROUP_HEAD  then 
+			local plywpn = attacker:GetActiveWeapon()
+			if plywpn.NZHeadShotMultiplier then
+			dmginfo:ScaleDamage(plywpn.NZHeadShotMultiplier) 
+			else
+			dmginfo:ScaleDamage(2) 
+			end
+			end
 			if attacker:IsPlayer() and attacker:HasPerk("pop") and math.random(1,6) == 3 then
+			local effect = 0
 			if attacker:HasUpgrade("pop") then
 			 effect = math.random(8,20)
 			 else
@@ -337,15 +347,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			end -- dtap2 bullet damage buff
 			end
 			
-			if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and hitgroup == HITGROUP_HEAD  then 
-			local plywpn = attacker:GetActiveWeapon()
-			if plywpn.NZHeadShotMultiplier then
-			dmginfo:ScaleDamage(NZHeadShotMultiplier)
-			else
-			dmginfo:ScaleDamage(2)
-			end
-			end 
-
 			--  Pack-a-Punch doubles damage...hell no it doesnt
 			if dmginfo:GetDamageType() == DMG_CRUSH then
 				dmginfo:SetDamage(80)
