@@ -838,7 +838,7 @@ function ENT:IsAllowedToMove()
     end
 	if self:GetSpecialAnimation() then
 	return false
-	end
+	end	
 
     if self:GetWandering() then
         return false
@@ -1033,6 +1033,7 @@ function ENT:Attack( data )
 		end
 	end
 	
+	
 	data.attacksound = data.attacksound
 	if !data.attacksound then
 		local actstage = self.ActStages[self:GetActStage()]
@@ -1055,11 +1056,19 @@ function ENT:Attack( data )
 	data.dmgforce.z = math.Clamp(data.dmgforce.z, 1, 16)
 	
 
-	self:EmitSound("npc/zombie_poison/pz_throw2.wav", 50, math.random(75, 125))
+	--self:EmitSound("npc/zombie_poison/pz_throw2.wav", 50, math.random(75, 125))
 
 	self:SetAttacking( true )
 
-	self:TimedEvent(0.1, function()
+	--self:TimedEvent(0.1, function()
+	--local soundtbl2 =  self.AttackSounds
+	--print(self.AttackSounds)
+		--local attacksound = soundtbl[math.random(#soundtbl)] 
+		--local attacksound = table.Random( soundtbl )
+		--self:EmitSound( attacksound )
+	--end)
+	
+	self:TimedEvent(0.0, function()
 		self:EmitSound( data.attacksound )
 	end)
 

@@ -51,7 +51,7 @@ local RunAttackSequences = {
 	{seq = "attack3", dmgtimes = {0.5}}
 }
 
-local AttackSounds = {
+ENT.AttackSounds = {
 	"slasher3/twitcher_security_097.wav",
 	"slasher3/twitcher_security_098.wav",
 	"slasher3/twitcher_security_099.wav",

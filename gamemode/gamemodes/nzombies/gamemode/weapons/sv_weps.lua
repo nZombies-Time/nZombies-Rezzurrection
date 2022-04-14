@@ -118,7 +118,7 @@ local function OnWeaponAdded( weapon )
 			weapon:ApplyNZModifier("equip")
 			if  weapon.Base == "arccw_base" then
 			ply:StripWeapon( weapon:GetClass() )
-			ply:ChatPrint( "jk idiot try again next year happy april fools =)" )
+			ply:ChatPrint( "Maybe next time you'll follow directions. Go use TFA." )
 			end
 		end)
 	end

@@ -5,6 +5,7 @@ ENT.PrintName = "Burning Walker (Ascension)"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
+
 function ENT:StatsInitialize()
     if SERVER then
 		if nzRound:GetNumber() == -1 then
@@ -20,6 +21,7 @@ function ENT:StatsInitialize()
         self:Flames( true )
 
 		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
+		 --self:SetBodygroup(1,  math.random(0,2) )
     end
 end
 

@@ -451,6 +451,10 @@ function nzRound:ResetGame()
 	for k,v in pairs(ents.FindByClass("perk_machine")) do
 		v:TurnOff()
 	end
+	
+	for k,v in pairs(ents.FindByClass("ammo_box")) do
+		v:SetPrice(4500)
+	end
 
 	for _, ply in pairs(player.GetAll()) do
 		ply:SetPoints(0) --Reset all player points

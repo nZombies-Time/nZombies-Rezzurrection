@@ -202,6 +202,7 @@ function ENT:OnSpawn()
 		
 			
 		self:PlaySequenceAndWait(seq)
+		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 	end
 end
 

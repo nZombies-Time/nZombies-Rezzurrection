@@ -34,7 +34,8 @@ local RunAttackSequences = {
 	{seq = "nz_run_attack4", dmgtimes = {0.3, 0.8}}
 }
 
-local AttackSounds = {
+
+ENT.AttackSounds = {
 	"nz/zombies/attack/attack_00.wav",
 	"nz/zombies/attack/attack_01.wav",
 	"nz/zombies/attack/attack_02.wav",
@@ -44,36 +45,36 @@ local AttackSounds = {
 	"nz/zombies/attack/attack_06.wav",
 	"nz/zombies/attack/attack_07.wav",
 	"nz/zombies/attack/attack_08.wav",
-	"nz/zombies/attack/attack_09.wav",
-	"nz/zombies/attack/attack_10.wav",
-	"nz/zombies/attack/attack_11.wav",
-	"nz/zombies/attack/attack_12.wav",
-	"nz/zombies/attack/attack_13.wav",
+	"nz/zombies/attack/attack_n_1.wav",
+	"nz/zombies/attack/attack_n_2.wav",
+	"nz/zombies/attack/attack_n_3.wav",
+	"nz/zombies/attack/attack_n_4.wav",
+	"nz/zombies/attack/attack_n_5.wav",
 	"nz/zombies/attack/attack_14.wav",
 	"nz/zombies/attack/attack_15.wav",
 	"nz/zombies/attack/attack_16.wav",
 	"nz/zombies/attack/attack_17.wav",
 	"nz/zombies/attack/attack_18.wav",
 	"nz/zombies/attack/attack_19.wav",
-	"nz/zombies/attack/attack_20.wav",
+	"nz/zombies/attack/attack_n_6.wav",
 	"nz/zombies/attack/attack_21.wav",
-	"nz/zombies/attack/attack_22.wav",
+	"nz/zombies/attack/attack_22.wav"
 }
 
 local WalkSounds = {
 	"nz/zombies/ambient/ambient_00.wav",
 	"nz/zombies/ambient/ambient_01.wav",
 	"nz/zombies/ambient/ambient_02.wav",
-	"nz/zombies/ambient/ambient_03.wav",
-	"nz/zombies/ambient/ambient_04.wav",
+	"nz/zombies/ambient/ambient_n_1.wav",
+	"nz/zombies/ambient/ambient_n_2.wav",
 	"nz/zombies/ambient/ambient_05.wav",
-	"nz/zombies/ambient/ambient_06.wav",
-	"nz/zombies/ambient/ambient_07.wav",
-	"nz/zombies/ambient/ambient_08.wav",
+	"nz/zombies/ambient/ambient_n_3.wav",
+	"nz/zombies/ambient/ambient_n_4.wav",
+	"nz/zombies/ambient/ambient_n_5.wav",
 	"nz/zombies/ambient/ambient_09.wav",
-	"nz/zombies/ambient/ambient_10.wav",
-	"nz/zombies/ambient/ambient_11.wav",
-	"nz/zombies/ambient/ambient_12.wav",
+	"nz/zombies/ambient/ambient_n_6.wav",
+	"nz/zombies/ambient/ambient_n_7.wav",
+	"nz/zombies/ambient/ambient_n_8.wav",
 	"nz/zombies/ambient/ambient_13.wav",
 	"nz/zombies/ambient/ambient_14.wav",
 	"nz/zombies/ambient/ambient_15.wav",
@@ -81,7 +82,19 @@ local WalkSounds = {
 	"nz/zombies/ambient/ambient_17.wav",
 	"nz/zombies/ambient/ambient_18.wav",
 	"nz/zombies/ambient/ambient_19.wav",
-	"nz/zombies/ambient/ambient_20.wav"
+	"nz/zombies/ambient/ambient_20.wav",
+	"nz/zombies/ambient/ambient_21.wav",
+	"nz/zombies/ambient/ambient_22.wav",
+	"nz/zombies/ambient/ambient_23.wav",
+	"nz/zombies/ambient/ambient_24.wav",
+	"nz/zombies/ambient/ambient_25.wav",
+	"nz/zombies/ambient/ambient_26.wav",
+	"nz/zombies/ambient/ambient_27.wav",
+	"nz/zombies/ambient/ambient_28.wav",
+	"nz/zombies/ambient/ambient_29.wav",
+	"nz/zombies/ambient/ambient_30.wav",
+	"nz/zombies/ambient/ambient_31.wav",
+	"nz/zombies/ambient/ambient_32.wav",
 }
 
 local RunSounds = {
@@ -93,7 +106,25 @@ local RunSounds = {
 	"nz/zombies/sprint2/sprint5.wav",
 	"nz/zombies/sprint2/sprint6.wav",
 	"nz/zombies/sprint2/sprint7.wav",
-	"nz/zombies/sprint2/sprint8.wav"
+	"nz/zombies/sprint2/sprint8.wav",
+	"nz/zombies/sprint2/sprint9.wav",
+	"nz/zombies/sprint2/sprint10.wav",
+	"nz/zombies/sprint2/sprint12.wav",
+	"nz/zombies/sprint2/sprint11.wav",
+	"nz/zombies/sprint2/sprint13.wav",
+	"nz/zombies/sprint2/sprint14.wav",
+	"nz/zombies/sprint2/sprint15.wav",
+	"nz/zombies/sprint2/sprint16.wav",
+	"nz/zombies/sprint2/sprint17.wav",
+	"nz/zombies/sprint2/sprint18.wav",
+	"nz/zombies/sprint2/19.wav",
+	"nz/zombies/sprint2/20.wav",
+	"nz/zombies/sprint2/21.wav",
+	"nz/zombies/sprint2/22.wav",
+	"nz/zombies/sprint2/23.wav",
+	"nz/zombies/sprint2/24.wav",
+	"nz/zombies/sprint2/25.wav",
+	"nz/zombies/sprint2/26.wav",
 }
 
 local JumpSequences = {
@@ -166,17 +197,25 @@ ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet5.wav"
 }
 ENT.DeathSounds = {
-	"nz/zombies/death/death_00.wav",
-	"nz/zombies/death/death_01.wav",
-	"nz/zombies/death/death_02.wav",
-	"nz/zombies/death/death_03.wav",
-	"nz/zombies/death/death_04.wav",
-	"nz/zombies/death/death_05.wav",
-	"nz/zombies/death/death_06.wav",
-	"nz/zombies/death/death_07.wav",
-	"nz/zombies/death/death_08.wav",
+	--"nz/zombies/death/death_00.wav",
+	--"nz/zombies/death/death_01.wav",
+	--"nz/zombies/death/death_02.wav",
+	--"nz/zombies/death/death_03.wav",
+	--"nz/zombies/death/death_04.wav",
+	--"nz/zombies/death/death_05.wav",
+	--"nz/zombies/death/death_06.wav",
+	--"nz/zombies/death/death_07.wav",
+	--"nz/zombies/death/death_08.wav",
 	"nz/zombies/death/death_09.wav",
-	"nz/zombies/death/death_10.wav"
+	"nz/zombies/death/death_10.wav",
+	"nz/zombies/death/death_11.wav",
+	"nz/zombies/death/death_12.wav",
+	"nz/zombies/death/death_13.wav",
+	"nz/zombies/death/death_14.wav",
+	"nz/zombies/death/death_15.wav",
+	"nz/zombies/death/death_16.wav",
+	"nz/zombies/death/death_17.wav",
+	
 }
 
 function ENT:StatsInitialize()

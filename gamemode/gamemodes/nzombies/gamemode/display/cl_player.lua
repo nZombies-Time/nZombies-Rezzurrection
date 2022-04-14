@@ -24,7 +24,7 @@ function player:GetHUDPointsType(id)
 	end
 	
 	if id == "Infinite Warfare" then
-	 return "cw_score1.png"
+	 return "iw_hud_score.png"
 	end
 		if id == "Buried" then
 	return "buried_score1.png"
@@ -33,7 +33,7 @@ function player:GetHUDPointsType(id)
 	 return "d9s.png"
 	end
 	if id == "Shadows of Evil" then
-		return "bo3_score2.png"
+		return "SOE_score.png"
 	end
 	if id == "Black Ops 1" then
 	 return "bo1s.png"

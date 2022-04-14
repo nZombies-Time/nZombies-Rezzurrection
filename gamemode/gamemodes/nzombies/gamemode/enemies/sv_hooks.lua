@@ -336,7 +336,15 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			end
 			end -- dtap2 bullet damage buff
 			end
-			--if hitgroup == HITGROUP_HEAD and !dmginfo:IsDamageType( 128 ) and !dmginfo:IsDamageType( 4 ) then dmginfo:ScaleDamage(1.5) end Why do this again?
+			
+			if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and hitgroup == HITGROUP_HEAD  then 
+			local plywpn = attacker:GetActiveWeapon()
+			if plywpn.NZHeadShotMultiplier then
+			dmginfo:ScaleDamage(NZHeadShotMultiplier)
+			else
+			dmginfo:ScaleDamage(2)
+			end
+			end 
 
 			--  Pack-a-Punch doubles damage...hell no it doesnt
 			if dmginfo:GetDamageType() == DMG_CRUSH then

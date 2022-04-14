@@ -189,6 +189,28 @@ function nzMapping:EasterEgg(pos, ang, model, ply)
 	return egg
 end
 
+function nzMapping:AmmoBox(pos, ang, model, ply)
+	local ammobox = ents.Create( "ammo_box" )
+	ammobox:SetModel( model )
+	ammobox:SetPos( pos )
+	ammobox:SetPrice( 4500 )
+	ammobox:SetAngles( ang )
+	ammobox:Spawn()
+
+	local phys = ammobox:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:EnableMotion(false)
+	end
+
+	if ply then
+		undo.Create( "Ammo Box" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( ammobox )
+		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
+	end
+	return ammobox
+end
+
 function nzMapping:Ending(pos, ang, price, ply)
 	local ending = ents.Create( "buyable_ending" )
 	ending:SetPos( pos )

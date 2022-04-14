@@ -5,7 +5,7 @@ ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
-ENT.Models = { "models/nz_zombie/zombie_hellhound.mdl" }
+ENT.Models = { "models/nzr/2022/aprilfools/helldonkey.mdl" }
 
 ENT.AttackRange = 80
 ENT.DamageLow = 20

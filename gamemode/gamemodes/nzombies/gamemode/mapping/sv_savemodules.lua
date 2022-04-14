@@ -376,6 +376,26 @@ nzMapping:AddSaveModule("EasterEggs", {
 	cleanents = {"easter_egg"},
 })
 
+nzMapping:AddSaveModule("AmmoBox", {
+	savefunc = function()
+		local ammoboxes = {}
+		for _, v in pairs(ents.FindByClass("ammo_box")) do
+			table.insert(ammoboxes, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			model = v:GetModel(),
+			})
+		end
+		return ammoboxes
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:AmmoBox(v.pos, v.angle, v.model)
+		end
+	end,
+	cleanents = {"ammo_box"},
+})
+
 nzMapping:AddSaveModule("Endings", {
 	savefunc = function()
 		local endings = {}
@@ -390,7 +410,7 @@ nzMapping:AddSaveModule("Endings", {
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:BuyableEnding(v.pos, v.angle, v.price)
+			nzMapping:Ending(v.pos, v.angle, v.price)
 		end
 	end,
 	cleanents = {"buyable_ending"},

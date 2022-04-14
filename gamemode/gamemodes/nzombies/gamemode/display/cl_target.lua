@@ -70,6 +70,12 @@ end
 			return text
 		end
 	end,
+	["ammo_box"] = function(ent)
+		
+			local text = "Press E to buy ammo for " ..ent:GetPrice() .. " points."
+			return text
+		
+	end,
 	["random_box"] = function(ent)
 		if !ent:GetOpen() then
 			local text = nzPowerUps:IsPowerupActive("firesale") and "Press E to buy a random weapon for 10 points." or "Press E to buy a random weapon for 950 points."

@@ -36,6 +36,7 @@ if SERVER then
 	end
 end
 
+
 nzRound.PerkSelectData = nzRound.PerkSelectData or {}
 function nzRound:AddMachineType(id, class)
 	if SERVER then
@@ -327,7 +328,7 @@ function nzRound:GetHUDType(id)
 	return "motd.png"
 	end
 	if id == "Shadows of Evil" then
-	return "soe.png"
+	return "SOE_HUD_NEW.png"
 	end
 	if id == "Fade" then
 	return "fade.png"
@@ -563,6 +564,25 @@ end
 nzRound:AddSpecialRoundType("Hellhounds", {
 	specialTypes = {
 		["nz_zombie_special_dog"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 55
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.13
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Helldonkeys", {
+	specialTypes = {
+		["nz_zombie_special_donkey"] = {chance = 100}
 	},
 	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
 	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
@@ -989,6 +1009,8 @@ nzRound:AddAdditionalZombieType("Keepers", "nz_zombie_special_keeper", {
 }) 
 nzRound:AddAdditionalZombieType("Hellhounds", "nz_zombie_special_dog", {
 }) 
+nzRound:AddAdditionalZombieType("Helldonkeys", "nz_zombie_special_donkey", {
+}) 
 nzRound:AddAdditionalZombieType("Panzer", "nz_zombie_boss_panzer", {
 }) 
 nzRound:AddAdditionalZombieType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
@@ -1097,6 +1119,9 @@ function nzRound:GetSpecialType(id)
 	end
 	if id == "Hellhounds" then
 	return "nz_zombie_special_dog"
+	end
+	if id == "Helldonkeys" then
+	return "nz_zombie_special_donkey"
 	end
 	if id == "Panzer" then
 	return "nz_zombie_boss_panzer"
