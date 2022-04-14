@@ -17,11 +17,13 @@ AddCSLuaFile()
 
 function ENT:Initialize()
 
-	self:SetModel(  "models/codww2/other/carepackage.mdl" )
+	self:SetModel(  "models/codww2/other/zombielootcrate.mdl" )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetCollisionGroup( COLLISION_GROUP_WEAPON )
 	self.Used = false
+	self:SetSkin(4)
+	self:SetBodygroup(2,1)
 	if SERVER then
 		self:SetUseType(SIMPLE_USE)
 	end
@@ -31,13 +33,13 @@ end
 	
 function ENT:Use( activator, caller )
 	if nzRound:InProgress() then
+	local currentWep = activator:GetActiveWeapon()
 	local price = self:GetPrice()
-	if activator:GetPoints() >=  price then
+	if activator:GetPoints() >=  price and !currentWep.NZWonderWeapon then
 		activator:Buy(price, self, function()
 		activator:TakePoints(price)
 		self:EmitSound("nz/effects/buy.wav")
-		local currentWep = activator:GetActiveWeapon()
-		if !currentWep.NZWonderWeapon then currentWep:GiveMaxAmmo() end
+		currentWep:GiveMaxAmmo() 
 		end)
 		 self:SetPrice(price + (nzRound:GetNumber()/4 * 1000))
 		 
