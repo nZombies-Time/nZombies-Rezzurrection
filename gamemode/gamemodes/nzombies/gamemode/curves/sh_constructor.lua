@@ -30,8 +30,8 @@ if SERVER then
 		local tbl = {}
 		local range = 3 -- The range on either side of the tip (current round) of speeds in steps of "steps"
 		local min = 30 -- Minimum speed (Round 1)
-		local max = 300 -- Maximum speed
-		local maxround = 27 -- The round at which the 300 speed has its tip
+		local max = 275 -- Maximum speed
+		local maxround = 30 -- The round at which the 300 speed has its tip
 		local steps = ((max-min)/maxround) -- The different speed steps speed can exist in
 
 		print("Generating round speeds with steps of "..steps.."...")

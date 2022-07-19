@@ -62,21 +62,24 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 			end
 		end
 			if dmginfo:IsDamageType( 131072 ) then
+			if math.random(5) == 3 then
 			enemy:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
 			ParticleEffect("novagas_xplo",enemy:GetPos(),enemy:GetAngles(),nil)
 		local vaporizer = ents.Create("point_hurt")
 		if !vaporizer:IsValid() then return end
 		vaporizer:SetKeyValue("Damage", 25)
 		vaporizer:SetKeyValue("DamageRadius", 100)
-		vaporizer:SetKeyValue("DamageDelay", 1)
+		vaporizer:SetKeyValue("DamageDelay", 0.75)
 		vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
 		vaporizer:SetPos(enemy:GetPos())
 		vaporizer:SetOwner(attacker)
 		vaporizer:Spawn()
 		vaporizer:Fire("TurnOn","",0)
-		vaporizer:Fire("kill","",18)
+		vaporizer:Fire("kill","",15)
+		end
 		end
 		if dmginfo:IsDamageType( 1048576 ) then
+		if math.random(7) == 6 then
 			enemy:EmitSound("pop_acid.mp3",511)
 		local vaporizer = ents.Create("point_hurt")
 		   local gfx = ents.Create("pfx2_03")
@@ -84,7 +87,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
         gfx:SetAngles(enemy:GetAngles())
         gfx:Spawn()
 		if !vaporizer:IsValid() then return end
-		vaporizer:SetKeyValue("Damage", 35)
+		vaporizer:SetKeyValue("Damage", 34)
 		vaporizer:SetKeyValue("DamageRadius", 200)
 		vaporizer:SetKeyValue("DamageDelay", 0.5)
 		vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
@@ -96,25 +99,96 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 		timer.Simple(10, function()
 					gfx:Remove()
 				end)
+				end
 		end
 		
-			if dmginfo:IsDamageType( 32768 ) then
+
+		
+		
+		
+			if dmginfo:IsDamageType( 4096 ) then
+			if math.random(10) == 6 then
 			enemy:EmitSound("pop_antimatter.wav", 94, math.random(90,100))
             local ent = ents.Create("env_explosion")
         ent:SetPos(enemy:GetPos())
         ent:SetAngles(enemy:GetAngles())
         ent:Spawn()
-         ent:SetKeyValue("imagnitude", "500")
+		local baseDamage =  dmginfo:GetDamage() *5.5
+         ent:SetKeyValue("imagnitude", baseDamage)
+		ent:SetKeyValue("iradiusoverride", "80")
+        ent:Fire("explode")
+		  local gfx = ents.Create("pfx8_01")
+        gfx:SetPos(enemy:GetPos() + Vector(0,0,20))
+        gfx:SetAngles(enemy:GetAngles())
+        gfx:Spawn()
+		timer.Simple(2, function()
+					gfx:Remove()
+				end)
+			end
+	end
+
+
+
+if attacker:HasPerk("pop") then
+			local effect = math.random(11)
+			 
+			 if  effect == 7 then
+			enemy:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
+			ParticleEffect("novagas_xplo",enemy:GetPos(),enemy:GetAngles(),nil)
+		local vaporizer = ents.Create("point_hurt")
+		if !vaporizer:IsValid() then return end
+		vaporizer:SetKeyValue("Damage", 40)
+		vaporizer:SetKeyValue("DamageRadius", 100)
+		vaporizer:SetKeyValue("DamageDelay", 1)
+		vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
+		vaporizer:SetPos(enemy:GetPos())
+		vaporizer:SetOwner(attacker)
+		vaporizer:Spawn()
+		vaporizer:Fire("TurnOn","",0)
+		vaporizer:Fire("kill","",18)
+			
+			end
+			if  effect == 6 then
+						enemy:EmitSound("pop_acid.mp3",511)
+		local vaporizer = ents.Create("point_hurt")
+		   local gfx = ents.Create("pfx2_03")
+        gfx:SetPos(enemy:GetPos())
+        gfx:SetAngles(enemy:GetAngles())
+        gfx:Spawn()
+		if !vaporizer:IsValid() then return end
+		vaporizer:SetKeyValue("Damage", 40)
+		vaporizer:SetKeyValue("DamageRadius", 200)
+		vaporizer:SetKeyValue("DamageDelay", 0.5)
+		vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
+		vaporizer:SetPos(enemy:GetPos())
+		vaporizer:SetOwner(attacker)
+		vaporizer:Spawn()
+		vaporizer:Fire("TurnOn","",0)
+		vaporizer:Fire("kill","",10)
+		timer.Simple(10, function()
+					gfx:Remove()
+				end)
+			 end
+			
+			 if  effect == 5 then
+						enemy:EmitSound("pop_antimatter.wav", 94, math.random(90,100))
+            local ent = ents.Create("env_explosion")
+        ent:SetPos(enemy:GetPos())
+        ent:SetAngles(enemy:GetAngles())
+        ent:Spawn()
+         ent:SetKeyValue("imagnitude", "666")
 		ent:SetKeyValue("iradiusoverride", "100")
         ent:Fire("explode")
 		  local gfx = ents.Create("pfx8_01")
         gfx:SetPos(enemy:GetPos() + Vector(0,0,20))
         gfx:SetAngles(enemy:GetAngles())
         gfx:Spawn()
-		timer.Simple(3, function()
+		timer.Simple(2, function()
 					gfx:Remove()
 				end)
 			end
+			 end
+			 
 	end
 
 	-- Run on-killed function to give points if the hook isn't blocking it
@@ -246,35 +320,7 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			dmginfo:ScaleDamage(2) 
 			end
 			end
-			if attacker:IsPlayer() and attacker:HasPerk("pop") and math.random(1,6) == 3 then
-			local effect = 0
-			if attacker:HasUpgrade("pop") then
-			 effect = math.random(8,20)
-			 else
-			 effect = math.random(1,20)
-			 end
-			 if effect > 17 then
-			 effect = math.random(5,8)
-			 else
-			  effect = math.random(1,4)
-			 end
-			 end
-			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 7 then
-			dmginfo:SetDamageType( 131072)
-			dmginfo:ScaleDamage(zombie:Health()) 
-			end
-			if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 6 then
-				dmginfo:SetDamageType( 1048576)
-				dmginfo:ScaleDamage(zombie:Health()) 
-			 end
-			if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 2 then
-			zombie:EmitSound("pop_rad.mp3", 94, math.random(90,100))
-			dmginfo:SetDamage(dmginfo:GetDamage() + zombie:Health()*0.07)
-			 end
-			 if attacker:IsPlayer() and attacker:HasPerk("pop") and effect == 5 then
-			dmginfo:SetDamageType( 32768)
-			 dmginfo:ScaleDamage(zombie:Health()) 
-			 end
+		
 
 			if nzPowerUps:IsPowerupActive("insta") then
 				dmginfo:ScaleDamage(zombie:Health()) --zombie:Kill(dmginfo)
@@ -298,6 +344,8 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				dmginfo:SetDamage( dmginfo:GetDamage() + zombie:Health()*0.07) 
 			 end
 			
+				
+		
 		
 			 if attacker:IsPlayer() and IsValid(attacker:GetActiveWeapon()) and attacker:GetActiveWeapon():HasNZModifier("pap") then
 			 local gun = attacker:GetActiveWeapon():GetClass()
@@ -307,12 +355,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			 end
 			 end
 			
-			if attacker:IsPlayer() and dmginfo:IsDamageType( 1048576 ) then
-			if  math.random(6) == 1 then
-				dmginfo:ScaleDamage(zombie:Health()) 
-				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
-			return end
-			end
 			
 			
 			
@@ -331,6 +373,28 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				zombie:Ignite((dmginfo:GetDamage()/16))
 			 end
 			
+						if attacker:IsPlayer() and  dmginfo:IsDamageType( 16384 ) then
+				--winters fury
+		if math.random(9) == 6 then
+		zombie:SetPlaybackRate( 0 ) -- Slow them down
+		zombie:SetMaterial("effects/freeze_overlayeffect01")
+		zombie:SetStop(true)
+		zombie.loco:SetDesiredSpeed(1)
+		zombie:SetBlockAttack(true)
+		zombie:EmitSound("weapons/wintershowl/freeze"..math.random(0,2)..".ogg")
+				timer.Simple(2, function()
+				if zombie:IsValid() then
+				zombie:EmitSound("weapons/wintershowl/shatter"..math.random(0,1)..".ogg")
+				  zombie:TakeDamage(zombie:Health())
+				  nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 )
+				--nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
+				end
+				end)
+			
+				
+				end
+		end
+		
 			if attacker:IsPlayer() and attacker:HasUpgrade("fire")  and math.random(5) == 4  then
 				zombie:Ignite((dmginfo:GetDamage()/9))
 			 end

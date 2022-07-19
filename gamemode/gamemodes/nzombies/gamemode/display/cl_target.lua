@@ -107,9 +107,9 @@ end
 				local wep = LocalPlayer():GetActiveWeapon()
 				if wep:HasNZModifier("pap") then
 					if wep.NZRePaPText then
-						text = "Press E to "..wep.NZRePaPText.." for 2000 points."
+						text = "Press E to "..wep.NZRePaPText.." for 3000 points."
 					elseif wep:CanRerollPaP() then
-						text = "Press E to reroll attachments for 2000 points."
+						text = "Press E to reroll attachments for 3000 points."
 					else
 						text = "This weapon is already upgraded."
 					end

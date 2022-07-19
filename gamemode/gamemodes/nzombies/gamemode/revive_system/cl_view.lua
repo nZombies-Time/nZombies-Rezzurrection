@@ -251,7 +251,7 @@ end
 
 CreateClientConVar("nz_bloodoverlay", 1, true, false)
 
-local blood_overlay = Material("materials/overlay_low_health.png", "unlitgeneric smooth")
+local blood_overlay = Material("materials/overlay_urdyinglol.png", "unlitgeneric smooth")
 local bloodpulse = true --if true, going up
 local pulse = 0
 local function DrawDamagedOverlay()

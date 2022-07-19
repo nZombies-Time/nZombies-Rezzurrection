@@ -627,7 +627,7 @@ nzPerks:NewPerk("pap", {
 		if wep:HasNZModifier("pap") and wep:CanRerollPaP() then
 			reroll = true
 		end
-		local cost = reroll and 2000 or 5000
+		local cost = reroll and 3000 or 5000
 
 		ply:Buy(cost, machine, function()
 			hook.Call("OnPlayerBuyPackAPunch", nil, ply, wep, machine)
