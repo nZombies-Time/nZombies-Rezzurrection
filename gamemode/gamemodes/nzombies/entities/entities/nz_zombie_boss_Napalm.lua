@@ -230,12 +230,23 @@ function ENT:OnSpawn()
 	end
 end
 
-function ENT:OnZombieDeath()
-dying = true
-	if !hasExploded then
-        self:SetNoDraw(true)
-        hasExploded = true
-        self:EmitSound("bo1_overhaul/nap/explode.mp3",511)
+function ENT:OnZombieDeath(dmgInfo)
+	dying = true
+	self:ReleasePlayer()
+	self:StopFlames()
+	self:SetRunSpeed(0)
+	self.loco:SetVelocity(Vector(0,0,0))
+	self:Stop()
+	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
+	self:ResetSequence(seq)
+	self:SetCycle(0)
+
+	timer.Simple(dur, function()
+		if IsValid(self) then
+			
+			util.ScreenShake(self:GetPos(),12,400,3,1000)
+			self:EmitSound("bo1_overhaul/nap/explode.mp3",511)
             local ent = ents.Create("env_explosion")
         ent:SetPos(self:GetPos())
         ent:SetAngles(self:GetAngles())
@@ -260,35 +271,11 @@ dying = true
             vaporizer:Spawn()
             vaporizer:Fire("TurnOn","",0)
             vaporizer:Fire("kill","",20)
-        self:SetRunSpeed(0)
-        self.loco:SetVelocity(Vector(0,0,0))
-        self:Stop()
-        local seqstr = self.DeathSequences[math.random(#self.DeathSequences)]
-        local seq, dur = self:LookupSequence(seqstr)
-        -- Delay it slightly; Seems to fix it instantly getting overwritten
-        timer.Simple(0, function() 
-            if IsValid(self) then
-                self:ResetSequence(seq)
-                self:SetCycle(0)
-                self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-            end 
-        end)
+			--util.Effect("Explosion", effectData)
+			self:Remove()
+		end
+	end)
 
-        timer.Simple(dur + 1, function()
-            if IsValid(self) then
-                self:Remove()
-            end
-        end)
-        
-        if self.DeathSounds then
-            self:EmitSound( self.DeathSounds[ math.random( #self.DeathSounds ) ], 100)
-        end
-	else
-	    self:ResetSequence(seq)
-        self:SetCycle(0)
-        self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-        self:Remove()
-    end
 end
 
 function ENT:BodyUpdate()

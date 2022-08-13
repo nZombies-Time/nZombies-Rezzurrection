@@ -133,7 +133,7 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(350)
+		self:SetRunSpeed(300)
 		self:SetHealth(350)
 		self:SetMaxHealth(10000)
 		screaming = false

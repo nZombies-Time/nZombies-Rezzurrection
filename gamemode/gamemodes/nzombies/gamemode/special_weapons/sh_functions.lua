@@ -377,7 +377,7 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	
 	--Emergency Sake
 	if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_perk_bottle") then
-	if ply:HasWeapon("nz_knife_boring") or ply:HasWeapon("nz_knife_butterfly") or ply:HasWeapon("nz_knife_carver") or ply:HasWeapon("nz_knife_crescent") or ply:HasWeapon("nz_knife_lukewarmconflict") or ply:HasWeapon("nz_knife_malice") or ply:HasWeapon("nz_quickknife_crowbar") then
+	if ply:HasWeapon("nz_knife_bo1") or ply:HasWeapon("nz_knife_boring") or ply:HasWeapon("nz_knife_butterfly") or ply:HasWeapon("nz_knife_carver") or ply:HasWeapon("nz_knife_crescent") or ply:HasWeapon("nz_knife_lukewarmconflict") or ply:HasWeapon("nz_knife_malice") or ply:HasWeapon("nz_quickknife_crowbar") then
 	ply:Give("nz_yamato")
 	end
 	

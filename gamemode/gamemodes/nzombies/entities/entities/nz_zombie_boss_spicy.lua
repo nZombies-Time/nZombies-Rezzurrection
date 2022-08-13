@@ -1,82 +1,87 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Licker"
+ENT.PrintName = "Fuel Junkie"
 ENT.Category = "Brainz"
-ENT.Author = "Laby"
+ENT.Author = "Zet0r"
 
-ENT.Models = { "models/roach/re2/licker.mdl" }
+ENT.Models = { "models/nzr/2022/enemies/takieater.mdl" }
 
-ENT.AttackRange = 150
-ENT.DamageLow = 20
-ENT.DamageHigh = 24
+ENT.AttackRange = 130
+ENT.DamageLow = 40
+ENT.DamageHigh = 60
+
+ENT.RedEyes = true
 
 ENT.AttackSequences = {
-	{seq = "att1", dmgtimes = {0.6}},
-	{seq = "att2", dmgtimes = {0.6}},
-	{seq = "att3", dmgtimes = {0.3}}
+	{seq = "shriek3", dmgtimes = {0.9}}
 }
 
 ENT.DeathSequences = {
-	"death_f",
-	"death_b"
+	"suicide3"
 }
 
 ENT.AttackSounds = {
-	"re2/em3000/attack1.mp3",
-	"re2/em3000/attack2.mp3",
-	"re2/em3000/attack3.mp3",
-	"re2/em3000/attack4.mp3",
-	"re2/em3000/attack5.mp3",
-	"re2/em3000/attack6.mp3"
-
+	"nz/zombies/attack/attack_00.wav",
+	"nz/zombies/attack/attack_01.wav",
+	"nz/zombies/attack/attack_02.wav",
+	"nz/zombies/attack/attack_03.wav",
+	"nz/zombies/attack/attack_04.wav",
+	"nz/zombies/attack/attack_05.wav",
+	"nz/zombies/attack/attack_06.wav",
+	"nz/zombies/attack/attack_07.wav",
+	"nz/zombies/attack/attack_08.wav",
+	"nz/zombies/attack/attack_n_1.wav",
+	"nz/zombies/attack/attack_n_2.wav",
+	"nz/zombies/attack/attack_n_3.wav",
+	"nz/zombies/attack/attack_n_4.wav",
+	"nz/zombies/attack/attack_n_5.wav",
+	"nz/zombies/attack/attack_14.wav",
+	"nz/zombies/attack/attack_15.wav",
+	"nz/zombies/attack/attack_16.wav",
+	"nz/zombies/attack/attack_17.wav",
+	"nz/zombies/attack/attack_18.wav",
+	"nz/zombies/attack/attack_19.wav",
+	"nz/zombies/attack/attack_n_6.wav",
+	"nz/zombies/attack/attack_21.wav",
+	"nz/zombies/attack/attack_22.wav"
 }
 
 ENT.PainSounds = {
-"physics/flesh/flesh_impact_bullet1.wav",
+	"physics/flesh/flesh_impact_bullet1.wav",
 	"physics/flesh/flesh_impact_bullet2.wav",
 	"physics/flesh/flesh_impact_bullet3.wav",
 	"physics/flesh/flesh_impact_bullet4.wav",
 	"physics/flesh/flesh_impact_bullet5.wav"
 }
 
-ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
-	
-	
-}
-
 ENT.WalkSounds = {
-	"re2/em3000/step1.mp3",
-	"re2/em3000/step2.mp3",
-	"re2/em3000/step3.mp3",
-	"re2/em3000/step4.mp3",
-	"re2/em3000/step5.mp3",
-	"re2/em3000/step6.mp3"
-
+	"bo1_overhaul/son/amb1.mp3",
+	"bo1_overhaul/son/amb2.mp3",
+	"bo1_overhaul/son/amb3.mp3"
 }
 
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 0,
+		minspeed = 5,
 	},
 	[2] = {
-		act = ACT_RUN,
-		minspeed = 300,
+		act = ACT_WALK,
+		minspeed = 50,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 325
-	}
+		minspeed = 60,
+	},
+	[4] = {
+		act = ACT_RUN,
+		minspeed = 300,
+	},
 }
 
 -- We overwrite the Init function because we do not change bodygroups randomly!
 function ENT:Initialize()
-
 
 	self:Precache()
 
@@ -99,7 +104,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -143,10 +148,15 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(250)
-		self:SetHealth(300)
-		self:SetMaxHealth(140)
+		self:SetRunSpeed(200)
+		self:SetHealth(1000)
+		self:SetMaxHealth(1000)
+		shooting = false
+		dying = false
+		helmet = true
+		counting = false
 	end
+	self:SetCollisionBounds(Vector(-15,-15, 0), Vector(15, 15, 100))
 
 	--PrintTable(self:GetSequenceList())
 end
@@ -156,7 +166,7 @@ function ENT:SpecialInit()
 	if CLIENT then
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:SetNoDraw(true)
-		self:TimedEvent( 0.5, function()
+		self:TimedEvent( 0.15, function()
 			self:SetNoDraw(false)
 		end)
 
@@ -177,39 +187,44 @@ function ENT:InitDataTables()
 end
 
 function ENT:OnSpawn()
-	local seq = "emerge"
+	local seq = "land"
 	local tr = util.TraceLine({
 		start = self:GetPos() + Vector(0,0,500),
 		endpos = self:GetPos(),
 		filter = self,
 		mask = MASK_SOLID_BRUSHONLY,
 	})
-	if tr.Hit then seq = "emerge" end
+	if tr.Hit then seq = "land" end
 	local _, dur = self:LookupSequence(seq)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
+		self:SetSpecialAnimation(true)
+		local pos = self:GetPos() + (seq == "flinch_head_2" and Vector(0,0,100) or Vector(0,0,450))
+		counting = true
+		self:EmitSound("bo1_overhaul/nap/spawn.mp3",511)
+		local entParticle = ents.Create("info_particle_system")
+		entParticle:SetKeyValue("start_active", "1")
+		entParticle:SetKeyValue("effect_name", "napalm_emerge")
+		entParticle:SetPos(self:GetPos())
+		entParticle:SetAngles(self:GetAngles())
+		entParticle:Spawn()
+		entParticle:Activate()
+		entParticle:Fire("kill","",1)
+		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		self:TimedEvent(dur, function()
+		counting = false
+		self:SetSpecialAnimation(false)
+		end)
 		
-		local pos = self:GetPos() + (seq == "emerge" and Vector(0,0,100) or Vector(0,0,450))
-		
-		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
-		self:EmitSound("re2/em3000/alert"..math.random(6)..".mp3",100)
-	
-		
-		--[[effectData = EffectData()
-		effectData:SetStart( pos + Vector(0, 0, 1000) )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude( 0.75 )
-		util.Effect("lightning_strike", effectData)]]
-		
-			
 		self:PlaySequenceAndWait(seq)
+		
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -219,10 +234,39 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-	self:EmitSound("re2/em3000/death"..math.random(6)..".mp3",100)
-ParticleEffect("bo3_margwa_death",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+
+self:EmitSound("bo1_overhaul/son/amb1.mp3")
+
 	timer.Simple(dur, function()
 		if IsValid(self) then
+			
+			util.ScreenShake(self:GetPos(),12,400,3,1000)
+			self:EmitSound("bo1_overhaul/nap/explode.mp3",511)
+            local ent = ents.Create("env_explosion")
+        ent:SetPos(self:GetPos())
+        ent:SetAngles(self:GetAngles())
+        ent:Spawn()
+        ent:SetKeyValue("imagnitude", "200")
+        ent:Fire("explode")
+            local entParticle = ents.Create("info_particle_system")
+            entParticle:SetKeyValue("start_active", "1")
+            entParticle:SetKeyValue("effect_name", "napalm_postdeath_napalm")
+            entParticle:SetPos(self:GetPos())
+            entParticle:SetAngles(self:GetAngles())
+            entParticle:Spawn()
+            entParticle:Activate()
+            entParticle:Fire("kill","",20)
+            local vaporizer = ents.Create("point_hurt")
+            if !vaporizer:IsValid() then return end
+            vaporizer:SetKeyValue("Damage", 22)
+            vaporizer:SetKeyValue("DamageRadius", 150)
+            vaporizer:SetKeyValue("DamageType",DMG_BURN)
+            vaporizer:SetPos(self:GetPos())
+            vaporizer:SetOwner(self)
+            vaporizer:Spawn()
+            vaporizer:Fire("TurnOn","",0)
+            vaporizer:Fire("kill","",20)
+			--util.Effect("Explosion", effectData)
 			self:Remove()
 		end
 	end)
@@ -231,14 +275,13 @@ end
 
 function ENT:BodyUpdate()
 
-
 	self.CalcIdeal = ACT_IDLE
 
 	local velocity = self:GetVelocity()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 300 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 0 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 60 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -256,72 +299,14 @@ function ENT:BodyUpdate()
 
 end
 
-function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
-	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:SetAttackRange(225)
-				timer.Simple(6/24, function()
-				self:EmitSound("re2/em3000/tongue_whip1.mp3",100)
-		
-	end)
-				self:PlaySequenceAndWait("att3")
-				self:SetAttackRange(150)
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:SetStop(false)
-			
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
+function ENT:OnTargetInAttackRange()
+	self.NextFlameTime = CurTime() + 1
+    local atkData = {}
+    atkData.dmglow = 30
+    atkData.dmghigh = 50
+    atkData.dmgforce = Vector( 0, 0, 0 )
+	atkData.dmgdelay = 1
+    self:Attack( atkData )
 end
 
 function ENT:IsValidTarget( ent )
@@ -331,6 +316,42 @@ function ENT:IsValidTarget( ent )
 end
 
 -- This function is run every time a path times out, once every 1 seconds of pathing
+function ENT:OnPathTimeOut()
+	local target = self:GetTarget()
+	if CurTime() < self.NextAction then return end
+	
+	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
+		-- Claw
+		
+	elseif CurTime() > self.NextFlameTime then
+		-- Flamethrower
+		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
+			self:Stop()
+			--self:PlaySequenceAndWait("att_ft")
+			self.loco:SetDesiredSpeed(0)
+			local ang = (target:GetPos() - self:GetPos()):Angle()
+			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+			
+			self:StartFlames()
+			local seq =  "shriek1"
+			local id, dur = self:LookupSequence(seq)
+			self:ResetSequence(id)
+			self:SetCycle(0)
+			self:SetPlaybackRate(1)
+			self:SetVelocity(Vector(0,0,0))
+			
+			self:TimedEvent(dur-0.3, function()
+				self.loco:SetDesiredSpeed(100)
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			end)
+			
+			self.NextAction = CurTime() + math.random(1, 5)
+			self.NextFlameTime = CurTime() + math.random(10, 20)
+		end
+	end
+end
 
 if CLIENT then
 	local eyeGlow =  Material( "sprites/redglow1" )
@@ -339,7 +360,36 @@ if CLIENT then
 	local lightyellow = Color( 255, 255, 200, 200 )
 	local clawglow = Material( "sprites/orangecore1" )
 	local clawred = Color( 255, 100, 100, 255 )
+	function ENT:Draw()
+		self:DrawModel()
+		
+
+		
+		--if self.RedEyes then
+			--local eyes = self:GetAttachment(self:LookupAttachment("eyes")).Pos
+			--local leftEye = eyes + self:GetRight() * -1.5 + self:GetForward() * 0.5
+			--local rightEye = eyes + self:GetRight() * 1.5 + self:GetForward() * 0.5
+
+			--local leftEye = self:GetAttachment(self:LookupAttachment("lefteye")).Pos
+			--local rightEye = self:GetAttachment(self:LookupAttachment("righteye")).Pos
+			--cam.Start3D()
+				--render.SetMaterial( eyeGlow )
+				--render.DrawSprite( leftEye, 4, 4, white)
+				--render.DrawSprite( rightEye, 4, 4, white)
+			--cam.End3D()
+		--end
+		if GetConVar( "nz_zombie_debug" ):GetBool() then
+			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+			render.DrawWireframeSphere(self:GetPos(), self:GetAttackRange(), 10, 10, Color(255,165,0), true)
+		end
+		
+		--debugoverlay.Cross(finalpos, 5)
+		--debugoverlay.Line(finalpos, finalpos + ang:Forward()*10, 1, Color(0,255,0))
+		--debugoverlay.Line(finalpos, finalpos + ang:Right()*5, 1, Color(0,255,0))
+	
+	end
 end
+
 
 function ENT:OnRemove()
 	if IsValid(self.ClawHook) then self.ClawHook:Remove() end
@@ -349,85 +399,60 @@ end
 
 function ENT:StartFlames(time)
 	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
+	--self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/start.wav")
+	
+	timer.Simple(0.7, function()
+	self:EmitSound("bo1_overhaul/son/scream.mp3")
+	self:EmitSound("bo1_overhaul/nap/spawn.mp3")
+	self:SetFlamethrowing(true)
+	end)
 end
 
 function ENT:StopFlames()
+self:StopParticles()
+ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+	self:SetFlamethrowing(false)
 	self:SetStop(false)
 end
 
-function ENT:OnInjured(dmg)
-if math.random(0,1) == 1 then
-self:EmitSound("re2/em3000/pain"..math.random(6)..".mp3",100)
+function ENT:OnThink()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(2.5, function()self:SetSpecialAnimation(false)end)
+end
+if !self:IsAttacking() then
+if !counting and !dying and !shooting and self:Health() > 0 and !self:GetFlamethrowing() and !self:GetSpecialAnimation() then
+counting = true
+timer.Simple(0.32,function()
+self:EmitSound("bo1_overhaul/nap/step"..math.random(1,3)..".mp3")
+counting = false
+end)
 end
 end
 
-function ENT:OnThink()
-if math.random(0,1250) == 988 then
-if math.random(0,1) == 0 then
-self:EmitSound("re2/em3000/idle"..math.random(6)..".mp3",100)
-else
-self:EmitSound("re2/em3000/detected"..math.random(6)..".mp3",100)
-end
-end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
+			local bone = self:LookupBone("tag_origin")
 			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
+			pos = pos + Vector( 20 ,20, 50 )
 			if CLIENT then
 				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
 				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
+				ParticleEffectAttach("bo3_panzer_flame",PATTACH_POINT_FOLLOW,self,1)
+				--ParticleEffect("bo3_panzer_flame", pos, ang, self )
 			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
 					local tr = util.TraceHull({
 						start = pos,
-						endpos = pos - ang:Forward()*150,
+						endpos = pos + ang:Forward()*300,
 						filter = self,
 						--mask = MASK_SHOT,
 						mins = Vector( -5, -5, -10 ),
 						maxs = Vector( 5, 5, 10 ),
 					})
 					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
+					debugoverlay.Line(pos, pos + ang:Forward()*300)
 					
 					if self:IsValidTarget(tr.Entity) then
 						local dmg = DamageInfo()
@@ -439,7 +464,7 @@ end
 						tr.Entity:TakeDamageInfo(dmg)
 						tr.Entity:Ignite(2, 0)
 					end
-				end
+				
 			end
 			
 			self.NextFireParticle = CurTime() + 0.05
@@ -449,16 +474,12 @@ end
 		self.FireEmitter = nil
 	end
 	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)
 	if CLIENT then return end
 	
-	
+	self:SetBodygroup(2,0)
 	self:SetUsingClaw(false)
 	self:SetStop(false)
 	self.loco:SetDesiredSpeed(self:GetRunSpeed())
@@ -527,7 +548,7 @@ function ENT:OnBarricadeBlocking( barricade )
 			elseif target then -- It is a string or ACT
 				seq, dur = self:LookupSequenceAct(target)
 			else
-				seq, dur = self:LookupSequence("swing")
+				seq, dur = self:LookupSequence("att1")
 			end
 			
 			self:SetAttacking(true)

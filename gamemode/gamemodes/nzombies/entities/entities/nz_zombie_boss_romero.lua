@@ -228,7 +228,7 @@ end
 function ENT:OnInjured(dmg, delay)
 	if self:WaterLevel() < 1 and not self.Enraged then
 		self.Enraged = true
-			self.loco:SetDesiredSpeed(350)
+			self.loco:SetDesiredSpeed(275)
 		self:EmitSound("bo1_overhaul/dir/vox_director_angered_0"..math.random(4)..".mp3",511)
 		self:SetBodygroup(0,1)
 		util.ScreenShake(self:GetPos(),10000,5000,3,1000)

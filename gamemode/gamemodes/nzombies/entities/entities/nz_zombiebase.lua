@@ -1158,13 +1158,11 @@ function ENT:Jump()
 	self:TimedEvent( 0.5, function() self.loco:SetVelocity( self:GetForward() * 5 ) end)
 	else
 	
-	if !nzMapping.Settings.bosstype == "None" then
-	local stuckdata = nzRound:GetBossData(nzMapping.Settings.bosstype).class
-	if isstring(stuckdata) and self:GetClass() ==  stuckdata then
-	local bosstype =  self.BossType
-		if bosstype then
-			local data = nzRound:GetBossData(bosstype)
-			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" or "nz_spawn_zombie_boss" or "nz_spawn_zombie_extra1" or "nz_spawn_zombie_extra2" or "nz_spawn_zombie_extra3" or "nz_spawn_zombie_extra4"  -- Check what spawnpoint type we're using
+	local classname = self:GetClass()
+	local bossent = string.find( classname:lower(), "boss" )
+	if bossent then
+			print("THOT DETECTED")
+			local spawnpoint =  "nz_spawn_zombie_special"  or "nz_spawn_zombie_boss" 
 			local spawnpoints = {}
 			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
 				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
@@ -1177,7 +1175,7 @@ function ENT:Jump()
 				self:SetPos( spawn:GetPos() )
 				
 			end
-		end
+		
 		else
 		timer.Simple(3, function()
 	if self:IsValid() then
@@ -1185,22 +1183,11 @@ function ENT:Jump()
 	else
 			self:RespawnZombie()
 			end
-	else
 			end
 	end)
-		end
-
-	else
-	timer.Simple(3, function()
-	if self:IsValid() then
-	if self:Health() > 0 and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
-	else
-			self:RespawnZombie()
-			end
-	else
-			end
-	end)
+	
 	end
+	
 	end
 	end
 	

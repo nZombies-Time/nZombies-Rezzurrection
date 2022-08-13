@@ -1,79 +1,70 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "SUPA SPOODA"
+ENT.PrintName = "Panzersoldat"
 ENT.Category = "Brainz"
-ENT.Author = "Laby"
+ENT.Author = "Zet0r"
 
-ENT.Models = { "models/roach/blackops3/spooder.mdl" }
+ENT.Models = { "models/nzr/2022/enemies/stupidtoaster.mdl" }
 
-ENT.AttackRange = 80
-ENT.DamageLow = 23
-ENT.DamageHigh = 24
+ENT.AttackRange = 130
+ENT.DamageLow = 40
+ENT.DamageHigh = 60
 
+ENT.RedEyes = true
 
 ENT.AttackSequences = {
-	{seq = "melee"}
+	{seq = "att1"},
+	{seq = "att2"},
 }
 
 ENT.DeathSequences = {
-	"death"
+	"death1","death2",
 }
 
 ENT.AttackSounds = {
-	"roach/bo3/spider/vox/melee_01.mp3",
-	"roach/bo3/spider/vox/melee_02.mp3",
-	"roach/bo3/spider/vox/melee_03.mp3",
-	"roach/bo3/spider/vox/melee_04.mp3"
-
-}
-
-ENT.PainSounds = {
-"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"codz_megapack/zmb/ai/mechz2/vox/swing_00.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/swing_01.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/swing_02.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/swing_03.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/swing_04.wav",
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"bo1_overhaul/dir/sfx/zmb_melee_light_00.mp3",
+	"bo1_overhaul/dir/sfx/zmb_melee_light_01.mp3",
+	"bo1_overhaul/dir/sfx/zmb_melee_light_02.mp3",
 }
 
 ENT.WalkSounds = {
-	"roach/bo3/spider/vox/ambient_01.mp3",
-	"roach/bo3/spider/vox/ambient_02.mp3",
-	"roach/bo3/spider/vox/ambient_03.mp3",
-	"roach/bo3/spider/step_02.mp3",
-	"roach/bo3/spider/step_03.mp3",
-	"roach/bo3/spider/step_04.mp3",
-	"roach/bo3/spider/step_05.mp3",
-	"roach/bo3/spider/step_06.mp3"
+	"codz_megapack/zmb/ai/mechz2/vox/ambient_00.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/ambient_01.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/ambient_02.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/ambient_03.wav",
+	"codz_megapack/zmb/ai/mechz2/vox/ambient_04.wav",
 }
 
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 0,
+		minspeed = 5,
 	},
 	[2] = {
 		act = ACT_WALK,
-		minspeed = 390,
+		minspeed = 50,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 400
-	}
+		minspeed = 300,
+	},
+	[4] = {
+		act = ACT_RUN,
+		minspeed = 300,
+	},
 }
 
 -- We overwrite the Init function because we do not change bodygroups randomly!
 function ENT:Initialize()
-
 
 	self:Precache()
 
@@ -96,7 +87,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -140,10 +131,15 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(275)
-		self:SetHealth(140)
-		self:SetMaxHealth(140)
+		self:SetRunSpeed(100)
+		self:SetHealth(1000)
+		self:SetMaxHealth(1000)
+		shooting = false
+		dying = false
+		helmet = true
+		counting = false
 	end
+	self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 100))
 
 	--PrintTable(self:GetSequenceList())
 end
@@ -153,7 +149,7 @@ function ENT:SpecialInit()
 	if CLIENT then
 		--make them invisible for a really short duration to blend the emerge sequences
 		self:SetNoDraw(true)
-		self:TimedEvent( 0.5, function()
+		self:TimedEvent( 0.15, function()
 			self:SetNoDraw(false)
 		end)
 
@@ -174,40 +170,61 @@ function ENT:InitDataTables()
 end
 
 function ENT:OnSpawn()
-	local seq = "shoot"
+	local seq = "arrive"
 	local tr = util.TraceLine({
 		start = self:GetPos() + Vector(0,0,500),
 		endpos = self:GetPos(),
 		filter = self,
 		mask = MASK_SOLID_BRUSHONLY,
 	})
-	if tr.Hit then seq = "shoot" end
+	if tr.Hit then seq = "flinch_head_2" end
 	local _, dur = self:LookupSequence(seq)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
-		
-		local pos = self:GetPos() + (seq == "shoot" and Vector(0,0,100) or Vector(0,0,450))
-		
-		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
-		self:EmitSound("roach/bo3/spider/spawn_01.mp3")
-	
-		
+		self:SetSpecialAnimation(true)
+		local pos = self:GetPos() + (seq == "flinch_head_2" and Vector(0,0,100) or Vector(0,0,450))
+		counting = true
+		local effectData = EffectData()
+		effectData:SetStart( pos )
+		effectData:SetOrigin( pos )
+		effectData:SetMagnitude(dur)
+		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/incoming_alarm_new.wav",511)
+		--util.Effect("panzer_spawn_tp", effectData)
+		for i=3,4 do ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,i)end
+		self:EmitSound("codz_megapack/zmb/ai/mechz2/mechz_entrance.wav")
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
 		effectData:SetOrigin( pos )
 		effectData:SetMagnitude( 0.75 )
 		util.Effect("lightning_strike", effectData)]]
 		
+		self:TimedEvent(dur - 1.2, function()
+			--dust cloud
+			local effectData = EffectData()
+			effectData:SetStart( self:GetPos() )
+			effectData:SetOrigin( self:GetPos() )
+			effectData:SetMagnitude(dur)
 			
+			self:StopSound("zmb_ai_panzer_rocket_loop")
+		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/rocket/stop.wav")
+		end)
+		self:TimedEvent(dur - 0.6, function()
+			util.Effect("panzer_land_dust", effectData)
+			self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/land_0"..math.random(0,2)..".wav")
+		self:StopParticles()
+		counting = false
+		self:SetSpecialAnimation(false)
+		end)
+		
 		self:PlaySequenceAndWait(seq)
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	--dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -217,11 +234,22 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("roach/bo3/spider/vox/death_01.mp3")
-ParticleEffect("bo3_margwa_death",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+
+self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/killimp.wav")
+	timer.Simple(0.36,function()
+		if IsValid(self) then
+		dying = true
+		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/destruction_0"..math.random(0,2)..".wav")
+		end
+	end)
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
+			util.ScreenShake(self:GetPos(),12,400,3,1000)
+			ParticleEffect("bo3_panzer_explosion",self:GetPos(),Angle(0,0,0),nil)
+			self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/explode.mp3")
+			--util.Effect("Explosion", effectData)
+			
 		end
 	end)
 
@@ -229,14 +257,13 @@ end
 
 function ENT:BodyUpdate()
 
-
 	self.CalcIdeal = ACT_IDLE
 
 	local velocity = self:GetVelocity()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 390 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 0 ) then self.CalcIdeal = ACT_WALK end
+	if ( len2d > 60 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -255,14 +282,22 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
+
     local atkData = {}
-    atkData.dmglow = 22
-    atkData.dmghigh = 24
+    atkData.dmglow = 40
+    atkData.dmghigh = 60
     atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 0.2
+	atkData.dmgdelay = 0.7
     self:Attack( atkData )
 end
 
+function ENT:IsValidTarget( ent )
+	if !ent then return false end
+	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
+end
+
+-- This function is run every time a path times out, once every 1 seconds of pathing
 function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
@@ -279,28 +314,38 @@ function ENT:OnPathTimeOut()
 			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
 				self:Stop()
-				timer.Simple(22/55, function()
-				self:EmitSound("roach/bo3/spider/spd_attack_0"..math.random(3)..".mp3")
-		self:StopParticles()
+				shooting = true
+				
+				self:PlaySequenceAndWait("att_chaingun_1")
+						timer.Simple(0.5, function()
+				
 	end)
-				timer.Simple(1, function()self.ClawHook = ents.Create("nz_spider_goo")end)
-				timer.Simple(1, function()self.ClawHook:SetPos(self:LocalToWorld(Vector(0,0,80)))end)
-				timer.Simple(1, function()self.ClawHook:Spawn()end)
-				timer.Simple(1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot_web")
+				
 				self.loco:SetDesiredSpeed(0)
 				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
 				
-				local seq = "idle"
+				local seq = "att_chaingun_2"
 			local id, dur = self:LookupSequence(seq)
 				self:ResetSequence(id)
 			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(1, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+			local clawpos = self:GetAttachment(self:LookupAttachment("tag_gun_spin")).Pos
+			timer.Simple(0.1, function()self.ClawHook = ents.Create("nz_mangler_shot")
+			self:EmitSound("codz_megapack/zmb/ai/mechz2/wpn_grenade_fire_mechz.wav")
+		self:EmitSound("codz_megapack/zmb/ai/mechz2/mech_z_entrance_land_alt.wav")
+		ParticleEffectAttach("bo3_panzer_elec_blast",PATTACH_POINT,self,8)
+		end)
+				timer.Simple(0.1, function()self.ClawHook:SetPos(clawpos)end)
+				timer.Simple(0.1, function()self.ClawHook:Spawn()end)
+				timer.Simple(0.1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
+				timer.Simple(0.1, function()self:SetClawHook(self.ClawHook)end)
+				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				
+			self:TimedEvent(dur, function()
+			self:StopParticles()
+			shooting = false
+				self.loco:SetDesiredSpeed(100)
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
@@ -309,43 +354,35 @@ function ENT:OnPathTimeOut()
 				self.NextClawTime = CurTime() + math.random(3, 15)
 			end
 		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
+	elseif CurTime() > self.NextFlameTime then
 		-- Flamethrower
 		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
 			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
+			--self:PlaySequenceAndWait("att_ft")
 			self.loco:SetDesiredSpeed(0)
 			local ang = (target:GetPos() - self:GetPos()):Angle()
 			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
 			
 			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
+			local seq =  "att_ft"
 			local id, dur = self:LookupSequence(seq)
 			self:ResetSequence(id)
 			self:SetCycle(0)
 			self:SetPlaybackRate(1)
 			self:SetVelocity(Vector(0,0,0))
 			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+			self:TimedEvent(dur-0.3, function()
+				self.loco:SetDesiredSpeed(100)
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
 			end)
 			
 			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
+			self.NextFlameTime = CurTime() + math.random(10, 20)
 		end
 	end
 end
-
-function ENT:IsValidTarget( ent )
-	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
-	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
-end
-
--- This function is run every time a path times out, once every 1 seconds of pathing
 
 if CLIENT then
 	local eyeGlow =  Material( "sprites/redglow1" )
@@ -354,6 +391,123 @@ if CLIENT then
 	local lightyellow = Color( 255, 255, 200, 200 )
 	local clawglow = Material( "sprites/orangecore1" )
 	local clawred = Color( 255, 100, 100, 255 )
+	function ENT:Draw()
+		self:DrawModel()
+		
+		local dlight = DynamicLight( self:EntIndex() )
+		if ( dlight ) then
+			local bone = self:LookupBone("j_spinelower")
+			local pos, ang = self:GetBonePosition(bone)
+			pos = pos + ang:Right()*-8 + ang:Forward()*25
+			dlight.pos = pos
+			dlight.r = 255
+			dlight.g = 255
+			dlight.b = 255
+			dlight.brightness = 10
+			dlight.Decay = 1000
+			dlight.Size = 16
+			dlight.DieTime = CurTime() + 1
+			dlight.dir = ang:Right() + ang:Forward()
+			dlight.innerangle = 1
+			dlight.outerangle = 1
+			dlight.style = 0
+			dlight.noworld = true
+		end
+		
+		--if self.RedEyes then
+			--local eyes = self:GetAttachment(self:LookupAttachment("eyes")).Pos
+			--local leftEye = eyes + self:GetRight() * -1.5 + self:GetForward() * 0.5
+			--local rightEye = eyes + self:GetRight() * 1.5 + self:GetForward() * 0.5
+
+			--local leftEye = self:GetAttachment(self:LookupAttachment("lefteye")).Pos
+			--local rightEye = self:GetAttachment(self:LookupAttachment("righteye")).Pos
+			--cam.Start3D()
+				--render.SetMaterial( eyeGlow )
+				--render.DrawSprite( leftEye, 4, 4, white)
+				--render.DrawSprite( rightEye, 4, 4, white)
+			--cam.End3D()
+		--end
+		if GetConVar( "nz_zombie_debug" ):GetBool() then
+			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+			render.DrawWireframeSphere(self:GetPos(), self:GetAttackRange(), 10, 10, Color(255,165,0), true)
+		end
+		
+		--debugoverlay.Cross(finalpos, 5)
+		--debugoverlay.Line(finalpos, finalpos + ang:Forward()*10, 1, Color(0,255,0))
+		--debugoverlay.Line(finalpos, finalpos + ang:Right()*5, 1, Color(0,255,0))
+		if self:GetBodygroup(2) == 0 then
+			local bone = self:LookupBone("j_faceplate")
+			local pos, ang = self:GetBonePosition(bone)
+			local finalpos = pos + ang:Forward()*20 + ang:Up()*10
+		
+			cam.Start3D2D(finalpos, ang, 1)
+				surface.SetMaterial(lightglow)
+				surface.SetDrawColor(lightyellow)
+				surface.DrawTexturedRect(-50,-10,100,20)
+			cam.End3D2D()
+			
+			ang:RotateAroundAxis(ang:Forward(),90)
+			
+			--debugoverlay.Line(finalpos, finalpos + ang:Forward()*15, 1, Color(255,0,0))
+			--debugoverlay.Line(finalpos, finalpos + ang:Right()*5, 1, Color(255,0,0))
+		
+			cam.Start3D2D(finalpos, ang, 1)
+				surface.SetMaterial(lightglow)
+				surface.SetDrawColor(lightyellow)
+				surface.DrawTexturedRect(-50,-10,100,20)
+			cam.End3D2D()
+		end
+		
+		
+	end
+end
+
+function ENT:OnInjured( dmgInfo )
+	local hitpos = dmgInfo:GetDamagePosition()
+	
+	if !self.HelmetLost then
+		local bone = self:LookupBone("j_faceplate")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
+		
+		if hitpos:DistToSqr(finalpos) < 50 then
+			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
+			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
+				self.HelmetLost = true
+				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
+				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
+				self:SetBodygroup(2, 1)
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				self:ReleasePlayer()
+				self:StopFlames()
+				local id, dur = self:LookupSequence("flinch_head_1")
+				self:ResetSequence(id)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+					self.loco:SetDesiredSpeed(self:GetRunSpeed())
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+				end)
+			end
+		end
+		
+		dmgInfo:ScaleDamage(0.1) -- When the helmet isn't lost, all damage only deals 10%
+	else
+		local bone = self:LookupBone("j_head")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Up()*4
+		
+		if hitpos:DistToSqr(finalpos) < 150 then
+			-- No damage scaling on headshot, we keep it at 1x
+		else
+			dmgInfo:ScaleDamage(0.1) -- When the helmet is lost, a non-headshot still only deals 10%
+		end
+	end
+	
 end
 
 function ENT:OnRemove()
@@ -364,14 +518,41 @@ end
 
 function ENT:StartFlames(time)
 	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
+	self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/start.wav")
+	self:SetFlamethrowing(true)
+	timer.Simple(0.5, function()self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/loop.wav")end)
+	if time then self:TimedEvent(time, function() 
+	self:StopFlames() 
+	self:StopSound("codz_megapack/zmb/ai/mechz2/v2/flame/loop.wav")
+	self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/end.wav")
+	end)
+	end
 end
 
 function ENT:StopFlames()
+self:StopParticles()
+	self:SetFlamethrowing(false)
 	self:SetStop(false)
 end
 
 function ENT:OnThink()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(1.5, function()self:SetSpecialAnimation(false)end)
+end
+if !self:GetSpecialAnimation() then
+if !counting and !dying and !shooting and self:Health() > 0 and !self:GetFlamethrowing() then
+counting = true
+timer.Simple(0.4,function()
+util.ScreenShake(self:GetPos(),4,1000,0.5,2048)
+self:EmitSound("codz_megapack/zmb/ai/mechz2/anim_decepticon_lg_run_0".. math.random(1, 4) ..".wav")
+counting = false
+end)
+end
+end
+
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")
@@ -380,56 +561,18 @@ function ENT:OnThink()
 			if CLIENT then
 				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
 				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
+				ParticleEffectAttach("bo3_panzer_flame",PATTACH_POINT_FOLLOW,self,5)
 			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
 					local tr = util.TraceHull({
 						start = pos,
-						endpos = pos - ang:Forward()*150,
+						endpos = pos - ang:Forward()*300,
 						filter = self,
 						--mask = MASK_SHOT,
 						mins = Vector( -5, -5, -10 ),
 						maxs = Vector( 5, 5, 10 ),
 					})
 					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
+					debugoverlay.Line(pos, pos - ang:Forward()*300)
 					
 					if self:IsValidTarget(tr.Entity) then
 						local dmg = DamageInfo()
@@ -441,7 +584,7 @@ function ENT:OnThink()
 						tr.Entity:TakeDamageInfo(dmg)
 						tr.Entity:Ignite(2, 0)
 					end
-				end
+				
 			end
 			
 			self.NextFireParticle = CurTime() + 0.05
@@ -451,16 +594,12 @@ function ENT:OnThink()
 		self.FireEmitter = nil
 	end
 	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)
 	if CLIENT then return end
 	
-	
+	self:SetBodygroup(2,0)
 	self:SetUsingClaw(false)
 	self:SetStop(false)
 	self.loco:SetDesiredSpeed(self:GetRunSpeed())
@@ -529,7 +668,7 @@ function ENT:OnBarricadeBlocking( barricade )
 			elseif target then -- It is a string or ACT
 				seq, dur = self:LookupSequenceAct(target)
 			else
-				seq, dur = self:LookupSequence("swing")
+				seq, dur = self:LookupSequence("att1")
 			end
 			
 			self:SetAttacking(true)

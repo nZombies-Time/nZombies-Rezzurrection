@@ -130,7 +130,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 
 
 if attacker:HasPerk("pop") then
-			local effect = math.random(11)
+			local effect = math.random(16)
 			 
 			 if  effect == 7 then
 			enemy:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")

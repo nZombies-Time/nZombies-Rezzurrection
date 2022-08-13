@@ -103,13 +103,11 @@ local own = self:GetPos()
 	self.Entity:EmitSound( "ambient/explosions/explode_4.wav" )
 	self.Entity:SetOwner(self.ClayOwner)
 	
-	local detonate = ents.Create( "env_explosion" )
---		detonate:SetOwner(own)
-		detonate:SetPos( self.Entity:GetPos() )
-		detonate:SetKeyValue( "iMagnitude", "150" )
-		detonate:Spawn()
-		detonate:Activate()
-		detonate:Fire( "Explode", "", 0 )
+	local effectdata = EffectData()
+      effectdata:SetOrigin( self:GetPos() )
+      util.Effect("nade_explode", effectdata)
+      util.BlastDamage( self, self.Owner, self:GetPos(), 200, 300 )
+        
 	
 	local shake = ents.Create( "env_shake" )
 		shake:SetOwner( self.ClayOwner )

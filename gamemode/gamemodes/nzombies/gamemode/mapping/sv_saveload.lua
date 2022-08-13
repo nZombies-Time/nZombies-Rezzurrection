@@ -124,7 +124,7 @@ end
 function nzMapping:LoadConfig( name, loader )
 
 	hook.Call("PreConfigLoad")
-
+	
 	local filepath = "nz/" .. name
 	local location = "DATA"
 	local official = false
@@ -251,6 +251,9 @@ function nzMapping:LoadConfig( name, loader )
 		end
 
 		print("[nZ] Finished loading map config.")
+		for i, playr in ipairs( player.GetAll() ) do
+		playr:ChatPrint( "Make sure you press submit on map settings to update your config to the newest gamemode version!" )
+		end
 		hook.Call("PostConfigLoad", nil, true)
 	else
 		print(filepath)
