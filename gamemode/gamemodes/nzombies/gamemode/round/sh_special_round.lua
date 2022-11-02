@@ -378,6 +378,8 @@ nzRound:AddHUDType("Breen Desk", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Castle", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Sus", "nz_zombie_walker", {
+}) 
 
 function nzRound:GetHUDType(id)
 	if id == "Black Ops 3" then
@@ -385,6 +387,9 @@ function nzRound:GetHUDType(id)
 	end
 	if id == "Cold War" then
 	return "cw_hud.png"
+	end
+	if id == "Sus" then
+	return "kawaii_hud.png"
 	end
 	if id == "Breen Desk" then
 	return "BREEN.png"

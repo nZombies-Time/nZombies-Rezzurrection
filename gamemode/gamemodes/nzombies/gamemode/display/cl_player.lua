@@ -25,6 +25,9 @@ function player:GetHUDPointsType(id)
 	if id == "Castle" then
 	 return "bloxo_small.png"
 	end
+	if id == "Sus" then
+	 return "kawaii_hud_score.png"
+	end
 	
 	if id == "Breen Desk" then
 	 return "buried_score1.png"

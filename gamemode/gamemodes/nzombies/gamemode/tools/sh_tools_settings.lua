@@ -687,6 +687,7 @@ nzTools:CreateTool("settings", {
 			presets:AddChoice("Samantha")
 			presets:AddChoice("Avogadro")
 			presets:AddChoice("Warden")
+			presets:AddChoice("Laby")
 			presets.OnSelect = function(self, index, value)
 				if (value == "Richtofen") then
 					colorChoose:SetColor(Color(0, 255, 255))
@@ -694,6 +695,8 @@ nzTools:CreateTool("settings", {
 					colorChoose:SetColor(Color(255, 145, 0))
 				elseif (value == "Avogadro") then
 					colorChoose:SetColor(Color(255, 255, 255))
+				elseif (value == "Laby") then
+					colorChoose:SetColor(Color(34, 177, 76))
 				elseif (value == "Warden") then
 					colorChoose:SetColor(Color(255, 0, 0))	
 				end
