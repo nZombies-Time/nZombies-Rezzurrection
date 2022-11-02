@@ -8,7 +8,6 @@ if SERVER then
 
 			if wep.IsTFAWeapon or wep.CW20Weapon or wep.IsFAS2Weapon then //nz compatible weapons
 				if wep.NZSpecialCategory then return end
-				if nzConfig.WeaponBlackList[wep.ClassName] then return end
 
 				print('Generated random pap camo from config table')
 				print(nzCamos:Get(nzMapping.Settings.PAPcamo).name)
