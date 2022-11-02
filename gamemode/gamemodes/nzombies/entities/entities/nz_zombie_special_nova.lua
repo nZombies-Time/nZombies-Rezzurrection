@@ -319,3 +319,12 @@ function ENT:IsValidTarget( ent )
 	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
+
+function ENT:OnThink()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(0.6, function()self:SetSpecialAnimation(false)end)
+end
+end

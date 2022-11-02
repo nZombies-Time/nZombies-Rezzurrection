@@ -19,7 +19,10 @@ ENT.AttackSequences = {
 }
 
 ENT.DeathSequences = {
-	"death2"
+	"death2",
+	"suicide1",
+	"suicide2",
+	"suicide3"
 }
 
 ENT.AttackSounds = {
@@ -232,17 +235,13 @@ end
 
 function ENT:OnZombieDeath(dmgInfo)
 	dying = true
-	self:ReleasePlayer()
-	self:StopFlames()
+	--self:ReleasePlayer()
+	--self:StopFlames()
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
-	self:Stop()
+	--self:Stop()
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:ResetSequence(seq)
-	self:SetCycle(0)
 
-	timer.Simple(dur, function()
 		if IsValid(self) then
 			
 			util.ScreenShake(self:GetPos(),12,400,3,1000)
@@ -274,7 +273,7 @@ function ENT:OnZombieDeath(dmgInfo)
 			--util.Effect("Explosion", effectData)
 			self:Remove()
 		end
-	end)
+	
 
 end
 
@@ -317,14 +316,10 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
-    local atkData = {}
-    atkData.dmglow = 10
-    atkData.dmghigh = 20
-    atkData.dmgforce = Vector( 0, 0, 0 )
-    atkData.dmgdelay = 1.0
-    self:Attack( atkData )
+ self:Attack( )
+  self:OnZombieDeath()
+	--self:TimedEvent(0.7, function()    self:OnZombieDeath() end)
 
-    self:OnZombieDeath()
 end
 
 function ENT:OnPathTimeOut()
@@ -388,6 +383,11 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+end
 if !counting and !dying and self:Health() > 0 then
 counting = true
 timer.Simple(0.8,function()

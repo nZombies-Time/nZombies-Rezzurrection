@@ -211,6 +211,27 @@ function nzMapping:AmmoBox(pos, ang, model, ply)
 	return ammobox
 end
 
+function nzMapping:StinkyLever(pos, ang, ply)
+	local category5 = ents.Create( "stinky_lever" )
+	category5:SetPos( pos )
+	category5:Setohfuck( false )
+	category5:SetAngles( ang )
+	category5:Spawn()
+
+	local phys = category5:GetPhysicsObject()
+	if phys:IsValid() then
+		phys:EnableMotion(false)
+	end
+
+	if ply then
+		undo.Create( "Suffering Amplification Device" )
+			undo.SetPlayer( ply )
+			undo.AddEntity( category5 )
+		undo.Finish( "Effect" )
+	end
+	return category5
+end
+
 function nzMapping:Ending(pos, ang, price, ply)
 	local ending = ents.Create( "buyable_ending" )
 	ending:SetPos( pos )
@@ -567,8 +588,8 @@ function nzMapping:SpawnEffect( pos, ang, model, ply )
 
 end
 	
-function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype,anim,cd,kino, kinodur, ply )
-
+function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype,anim,cd,kino, kinodur,buyable, ply )
+print(buyable)
 	local tele = ents.Create("nz_teleporter")
 	tele:SetPos(pos)
 	tele:SetAngles( ang )
@@ -580,6 +601,7 @@ function nzMapping:Teleporter( pos, ang,dest,id,price,modeltype,anim,cd,kino, ki
 	tele:SetCooldownTime(cd)
 	tele:SetKino(kino)
 	tele:SetKinodelay(kinodur)
+	tele:SetUsable(buyable)
 	tele:TurnOff()
 	tele:Spawn()
 	local phys = tele:GetPhysicsObject()

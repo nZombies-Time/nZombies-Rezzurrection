@@ -192,15 +192,15 @@ function ENT:OnSpawn()
 	if coroutine.running() then
 		
 		local pos = self:GetPos() + (seq == "attack3" and Vector(0,0,100) or Vector(0,0,450))
-		for i=1,4 do
-			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
-		end
+		
+			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(1),20,0)),Angle(0,0,0),nil)
+		
 		util.ScreenShake(self:GetPos(),5,1000,1.2,2048)
-		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
+	
 		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
 		counting = true
 	self:SetInvulnerable(true)
-		
+		self:SetSpecialAnimation(true)
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
 		effectData:SetOrigin( pos )
@@ -211,6 +211,7 @@ function ENT:OnSpawn()
 			--dust cloud
 			self:SetPos(self:GetPos() + Vector(0,0,0))
 			self:SetInvulnerable(false)
+			self:SetSpecialAnimation(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
@@ -396,15 +397,29 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
+
 function ENT:OnThink()
-if !self:IsAttacking() and !counting and !dying then
+
+if self:IsAttacking() and self and self:IsValid() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+timer.Simple(1.1, function()self:SetSpecialAnimation(false)end)
+end
+if !self:GetSpecialAnimation() then
+if !counting and !dying and self:Health() > 0 then
 counting = true
-timer.Simple(0.8,function()
+timer.Simple(1,function()
+if self and self:IsValid() then
 self:EmitSound("brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".wav")
 util.ScreenShake(self:GetPos(),5,1000,0.5,2048)
 counting = false
+end
 end)
-			end
+end
+end
+
+
+
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

@@ -10,72 +10,60 @@ ENT.Instructions	= ""
 ENT.Rotated = false
 
 function ENT:SetupDataTables()
-
 	self:NetworkVar( "Bool", 0, "Open" )
-
 end
 
 function ENT:Initialize()
-		
-		if (nzMapping.Settings.boxtype =="Original") then
-	self:SetModel("models/hoff/props/mysterybox/box.mdl")
+	if (nzMapping.Settings.boxtype =="Original") then
+		self:SetModel("models/hoff/props/mysterybox/box.mdl")
 	end
 	if (nzMapping.Settings.boxtype =="Origins") then
-	self:SetModel( "models/nzr/originsbox/box.mdl" )
+		self:SetModel( "models/nzr/originsbox/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/nzr/2022/box/motd.mdl" )
-	--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
+		self:SetModel( "models/nzr/2022/box/motd.mdl" )
+		--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
-	self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
+		self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
-	self:SetModel( "models/nzr/re/box.mdl" )
+		self:SetModel( "models/nzr/re/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == nil) then
-	self:SetModel("models/hoff/props/mysterybox/box.mdl")
+		self:SetModel("models/hoff/props/mysterybox/box.mdl")
 	end
-	
 	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
-	self:SetModel( "models/nzr/2022/box/ww2.mdl" )
+		self:SetModel( "models/nzr/2022/box/ww2.mdl" )
 	end
-	
 	if (nzMapping.Settings.boxtype == "DOOM") then
-	self:SetModel( "models/nzr/2022/box/DOOM_on.mdl" )
+		self:SetModel( "models/nzr/2022/box/DOOM_on.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
-	self:SetModel( "models/nzr/2022/box/soe.mdl" )
+		self:SetModel( "models/nzr/2022/box/soe.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Chaos") then
-	self:SetModel( "models/nzr/2022/box/chaos.mdl" )
+		self:SetModel( "models/nzr/2022/box/chaos.mdl" )
 	end
 	
-		self:PhysicsInit( SOLID_VPHYSICS )
+	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
-	
-	--[[local phys = self:GetPhysicsObject()
-	if (phys:IsValid()) then
-		phys:Wake()
-	end]]
 
 	self:DrawShadow( false )
-	--self:AddEffects( EF_ITEM_BLINK )
 	self:SetOpen(false)
 	self.Moving = false
 	self:Activate()
+
 	if SERVER then
 		self:SetUseType( SIMPLE_USE )
 	end
-	
 	
 	if CLIENT then
 		self.Light = ClientsideModel("models/effects/vol_light128x512.mdl")
 		local ang = self:GetAngles()
 		self.Light:SetAngles(Angle(0, ang[2], 180))
 		self.Light:SetPos(self:GetPos() - Vector(0,0,50))
-		--self.Light:SetParent(self)
 		local defaultColor = Color(0, 150,200,255)
 		local lightColor = !IsColor(nzMapping.Settings.boxlightcolor) and defaultColor or nzMapping.Settings.boxlightcolor
 		self.Light:SetColor(nzMapping.Settings.boxlightcolor)
@@ -88,7 +76,7 @@ function ENT:Initialize()
 		mat:Scale( scale )
 		self.Light:EnableMatrix( "RenderMultiply", mat )
 		
-			self.Light:Spawn()
+		self.Light:Spawn()
 	end
 end
 
@@ -98,16 +86,13 @@ function ENT:Use( activator, caller )
 		nzSounds:PlayEnt("Open", self)
 	end
 	self:BuyWeapon(activator)
-	-- timer.Simple(5,function() self:MoveAway() end)
 end
 
 function ENT:BuyWeapon(ply)
 	ply:Buy(nzPowerUps:IsPowerupActive("firesale") and 10 or 950, self, function()
         local class = nzRandomBox.DecideWep(ply)
         if class != nil then
-      		--ply:TakePoints(nzPowerUps:IsPowerupActive("firesale") and 10 or 950)
 			local ang = self:GetAngles()
-			--ParticleEffect("bo3_napalm_fs", self:GetPos() + ang:Up()*44 + ang:Forward()*13, ang,self)
       		self:Open()
       		local wep = self:SpawnWeapon( ply, class )
 			wep.Buyer = ply
@@ -120,10 +105,10 @@ function ENT:BuyWeapon(ply)
 end
 
 function ENT:Open()
-if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-self.FlamesEnt = ents.Create("env_fire")
-self.FlamesEntL = ents.Create("env_fire")
-self.FlamesEntR = ents.Create("env_fire")
+	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+		self.FlamesEnt = ents.Create("env_fire")
+		self.FlamesEntL = ents.Create("env_fire")
+		self.FlamesEntR = ents.Create("env_fire")
 		if IsValid( self.FlamesEnt ) then
 			self.FlamesEnt:SetParent(self)
 			self.FlamesEnt:SetOwner(self)
@@ -139,7 +124,6 @@ self.FlamesEntR = ents.Create("env_fire")
 			self.FlamesEnt:Activate()
 		end
 		
-		
 		if IsValid( self.FlamesEntR ) then
 			self.FlamesEntR:SetParent(self)
 			self.FlamesEntR:SetOwner(self)
@@ -154,7 +138,7 @@ self.FlamesEntR = ents.Create("env_fire")
 			self.FlamesEntR:Spawn()
 			self.FlamesEntR:Activate()
 		end
-		
+
 		if IsValid( self.FlamesEntL ) then
 			self.FlamesEntL:SetParent(self)
 			self.FlamesEntL:SetOwner(self)
@@ -165,35 +149,29 @@ self.FlamesEntR = ents.Create("env_fire")
 			self.FlamesEntL:SetKeyValue("fireattack", 0)
 			self.FlamesEntL:SetKeyValue("health", 0)
 			self.FlamesEntL:SetKeyValue("damagescale", "-10") -- only neg. value prevents dmg
-
 			self.FlamesEntL:Spawn()
 			self.FlamesEntL:Activate()
 		end
-		end
+	end
+
 	local sequence = self:LookupSequence("Close")
-	--self:ResetSequence(sequence)
 	self:SetPlaybackRate( 0.1 )
 	self:SetSequence( sequence )
-	--self:RemoveEffects( EF_ITEM_BLINK )
-
 	self:SetOpen(true)
 end
 
 function ENT:Close()
- --self:StopParticles()
- if (nzMapping.Settings.boxtype =="Mob of the Dead") then
- self.FlamesEnt:Remove()
+	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
+		self.FlamesEnt:Remove()
 		self.FlamesEnt = nil
 		self.FlamesEntL:Remove()
 		self.FlamesEntL = nil
 		self.FlamesEntR:Remove()
 		self.FlamesEntR = nil
-		end
-	local sequence = self:LookupSequence("Open")
-	--self:ResetSequence(sequence)
-	self:SetSequence( sequence )
-	--self:AddEffects( EF_ITEM_BLINK )
+	end
 
+	local sequence = self:LookupSequence("Open")
+	self:SetSequence( sequence )
 	self:SetOpen(false)
 	nzSounds:PlayEnt("Close", self)
 end
@@ -203,18 +181,23 @@ function ENT:SpawnWeapon(activator, class)
 	local ang = self:GetAngles()
 	wep:SetAngles( ang )
 	if (nzMapping.Settings.boxtype =="Original") then
-	wep:SetPos( self:GetPos() + ang:Up()*17 )
+		wep:SetPos( self:GetPos() + ang:Up()*17 )
 	else
-	wep:SetPos( self:GetPos() + ang:Up()*30 )
+		wep:SetPos( self:GetPos() + ang:Up()*30 )
 	end
+
 	wep:SetWepClass(class)
+	wep:SetBuyer(activator)
+
 	wep:Spawn()
-	wep.Buyer = activator
-	--wep:SetParent( self )
+
 	wep.Box = self
-	--wep:SetAngles( self:GetAngles() )
-	--self:EmitSound("nz/randombox/random_box_jingle.wav")
-	nzSounds:PlayEnt("Jingle", self)
+	if activator:HasPerk("speed") and activator:HasUpgrade("speed") then
+		self:EmitSound("nz/randombox/music_box_00_fast.wav")
+	else
+		nzSounds:PlayEnt("Jingle", self)
+	end
+
 	return wep
 end
 
@@ -229,19 +212,20 @@ function ENT:Think()
 end
 
 function ENT:MoveAway()
-	--nzNotifications:PlaySound("nz/randombox/Announcer_Teddy_Zombies.wav", 0)
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self.FlamesEnt:Remove()
+		self.FlamesEnt:Remove()
 		self.FlamesEnt = nil
 		self.FlamesEntL:Remove()
 		self.FlamesEntL = nil
 		self.FlamesEntR:Remove()
 		self.FlamesEntR = nil
-		end
+	end
+
 	self.Moving = true
 	self:SetSolid(SOLID_NONE)
 	local s = 0
 	local ang = self:GetAngles()
+
 	-- Shake Effect
 	nzSounds:PlayEnt("Shake", self)
 	timer.Create( "shake", 0.1, 300, function()
@@ -273,58 +257,54 @@ function ENT:MoveAway()
 
 	-- Move Up
 	if (nzMapping.Settings.boxtype =="Dead Space") or (nzMapping.Settings.boxtype =="Shadows of Evil")  then
-	self.Moving = false
-			timer.Destroy("moveAway")
-			timer.Destroy("shake")
+		self.Moving = false
+		timer.Destroy("moveAway")
+		timer.Destroy("shake")
 
-			self.SpawnPoint.Box = nil
-			--self.SpawnPoint:SetBodygroup(1,0)
-			self:MoveToNewSpot(self.SpawnPoint)
-			--self:EmitSound("nz/randombox/poof.wav")
-			nzSounds:PlayEnt("Poof", self)
-			self:Remove()
+		self.SpawnPoint.Box = nil
+		self:MoveToNewSpot(self.SpawnPoint)
+		nzSounds:PlayEnt("Poof", self)
+		self:Remove()
 	else
-	timer.Simple( 1, function()
-		timer.Create( "moveAway", 5, 1, function()
-			self.Moving = false
-			timer.Destroy("moveAway")
-			timer.Destroy("shake")
+		timer.Simple( 1, function()
+			timer.Create( "moveAway", 5, 1, function()
+				self.Moving = false
+				timer.Destroy("moveAway")
+				timer.Destroy("shake")
 
-			self.SpawnPoint.Box = nil
-			--self.SpawnPoint:SetBodygroup(1,0)
-			self:MoveToNewSpot(self.SpawnPoint)
-			--self:EmitSound("nz/randombox/poof.wav")
-			nzSounds:PlayEnt("Poof", self)
-			self:Remove()
-		end)
-		--print(self:GetMoveType())
-		self:SetMoveType(MOVETYPE_FLY)
-		self:SetGravity(0.1)
-		self:SetNotSolid(true)
-		self:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
-		self:GetPhysicsObject():SetDamping(100, 0)
-		self:CollisionRulesChanged()
-		self:SetLocalVelocity(ang:Up()*100)
-		timer.Simple(1.5, function()
-			self:SetLocalVelocity( Vector(0,0,0) )
-			self:SetVelocity( Vector(0,0,0) )
+				self.SpawnPoint.Box = nil
+				self:MoveToNewSpot(self.SpawnPoint)
+				nzSounds:PlayEnt("Poof", self)
+				self:Remove()
+			end)
+
 			self:SetMoveType(MOVETYPE_FLY)
-			self:Open()
-			self:SetLocalAngularVelocity( Angle(0, 0, 250) )
-			timer.Simple(0.5, function()
-				self:SetLocalAngularVelocity( Angle(0, 0, 500) )
+			self:SetGravity(0.1)
+			self:SetNotSolid(true)
+			self:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
+			self:GetPhysicsObject():SetDamping(100, 0)
+			self:CollisionRulesChanged()
+			self:SetLocalVelocity(ang:Up()*100)
+			timer.Simple(1.5, function()
+				self:SetLocalVelocity( Vector(0,0,0) )
+				self:SetVelocity( Vector(0,0,0) )
+				self:SetMoveType(MOVETYPE_FLY)
+				self:Open()
+				self:SetLocalAngularVelocity( Angle(0, 0, 250) )
 				timer.Simple(0.5, function()
-					self:SetLocalAngularVelocity( Angle(0, 0, 750) )
-					timer.Simple(0.2, function()
-						self:SetLocalAngularVelocity( Angle(0, 0, 1000) )
+					self:SetLocalAngularVelocity( Angle(0, 0, 500) )
+					timer.Simple(0.5, function()
+						self:SetLocalAngularVelocity( Angle(0, 0, 750) )
 						timer.Simple(0.2, function()
-							self:SetLocalAngularVelocity( Angle(0, 0, 2000) )
+							self:SetLocalAngularVelocity( Angle(0, 0, 1000) )
+							timer.Simple(0.2, function()
+								self:SetLocalAngularVelocity( Angle(0, 0, 2000) )
+							end)
 						end)
 					end)
 				end)
 			end)
 		end)
-	end)
 	end
 end
 
@@ -351,9 +331,7 @@ end
 if CLIENT then
 	function ENT:Draw()
 		self:DrawModel()
-	
 	end
-
 	--[[hook.Add( "PostDrawOpaqueRenderables", "random_box_beam", function()
 		for k,v in pairs(ents.FindByClass("random_box")) do
 			if ( LocalPlayer():GetPos():Distance( v:GetPos() ) ) > 750 then
@@ -364,7 +342,6 @@ if CLIENT then
 			end
 		end
 	end )]]
-
 end
 
 function ENT:OnRemove()
@@ -376,8 +353,9 @@ function ENT:OnRemove()
 		if IsValid(self.SpawnPoint) then
 			--self.SpawnPoint.Box = nil
 			if (nzMapping.Settings.boxtype =="Resident Evil" or nzMapping.Settings.boxtype =="Call of Duty: WW2" or nzMapping.Settings.boxtype =="DOOM" or nzMapping.Settings.boxtype =="Chaos" ) then
-			self.SpawnPoint:SetModelScale(1, 0 )
+				self.SpawnPoint:SetModelScale(1, 0 )
 			end
+			
 			self.SpawnPoint:SetBodygroup(1,0)
 		end
 	end

@@ -135,9 +135,9 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(400)
-		self:SetHealth(140)
-		self:SetMaxHealth(140)
+		self:SetRunSpeed(240)
+		self:SetHealth(50)
+		self:SetMaxHealth(50)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -260,8 +260,9 @@ function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
+	if math.random(0,5) == 4 and CurTime() > self.NextClawTime then
 		-- Claw
+		print("fuck")
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
@@ -270,65 +271,46 @@ function ENT:OnPathTimeOut()
 			})
 			
 			
+			
+			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				timer.Simple(22/55, function()
-				self:EmitSound("roach/bo3/spider/spd_attack_0"..math.random(3)..".mp3")
-		self:StopParticles()
+				local fuck = self:GetGroundEntity( nil )
+				self:EmitSound("npc/antlion/digup1.wav")
+				local dir = (tr.Entity:GetPos() + Vector(0,0,50)) - self:GetPos():GetNormalized()
+				self:SetGroundEntity( nil )
+				self:SetPos( self:GetPos() + Vector(0,0,50))
+				self.loco:SetVelocity( (self:GetForward() * 1000) + Vector(0,0,200) )
+				--self:SetAbsVelocity( Vector( 0, 0, 100) )
+				-- local phys = self:GetPhysicsObject()
+				--phys:SetVelocity(  Vector( 0, 0, 1000) )
+				--self:SetVelocity( Vector( 0, 0, 1000))
+				--self:SetLocalVelocity(dir * 5)
+				--self.loco:SetVelocity( Vector( 0, 0, 1000) )
+				
+				timer.Simple(2, function()
+		if IsValid(self) then
+			--self:SetGroundEntity( fuck )
+		end
 	end)
-				timer.Simple(1, function()self.ClawHook = ents.Create("nz_spider_goo")end)
-				timer.Simple(1, function()self.ClawHook:SetPos(self:LocalToWorld(Vector(0,0,80)))end)
-				timer.Simple(1, function()self.ClawHook:Spawn()end)
-				timer.Simple(1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot_web")
-				self.loco:SetDesiredSpeed(0)
+				--self.loco:SetDesiredSpeed( 450 )
+	--self.loco:SetAcceleration( 5000 )
+	--self:SetJumping( true )
+	--self:SetSolidMask( MASK_NPCSOLID_BRUSHONLY )
+	--self.loco:Jump()
+	--Boost them
+	--self.loco:SetVelocity( self:GetForward() * 5 )
+				--self:SetAngles(((dir)):Angle()+  Angle( 50, 0, 0 ))
+				--self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				--self:PlaySequenceAndWait("jump")
+				--self.loco:SetDesiredSpeed(0)
 				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
 				
-				local seq = "idle"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(1, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
+				self.NextAction = CurTime() + math.random(1, 3)
+				self.NextClawTime = CurTime() + math.random(5, 10)
 			end
 		end
 	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
+		
 	end
 end
 
@@ -375,92 +357,14 @@ function ENT:OnContact( ent )
 		
 	end
 end
- 
+
 function ENT:OnThink()
-
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("b_Root")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+--self.loco:SetDesiredSpeed(0)
+--self:SetVelocity(Vector(0,0,0))
+timer.Simple(1, function()self:SetSpecialAnimation(false)end)
+end
 end
 
 function ENT:GrabPlayer(ply)

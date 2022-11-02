@@ -38,15 +38,17 @@ function EFFECT:Think( )
 			self.NextParticle = CurTime() + self.ParticleDelay
 		end
 	end
-	self.Emitter:SetPos( (self.Catcher:GetPos()-self.Emitter:GetPos()):GetNormal() * self.MoveSpeed * FrameTime() + self.Emitter:GetPos() )
-	if self.Emitter:GetPos():DistToSqr(self.Catcher:GetPos()) <= self.DistToCatch then
-		self.Catcher:CollectSoul()
-		return false
-	else
-		return true
-	end
+	if self.Catcher:IsValid() then
+	    self.Emitter:SetPos( (self.Catcher:GetPos()-self.Emitter:GetPos()):GetNormal() * self.MoveSpeed * FrameTime() + self.Emitter:GetPos() )
+	    
+		if self.Emitter:GetPos():DistToSqr(self.Catcher:GetPos()) <= self.DistToCatch then
+		    --self.Catcher:CollectSoul()
+		    return false
+	    else
+		    return true
+	    end
+    end
 end
-
 --[[---------------------------------------------------------
    Draw the effect
 -----------------------------------------------------------]]

@@ -7,7 +7,7 @@ nzTraps:Register("nz_trap_turret")
 
 ENT.Author = "Ethorbit"
 ENT.PrintName = "Turret"
-ENT.SpawnIcon = "models/codbo/other/autoturret.mdl"
+ENT.SpawnIcon = "models/nzr/2022/traps/autoturret.mdl"
 ENT.Description = "Auto Turret that shoots enemies around it."
 
 ENT.Type = "anim"
@@ -37,7 +37,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
-	self:SetModel( "models/codbo/other/autoturret.mdl" )
+	self:SetModel( "models/nzr/2022/traps/autoturret.mdl" )
 	self:SetModelScale(1.5)
 	self.fLastTargetCheck = CurTime()
 	self.fNextFire = CurTime()

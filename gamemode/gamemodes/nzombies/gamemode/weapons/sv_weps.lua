@@ -118,6 +118,7 @@ local function OnWeaponAdded( weapon )
 			weapon:ApplyNZModifier("equip")
 			if  weapon.Base == "arccw_base" then
 			ply:StripWeapon( weapon:GetClass() )
+			ply:EmitSound("arccw.wav",511)
 			ply:ChatPrint( "Maybe next time you'll follow directions. Go use TFA." )
 			end
 		end)

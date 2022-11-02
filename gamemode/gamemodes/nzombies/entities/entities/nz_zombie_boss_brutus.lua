@@ -46,11 +46,15 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"cb/step1.mp3",
-	"cb/step2.mp3",
-	"cb/step3.mp3",
-	"cb/step4.mp3",
-	"cb/step5.mp3"
+	"cb/taunt1.wav",
+	"cb/taunt2.wav",
+	"cb/taunt3.wav",
+	"cb/taunt4.wav",
+	"cb/taunt5.wav",
+	"cb/taunt6.wav",
+	"cb/taunt7.wav",
+	"cb/taunt8.wav",
+	"cb/taunt9.wav"
 }
 
 ENT.ActStages = {
@@ -393,7 +397,7 @@ end
 function ENT:OnInjured(dmg)
 	if helmet then
 	dmg:ScaleDamage(0.5)
-	if self:Health() < 2000 then
+	if self:Health() < 3500 then
 	helmet = false
 	end
 	else
@@ -410,10 +414,23 @@ end
 end
 
 function ENT:OnThink()
-
-if math.random(0,2500) == 1 then
-self:EmitSound("cb/taunt"..math.random(1,6)..".mp3")
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(1, function()self:SetSpecialAnimation(false)end)
 end
+if !self:GetSpecialAnimation() then
+if !counting and !dying and self:Health() > 0 then
+counting = true
+timer.Simple(0.8,function()
+self:EmitSound("cb/step"..math.random(1,5)..".mp3")
+util.ScreenShake(self:GetPos(),5,500,0.5,1024)
+counting = false
+end)
+end
+end
+
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

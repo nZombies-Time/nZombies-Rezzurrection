@@ -65,11 +65,11 @@ ENT.ActStages = {
 	},
 	[2] = {
 		act = ACT_RUN,
-		minspeed = 150,
+		minspeed = 80,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 180
+		minspeed = 120
 	}
 }
 
@@ -142,7 +142,7 @@ end
 function ENT:StatsInitialize()
 	if SERVER then
 		
-		self:SetRunSpeed(35)
+		self:SetRunSpeed(50)
 		self:SetHealth(9000)
 		self:SetMaxHealth(90000)
 		dying = false
@@ -212,6 +212,8 @@ function ENT:OnSpawn()
 			effectData:SetMagnitude(1)
 			self.loco:SetDesiredSpeed(35)
 		end)
+		timer.Simple(45, function() self:SetRunSpeed(180) end)
+		
 		self:PlaySequenceAndWait(seq)
 	end
 end
@@ -325,12 +327,20 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-if !self:IsAttacking() and !counting and !dying and self:Health() >= 1 and self.ZombieAlive then
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(1, function()self:SetSpecialAnimation(false)end)
+end
+if !self:GetSpecialAnimation() then
+if !counting   and self:Health() > 0 then
 counting = true
-timer.Simple(1,function()
+timer.Simple(0.9,function()
 self:EmitSound("divider/footstep/divider_body_footstep-0"..math.random(1,9)..".wav")
 counting = false
 end)
+end
 end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then

@@ -287,7 +287,8 @@ atkData.dmglow = 1
 	atkData.dmgdelay = 1
 		self:Attack( atkData )
 		screaming = false
-		self.loco:SetDesiredSpeed(300)
+		self.loco:SetDesiredSpeed(275)
+		self:SetSpecialAnimation(false)
 	
 end
 
@@ -353,9 +354,9 @@ end
 
 function ENT:OnThink()
  if self:IsAttacking() then
+ self:SetSpecialAnimation(true)
  	self.loco:SetDesiredSpeed(0)
 	if !screaming then
-
 	screaming = true
 		timer.Simple(0.6,function() 
 			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do

@@ -223,7 +223,7 @@ function ENT:OnSpawn()
 			effectData:SetMagnitude(1)
 			self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
 		self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
-			for i=1,8 do
+			for i=1,4 do
 			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
 			
@@ -292,97 +292,135 @@ end
 
 function ENT:OnTargetInAttackRange()
     local atkData = {}
-    atkData.dmglow = 140
-    atkData.dmghigh = 140
+    atkData.dmglow = 90
+    atkData.dmghigh = 90
     atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 0.5
     self:Attack( atkData )
 	
 end
 
-function ENT:OnPathTimeOut()
 
+function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Roar
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-		
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-			ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)
-			self:EmitSound("roach/bo3/thrasher/vox/enrage"..math.random(6)..".mp3")
-			self.loco:SetDesiredSpeed(0)
-			
-			 local atkData = {}
-					self.AttackSequences = {
-						{seq = "enrage"}
-										}
-			 self:SetAttackRange(200)
-				atkData.dmglow = 40
-				atkData.dmghigh = 60
-				atkData.dmgforce = Vector( 0, 0, 0 )
-				atkData.dmgdelay = 0.5
-				self:Attack( atkData )
-		
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-					local id, dur = self:LookupSequence("enrage")
-			
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-			self:SetAttackRange(140)
-			self.AttackSequences = {
-						{seq = "melee1"},
-						{seq = "melee2"}
-										}
-				self.loco:SetDesiredSpeed(350)
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
+	if math.random(0,10) == 11 and CurTime() > self.NextFlameTime   then
+		-- Eat downed players
+		for k,v in pairs(player.GetAll()) do
+			if v:GetNotDowned() then
+				else
+				self:SetTarget(v)
+				target = self:GetTarget()
 			end
 		end
-	elseif math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Useless Removed flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+		if math.random(1,100) == 69 then
+			self:EmitSound("Thrasher_roar_laby.wav",511)
+		else
+			self:EmitSound("roach/bo3/thrasher/vox/enrage"..math.random(6)..".mp3",511)
+		end
 			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+		self:Stop()
+		self:SetSpecialAnimation(true)
+		self:SetBlockAttack(true)
+		timer.Simple(0.2, function()
+			ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)				
+		end)
+		self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+		self.loco:SetDesiredSpeed(0)	
+		self:PlaySequenceAndWait("enrage")
+		timer.Simple(1, function()
+				self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
+				self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
+					for i=1,4 do
+						ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
+					end
+			end)
+				self:PlaySequenceAndWait("teleport_in")
+				self:SetPos( target:GetPos() + (Vector(60,60,0)) )
+				self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(2)..".mp3",511)
+		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
+					
+				local ang1 = (target:GetPos() - self:GetPos()):Angle()
+				self:SetAngles(Angle(ang1[1], ang1[2] + 10, ang1[3]))
+				self:PlaySequenceAndWait("teleport_out")
+				
+				local ang2 = (target:GetPos() - self:GetPos()):Angle()
+				self:SetAngles(Angle(ang2[1], ang2[2] + 10, ang2[3]))
+				timer.Simple(2, function()
+						if target:GetNotDowned() then
+						else
+						local succ = self:GetBonePosition( 27 )
+						self:EmitSound("exploder/explode/brute_armour_slide_flesh_00.wav")
+						self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav")
+						self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav")
+						self:EmitSound("exploder/explode/brute_belly_puss_shared_01.wav")
+						self:EmitSound("exploder/explode/brute_puss_bomb_l_shared_00.wav")
+						self:EmitSound("divider/divider_merge_18.wav")
+						self:EmitSound("divider/divider_merge_18.wav")
+						self:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
+						ParticleEffect("divider_slash2",succ,Angle(0,0,0),nil)
+						ParticleEffect("divider_slash3",succ,Angle(0,0,0),nil)
+						ParticleEffect("baby_dead",succ,Angle(0,0,0),nil)
+						target:Kill()
+						end
+				end)
+				
+				self:PlaySequenceAndWait("consume")
+				
+
+				self:StartActivity( ACT_RUN )
+				self.loco:SetDesiredSpeed( 300 )
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
-			end)
 			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextFlameTime = CurTime() + math.random(1, 10)
+			
+		
+	elseif  math.random(0,10) == 2 and CurTime() > self.NextFlameTime   then
+	--YOU CAN'T ESCAPE
+			self:Stop()
+			self:SetSpecialAnimation(true)
+					self:SetBlockAttack(true)
+				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				
+			self.loco:SetDesiredSpeed(0)
+				
+				timer.Simple(1, function()
+					self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
+					self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
+						for i=1,4 do
+			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
-	end
+			
+					
+			end)
+				self:PlaySequenceAndWait("teleport_in")
+				self:SetPos( target:GetPos() + (Vector(60,60,0)) )
+					self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(2)..".mp3",511)
+		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
+					
+			
+				local ang1 = (target:GetPos() - self:GetPos()):Angle()
+				self:SetAngles(Angle(ang1[1], ang1[2] + 10, ang1[3]))
+				self:PlaySequenceAndWait("teleport_out")
+				
+				local ang2 = (target:GetPos() - self:GetPos()):Angle()
+				self:SetAngles(Angle(ang2[1], ang2[2] + 10, ang2[3]))
+				self:StartActivity( ACT_RUN )
+				self.loco:SetDesiredSpeed( 300 )
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				self:StopFlames()
+			
+				self.NextAction = CurTime() + math.random(1, 5)
+			self.NextFlameTime = CurTime() + math.random(1, 8)
 end
 
+end
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
 	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
@@ -440,13 +478,26 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-if !counting and !dying and self:Health() > 0 then
+if self and self:IsValid() then
+if self and self:IsValid() and self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(0.8, function()self:SetSpecialAnimation(false)end)
+end
+if self and !self:GetSpecialAnimation() then
+if self and self:IsValid() and !counting and !dying and self:Health() > 0 then
 counting = true
 timer.Simple(0.7,function()
+if self and self:IsValid() then
 self:EmitSound("roach/bo3/thrasher/fall_0"..math.random(1,3)..".mp3")
 counting = false
+end
 end)
 end
+end
+end
+
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

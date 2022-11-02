@@ -6,13 +6,13 @@ nzTools:CreateTool("teleporter", {
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
 		local ent = tr.Entity
-		print(data.gif)
+		--print(data.gif)
 		if IsValid(ent) and ent:GetClass() == "nz_teleporter" then
-			nzMapping:Teleporter(ent:GetPos(), ent:GetAngles(), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
+			nzMapping:Teleporter(ent:GetPos(), ent:GetAngles(), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay,data.buyable, ply)
 			
 			ent:Remove()
 		else
-			nzMapping:Teleporter(tr.HitPos, Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay, ply)
+			nzMapping:Teleporter(tr.HitPos, Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.destination, data.id,data.price,data.mdl,data.gif,data.cooldown, data.kino,data.kinodelay,data.buyable, ply)
 		end
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
@@ -47,6 +47,7 @@ nzTools:CreateTool("teleporter", {
 		valz["Row6"] = data.cooldown
 		valz["Row7"] = data.kino
 		valz["Row8"] = data.kinodelay
+		valz["Row9"] = data.buyable
 		
 
 		local DProperties = vgui.Create( "DProperties", frame )
@@ -62,6 +63,7 @@ nzTools:CreateTool("teleporter", {
 			data.cooldown = valz["Row6"]
 			data.kino = valz["Row7"]
 			data.kinodelay = valz["Row8"]
+			data.buyable = valz["Row9"]
 
 			--PrintTable(data)
 			
@@ -112,6 +114,11 @@ nzTools:CreateTool("teleporter", {
 		Row8:Setup( "Integer" )
 		Row8:SetValue( valz["Row8"] )
 		Row8.DataChanged = function( _, val ) valz["Row8"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
+		local Row9 = DProperties:CreateRow( "Teleporter", "Purchaseable?" )
+		Row9:Setup( "Boolean" )
+		Row9:SetValue( valz["Row9"] )
+		Row9.DataChanged = function( _, val ) valz["Row9"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
 		return DProperties
 	end,
@@ -123,6 +130,7 @@ nzTools:CreateTool("teleporter", {
 		gif =1,
 		cooldown = 30,
 		kino = false,
-		kinodelay = 0
+		kinodelay = 0,
+		buyable = false
 	}
 })

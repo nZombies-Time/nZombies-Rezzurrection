@@ -239,7 +239,7 @@ function wepmeta:ApplyNZModifier(modifier, blocknetwork)
 		end
 		
 		if !modded then
-			if (modifier == "pap" and self.OnPaP and self:OnPaP()) or (modifier == "repap" and self.OnRePaP and self.OnRePaP()) then
+			if (modifier == "pap" and self.OnPaP and self:OnPaP()) or (modifier == "repap" and self.OnRePaP and self:OnRePaP()) then
 				modded = true
 			end
 		end

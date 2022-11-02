@@ -94,16 +94,16 @@ function ENT:Use( activator, caller )
 	if CurTime() > self.NextPlank then
 		if self:GetHasPlanks() and self:GetNumPlanks() < GetConVar("nz_difficulty_barricade_planks_max"):GetInt() then
 			self:AddPlank()
-					if activator:HasPerk("amish") then
-					if activator:HasUpgrade("amish") and math.random(1,4) == 2 then
+			if activator:HasPerk("amish") then
+				if activator:HasUpgrade("amish") and math.random(1,4) == 2 then
 					activator:GivePoints(115)
-					end
-					activator:GivePoints(30)
-					else
-                  activator:GivePoints(10)
-				  end
-				  activator:EmitSound("nz/effects/repair_ching.wav")
-			self.NextPlank = CurTime() + 1
+				end
+				activator:GivePoints(30)
+			else
+				activator:GivePoints(10)
+			end
+			activator:EmitSound("nz/effects/repair_ching.wav")
+			self.NextPlank = CurTime() + (activator:HasUpgrade("speed") and 2/3 or 1)
 		end
 	end
 end

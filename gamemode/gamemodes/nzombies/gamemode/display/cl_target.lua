@@ -76,6 +76,12 @@ end
 			return text
 		
 	end,
+	["stinky_lever"] = function(ent)
+		
+			local text = "Press E to hasten your demise"
+			return text
+		
+	end,
 	["random_box"] = function(ent)
 		if !ent:GetOpen() then
 			local text = nzPowerUps:IsPowerupActive("firesale") and "Press E to buy a random weapon for 10 points." or "Press E to buy a random weapon for 950 points."
@@ -146,7 +152,9 @@ end
 	end,
 	["nz_teleporter"] = function(ent)
 		local text = ""
-		if !ent:IsOn() then
+		if !ent:GetUsable() then
+		text = "welcome...TO THE CUM ZONE"
+		elseif !ent:IsOn() then
 			text = "No Power."
 		elseif ent:GetBeingUsed() then
 			text = "Currently in use."

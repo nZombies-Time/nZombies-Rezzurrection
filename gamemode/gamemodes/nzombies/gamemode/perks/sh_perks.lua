@@ -217,6 +217,7 @@ nzPerks:NewPerk("gum", {
 		playr:ChatPrint( "Always in sight" )
 		end
 		local zombls = ents.FindInSphere(ply:GetPos(), 3000)
+		
 		for k,v in pairs(zombls) do
 					if IsValid(v) and v:IsValidZombie() then
 						v:SetTarget(ply)
@@ -540,7 +541,7 @@ nzPerks:NewPerk("speed", {
 	price = 3000,
 	price_skin = 3000,
 	desc = "Gain increased reload speed.",
-	desc2 ="Use the Pack-A-Punch machine faster",
+	desc2 ="Repair barricades, spin the box, and use Pack-A-Punch faster.",
 	material = 15,
 	wfz = "models/perk_bottle/c_perk_bottle_speed",
 	icon = Material("perk_icons/chron/speed.png", "smooth unlitgeneric"),
@@ -631,82 +632,97 @@ nzPerks:NewPerk("pap", {
 
 		ply:Buy(cost, machine, function()
 			hook.Call("OnPlayerBuyPackAPunch", nil, ply, wep, machine)
-		
+
 			ply:Give("nz_packapunch_arms")
 
 			machine:SetBeingUsed(true)
-			machine:EmitSound("nz/machines/pap_up.wav")
+
+			if ply:HasPerk("speed") and ply:HasUpgrade("speed") then
+				machine:EmitSound("nz/machines/upgrade_fast.wav")
+			else
+				machine:EmitSound("nz/machines/pap_up.wav")
+			end
+
 			local class = wep:GetClass()
 			
 			local e = EffectData()
 			e:SetEntity(machine)
 			local ang = machine:GetAngles()
+
 			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
-			e:SetOrigin(machine:GetPos() + ang:Up()*45 + ang:Forward()*20 - ang:Right()*2)
+				e:SetOrigin(machine:GetPos() + ang:Up()*45 + ang:Forward()*20 - ang:Right()*2)
 			else
-			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
-			e:SetOrigin(machine:GetPos() + ang:Up()*42 + ang:Forward()*15 - ang:Right()*2)
-			else
-			e:SetOrigin(machine:GetPos() + ang:Up()*35 + ang:Forward()*20 - ang:Right()*2)
+				if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+					e:SetOrigin(machine:GetPos() + ang:Up()*42 + ang:Forward()*15 - ang:Right()*2)
+				else
+					e:SetOrigin(machine:GetPos() + ang:Up()*35 + ang:Forward()*20 - ang:Right()*2)
+				end
 			end
-			end
+
 			e:SetMagnitude(3)
+
 			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
-			ParticleEffect("bo3_mangler_pulse", machine:GetPos() + ang:Up()*44 + ang:Forward()*13, ang,machine)
+				ParticleEffect("bo3_mangler_pulse", machine:GetPos() + ang:Up()*44 + ang:Forward()*13, ang,machine)
 			else
-			util.Effect("pap_glow", e, true, true)
+				util.Effect("pap_glow", e, true, true)
 			end
 			
-
 			wep:Remove()
+
 			local startpos
 			local wep = ents.Create("pap_weapon_fly")
+
 			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
-			startpos = machine:GetPos() + (ang:Forward() + ang:Up()*50 + ang:Right()*-3) + (Vector(0,-5,0))
+				startpos = machine:GetPos() + (ang:Forward() + ang:Up()*50 + ang:Right()*-3) + (Vector(0,-5,0))
 			end
 			if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
-			startpos = machine:GetPos() + (ang:Forward()*11 + ang:Up()*50 + ang:Right()*4)
+				startpos = machine:GetPos() + (ang:Forward()*11 + ang:Up()*50 + ang:Right()*4)
 			else
-			startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
+				startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
 			end
-			--local startpos = machine:GetPos() + ang:Forward()*30 + ang:Up()*25 + ang:Right()*-3
+
 			wep:SetPos(startpos)
 			wep:SetAngles(ang + Angle(0,90,0))
 			wep.WepClass = class
 			wep:Spawn()
+
 			local weapon = weapons.Get(class)
 			local model = (weapon and weapon.WM or weapon.WorldModel) or "models/weapons/w_rif_ak47.mdl"
 			if !util.IsValidModel(model) then model = "models/weapons/w_rif_ak47.mdl" end
+
 			wep:SetModel(model)
 			wep.machine = machine
 			wep.Owner = ply
 			wep:SetMoveType( MOVETYPE_FLY )
 
-			--wep:SetNotSolid(true)
-			--wep:SetGravity(0.000001)
-			--wep:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
-			timer.Simple(0.5, function()
+			local speed = (ply:HasPerk("speed") and ply:HasUpgrade("speed") and 2) or 1
+			
+			timer.Simple(0.5 / speed, function()
 				if IsValid(wep) then
-				if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
-				else
-				if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw"  then
-					wep:SetLocalVelocity(ang:Forward()*-15 + ang:Up()*-25)
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+
 					else
-					wep:SetLocalVelocity(ang:Forward()*-30)
-					end
+						if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
+							wep:SetLocalVelocity((ang:Forward()*-15 + ang:Up()*-25) * speed)
+						else
+							wep:SetLocalVelocity((ang:Forward()*-30) * speed)
+						end
 					end
 				end
 			end)
-			timer.Simple(1.8, function()
+
+			timer.Simple(1.8 / speed, function()
 				if IsValid(wep) then
 					wep:SetMoveType(MOVETYPE_NONE)
-					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+
 					else
-					wep:SetLocalVelocity(Vector(0,0,0))
+						wep:SetLocalVelocity(Vector(0,0,0))
 					end	
 				end
 			end)
-			timer.Simple(3, function()
+
+			timer.Simple(3 / speed, function()
 				if IsValid(wep) and IsValid(machine) then
 					local weapon = weapons.Get(class)
 					if weapon and weapon.NZPaPReplacement and weapons.Get(weapon.NZPaPReplacement) then
@@ -727,34 +743,30 @@ nzPerks:NewPerk("pap", {
 						wep.Owner = ply
 						wep:SetMoveType( MOVETYPE_FLY )
 					end
-					
-					--print(wep, wep.WepClass, wep:GetModel())
-				
+
 					machine:EmitSound("nz/machines/pap_ready.wav")
-					 machine:StopParticles()
+					machine:StopParticles()
 					wep:SetCollisionBounds(Vector(0,0,0), Vector(0,0,0))
 					wep:SetMoveType(MOVETYPE_FLY)
 					wep:SetGravity(0.000001)
+
 					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw"  then
-					wep:SetLocalVelocity(ang:Forward()*20 + ang:Up()*25)
+						wep:SetLocalVelocity((ang:Forward()*20 + ang:Up()*25) * speed)
 					else
-					wep:SetLocalVelocity(ang:Forward()*30)
+						wep:SetLocalVelocity((ang:Forward()*30) * speed)
 					end
-					print(ang:Forward()*30, wep:GetVelocity())
-					
+
 					wep:CreateTriggerZone(reroll)
-					--print(reroll)
 				end
 			end)
-			timer.Simple(4.2, function()
+
+			timer.Simple(4.2 / speed, function()
 				if IsValid(wep) then
-					--print("YDA")
-					--print(wep:GetMoveType())
-					--print(ang:Forward()*30, wep:GetVelocity())
 					wep:SetMoveType(MOVETYPE_NONE)
-					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+
 					else
-					wep:SetLocalVelocity(Vector(0,0,0))
+						wep:SetLocalVelocity(Vector(0,0,0))
 					end
 				end
 			end)
@@ -762,12 +774,14 @@ nzPerks:NewPerk("pap", {
 			timer.Simple(10, function()
 				if IsValid(wep) then
 					wep:SetMoveType(MOVETYPE_FLY)
-					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2"  then
+					if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
+
 					else
-					wep:SetLocalVelocity(ang:Forward()*-2)
+						wep:SetLocalVelocity(ang:Forward()*-2)
 					end
 				end
 			end)
+
 			timer.Simple(25, function()
 				if IsValid(wep) then
 					wep:Remove()
@@ -782,7 +796,6 @@ nzPerks:NewPerk("pap", {
 		end)
 	end,
 	lostfunc = function(self, ply)
-
 	end,
 })
 
@@ -1489,5 +1502,77 @@ nzPerks:NewPerk("widowswine", {
 	end,
 		upgradefunc  = function(self, ply)
 	
+	end,
+})
+
+nzPerks:NewPerk("death", {
+	name = "Death Perception",
+	name_skin = "uhhhhhh",
+	name_holo = "uhhhhhh",
+	model = "models/props_c17/FurnitureFridge001a.mdl",
+	skin = "models/props_c17/FurnitureFridge001a.mdl",
+	//off_skin = 1,
+	//on_skin = 0,
+	price = 3000,
+	price_skin = 3000,
+	desc = "Critical damage increased by 25%. Enemies give danger indicators when behind the Player.",
+	desc2 = "Greatly increase damage against armored enemies.",
+	material = 26,
+	wfz = "models/perk_bottle/c_perk_bottle_danger",
+	icon = Material("perk_icons/waw/death.png",			"smooth unlitgeneric"),
+	icon_iw = Material("perk_icons/waw/death.png",		"smooth unlitgeneric"),
+	icon_waw = Material("perk_icons/waw/death.png",		"smooth unlitgeneric"),
+	icon_bo2 = Material("perk_icons/bo2/death.png",		"smooth unlitgeneric"),
+	icon_bo3 = Material("perk_icons/bo3/death.png",		"smooth unlitgeneric"),
+	icon_bo4 = Material("perk_icons/bo4/death.png",		"smooth unlitgeneric"),
+	icon_mw = Material("perk_icons/waw/death.png",		"smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/death.png",		"smooth unlitgeneric"),
+	icon_dumb = Material("perk_icons/waw/death.png",	"smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/waw/death.png",	"smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/waw/death.png",	"smooth unlitgeneric"),
+	color = Color(220, 45, 5),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+	upgradefunc = function(self, ply)
+	end,
+})
+
+nzPerks:NewPerk("tortoise", {
+	name = "Victorious Tortoise",
+	name_skin = "uhhhhhh",
+	name_holo = "uhhhhhh",
+	model = "models/props_c17/FurnitureFridge001a.mdl",
+	skin = "models/props_c17/FurnitureFridge001a.mdl",
+	//off_skin = 1,
+	//on_skin = 0,
+	price = 2000,
+	price_skin = 2000,
+	desc = "Shields block damage from all directions while held and explode when broken.",
+	desc2 = "Shields gain double the durability.",
+	material = 25,
+	wfz = "models/perk_bottle/c_perk_bottle_speed",
+	icon = Material("perk_icons/waw/tortoise.png",		"smooth unlitgeneric"),
+	icon_iw = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	icon_waw = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	icon_bo2 = Material("perk_icons/bo2/tortoise.png",	"smooth unlitgeneric"),
+	icon_bo3 = Material("perk_icons/bo3/tortoise.png",	"smooth unlitgeneric"),
+	icon_bo4 = Material("perk_icons/bo4/tortoise.png",	"smooth unlitgeneric"),
+	icon_mw = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	icon_cw = Material("perk_icons/bocw/tortoise.png",	"smooth unlitgeneric"),
+	icon_dumb = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	icon_holo = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	icon_glow = Material("perk_icons/waw/tortoise.png",	"smooth unlitgeneric"),
+	color = Color(77, 144, 36),
+	func = function(self, ply, machine)
+	end,
+	lostfunc = function(self, ply)
+	end,
+	upgradefunc = function(self, ply)
+		if IsValid(ply.Shield) then
+			ply.Shield:SetHealth(ply.Shield:GetMaxHealth()*2)
+			ply.Shield:SetMaxHealth(ply.Shield:GetMaxHealth()*2)
+		end
 	end,
 })

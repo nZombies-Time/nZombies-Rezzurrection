@@ -22,6 +22,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 3, "Kino")
 	self:NetworkVar("Int", 5, "Kinodelay")
 	self:NetworkVar("Bool", 4, "Giftoggle")
+	self:NetworkVar("Bool", 5, "Usable")
 end
 
 function ENT:Initialize()
@@ -95,7 +96,7 @@ end
 function ENT:Use(activator, caller)
 	
 	
-	if self:IsOn() then
+	if self:IsOn() and !self:GetBeingUsed() and self:GetUsable() then
 		local price = self:GetPrice()
 		local walk = activator:GetWalkSpeed()
 		local run = activator:GetRunSpeed()

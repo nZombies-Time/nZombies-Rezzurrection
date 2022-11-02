@@ -67,6 +67,8 @@ function ENT:ReleaseSoul( z )
 		e:SetEntity(self)
 		util.Effect("zombie_soul", e)
 		self.CurrentAmount = self.CurrentAmount + 1
+		self:CollectSoul()
+		self:EmitSound("nz/souls/nuke_spirit/nuke_spirit"..math.random(0,10)..".wav",100)
 	end
 end
 
@@ -77,7 +79,7 @@ function ENT:CollectSoul()
 	end
 end
 
-hook.Add("EntityTakeDamage", "SoulCatchZombies", function(ent, dmg)
+hook.Add("OnZombieKilled", "SoulCatchZombies", function(ent, dmg)
 	if ent:IsValidZombie() and ent:Health() <= dmg:GetDamage() then
 		for k,v in pairs(ents.FindByClass("nz_script_soulcatcher")) do
 			if v.Enabled and ent:GetPos():DistToSqr(v:GetPos()) <= v.Range and v:Condition(ent, dmg) then

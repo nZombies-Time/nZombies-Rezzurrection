@@ -258,6 +258,7 @@ nzChatCommand.Add("/tools", SERVER, function(ply, text)
 	if ply:IsInCreative() then
 		ply:Give("weapon_physgun")
 		ply:Give("nz_multi_tool")
+		ply:Give("weapon_hands")
 	end
 end, true, "Give creative mode tools to yourself if in Creative.")
 

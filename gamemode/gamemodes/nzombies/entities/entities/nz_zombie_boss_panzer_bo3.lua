@@ -495,7 +495,7 @@ function ENT:OnInjured( dmgInfo )
 			end
 		end
 		
-		dmgInfo:ScaleDamage(0.1) -- When the helmet isn't lost, all damage only deals 10%
+		dmgInfo:ScaleDamage(0.15) -- When the helmet isn't lost, all damage only deals 10%
 	else
 		local bone = self:LookupBone("j_head")
 		local pos, ang = self:GetBonePosition(bone)
@@ -504,7 +504,7 @@ function ENT:OnInjured( dmgInfo )
 		if hitpos:DistToSqr(finalpos) < 150 then
 			-- No damage scaling on headshot, we keep it at 1x
 		else
-			dmgInfo:ScaleDamage(0.1) -- When the helmet is lost, a non-headshot still only deals 10%
+			dmgInfo:ScaleDamage(0.2) -- When the helmet is lost, a non-headshot still only deals 10%
 		end
 	end
 	

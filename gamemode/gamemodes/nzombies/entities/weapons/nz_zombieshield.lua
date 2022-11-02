@@ -195,17 +195,3 @@ if CLIENT then
 	end
 
 end
-
-hook.Add("PlayerShouldTakeDamage", "nzShieldDamageHandler", function(ply, ent)
-	
-	if ent:IsValidZombie() and IsValid(ply.Shield) then
-		local dot = (ent:GetPos() - ply:GetPos()):Dot(ply:GetAimVector())
-		local wep = ply:GetActiveWeapon()
-		local shield = IsValid(wep) and wep:GetClass() == "nz_zombieshield"
-		if (dot < 0 and !shield) or (dot >= 0 and shield) then
-			ply.Shield:TakeDamage(30, ent, ent)
-			return false
-		end
-	end
-	
-end)

@@ -73,9 +73,20 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings.PAPtype = "Original"
 	end
 	
+	if data.PAPcamo then
+		nzMapping.Settings.PAPcamo = data.PAPcamo or "nz_classic"
+		else
+		nzMapping.Settings.PAPcamo = "nz_classic"
+	end
 	
 	if data.hp then
 		nzMapping.Settings.hp = tonumber(data.hp) or 100
+	end
+	
+	if data.eemdl then
+		nzMapping.Settings.eemdl = data.eemdl or "Hula Doll"
+		else
+		nzMapping.Settings.eemdl = "Hula Doll"
 	end
 	
 	if data.range then

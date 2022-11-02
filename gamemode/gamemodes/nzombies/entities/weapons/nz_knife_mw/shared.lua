@@ -5,7 +5,7 @@ SWEP.Author		= "Laby" --Author Tooltip
 SWEP.ViewModel = "models/weapons/nz_knives/c_knife_mw.mdl"
 SWEP.WorldModel = "models/weapons/tfa_mw2019/knife/w_knife.mdl"
 SWEP.ViewModelFlip = false
-SWEP.ViewModelFOV = 70
+SWEP.ViewModelFOV = 60
 SWEP.UseHands = true
 SWEP.HoldType = "knife"
 SWEP.DrawCrosshair = true
@@ -21,7 +21,7 @@ SWEP.Secondary.CanBash = false
 SWEP.Secondary.MaxCombo = 0
 SWEP.Primary.MaxCombo = 0
 
-SWEP.VMPos = Vector(0,0,0) --The viewmodel positional offset, constantly.  Subtract this from any other modifications to viewmodel position.
+SWEP.VMPos = Vector(5,0,0) --The viewmodel positional offset, constantly.  Subtract this from any other modifications to viewmodel position.
 
 -- nZombies Stuff
 SWEP.NZPreventBox		= true	-- If true, this gun won't be placed in random boxes GENERATED. Users can still place it in manually.

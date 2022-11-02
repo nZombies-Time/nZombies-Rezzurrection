@@ -227,13 +227,14 @@ nzMapping:AddSaveModule("Teleporter", {
 			cd = v:GetCooldownTime(),
 			kino = v:GetKino(),
 			delay = v:GetKinodelay(),
+			buyable = v:GetUsable()
 			})
 		end
 		return teleporters
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:Teleporter(v.pos,v.angle, v.desti, v.id, v.price, v.mdltype, v.gif, v.cd, v.kino, v.delay)
+			nzMapping:Teleporter(v.pos,v.angle, v.desti, v.id, v.price, v.mdltype, v.gif, v.cd, v.kino, v.delay,v.buyable)
 		end
 	end,
 	cleanents = {"nz_teleporter"},
@@ -395,6 +396,27 @@ nzMapping:AddSaveModule("AmmoBox", {
 	end,
 	cleanents = {"ammo_box"},
 })
+
+nzMapping:AddSaveModule("SufferingMachine", {
+	savefunc = function()
+		local machines = {}
+		for _, v in pairs(ents.FindByClass("stinky_lever")) do
+			table.insert(machines, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			
+			})
+		end
+		return machines
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:StinkyLever(v.pos, v.angle)
+		end
+	end,
+	cleanents = {"stinky_lever"},
+})
+
 
 nzMapping:AddSaveModule("Endings", {
 	savefunc = function()

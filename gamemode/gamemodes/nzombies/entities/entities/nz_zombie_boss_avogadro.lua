@@ -398,10 +398,15 @@ self.ClawHook = self:GetClawHook()
 		print( v[1], v[2], v[3] )
 		if(v[2] > 0) then
 		self:SetPos(self.ClawHook:GetPos() - Vector(0,100,0))
-		print("Teleport backwards")
+		self:StopParticles()
+		ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,3)
+		--print("Teleport backwards")
 		else
+		
 		self:SetPos(self.ClawHook:GetPos() + Vector(0,100,0))
-		print("Teleport forwards")
+		self:StopParticles()
+		ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,3)
+		--print("Teleport forwards")
 		end
 	 
 	end
@@ -491,11 +496,13 @@ self.ClawHook = self:GetClawHook()
 	end
 end
 
-function ENT:OnInjured( dmgInfo )
-	if  math.random(0,14)==14  then
-	self:EmitSound("avo/avogadro_damaged_"..math.random(12)..".mp3")
+function ENT:OnInjured( dmginfo )
+	if dmginfo:GetDamageType() == DMG_BULLET then
+		dmginfo:ScaleDamage(0.1)
+		if  math.random(0,20)==14  then
+			self:EmitSound("avo/avogadro_damaged_"..math.random(12)..".mp3")
+		end
 	end
-	
 end
 
 function ENT:GrabPlayer(ply)

@@ -20,7 +20,9 @@ ENT.AttackSequences = {
 }
 
 ENT.DeathSequences = {
-	"death"
+	"death1",
+	"death2",
+	"death3"
 }
 
 ENT.AttackSounds = {
@@ -55,16 +57,16 @@ ENT.WalkSounds = {
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_RUN,
+		act = ACT_WALK,
 		minspeed = 1,
 	},
 	[2] = {
 		act = ACT_RUN,
-		minspeed = 180,
+		minspeed = 200,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 190
+		minspeed = 210
 	}
 }
 
@@ -102,7 +104,7 @@ function ENT:Initialize()
 	self:SetRunSpeed( self.RunSpeed ) --fallback
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
 
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+	self:SetCollisionBounds(Vector(-17,-17, 0), Vector(17, 17, 70))
 
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
@@ -122,7 +124,7 @@ function ENT:Initialize()
 			self:SetLagCompensated(true)
 		end
 		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
+		self.ouch = 0 -- Used to save how much damage the light has taken
 		self:SetUsingClaw(false)
 		
 		self.NextAction = 0
@@ -136,9 +138,9 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(200)
+		self:SetRunSpeed(150)
 		self:SetHealth(3000)
-		self:SetMaxHealth(2000)
+		self:SetMaxHealth(20000)
 		shooting = false
 		dying = false
 		helmet = true
@@ -191,6 +193,7 @@ function ENT:OnSpawn()
 		
 		local pos = self:GetPos() + (seq == "enrage" and Vector(0,0,100) or Vector(0,0,450))
 		counting = true
+		self:SetSpecialAnimation(true)
 		self:SetNoDraw(true)
 		ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
@@ -219,11 +222,14 @@ function ENT:OnSpawn()
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
 			counting = false
+			self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
-	self:ResetSequence("run")
-	self:SetCycle(0)
+
 end
 
 function ENT:OnZombieDeath(dmgInfo)
@@ -274,14 +280,14 @@ function ENT:BodyUpdate()
 end
 
 function ENT:OnTargetInAttackRange()
-if math.random(0,5)==5 then
+if math.random(0,7)==7 then
 self.AttackSequences = {
 	{seq = "melee_uppercut"}
 	
 }
   local atkData2 = {}
-    atkData2.dmglow = 110
-    atkData2.dmghigh = 145
+    atkData2.dmglow = 240
+    atkData2.dmghigh = 240
     atkData2.dmgforce = Vector( 0, 0, 0 )
 	atkData2.dmgdelay = 0.3
     self:Attack( atkData2 )
@@ -293,10 +299,10 @@ self.AttackSequences = {
 	
 }
     local atkData = {}
-    atkData.dmglow = 65
-    atkData.dmghigh = 70
+    atkData.dmglow = 45
+    atkData.dmghigh = 55
     atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 0.2
+	atkData.dmgdelay = 0.3
     self:Attack( atkData )
 	end
 end
@@ -306,7 +312,8 @@ function ENT:OnPathTimeOut()
 	if CurTime() < self.NextAction then return end
 	
 	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
-		-- Claw
+	
+	-- Claw
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
@@ -314,47 +321,44 @@ function ENT:OnPathTimeOut()
 				filter = self,
 			})
 			
-			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				shooting = true
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
-			timer.Simple(0.2,function()
+			
+			self:Stop()
+			self:SetSpecialAnimation(true)
 				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
 				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
-			end)
-				timer.Simple(1.5, function()
-				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
-				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
-				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
-				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
+					local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
+				timer.Simple(1, function() self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")end)
+				timer.Simple(1, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
+				timer.Simple(1, function()self.ClawHook:SetPos(clawpos)end)
+				timer.Simple(1, function()self.ClawHook:Spawn()end)
+				timer.Simple(1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
+				timer.Simple(1, function()self:SetClawHook(self.ClawHook)end)
+				timer.Simple(1, function()self:StopParticles()end)
+				
 				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot")
+				
 				self.loco:SetDesiredSpeed(0)
+				
+				self:PlaySequenceAndWait("shoot")
+	
 				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
 				
-				local seq = "taunt"
+				local seq = "shoot"
 			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-			shooting = false
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
-			end)
+			
 				self.NextAction = CurTime() + math.random(1, 5)
 				self.NextClawTime = CurTime() + math.random(3, 15)
 			end
+			
 		end
+		
+
 	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
 		-- Flamethrower
 		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
@@ -383,7 +387,7 @@ function ENT:OnPathTimeOut()
 			self.NextFlameTime = CurTime() + math.random(1, 10)
 		end
 	end
-end
+	end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
@@ -441,25 +445,54 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnInjured(dmg)
-	if helmet then
-	dmg:ScaleDamage(0.5)
-	if self:Health() < 2000 then
-	helmet = false
+function ENT:OnInjured( dmgInfo )
+	local hitpos = dmgInfo:GetDamagePosition()
+	
+	if !self.HelmetLost then
+		local bone = self:LookupBone("j_head")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
+		
+		if hitpos:DistToSqr(finalpos) < 100 then
+		print("headshot")
+			self.ouch = self.ouch + dmgInfo:GetDamage()
+			print(self.ouch)
+			if self.ouch > 300 then
+			print("lose helmet")
+				self.HelmetLost = true
+				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
+				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
+				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",511)
+				self:SetBodygroup(1,1)
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				local id, dur = self:LookupSequence("destroy_helmet")
+				self:ResetSequence(id)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+					self.loco:SetDesiredSpeed(self:GetRunSpeed()*1.5)
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+				end)
+			end
+		end
+		
+		dmgInfo:ScaleDamage(0.6) -- When the helmet isn't lost, all damage only deals 60%
 	end
-	else
-	dmg:ScaleDamage(1)
-if  !hasTaunted then
-self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",511)
-self:SetBodygroup(1,1)
-hasTaunted = true
+	
 end
-end
-end
-
 
 function ENT:OnThink()
 self:RemoveAllDecals()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(1.1, function()self:SetSpecialAnimation(false)end)
+end
 if !self:IsAttacking() then
 if !counting and !dying and !shooting and self:Health() > 0 then
 counting = true
@@ -469,92 +502,7 @@ counting = false
 end)
 end
 end
-if self:IsAttacking() then
-self.loco:SetDesiredSpeed(0)
-end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
 
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)

@@ -42,6 +42,17 @@ function nzRound:Prepare( time )
 	self:SetZombiesMax( nzCurves.GenerateMaxZombies(self:GetNumber()) )
 
 	self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
+	
+	for k,v in pairs(ents.FindByClass("stinky_lever")) do
+		if v:Getohfuck(true) then
+		local tbl = {[250] = 100}
+		self:SetZombieSpeeds(tbl )
+		--you fool owl boy, you've fallen for the classic blunder
+		break;
+		else
+		self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
+		end
+	end
 
 	self:SetZombiesKilled( 0 )
 
@@ -454,6 +465,10 @@ function nzRound:ResetGame()
 	
 	for k,v in pairs(ents.FindByClass("ammo_box")) do
 		v:SetPrice(4500)
+	end
+	
+	for k,v in pairs(ents.FindByClass("stinky_lever")) do
+		v:Setohfuck(false)
 	end
 
 	for _, ply in pairs(player.GetAll()) do

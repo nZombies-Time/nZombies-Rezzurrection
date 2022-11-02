@@ -760,7 +760,21 @@ function ENT:ChaseTarget( options )
 			self.BarricadeCheckDir = segment and segment.forward or Vector(0,0,0)
 			return "timeout"
 		end
-
+		
+			local distToTarget = self:GetPos():Distance(self.Target:GetPos())
+				if path:GetAge() > math.Clamp(distToTarget / 1000,3,10) then -- This is pulled from Ba2 for distance based repathing.
+					return "timeout"
+				end
+				if path:IsValid() then
+					if path:GetAge() > 1 and (distToTarget < 750) then -- We're closing in, let's start repathing sooner!
+					self.BarricadeCheckDir = segment and segment.forward or Vector(0,0,0)
+						return "timeout"
+					elseif path:GetAge() > 0.35 and (distToTarget < 250) or path:GetAge() > 0.075 and (distToTarget < 250) and self.loco:GetVelocity():Length2D() >= 150 then -- We're nearing attack range! Don't stop now! self.loco:GetVelocity():Length2D() >= 110
+						self.BarricadeCheckDir = segment and segment.forward or Vector(0,0,0)
+						return "timeout"
+					end
+				end
+				
 		path:Update( self )	-- This function moves the bot along the path
 		if options.draw or GetConVar( "nz_zombie_debug" ):GetBool() then
 			path:Draw()
@@ -1144,10 +1158,12 @@ function ENT:PlayAttackAndWait( name, speed )
 
 end
 
+
 --we do our own jump since the loco one is a bit weird.
 function ENT:Jump()
-	if navmesh.GetNavArea(self:GetPos(), 50):IsValid() then
-	if CurTime() < self:GetLastLand() + 0.5 or navmesh.GetNavArea(self:GetPos(), 50):HasAttributes( NAV_MESH_NO_JUMP ) then return end
+	local nav = navmesh.GetNavArea(self:GetPos(), math.huge)
+	if (!IsValid(nav) or IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP)) then return end
+	if CurTime() < self:GetLastLand() + 0.5 then return end
 	if !self:IsOnGround() then return end
 	self.loco:SetDesiredSpeed( 450 )
 	self.loco:SetAcceleration( 5000 )
@@ -1156,40 +1172,33 @@ function ENT:Jump()
 	self.loco:Jump()
 	--Boost them
 	self:TimedEvent( 0.5, function() self.loco:SetVelocity( self:GetForward() * 5 ) end)
-	else
 	
 	local classname = self:GetClass()
 	local bossent = string.find( classname:lower(), "boss" )
 	if bossent then
-			print("THOT DETECTED")
-			local spawnpoint =  "nz_spawn_zombie_special"  or "nz_spawn_zombie_boss" 
-			local spawnpoints = {}
-			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
-				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
-					table.insert(spawnpoints, v)
+		print("THOT DETECTED")
+		local spawnpoint =  "nz_spawn_zombie_special"  or "nz_spawn_zombie_boss" 
+		local spawnpoints = {}
+		for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
+			if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
+				table.insert(spawnpoints, v)
+			end
+		end
+		local spawn = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
+		if IsValid(spawn) then -- If we this exists, spawn here
+			self:SetPos( spawn:GetPos() )	
+		end
+	else
+		timer.Simple(3, function()
+			if self:IsValid() then
+				if self:Health() > 0 and IsValid(nav) then
+				else
+					self:RespawnZombie()
 				end
 			end
-			
-			local spawn = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
-			if IsValid(spawn) then -- If we this exists, spawn here
-				self:SetPos( spawn:GetPos() )
-				
-			end
-		
-		else
-		timer.Simple(3, function()
-	if self:IsValid() then
-	if self:Health() > 0 and navmesh.GetNavArea(self:GetPos(), 25):IsValid() then
-	else
-			self:RespawnZombie()
-			end
-			end
-	end)
-	
+		end)
 	end
-	
-	end
-	end
+end
 	
 
 function ENT:Flames( state )

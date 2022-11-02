@@ -13,7 +13,9 @@ AddCSLuaFile()
 
 function ENT:Initialize()
 
-	self:SetModel( "models/props_lab/huladoll.mdl" )
+	
+	self:SetModel(nzRound:GetSongType(nzMapping.Settings.eemdl))
+	--self:SetModel( "models/props_lab/huladoll.mdl" )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetCollisionGroup( COLLISION_GROUP_WEAPON )

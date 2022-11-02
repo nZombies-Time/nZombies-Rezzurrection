@@ -62,12 +62,8 @@ ENT.ActStages = {
 		minspeed = 0,
 	},
 	[2] = {
-		act = ACT_WALK,
-		minspeed = 390,
-	},
-	[3] = {
 		act = ACT_RUN,
-		minspeed = 400
+		minspeed = 270
 	}
 }
 
@@ -276,12 +272,13 @@ function ENT:OnPathTimeOut()
 				filter = self,
 			})
 			
-			
 			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
+			
+			self:Stop()
+			self:SetSpecialAnimation(true)
+				
 				timer.Simple(22/55, function()
 				self:EmitSound("roach/bo3/spider/spd_attack_0"..math.random(3)..".mp3")
-		self:StopParticles()
 	end)
 				timer.Simple(1, function()self.ClawHook = ents.Create("nz_spider_goo")end)
 				timer.Simple(1, function()self.ClawHook:SetPos(self:LocalToWorld(Vector(0,0,80)))end)
@@ -289,25 +286,25 @@ function ENT:OnPathTimeOut()
 				timer.Simple(1, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
 				timer.Simple(1, function()self:SetClawHook(self.ClawHook)end)
 				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot_web")
+				
 				self.loco:SetDesiredSpeed(0)
+				
+				self:PlaySequenceAndWait("shoot_web")
+	
 				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
 				
-				local seq = "idle"
+				local seq = "shoot_web"
 			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(1, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
 				self:StopFlames()
-			end)
+			
 				self.NextAction = CurTime() + math.random(1, 5)
 				self.NextClawTime = CurTime() + math.random(3, 15)
 			end
+			
 		end
 	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
 		-- Flamethrower
@@ -372,6 +369,12 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
+if self:IsAttacking() then
+self:SetSpecialAnimation(true)
+self.loco:SetDesiredSpeed(0)
+self:SetVelocity(Vector(0,0,0))
+timer.Simple(1, function()self:SetSpecialAnimation(false)end)
+end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
 			local bone = self:LookupBone("j_elbow_ri")

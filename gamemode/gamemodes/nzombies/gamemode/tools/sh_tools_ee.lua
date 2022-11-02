@@ -2,7 +2,7 @@ nzTools:CreateTool("ee", {
 	displayname = "Easter Egg Placer",
 	desc = "LMB: Easter Egg, RMB: Remove Easter Egg, Use Player Handler to select song",
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		return true
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
 		nzMapping:EasterEgg(tr.HitPos, Angle(0,0,0), "models/props_lab/huladoll.mdl", ply)
@@ -27,7 +27,7 @@ nzTools:CreateTool("ee", {
 	icon = "icon16/music.png",
 	weight = 20,
 	condition = function(wep, ply)
-		return nzTools.Advanced
+		return true
 	end,
 	interface = function(frame, data)
 

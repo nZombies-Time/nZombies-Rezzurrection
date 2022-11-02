@@ -5,8 +5,8 @@ ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
-ENT.Models = { "models/nz_zombie/zombie_hellhound.mdl" }
-
+ENT.Models = { "models/moo/pupper/moo_zombie_woofer.mdl" }
+ENT.RedEyes = true
 ENT.AttackRange = 80
 ENT.DamageLow = 20
 ENT.DamageHigh = 35
@@ -24,35 +24,29 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"nz/hellhound/attack/attack_00.wav",
-	"nz/hellhound/attack/attack_01.wav",
-	"nz/hellhound/attack/attack_02.wav",
-	"nz/hellhound/attack/attack_03.wav",
-	"nz/hellhound/attack/attack_04.wav",
-	"nz/hellhound/attack/attack_05.wav",
-	"nz/hellhound/attack/attack_06.wav"
+	"nz_moo/zombies/vox/_hellhound/attack/attack_00.mp3",
+	"nz_moo/zombies/vox/_hellhound/attack/attack_01.mp3",
+	"nz_moo/zombies/vox/_hellhound/attack/attack_02.mp3",
+	"nz_moo/zombies/vox/_hellhound/attack/attack_03.mp3",
+	"nz_moo/zombies/vox/_hellhound/attack/attack_04.mp3",
+	"nz_moo/zombies/vox/_hellhound/attack/attack_05.mp3"
 }
 
 ENT.AttackHitSounds = {
-	"nz/hellhound/bite/bite_00.wav",
-	"nz/hellhound/bite/bite_01.wav",
-	"nz/hellhound/bite/bite_02.wav",
-	"nz/hellhound/bite/bite_03.wav",
+	"nz_moo/zombies/vox/_hellhound/bite/bite_00.mp3",
+	"nz_moo/zombies/vox/_hellhound/bite/bite_01.mp3",
+	"nz_moo/zombies/vox/_hellhound/bite/bite_02.mp3"
 }
 
 ENT.WalkSounds = {
-	"nz/hellhound/dist_vox_a/dist_vox_a_00.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_01.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_02.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_03.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_04.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_05.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_06.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_07.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_08.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_09.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_10.wav",
-	"nz/hellhound/dist_vox_a/dist_vox_a_11.wav"
+	"nz_moo/zombies/vox/_hellhound/movement/movement_00.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_01.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_02.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_03.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_04.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3",
+	"nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"
 }
 
 ENT.PainSounds = {
@@ -64,13 +58,20 @@ ENT.PainSounds = {
 }
 
 ENT.DeathSounds = {
-	"nz/hellhound/death2/death0.wav",
-	"nz/hellhound/death2/death1.wav",
-	"nz/hellhound/death2/death2.wav",
-	"nz/hellhound/death2/death3.wav",
-	"nz/hellhound/death2/death4.wav",
-	"nz/hellhound/death2/death5.wav",
-	"nz/hellhound/death2/death6.wav",
+	"nz_moo/zombies/vox/_hellhound/death/death_00.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_01.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_02.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_03.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_04.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_05.mp3",
+	"nz_moo/zombies/vox/_hellhound/death/death_06.mp3",
+}
+
+ENT.AppearSounds = {
+	"nz_moo/zombies/vox/_hellhound/appear/appear_00.mp3",
+	"nz_moo/zombies/vox/_hellhound/appear/appear_01.mp3",
+	"nz_moo/zombies/vox/_hellhound/appear/appear_02.mp3",
+	"nz_moo/zombies/vox/_hellhound/appear/appear_03.mp3"
 }
 
 ENT.SprintSounds = {
@@ -114,66 +115,36 @@ function ENT:StatsInitialize()
 end
 
 function ENT:OnSpawn()
-
-	--self:SetNoDraw(true) -- Start off invisible while in the prespawn effect
-	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS) -- Don't collide in this state
-	self:Stop() -- Also don't do anything
-
-	local effectData = EffectData()
-	effectData:SetOrigin( self:GetPos() )
-	effectData:SetMagnitude( 2 )
-	effectData:SetEntity(nil)
-	util.Effect("lightning_prespawn", effectData)
 	self:SetNoDraw(true)
 	self:SetInvulnerable(true)
+	self:SetBlockAttack(true)
+
+	self:EmitSound("bo1_overhaul/hhound/prespawn.mp3",511,100)
+	ParticleEffect("driese_tp_arrival_phase1",self:GetPos(),self:GetAngles(),nil)
 
 	timer.Simple(1.4, function()
-		if IsValid(self) then
-			effectData = EffectData()
-			-- startpos
-			effectData:SetStart( self:GetPos() + Vector(0, 0, 1000) )
-			-- end pos
-			effectData:SetOrigin( self:GetPos() )
-			-- duration
-			effectData:SetMagnitude( 0.75 )
-			--util.Effect("lightning_strike", effectData)
-			util.Effect("lightning_strike", effectData)
+		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		self:EmitSound("bo1_overhaul/lgtstrike.mp3",511,100)
+		ParticleEffect("driese_tp_arrival_phase2",self:GetPos(),self:GetAngles(),nil)
 
-			self:SetNoDraw(false)
-			self:SetCollisionGroup(COLLISION_GROUP_NONE)
-			self:SetStop(false)
-
-			self:SetTarget(self:GetPriorityTarget())
-			self:SetInvulnerable(nil)
-		end
+		self:SetNoDraw(false)
+		self:SetTarget(self:GetPriorityTarget())
+		self:SetInvulnerable(nil)
+		self:SetBlockAttack(false)
+		self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 100, math.random(85, 105), 1, 2)
 	end)
 
 	nzRound:SetNextSpawnTime(CurTime() + 2) -- This one spawning delays others by 3 seconds
 end
 
 function ENT:OnZombieDeath(dmgInfo)
+	if self:IsValid() then ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self) end
+	self:SetNoDraw(true)
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()
-	local seqstr = self.DeathSequences[math.random(#self.DeathSequences)]
-	local seq, dur = self:LookupSequence(seqstr)
-	
-	timer.Simple(0, function()
-		--delay it slightly; Seems to fix it instantly getting overwritten
-		if IsValid(self) then
-			self:ResetSequence(seq)
-			self:SetCycle(0)
-			self:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE) --we use this type so the dogs d
-		end 
-	end)
-
-	timer.Simple(dur + 1, function()
-		if IsValid(self) then
-			self:Remove()
-		end
-	end)
-	
-	self:EmitSound(self.DeathSounds[math.random(#self.DeathSounds)], 100)
+	self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
+	self:EmitSound(self.DeathSounds[math.random(#self.DeathSounds)], 100, math.random(85, 105))
 end
 
 function ENT:BodyUpdate()
@@ -217,9 +188,9 @@ function ENT:GetPriorityTarget()
 	-- Well if he exists and he is targetable, just target this guy!
 	if IsValid(self:GetTarget()) and self:GetTarget():GetTargetPriority() > 0 then
 		local dist = self:GetRangeSquaredTo( self:GetTarget():GetPos() )
-		if dist < 100000000 then --if they are within 10000 units
+		if dist < 500000 then --if they are within 10000 units
 			if not self.sprinting then
-				self:EmitSound(self.SprintSounds[math.random(#self.SprintSounds)], 100)
+				self:EmitSound(self.SprintSounds[math.random(#self.SprintSounds)], 100, math.random(85, 105))
 				self.sprinting = true
 			end
 			

@@ -364,21 +364,33 @@ if CLIENT then
 	end)
 end
 
+local ScreenshotRequested = false
+function RequestAScreenshot()
+	ScreenshotRequested = true
+end
+
+-- For the sake of this example, we use a console command to request a screenshot
+concommand.Add( "make_screenshot", RequestAScreenshot )
+
+hook.Add( "PostRender", "example_screenshot", function()
+	if ( !ScreenshotRequested ) then return end
+	ScreenshotRequested = false
+
+	local data = render.Capture( {
+		format = "png",
+		x = 0,
+		y = 0,
+		w = ScrW(),
+		h = ScrH()
+	} )
+
+	file.Write( "image.png", data )
+end )
 hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	if but == ply:GetInfoNum("nz_key_knife", KEY_V) or
 	but == ply:GetInfoNum("nz_key_grenade", KEY_G) or
 	but == ply:GetInfoNum("nz_key_specialgrenade", KEY_B) then
 		ply.nzSpecialButtonDown = true
-	end
-	
-	if id and (ply:GetNotDowned() or id == "knife") and !ply:GetUsingSpecialWeapon() then
-		
-	end
-	
-	--Emergency Sake
-	if ply:HasPerk("sake") and !ply:HasWeapon("nz_yamato") and !ply:HasWeapon("nz_perk_bottle") then
-	if ply:HasWeapon("nz_knife_bo1") or ply:HasWeapon("nz_knife_boring") or ply:HasWeapon("nz_knife_butterfly") or ply:HasWeapon("nz_knife_carver") or ply:HasWeapon("nz_knife_crescent") or ply:HasWeapon("nz_knife_lukewarmconflict") or ply:HasWeapon("nz_knife_malice") or ply:HasWeapon("nz_quickknife_crowbar") then
-	ply:Give("nz_yamato")
 	end
 	
 	--[[Recode Comment Wolfkann:"Same issue when playing sound effects with stasis, 
@@ -399,7 +411,11 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	local reloadId = ply:GetInfoNum("+reload", KEY_R)
 
 		if but == reloadId and ply.nzCherryReload == false then
-			
+			if nzRound:InState( ROUND_CREATE ) then
+			-- if input.IsKeyDown( KEY_Z ) then
+			 
+			-- end
+			end
 			
 			if ply:HasPerk("cherry") then
 
@@ -419,25 +435,28 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 						intervalMin = 0.01,
 						intervalMax = 0.02,
 					})
-					end	
-					--print(pct)
-					local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
-					local d = DamageInfo()
-					d:SetDamage( 300*pct )
-					d:SetDamageType( DMG_BULLET )
-					d:SetAttacker(ply)
-					d:SetInflictor(ply)
-					
-					for k,v in pairs(zombies) do
-						if nzConfig.ValidEnemies[v:GetClass()] then
-							v:TakeDamageInfo(d)
+						local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
+						local d = DamageInfo()
+						d:SetDamage( 40*pct ) --this can be scaled with double tap and vigour rush
+						d:SetDamageType( DMG_BULLET )
+						d:SetAttacker(ply)
+						d:SetInflictor(ply)
+						
+						for k,v in pairs(zombies) do
+							if nzConfig.ValidEnemies[v:GetClass()] then
+								v:TakeDamageInfo(d)
+							end
 						end
 					end
 				end
 			end
 		end
+	
+	if id and (ply:GetNotDowned() or id == "knife") and !ply:GetUsingSpecialWeapon() then
 		
-end
+	end
+	
+
 end)
 
 hook.Add("PlayerButtonUp", "nzSpecialWeaponsThrow", function(ply, but)
@@ -447,6 +466,7 @@ hook.Add("PlayerButtonUp", "nzSpecialWeaponsThrow", function(ply, but)
 		ply.nzSpecialButtonDown = false
 	end
 end)
+
 
 local wep = FindMetaTable("Weapon")
 local ply = FindMetaTable("Player")

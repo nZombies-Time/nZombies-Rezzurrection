@@ -30,7 +30,6 @@ function ENT:Initialize()
 end
 
 
-	
 function ENT:Use( activator, caller )
 	if nzRound:InProgress() then
 	local currentWep = activator:GetActiveWeapon()
@@ -41,7 +40,7 @@ function ENT:Use( activator, caller )
 		self:EmitSound("nz/effects/buy.wav")
 		currentWep:GiveMaxAmmo() 
 		end)
-		 self:SetPrice(price + (nzRound:GetNumber()/4 * 1000))
+		 self:SetPrice((price/2) + (nzRound:GetNumber()/6 * 800))
 		 
 	end
 end

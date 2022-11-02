@@ -203,7 +203,7 @@ function ENT:OnSpawn()
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
-		
+		self:SetSpecialAnimation(true)
 		local pos = self:GetPos() + (seq == "s2_zom_brt_roar" and Vector(0,0,100) or Vector(0,0,450))
 		
 		local effectData = EffectData()
@@ -232,6 +232,9 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
+		end)
+		self:TimedEvent(dur, function()
+		self:SetSpecialAnimation(false)
 		end)
 		scaledHP = self:Health()
 		print(scaledHP)
@@ -419,8 +422,56 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
+function ENT:OnInjured( dmgInfo )
+	local hitpos = dmgInfo:GetDamagePosition()
+	
+	if !self.HelmetLost then
+		local bone = self:LookupBone("j_faceplate")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
+		
+		if hitpos:DistToSqr(finalpos) < 50 then
+			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
+			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
+				self.HelmetLost = true
+				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
+				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
+				self:SetBodygroup(2, 1)
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				self:ReleasePlayer()
+				self:StopFlames()
+				local id, dur = self:LookupSequence("flinch_head_1")
+				self:ResetSequence(id)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+					self.loco:SetDesiredSpeed(self:GetRunSpeed())
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+				end)
+			end
+		end
+		
+		dmgInfo:ScaleDamage(0.1) -- When the helmet isn't lost, all damage only deals 10%
+	else
+		local bone = self:LookupBone("j_head")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Up()*4
+		
+		if hitpos:DistToSqr(finalpos) < 150 then
+			-- No damage scaling on headshot, we keep it at 1x
+		else
+			dmgInfo:ScaleDamage(0.1) -- When the helmet is lost, a non-headshot still only deals 10%
+		end
+	end
+	
+end
+
 function ENT:OnInjured(dmg)
-print(self:Health())
+
 if self:Health() < scaledHP/2 and self:Health()> scaledHP/5 then
 self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_roar_0"..math.random(1,5)..".wav")
 fullHP = false
@@ -474,7 +525,7 @@ end
 end
 
 function ENT:OnThink()
-if !counting and !self:IsAttacking() and !dying and self:Health() > 0 then
+if !counting and !self:IsAttacking() and !dying and self:Health() > 0 and !self:GetSpecialAnimation() then
 counting = true
 --Walking MS
 if halfHP then

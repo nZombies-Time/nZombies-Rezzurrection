@@ -53,7 +53,7 @@ function plymeta:GiveMaxAmmo(papoverwrite)
 			v:GiveMaxAmmo()
 		else
 			local wepdata = v.NZSpecialWeaponData
-			if !wepdata then return end
+			if !wepdata then break end
 			
 			local ammo = usesammo[v:GetSpecialCategory()] or wepdata.AmmoType
 			local maxammo = wepdata.MaxAmmo

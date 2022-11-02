@@ -59,6 +59,70 @@ nzRound:AddMachineType("Original", "nz_zombie_walker", {
 nzRound:AddMachineType("Infinite Warfare", "nz_zombie_walker", {
 }) 
 
+nzRound.eemodel = nzRound.eemodel or {}
+function nzRound:AddSongType(id, class)
+	if SERVER then
+		if class then
+			local data = {}
+			-- Which entity to spawn
+			data.class = class
+			nzRound.eemodel[id] = data
+		else
+			nzRound.eemodel[id] = nil -- Remove it if no valid class was added
+		end
+	else
+		-- Clients only need it for the dropdown, no need to actually know the data and such
+		nzRound.eemodel[id] = class
+	end
+end
+
+nzRound:AddSongType("Hula Doll", "nz_zombie_walker", {
+}) 
+nzRound:AddSongType("115 Meteor", "nz_zombie_walker", {
+}) 
+nzRound:AddSongType("Origins Rock", "nz_zombie_walker", {
+})
+nzRound:AddSongType("Phone", "nz_zombie_walker", {
+})
+nzRound:AddSongType("Teddybear", "nz_zombie_walker", {
+})
+nzRound:AddSongType("Teddybear(Moon)", "nz_zombie_walker", {
+})
+nzRound:AddSongType("Teddybear(Shanks)", "nz_zombie_walker", {
+})
+nzRound:AddSongType("Vodka Bottle", "nz_zombie_walker", {
+})
+
+function nzRound:GetSongType(id)
+	if id == "Hula Doll" then
+	return "models/props_lab/huladoll.mdl"
+	end
+	if id == "115 Meteor" then
+	return "models/nzr/song_ee/meteor.mdl"
+	end
+	if id == "Origins Rock" then
+	return "models/nzr/song_ee/origins_rock.mdl"
+	end
+	if id == "Phone" then
+	return "models/nzr/song_ee/phone.mdl"
+	end
+	if id == "Teddybear" then
+	return "models/nzr/song_ee/teddybear.mdl"
+	end
+	if id == "Teddybear(Moon)" then
+	return "models/nzr/song_ee/teddybear_moon.mdl"
+	end
+	if id == "Teddybear(Shanks)" then
+	return "models/nzr/song_ee/teddybear_shanks.mdl"
+	end
+	if id == "Vodka Bottle" then
+	return "models/nzr/song_ee/vodka.mdl"
+	end
+	if id == nil then
+	return "models/props_lab/huladoll.mdl"
+	end
+end
+
 nzRound.PAPSelectData = nzRound.PAPSelectData or {}
 function nzRound:AddPAPType(id, class)
 	if SERVER then
@@ -310,6 +374,10 @@ nzRound:AddHUDType("Simple (Black)", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Simple (Outline)", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Breen Desk", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Castle", "nz_zombie_walker", {
+}) 
 
 function nzRound:GetHUDType(id)
 	if id == "Black Ops 3" then
@@ -317,6 +385,12 @@ function nzRound:GetHUDType(id)
 	end
 	if id == "Cold War" then
 	return "cw_hud.png"
+	end
+	if id == "Breen Desk" then
+	return "BREEN.png"
+	end
+	if id == "Castle" then
+	return "bloxo_big.png"
 	end
 	if id == "Infinite Warfare" then
 	return "iw_hud.png"
@@ -1031,11 +1105,26 @@ nzRound:AddAdditionalZombieType("Napalm Zombie", "nz_zombie_boss_napalm", {
 })
 nzRound:AddAdditionalZombieType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
 })
+nzRound:AddAdditionalZombieType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
+})
+nzRound:AddAdditionalZombieType("Fuel Junkie", "nz_zombie_boss_spicy", {
+})
 nzRound:AddAdditionalZombieType("Nemesis", "nz_zombie_boss_nemesis", {
 })
 nzRound:AddAdditionalZombieType("Thrasher", "nz_zombie_boss_thrasher", {
 })    
+nzRound:AddAdditionalZombieType("Avogadro", "nz_zombie_boss_avogadro", {
+})  
 function nzRound:GetSpecialType(id)
+	if id == "Panzer (Der Eisendrache)" then
+	return "nz_zombie_boss_panzer_bo3"
+	end
+	if id == "Fuel Junkie" then
+	return "nz_zombie_boss_spicy"
+	end
+	if id == "Avogadro" then
+	return "nz_zombie_boss_avogadro"
+	end
 	if id == "Burning Zombie" then
 	return "nz_zombie_special_burning"
 	end

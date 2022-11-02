@@ -11,16 +11,19 @@ ENT.Instructions	= ""
 function ENT:SetupDataTables()
 
 	self:NetworkVar( "Bool", 0, "Winding" )
+	self:NetworkVar( "Float", 0, "ThinkRate" )
 	self:NetworkVar( "String", 0, "WepClass")
+	self:NetworkVar( "Entity", 0, "Buyer")
 	self:NetworkVar( "Bool", 1, "IsTeddy" )
 	self:NetworkVar( "Bool", 2, "Sharing" )
 
 end
 
 function ENT:Initialize()
+	local speed = self:GetBuyer():HasPerk("speed") and self:GetBuyer():HasUpgrade("speed")
 
 	self:SetMoveType(MOVETYPE_NOCLIP)
-	self:SetLocalVelocity(self:GetAngles():Up() * 4)
+	self:SetLocalVelocity(self:GetAngles():Up() * (speed and 14 or 4))
 
 	self:SetSolid( SOLID_OBB )
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
@@ -29,34 +32,34 @@ function ENT:Initialize()
 	self:SetWinding(true)
 	self:SetIsTeddy(false)
 	self:SetSharing(false)
+	self:SetThinkRate(speed and .1 or .25)
 	self.c = 0
 	self.s = -20
 	self.t = 0
 	self:SetModel("models/weapons/w_rif_ak47.mdl")
-	--self:SetAngles(self.Box:GetAngles())
-	local box = self.Box -- self.Box
+	
+	local box = self.Box
 
 	if SERVER then
 		-- Stop winding up
 		if nzMapping.Settings.rboxweps then
 			self.ScrollWepList = table.GetKeys(nzMapping.Settings.rboxweps)
 		end
-		timer.Simple(5, function()
+
+		timer.Simple(speed and 1.2 or 5, function()
 			self:SetWinding(false)
 			if self:GetWepClass() == "nz_box_teddy" then
 				self:SetModel("models/hoff/props/teddy_bear/teddy_bear.mdl")
 				self:SetAngles( self.Box:GetAngles() + Angle(-90,90,0) )
 				self:SetLocalVelocity(self.Box:GetAngles():Up()*30)
-				--nzNotifications:PlaySound("nz/randombox/teddy_bear_laugh.wav", 0)
 				nzSounds:Play("Laugh")
 				self:SetIsTeddy(true)
-				if IsValid(self.Buyer) then self.Buyer:GivePoints(950) end -- Refund please
+				if IsValid(self:GetBuyer()) then self:GetBuyer():GivePoints(950) end -- Refund please
 			else
 				local wep = weapons.Get(self:GetWepClass())
 				self:SetModel(wep.WM or wep.WorldModel)
 				self:SetLocalVelocity(Vector(0,0,0)) -- Stop
 			end
-			--print(self:GetModel())
 		end)
 		
 		timer.Simple(12, function() if IsValid(self) then self:SetSharing(true)  end end)
@@ -83,30 +86,25 @@ end
 function ENT:Use( activator, caller )
 	if !self:GetWinding() and self:GetWepClass() != "nz_box_teddy" then
 		if nzMapping.Settings.sharing then
-		
-			if activator == self.Buyer or  self:GetSharing() then
+			if activator == self:GetBuyer() or self:GetSharing() then
 				local class = self:GetWepClass()
 				activator:Give(class)
 				nzWeps:GiveMaxAmmoWep(activator, class)
 				self.Box:Close()
 				self:SetSharing(false)
 				self:Remove()
-			
 			end
-		
 		else
-			if activator == self.Buyer then
-			
-			local class = self:GetWepClass()
-			activator:Give(class)
-			nzWeps:GiveMaxAmmoWep(activator, class)
-			self.Box:Close()
-			self:SetSharing(false)
-			self:Remove()
+			if activator == self:GetBuyer() then	
+				local class = self:GetWepClass()
+				activator:Give(class)
+				nzWeps:GiveMaxAmmoWep(activator, class)
+				self.Box:Close()
+				self:SetSharing(false)
+				self:Remove()
 			else
-			activator:PrintMessage( HUD_PRINTTALK, "This is " .. self.Buyer:Nick() .. "'s gun. You cannot take it." )
+				activator:PrintMessage( HUD_PRINTTALK, "This is " .. self:GetBuyer():Nick() .. "'s gun. You cannot take it." )
 			end
-		
 		end
 	end
 end
@@ -122,14 +120,9 @@ function ENT:WindUp( )
 	if gun and gun.WorldModel != nil then
 		self:SetModel(gun.WM or gun.WorldModel)
 	end
-	--[[self.c = self.c + 1.3
-	if self.c > 7 then
-		self.c = 7
-	end
-	self:SetPos(Vector(self:GetPos().X, self:GetPos().Y, self:GetPos().Z + 0.1*self.c))]]
 end
 
-function ENT:TeddyFlyUp( )
+function ENT:TeddyFlyUp()
 	self.t = self.t + 1
 	if self.t > 25 then
 		self.Box:Close()
@@ -137,18 +130,9 @@ function ENT:TeddyFlyUp( )
 		self:Remove()
 		self.t = 25
 	end
-	--self:SetPos(Vector(self:GetPos().X, self:GetPos().Y, self:GetPos().Z + 1*self.t))
 end
 
-function ENT:WindDown( )
-	--[[self.s = self.s + 1
-
-	if self.s > 7 then
-		self.s = 7
-	end
-	if self.s >= 0 then
-		self:SetPos(Vector(self:GetPos().X, self:GetPos().Y, self:GetPos().Z - 0.1*self.s))
-	end]]
+function ENT:WindDown()
 end
 
 function ENT:Think()
@@ -161,6 +145,9 @@ function ENT:Think()
 			self:WindDown()
 		end
 	end
+
+	self:NextThink(CurTime() + self:GetThinkRate())
+	return true
 end
 
 if CLIENT then

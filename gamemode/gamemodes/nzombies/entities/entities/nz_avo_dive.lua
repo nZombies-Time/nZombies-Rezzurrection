@@ -1,6 +1,6 @@
 ENT.Type = "anim"
 ENT.Base = "base_entity"
-ENT.PrintName = "Mangler Shot"
+ENT.PrintName = "avocado"
 ENT.Author = "Zet0r"
 
 ENT.Spawnable = false

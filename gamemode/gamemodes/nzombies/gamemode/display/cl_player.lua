@@ -22,6 +22,13 @@ function player:GetHUDPointsType(id)
 	if id == "Cold War" then
 	 return "cw_score1.png"
 	end
+	if id == "Castle" then
+	 return "bloxo_small.png"
+	end
+	
+	if id == "Breen Desk" then
+	 return "buried_score1.png"
+	end
 	
 	if id == "Infinite Warfare" then
 	 return "iw_hud_score.png"
