@@ -5,7 +5,7 @@ ENT.PrintName = "Thrasher"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/blackops3/so_like_this_guy_is_made_of_kush_right.mdl" }
+ENT.Models = { "models/roach/blackops3/cheekeater.mdl" }
 
 ENT.AttackRange = 112
 ENT.DamageLow = 140
