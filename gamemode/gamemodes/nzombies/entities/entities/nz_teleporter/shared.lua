@@ -93,11 +93,15 @@ function ENT:Animation(id)
 	return selectedmat
 end
 
+
 function ENT:Use(activator, caller)
 	
-	
-	if self:IsOn() and !self:GetBeingUsed() and self:GetUsable() then
-		local price = self:GetPrice()
+	print(self:GetUsable())
+	local price = self:GetPrice()
+	local damnitbobby = self:GetGifType()
+	if self:IsOn() and !self:GetBeingUsed() and price > 0 and damnitbobby < 6 then
+		--if self:GetUsable() == true then
+		--local price = self:GetPrice()
 		local walk = activator:GetWalkSpeed()
 		local run = activator:GetRunSpeed()
 		if activator:GetPoints() > price and self:GetCooldown()==false  then
@@ -204,6 +208,7 @@ function ENT:Use(activator, caller)
 			
 	
 		end
+	--end
 	end
 end
 

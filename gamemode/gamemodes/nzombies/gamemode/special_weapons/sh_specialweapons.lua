@@ -56,6 +56,7 @@ local function RegisterDefaultSpecialWeps()
 	nzSpecialWeapons:AddSpecialGrenade( "nz_tnt", 3, false, 1, false, 0.4 )
 	nzSpecialWeapons:AddSpecialGrenade( "nz_rpg", 3, false, 0.75, false, 0.4 )
 	nzSpecialWeapons:AddSpecialGrenade( "nz_molotov", 3, false, 1.4, false, 0.4 )
+	
 
 	nzSpecialWeapons:AddDisplay( "nz_revive_morphine", false, function(wep)
 		return !IsValid(wep.Owner:GetPlayerReviving())

@@ -101,6 +101,7 @@ nzTools:CreateTool("teleporter", {
         Row5:AddChoice("Black Ops 3",3)
         Row5:AddChoice("Shadows of Evil",4)
 		Row5:AddChoice("Origins (Black Ops 3)",5)
+		Row5:AddChoice("DISABLE THIS TELEPORTER",6)
 		Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
 		local Row6 = DProperties:CreateRow( "Teleporter", "Cooldown" )
 		Row6:Setup( "Integer" )
@@ -115,10 +116,10 @@ nzTools:CreateTool("teleporter", {
 		Row8:SetValue( valz["Row8"] )
 		Row8.DataChanged = function( _, val ) valz["Row8"] = val DProperties.UpdateData(DProperties.CompileData()) end
 		
-		local Row9 = DProperties:CreateRow( "Teleporter", "Purchaseable?" )
-		Row9:Setup( "Boolean" )
-		Row9:SetValue( valz["Row9"] )
-		Row9.DataChanged = function( _, val ) valz["Row9"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		--local Row9 = DProperties:CreateRow( "Teleporter", "Purchaseable?" )
+		--Row9:Setup( "Boolean" )
+		--Row9:SetValue( valz["Row9"] )
+		--Row9.DataChanged = function( _, val ) valz["Row9"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
 		return DProperties
 	end,
@@ -131,6 +132,6 @@ nzTools:CreateTool("teleporter", {
 		cooldown = 30,
 		kino = false,
 		kinodelay = 0,
-		buyable = false
+		buyable = true
 	}
 })

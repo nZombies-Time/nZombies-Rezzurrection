@@ -152,8 +152,10 @@ end
 	end,
 	["nz_teleporter"] = function(ent)
 		local text = ""
-		if !ent:GetUsable() then
-		text = "welcome...TO THE CUM ZONE"
+		local price = ent:GetPrice()
+		local enabled = ent:GetGifType()
+		if price < 0 or enabled > 5 then
+		text = ""
 		elseif !ent:IsOn() then
 			text = "No Power."
 		elseif ent:GetBeingUsed() then

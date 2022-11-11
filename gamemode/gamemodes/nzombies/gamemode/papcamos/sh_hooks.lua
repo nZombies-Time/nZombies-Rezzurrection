@@ -6,8 +6,9 @@ if SERVER then
 			if not IsValid(ply) then return end
 			if not IsValid(wep) then return end
 
-			if wep.IsTFAWeapon or wep.CW20Weapon or wep.IsFAS2Weapon then //nz compatible weapons
+			if wep.IsTFAWeapon or wep.CW20Weapon or wep.IsFAS2Weapon then 
 				if wep.NZSpecialCategory then return end
+			
 
 				print('Generated random pap camo from config table')
 				print(nzCamos:Get(nzMapping.Settings.PAPcamo).name)

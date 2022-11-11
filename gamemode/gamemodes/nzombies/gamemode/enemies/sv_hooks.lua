@@ -347,7 +347,6 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 			
 			
 			
-			
 			if attacker:IsPlayer() and attacker:HasPerk("fire") and (dmginfo:IsDamageType( 2097152 ) or dmginfo:IsDamageType(  8 )) then
 				dmginfo:ScaleDamage(2) 
 			end
