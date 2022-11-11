@@ -1479,7 +1479,7 @@ function ENT:TriggerBarricadeJump( barricade, dir )
 
 		--self:SetSolidMask(MASK_SOLID_BRUSHONLY)
 		self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY) -- Nocollide with props and other entities while we attempt to vault (Gets removed after event, or with CollideWhenPossible)
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
 
 		self.loco:SetDesiredSpeed(speed)
 		self:SetVelocity(self:GetForward() * speed)
