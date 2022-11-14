@@ -48,8 +48,6 @@ SWEP.NZPreventBox = true
 SWEP.NZSpecialCategory = "shield" -- This makes it count as special, as well as what category it replaces
 -- Since this is a unique ID, it won't replace any other special weapon and it won't be selectable, so we call this function:
 
-nzSpecialWeapons:RegisterSpecialWeaponCategory("shield", KEY_N) -- This also adds a convar to rebind (with that default)
-
 function SWEP:NZSpecialHolster(wep)
 	return true -- This lets us always holster it even though it is a special weapon
 end
@@ -59,25 +57,25 @@ function SWEP:SetupDataTables()
 end
 
 function SWEP:Initialize()
-
 	self:SetHoldType( self.HoldType )
-	print(self.NZSpecialHolster)
-
 end
 
 function SWEP:Deploy()
+	local ply = self:GetOwner()
+
 	if SERVER then
-		if IsValid(self.Owner) and IsValid(self.Shield) then
-			self.Owner.Shield:SetNoDraw(true)
+		if IsValid(ply) and IsValid(self.Shield) then
+			ply:GetShield():SetNoDraw(true)
 		else
 			self:Remove()
 		end
 	end
+
 	self:SendWeaponAnim(ACT_VM_DRAW)
-	self.WepOwner = self.Owner
+	self.WepOwner = ply
 	self:CallOnClient("Deploy")
 	
-	local viewmodel = self.Owner:GetViewModel()
+	local viewmodel = ply:GetViewModel()
 	if IsValid(viewmodel) then
 		viewmodel:SetBodygroup(0,self:GetBodygroup(0))
 		viewmodel:SetBodygroup(1,self:GetBodygroup(1))
@@ -86,14 +84,17 @@ function SWEP:Deploy()
 end
 
 function SWEP:Holster()
+	local ply = self:GetOwner()
+
 	if SERVER then
-		if IsValid(self.Owner) and IsValid(self.Shield) then
-			self.Owner.Shield:SetNoDraw(false)
+		if IsValid(ply) and IsValid(self.Shield) then
+			ply:GetShield():SetNoDraw(false)
 		else
 			self:Remove()
 		end
 	end
-	local viewmodel = self.Owner:GetViewModel()
+
+	local viewmodel = ply:GetViewModel()
 	if IsValid(viewmodel) then
 		viewmodel:SetBodygroup(0,0)
 		viewmodel:SetBodygroup(1,0)
@@ -102,11 +103,15 @@ function SWEP:Holster()
 	return true
 end
 
-function SWEP:CreateBackShield(owner)
-	owner.Shield = ents.Create("nz_zombieshield_back")
-	owner.Shield:SetOwner(owner)
-	owner.Shield:Spawn()
-	self.Shield = owner.Shield
+function SWEP:CreateBackShield(ply)
+	if not SERVER then return end
+	ply:SetShield(ents.Create("nz_zombieshield_back"))
+	ply:GetShield():SetOwner(ply)
+	ply:GetShield().Weapon = self
+	ply:GetShield():Spawn()
+	ply:GetShield().Weapon = self
+
+	self.Shield = ply:GetShield()
 end
 
 function SWEP:Equip( owner )
@@ -114,29 +119,29 @@ function SWEP:Equip( owner )
 end
 
 function SWEP:PrimaryAttack()
-	
+	local ply = self:GetOwner()
 	self:SetNextPrimaryFire(CurTime() + 1)
 
-	local vecSrc		= self.Owner:GetShootPos()
-	local vecDirection	= self.Owner:GetAimVector()
+	local vecSrc		= ply:GetShootPos()
+	local vecDirection	= ply:GetAimVector()
 
 	local trace			= {}
 		trace.start		= vecSrc
 		trace.endpos	= vecSrc + ( vecDirection * 100)
-		trace.filter	= self.Owner
+		trace.filter	= ply
 
 	local tracehit		= util.TraceLine( trace )
 	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
-	self.Owner:SetAnimation( PLAYER_ATTACK1 )
+	ply:SetAnimation( PLAYER_ATTACK1 )
 	
 	if ( tracehit.Hit ) then
 		if ( SERVER ) then
 			self:EmitSound("physics/metal/metal_box_impact_hard"..math.random(1,3)..".wav")
 			if self:GetElectrified() then
-				local ent = self.Owner:TraceHullAttack( vecSrc, tracehit.HitPos, Vector( -5, -5, -5 ), Vector( 5, 5, 36 ), 450, DMG_SHOCK, 100 )
+				local ent = ply:TraceHullAttack( vecSrc, tracehit.HitPos, Vector( -5, -5, -5 ), Vector( 5, 5, 36 ), 450, DMG_SHOCK, 100 )
 				if IsValid(ent) then timer.Simple(0, function() self:EmitSound("ambient/energy/zap"..math.random(1,9)..".wav") end) end
 			else
-				self.Owner:TraceHullAttack( vecSrc, tracehit.HitPos, Vector( -5, -5, -5 ), Vector( 5, 5, 36 ), 250, DMG_CLUB, 100 )
+				ply:TraceHullAttack( vecSrc, tracehit.HitPos, Vector( -5, -5, -5 ), Vector( 5, 5, 36 ), 250, DMG_CLUB, 100 )
 			end
 		end
 	end
