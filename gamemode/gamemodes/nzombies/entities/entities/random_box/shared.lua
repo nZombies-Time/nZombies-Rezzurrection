@@ -161,14 +161,6 @@ function ENT:Open()
 end
 
 function ENT:Close()
-	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-		self.FlamesEnt:Remove()
-		self.FlamesEnt = nil
-		self.FlamesEntL:Remove()
-		self.FlamesEntL = nil
-		self.FlamesEntR:Remove()
-		self.FlamesEntR = nil
-	end
 
 	local sequence = self:LookupSequence("Open")
 	self:SetSequence( sequence )
@@ -212,14 +204,6 @@ function ENT:Think()
 end
 
 function ENT:MoveAway()
-	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-		self.FlamesEnt:Remove()
-		self.FlamesEnt = nil
-		self.FlamesEntL:Remove()
-		self.FlamesEntL = nil
-		self.FlamesEntR:Remove()
-		self.FlamesEntR = nil
-	end
 
 	self.Moving = true
 	self:SetSolid(SOLID_NONE)

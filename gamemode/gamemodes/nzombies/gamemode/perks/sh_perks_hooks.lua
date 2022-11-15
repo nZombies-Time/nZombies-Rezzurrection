@@ -1,11 +1,36 @@
--- Tortoise upgrade
+-- Tortoise upgrade and Explosion
 hook.Add("OnEntityCreated", "nz.Perk.Tortoise_Upgrade", function(ent)
-	timer.Simple(0, function() //1 tick delay to get owner info
+	timer.Simple(engine.TickInterval(), function() //1 tick delay to get owner info
 		if not IsValid(ent) then return end
 		local ply = ent:GetOwner()
-		if not IsValid(ply) then return end
+		if not IsValid(ply) or not ply:IsPlayer() then return end
 
-		if IsValid(ply.Shield) and ent == ply.Shield then
+		if ply:HasPerk("tortoise") and IsValid(ply:GetShield()) and ent == ply:GetShield() then
+			ent:CallOnRemove("nz.Perk.Tortoise_Exp", function(ent)
+				local damage = DamageInfo()
+				damage:SetDamage(54000)
+				damage:SetAttacker(IsValid(ply) and ply or ent)
+				damage:SetInflictor(IsValid(ply:GetShield().Weapon) and ply:GetShield().Weapon or ent)
+				damage:SetDamageType(DMG_BLAST_SURFACE)
+
+				for k, v in pairs(ents.FindInSphere(ply:GetPos(), 512)) do
+					if v:IsValidZombie() then
+						damage:SetDamageForce(v:GetUp()*8000 + (v:GetPos() - ent:GetPos()):GetNormalized()*10000)
+						if SERVER then
+							v:TakeDamageInfo(damage)
+						end
+					end
+				end
+
+				util.ScreenShake(ply:GetPos(), 10, 255, 1.5, 600)
+
+				ParticleEffect("grenade_explosion_01", ply:WorldSpaceCenter(), Angle(0,0,0))
+
+				ply:EmitSound("Perk.Tortoise.Exp")
+				ply:EmitSound("Perk.Tortoise.Exp_Firey")
+				ply:EmitSound("Perk.Tortoise.Exp_Decay")
+			end)
+
 			if ply:HasUpgrade("tortoise") then
 				ent:SetHealth(ent:GetMaxHealth()*2)
 				ent:SetMaxHealth(ent:GetMaxHealth()*2)
@@ -14,58 +39,7 @@ hook.Add("OnEntityCreated", "nz.Perk.Tortoise_Upgrade", function(ent)
 	end)
 end)
 
-
 if SERVER then
-	-- Basic shield functionality
-	hook.Add("PlayerShouldTakeDamage", "nzShieldBlock", function(ply, ent)
-		if ent:IsValidZombie() and IsValid(ply.Shield) then
-			local dot = (ent:GetPos() - ply:GetPos()):Dot(ply:GetAimVector())
-			local wep = ply:GetActiveWeapon()
-			local shield = IsValid(wep) and wep == ply.Shield.Weapon
-			if ply:HasPerk("tortoise") and shield then
-				ply.Shield:TakeDamage(30, ent, ent)
-				return false
-			elseif (dot < 0 and !shield) or (dot >= 0 and shield) then
-				ply.Shield:TakeDamage(30, ent, ent)
-				return false
-			end
-		end
-	end)
-
-	-- Explode when shield breaks
-	hook.Add("EntityTakeDamage", "nz.Perk.Tortoise_Explode", function(ent, dmginfo)
-		local ply = ent:GetOwner()
-		if not IsValid(ply) or not ply:IsPlayer() then return end
-		if ply:HasPerk("tortoise") and IsValid(ply.Shield) and ent == ply.Shield then
-			if dmginfo:GetDamage() >= ent:Health() or ent:Health() == 0 then
-
-				local round = nzRound:GetNumber() > 0 and nzRound:GetNumber() or 1
-				local health = nzCurves.GenerateHealthCurve(round)
-
-				local damage = DamageInfo()
-				damage:SetDamage(health or 54000)
-				damage:SetInflictor(IsValid(ply.Shield.Weapon) and ply.Shield.Weapon or ent)
-				damage:SetAttacker(IsValid(ply) and ply or ent)
-				damage:SetDamageType(DMG_BLAST_SURFACE)
-
-				for k, v in pairs(ents.FindInSphere(ply:GetPos(), 300)) do
-					if IsValid(v) and v:IsValidZombie() then
-						damage:SetDamageForce(v:GetUp()*8000 + (v:GetPos() - ent:GetPos()):GetNormalized()*10000)
-						v:TakeDamageInfo(damage)
-					end
-				end
-
-				util.ScreenShake(ply:GetPos(), 15000, 255, 1.5, 600)
-				
-				ParticleEffect("grenade_explosion_01", ply:GetPos() + ply:OBBCenter(), Angle(0,0,0))
-				
-				ply:EmitSound("Perk.Tortoise.Exp")
-				ply:EmitSound("Perk.Tortoise.Exp_Firey")
-				ply:EmitSound("Perk.Tortoise.Exp_Decay")
-			end
-		end
-	end)
-
 	-- Scale headshot and boss damage
 	hook.Add("EntityTakeDamage", "nz.Perk.Death_Damage", function(ent, dmginfo)
 		if not IsValid(ent) or not ent:IsValidZombie() then return end
@@ -162,7 +136,7 @@ if CLIENT then
 
         if ply:HasPerk("death") then
             local pos = ply:GetPos()
-            local range = 350
+            local range = 400
             local ang = 0.65
 
             local dents = {}

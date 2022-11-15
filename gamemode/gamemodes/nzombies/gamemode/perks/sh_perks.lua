@@ -1570,9 +1570,10 @@ nzPerks:NewPerk("tortoise", {
 	lostfunc = function(self, ply)
 	end,
 	upgradefunc = function(self, ply)
-		if IsValid(ply.Shield) then
-			ply.Shield:SetHealth(ply.Shield:GetMaxHealth()*2)
-			ply.Shield:SetMaxHealth(ply.Shield:GetMaxHealth()*2)
+		local shield = ply:GetShield()
+		if IsValid(shield) then
+			shield:SetHealth(shield:GetMaxHealth()*2)
+			shield:SetMaxHealth(shield:GetMaxHealth()*2)
 		end
 	end,
 })
