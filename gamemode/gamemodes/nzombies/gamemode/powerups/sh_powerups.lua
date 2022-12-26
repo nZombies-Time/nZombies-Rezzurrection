@@ -259,7 +259,7 @@ nzPowerUps:NewPowerUp("nuke", {
 	
 		
 			if nzMapping.Settings.negative  then
-		if math.random(0,1) == 3 then
+		if math.random(0,3) == 3 then
 			nzPowerUps:Nuke(ply:GetPos())
 		else
 		for k,v in pairs(player.GetAll()) do
