@@ -124,12 +124,22 @@ if SERVER then
 	
 	local oldsetwep = playerMeta.SetActiveWeapon
 	function playerMeta:SetActiveWeapon(wep)
-		local oldwep = self:GetActiveWeapon()
-		if IsValid(oldwep) and !oldwep:IsSpecial() then
-			self.NZPrevWep = oldwep
-		end
-		oldsetwep(self, wep)
-	end
+    if isstring(wep) then
+        local wepEnt = weapons.Get(wep)
+        if istable(wepEnt) == true then
+          wep = ents.Create(wep)
+        else
+          print(string.format("[nZ] Error : Function SetActiveWeapon get a bad wep classname : %s",wep))
+          return
+        end
+    end
+
+    local oldwep = self:GetActiveWeapon()
+    if IsValid(oldwep) and !oldwep:IsSpecial() then
+        self.NZPrevWep = oldwep
+    end
+    oldsetwep(self, wep)
+end
 	
 else
 	
