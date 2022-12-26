@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/alien/alien.mdl",
+	"models/zombies/alien.mdl",
 }
 
 local AttackSequences = {
@@ -34,60 +34,60 @@ local RunAttackSequences = {
 }
 
 local AttackSounds = {
-	"character/alien/vocals/aln_taunt_01",
-	"character/alien/vocals/aln_taunt_02",
-	"character/alien/vocals/aln_taunt_03",
-	"character/alien/vocals/aln_taunt_04",
-	"character/alien/vocals/aln_taunt_05",
-	"character/alien/vocals/aln_taunt_06",
-	"character/alien/vocals/aln_pain_small_1",
-	"character/alien/vocals/aln_pain_small_2",
-	"character/alien/vocals/aln_pain_small_3",
-	"character/alien/vocals/aln_pain_small_4",
-	"character/alien/vocals/aln_pain_small_5",
-	"character/alien/vocals/aln_pain_small_6",
-	"character/alien/vocals/aln_pain_small_7",
-	"character/alien/vocals/aln_pain_small_8",
-	"character/alien/vocals/aln_pain_small_9",
-	"character/alien/vocals/aln_pain_small_10"
+	"enemies/zombies/alien/vocals/aln_taunt_01",
+	"enemies/zombies/alien/vocals/aln_taunt_02",
+	"enemies/zombies/alien/vocals/aln_taunt_03",
+	"enemies/zombies/alien/vocals/aln_taunt_04",
+	"enemies/zombies/alien/vocals/aln_taunt_05",
+	"enemies/zombies/alien/vocals/aln_taunt_06",
+	"enemies/zombies/alien/vocals/aln_pain_small_1",
+	"enemies/zombies/alien/vocals/aln_pain_small_2",
+	"enemies/zombies/alien/vocals/aln_pain_small_3",
+	"enemies/zombies/alien/vocals/aln_pain_small_4",
+	"enemies/zombies/alien/vocals/aln_pain_small_5",
+	"enemies/zombies/alien/vocals/aln_pain_small_6",
+	"enemies/zombies/alien/vocals/aln_pain_small_7",
+	"enemies/zombies/alien/vocals/aln_pain_small_8",
+	"enemies/zombies/alien/vocals/aln_pain_small_9",
+	"enemies/zombies/alien/vocals/aln_pain_small_10"
 	
 }
 
 local WalkSounds = {
-	"character/alien/vocals/alien_breathing_steady_01",
-	"character/alien/footsteps/walk/prd_fs_dirt_1",
-	"character/alien/footsteps/walk/prd_fs_dirt_2",
-	"character/alien/footsteps/walk/prd_fs_dirt_3",
-	"character/alien/footsteps/walk/prd_fs_dirt_4",
-	"character/alien/footsteps/walk/prd_fs_dirt_5",
-	"character/alien/footsteps/walk/prd_fs_dirt_6",
-	"character/alien/footsteps/walk/prd_fs_dirt_7",
-	"character/alien/footsteps/walk/prd_fs_dirt_8",
-	"character/alien/footsteps/walk/prd_fs_dirt_9",
-	"character/alien/footsteps/walk/prd_fs_dirt_10",
-	"character/alien/footsteps/walk/prd_fs_dirt_11",
-	"character/alien/footsteps/walk/prd_fs_dirt_12",
-	"character/alien/footsteps/walk/prd_fs_dirt_13",
-	"character/alien/footsteps/walk/prd_fs_dirt_14",
-	"character/alien/footsteps/walk/prd_fs_dirt_15"
+	"enemies/zombies/alien/vocals/alien_breathing_steady_01",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_1",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_2",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_3",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_4",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_5",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_6",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_7",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_8",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_9",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_10",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_11",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_12",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_13",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_14",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_15"
 }
 
 local RunSounds = {
-	"character/alien/footsteps/walk/prd_fs_dirt_1",
-	"character/alien/footsteps/walk/prd_fs_dirt_2",
-	"character/alien/footsteps/walk/prd_fs_dirt_3",
-	"character/alien/footsteps/walk/prd_fs_dirt_4",
-	"character/alien/footsteps/walk/prd_fs_dirt_5",
-	"character/alien/footsteps/walk/prd_fs_dirt_6",
-	"character/alien/footsteps/walk/prd_fs_dirt_7",
-	"character/alien/footsteps/walk/prd_fs_dirt_8",
-	"character/alien/footsteps/walk/prd_fs_dirt_9",
-	"character/alien/footsteps/walk/prd_fs_dirt_10",
-	"character/alien/footsteps/walk/prd_fs_dirt_11",
-	"character/alien/footsteps/walk/prd_fs_dirt_12",
-	"character/alien/footsteps/walk/prd_fs_dirt_13",
-	"character/alien/footsteps/walk/prd_fs_dirt_14",
-	"character/alien/footsteps/walk/prd_fs_dirt_15"
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_1",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_2",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_3",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_4",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_5",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_6",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_7",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_8",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_9",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_10",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_11",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_12",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_13",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_14",
+	"enemies/zombies/alien/footsteps/walk/prd_fs_dirt_15"
 }
 
 local JumpSequences = {
@@ -140,11 +140,11 @@ ENT.EmergeSequences = {
 	"Emerge3"
 }
 ENT.AttackHitSounds = {
-	"weapons/alien/alien_clawhit_flesh_tp_1.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_2.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_3.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_4.mp3",
-	"weapons/alien/alien_clawhit_flesh_tp_5.mp3"
+	"enemies/zombies/alien/alien_clawhit_flesh_tp_1.ogg",
+	"enemies/zombies/alien/alien_clawhit_flesh_tp_2.ogg",
+	"enemies/zombies/alien/alien_clawhit_flesh_tp_3.ogg",
+	"enemies/zombies/alien/alien_clawhit_flesh_tp_4.ogg",
+	"enemies/zombies/alien/alien_clawhit_flesh_tp_5.ogg"
 }
 ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet1.wav",
@@ -154,15 +154,15 @@ ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet5.wav"
 }
 ENT.DeathSounds = {
-	"character/alien/vocals/alien_death_scream_iconic_elephant.mp3",
-	"character/alien/vocals/aln_death_scream_20.mp3",
-	"character/alien/vocals/aln_death_scream_21.mp3",
-	"character/alien/vocals/aln_death_scream_22.mp3",
-	"character/alien/vocals/aln_death_scream_23.mp3",
-	"character/alien/vocals/aln_death_scream_24.mp3",
-	"character/alien/vocals/aln_death_scream_25.mp3",
-	"character/alien/vocals/aln_death_scream_26.mp3",
-	"character/alien/vocals/aln_death_scream_27.mp3"
+	"enemies/zombies/alien/vocals/alien_death_scream_iconic_elephant.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_20.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_21.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_22.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_23.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_24.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_25.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_26.ogg",
+	"enemies/zombies/alien/vocals/aln_death_scream_27.ogg"
 }
 
 function ENT:StatsInitialize()
@@ -224,7 +224,7 @@ function ENT:OnSpawn()
 	effectData:SetOrigin( self:GetPos() )
 	effectData:SetMagnitude(dur)
 	util.Effect("zombie_spawn_dust", effectData)
-	self:EmitSound("character/alien/vocals/aln_pain_small_" ..math.random(1,10)..".mp3", 75, 100, 1)
+		self:EmitSound("enemies/zombies/alien/vocals/aln_pain_small_" ..math.random(1,10)..".ogg", 75, 100, 1)
 
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
@@ -236,12 +236,12 @@ end
 function ENT:OnThink()
 if math.random(0,1500) == 965 then
 if math.random(0,1) == 0 then
-self:EmitSound("character/alien/vocals/alien_growl_short_0" ..math.random(1,5)..".mp3", 70, 100, 1)
+self:EmitSound("enemies/zombies/alien/vocals/alien_growl_short_0" ..math.random(1,5)..".ogg", 70, 100, 1)
 else
 if math.random(0,1) == 0 then
-self:EmitSound("character/alien/vocals/alien_hiss_long_0" ..math.random(1,2)..".mp3", 70, 100, 1)
+self:EmitSound("enemies/zombies/alien/vocals/alien_hiss_long_0" ..math.random(1,2)..".ogg", 70, 100, 1)
 else
-self:EmitSound("character/alien/vocals/aln_taunt_0" ..math.random(1,6)..".mp3", 70, 100, 1)
+self:EmitSound("enemies/zombies/alien/vocals/aln_taunt_0" ..math.random(1,6)..".ogg", 70, 100, 1)
 end
 
 end

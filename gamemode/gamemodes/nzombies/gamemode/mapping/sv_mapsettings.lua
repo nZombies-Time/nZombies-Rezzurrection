@@ -168,6 +168,10 @@ function nzMapping:LoadMapSettings(data)
 	if data.sharing then
 		nzMapping.Settings.sharing = (data.sharing) or nil
 	end
+	
+	if data.negative then
+		nzMapping.Settings.negative = (data.negative) or nil
+	end
 
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
 	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround

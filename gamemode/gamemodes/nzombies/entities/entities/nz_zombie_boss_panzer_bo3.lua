@@ -5,7 +5,7 @@ ENT.PrintName = "Panzersoldat"
 ENT.Category = "Brainz"
 ENT.Author = "Zet0r"
 
-ENT.Models = { "models/nzr/2022/enemies/stupidtoaster.mdl" }
+ENT.Models = { "models/bosses/stupidtoaster.mdl" }
 
 ENT.AttackRange = 130
 ENT.DamageLow = 40
@@ -23,25 +23,25 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"codz_megapack/zmb/ai/mechz2/vox/swing_00.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/swing_01.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/swing_02.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/swing_03.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/swing_04.wav",
+	"enemies/bosses/newpanzer/vox/swing_00.ogg",
+	"enemies/bosses/newpanzer/vox/swing_01.ogg",
+	"enemies/bosses/newpanzer/vox/swing_02.ogg",
+	"enemies/bosses/newpanzer/vox/swing_03.ogg",
+	"enemies/bosses/newpanzer/vox/swing_04.ogg",
 }
 
 ENT.AttackHitSounds = {
-	"bo1_overhaul/dir/sfx/zmb_melee_light_00.mp3",
-	"bo1_overhaul/dir/sfx/zmb_melee_light_01.mp3",
-	"bo1_overhaul/dir/sfx/zmb_melee_light_02.mp3",
+	"enemies/bosses/dir/sfx/zmb_melee_light_00.ogg",
+	"enemies/bosses/dir/sfx/zmb_melee_light_01.ogg",
+	"enemies/bosses/dir/sfx/zmb_melee_light_02.ogg",
 }
 
 ENT.WalkSounds = {
-	"codz_megapack/zmb/ai/mechz2/vox/ambient_00.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/ambient_01.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/ambient_02.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/ambient_03.wav",
-	"codz_megapack/zmb/ai/mechz2/vox/ambient_04.wav",
+	"enemies/bosses/newpanzer/vox/ambient_00.ogg",
+	"enemies/bosses/newpanzer/vox/ambient_01.ogg",
+	"enemies/bosses/newpanzer/vox/ambient_02.ogg",
+	"enemies/bosses/newpanzer/vox/ambient_03.ogg",
+	"enemies/bosses/newpanzer/vox/ambient_04.ogg",
 }
 
 ENT.ActStages = {
@@ -190,10 +190,10 @@ function ENT:OnSpawn()
 		effectData:SetStart( pos )
 		effectData:SetOrigin( pos )
 		effectData:SetMagnitude(dur)
-		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/incoming_alarm_new.wav",511)
+		self:EmitSound("enemies/bosses/newpanzer/incoming_alarm_new.ogg",511)
 		--util.Effect("panzer_spawn_tp", effectData)
 		for i=3,4 do ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,i)end
-		self:EmitSound("codz_megapack/zmb/ai/mechz2/mechz_entrance.wav")
+			self:EmitSound("enemies/bosses/newpanzer/mechz_entrance.ogg")
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
 		effectData:SetOrigin( pos )
@@ -208,11 +208,11 @@ function ENT:OnSpawn()
 			effectData:SetMagnitude(dur)
 			
 			self:StopSound("zmb_ai_panzer_rocket_loop")
-		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/rocket/stop.wav")
+		self:EmitSound("enemies/bosses/newpanzer/mech_z_entrance_land_alt.ogg")
 		end)
 		self:TimedEvent(dur - 0.6, function()
 			util.Effect("panzer_land_dust", effectData)
-			self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/land_0"..math.random(0,2)..".wav")
+			self:EmitSound("enemies/bosses/newpanzer/land_0"..math.random(0,2)..".ogg")
 		self:StopParticles()
 		counting = false
 		self:SetSpecialAnimation(false)
@@ -235,11 +235,11 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:ResetSequence(seq)
 	self:SetCycle(0)
 
-self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/killimp.wav")
+self:EmitSound("enemies/bosses/newpanzer/killimp.ogg")
 	timer.Simple(0.36,function()
 		if IsValid(self) then
 		dying = true
-		self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/destruction_0"..math.random(0,2)..".wav")
+		self:EmitSound("enemies/bosses/newpanzer/destruction_0"..math.random(0,2)..".ogg")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -247,7 +247,7 @@ self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/killimp.wav")
 			self:Remove()
 			util.ScreenShake(self:GetPos(),12,400,3,1000)
 			ParticleEffect("bo3_panzer_explosion",self:GetPos(),Angle(0,0,0),nil)
-			self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/explode.mp3")
+			self:EmitSound("enemies/bosses/newpanzer/explode.ogg")
 			--util.Effect("Explosion", effectData)
 			
 		end
@@ -332,8 +332,8 @@ function ENT:OnPathTimeOut()
 			self:SetVelocity(Vector(0,0,0))
 			local clawpos = self:GetAttachment(self:LookupAttachment("tag_gun_spin")).Pos
 			timer.Simple(0.1, function()self.ClawHook = ents.Create("nz_mangler_shot")
-			self:EmitSound("codz_megapack/zmb/ai/mechz2/wpn_grenade_fire_mechz.wav")
-		self:EmitSound("codz_megapack/zmb/ai/mechz2/mech_z_entrance_land_alt.wav")
+			self:EmitSound("enemies/bosses/newpanzer/wpn_grenade_fire_mechz.ogg")
+		self:EmitSound("enemies/bosses/newpanzer/mech_z_entrance_land_alt.ogg")
 		ParticleEffectAttach("bo3_panzer_elec_blast",PATTACH_POINT,self,8)
 		end)
 				timer.Simple(0.1, function()self.ClawHook:SetPos(clawpos)end)
@@ -475,7 +475,7 @@ function ENT:OnInjured( dmgInfo )
 			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
 				self.HelmetLost = true
 				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
-				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
+				self:EmitSound("enemies/bosses/newpanzer/mechz_faceplate.ogg",511)
 				self:SetBodygroup(2, 1)
 				self:SetSpecialAnimation(true)
 				self:SetBlockAttack(true)
@@ -518,13 +518,13 @@ end
 
 function ENT:StartFlames(time)
 	self:Stop()
-	self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/start.wav")
+	self:EmitSound("nz/panzer/mech_flamethrower_start.wav")
 	self:SetFlamethrowing(true)
-	timer.Simple(0.5, function()self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/loop.wav")end)
+	timer.Simple(0.5, function()self:EmitSound("nz/panzer/mech_flamethrower_loop.wav")end)
 	if time then self:TimedEvent(time, function() 
 	self:StopFlames() 
-	self:StopSound("codz_megapack/zmb/ai/mechz2/v2/flame/loop.wav")
-	self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/end.wav")
+	self:StopSound("nz/panzer/mech_flamethrower_loop.wav")
+	self:EmitSound("nz/panzer/flame/mech_flamethrower_start.wav")
 	end)
 	end
 end
@@ -547,7 +547,7 @@ if !counting and !dying and !shooting and self:Health() > 0 and !self:GetFlameth
 counting = true
 timer.Simple(0.4,function()
 util.ScreenShake(self:GetPos(),4,1000,0.5,2048)
-self:EmitSound("codz_megapack/zmb/ai/mechz2/anim_decepticon_lg_run_0".. math.random(1, 4) ..".wav")
+self:EmitSound("enemies/bosses/newpanzer/anim_decepticon_lg_run_0".. math.random(1, 4) ..".ogg")
 counting = false
 end)
 end

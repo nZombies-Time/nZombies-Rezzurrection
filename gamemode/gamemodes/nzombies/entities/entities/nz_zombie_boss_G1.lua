@@ -5,7 +5,7 @@ ENT.PrintName = "Birkin Stage 1"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/re2/g1.mdl" }
+ENT.Models = { "models/bosses/g1.mdl" }
 
 ENT.AttackRange = 100
 ENT.DamageLow = 10
@@ -25,18 +25,18 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"re2/em7000/attack1.mp3",
-	"re2/em7000/attack2.mp3",
-	"re2/em7000/attack3.mp3",
-	"re2/em7000/attack4.mp3",
-	"re2/em7000/attack5.mp3",
-	"re2/em7000/attack6.mp3",
-	"re2/em7000/vo/yell1.mp3",
-	"re2/em7000/vo/yell2.mp3",
-	"re2/em7000/vo/yell3.mp3",
-	"re2/em7000/vo/yell4.mp3",
-	"re2/em7000/vo/yell5.mp3",
-	"re2/em7000/vo/yell6.mp3"
+	"enemies/bosses/re2/em7000/attack1.ogg",
+	"enemies/bosses/re2/em7000/attack2.ogg",
+	"enemies/bosses/re2/em7000/attack3.ogg",
+	"enemies/bosses/re2/em7000/attack4.ogg",
+	"enemies/bosses/re2/em7000/attack5.ogg",
+	"enemies/bosses/re2/em7000/attack6.ogg",
+	"enemies/bosses/re2/em7000/vo/yell1.ogg",
+	"enemies/bosses/re2/em7000/vo/yell2.ogg",
+	"enemies/bosses/re2/em7000/vo/yell3.ogg",
+	"enemies/bosses/re2/em7000/vo/yell4.ogg",
+	"enemies/bosses/re2/em7000/vo/yell5.ogg",
+	"enemies/bosses/re2/em7000/vo/yell6.ogg",
 }
 
 ENT.PainSounds = {
@@ -48,16 +48,16 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"re2/em7000/hit_body1.mp3",
-	"re2/em7000/hit_body2.mp3",
-	"re2/em7000/hit_body3.mp3",
-	"re2/em7000/hit_body4.mp3",
-	"re2/em7000/hit_body5.mp3",
-	"re2/em7000/hit_body6.mp3"
+	"enemies/bosses/re2/em7000/hit_body1.ogg",
+	"enemies/bosses/re2/em7000/hit_body2.ogg",
+	"enemies/bosses/re2/em7000/hit_body3.ogg",
+	"enemies/bosses/re2/em7000/hit_body4.ogg",
+	"enemies/bosses/re2/em7000/hit_body5.ogg",
+	"enemies/bosses/re2/em7000/hit_body6.ogg",
 }
 
 ENT.WalkSounds = {
-	"re2/em7000/step1.wav"
+	"enemies/bosses/re2/em7000/step1.ogg",
 }
 
 ENT.ActStages = {
@@ -67,11 +67,7 @@ ENT.ActStages = {
 	},
 	[2] = {
 		act = ACT_RUN,
-		minspeed = 101,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 180
+		minspeed = 128,
 	}
 }
 
@@ -149,7 +145,8 @@ function ENT:StatsInitialize()
 		counting = true
 		dying = false
 		taunting = true
-		self:SetRunSpeed(100)
+		baseHealth = 0
+		self:SetRunSpeed(80)
 		self:SetHealth(5000)
 		self:SetMaxHealth(50000)
 	end
@@ -199,10 +196,10 @@ function ENT:OnSpawn()
 	if coroutine.running() then
 		
 		local pos = self:GetPos() + (seq == "slow_flinch_head" and Vector(0,0,100) or Vector(0,0,450))
-		for i=1,8 do
+		for i=1,4 do
 			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
-		self:EmitSound("re2/em7000/hit_world4.mp3",511,100)
+		self:EmitSound("enemies/bosses/re2/em7000/hit_world4.ogg",511,100)
 	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
@@ -215,7 +212,7 @@ function ENT:OnSpawn()
 			--dust cloud
 			self:SetPos(self:GetPos() + Vector(0,0,0))
 			self:SetInvulnerable(false)
-				self:EmitSound("re2/em7000/vo/help1.mp3",511,100)
+				self:EmitSound("enemies/bosses/re2/em7000/vo/help1.ogg",511,100)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
@@ -224,6 +221,7 @@ function ENT:OnSpawn()
 		end)
 		counting = false
 		taunting = false
+		baseHealth = self:Health()
 		self:PlaySequenceAndWait(seq)
 	end
 end
@@ -237,12 +235,12 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:Stop()
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:EmitSound("re2/em7000/pain"..math.random(6)..".mp3",511)
+	self:EmitSound("enemies/bosses/re2/em7000/pain"..math.random(6)..".ogg",511)
 	self:ResetSequence(seq)
 	self:SetCycle(0)
 	timer.Simple(40/115, function()
 		if IsValid(self) then
-			self:EmitSound("re2/em7000/down_knee"..math.random(5)..".mp3")
+			self:EmitSound("enemies/bosses/re2/em7000/down_knee"..math.random(5)..".ogg")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -250,7 +248,8 @@ function ENT:OnZombieDeath(dmgInfo)
 				self.G2 = ents.Create("nz_zombie_boss_G2")
 				self.G2:SetPos(self:GetPos())
 				self.G2:Spawn()
-		ents.Create("nz_zombie_boss_G2")
+				self.G2:SetHealth(nzRound:GetNumber() * 500 + 2500)
+	--	ents.Create("nz_zombie_boss_G2")
 			self:Remove()
 			ParticleEffect("nbnz_gib_explosion",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		end
@@ -258,31 +257,7 @@ function ENT:OnZombieDeath(dmgInfo)
 
 end
 
-function ENT:BodyUpdate()
 
-	self.CalcIdeal = ACT_IDLE
-
-	local velocity = self:GetVelocity()
-
-	local len2d = velocity:Length2D()
-
-	if ( len2d >101 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
-
-	if self:IsJumping() and self:WaterLevel() <= 0 then
-		self.CalcIdeal = ACT_JUMP
-	end
-
-	if !self:GetSpecialAnimation() and !self:IsAttacking() then
-		if self:GetActivity() != self.CalcIdeal and !self:GetStop() then self:StartActivity(self.CalcIdeal) end
-
-		if self.ActStages[self:GetActStage()] then
-			self:BodyMoveXY()
-		end
-	end
-
-	self:FrameAdvance()
-
-end
 
 function ENT:OnPathTimeOut()
 
@@ -331,46 +306,84 @@ function ENT:bonescaleup(a)
 	end
 end
 
-function ENT:OnInjured(dmg)
-if math.random(0,1000) == 3 then
+function ENT:OnInjured( dmgInfo )
+	if math.random(0,1000) == 3 then
 if mutated then
-self:EmitSound("re2/em7000/pain"..math.random(6)..".mp3")
+self:EmitSound("enemies/bosses/re2/em7000/pain"..math.random(6)..".ogg")
 else
-self:EmitSound("re2/em7000/vo/pain_big"..math.random(6)..".mp3")
+self:EmitSound("enemies/bosses/re2/em7000/vo/pain_big"..math.random(6)..".ogg")
 end
 end
-	if self:Health()< 500 and self:GetNWBool( "Mutated" )==false then 
-	self:ResetSequence("slow_change")
-	self:SetRunSpeed(230)
-	self.loco:SetDesiredSpeed(self:GetRunSpeed())
-	self:Stop()
-self:SetNWBool( "Mutated", true )
-self:EmitSound("re2/em7000/vo/mutate"..math.random(6)..".mp3",511)
-self:EmitSound("re2/em7000/mutate"..math.random(3)..".mp3",511)
-local id, dur = self:LookupSequence("slow_change")
-timer.Simple(4,function()
-self:EmitSound("re2/em7000/mutate_finish"..math.random(6)..".mp3",511)
-self:ResetSequence("fast_run")
-self:SetStop(false)
-end)
-self:bonescaleup()
+
+			if  self:Health()< (baseHealth/2) and  not self:GetNWBool( "Mutated" )  then
+			self:SetInvulnerable(true)
+			self:SetNWBool( "Mutated", true )
+			print("I'm going to beat your ass now waltuh")
+			
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				local id, dur = self:LookupSequence("slow_change")
+				mutated = true
+				
+				self:ResetSequence(id)
+				self:EmitSound("enemies/bosses/re2/em7000/vo/mutate"..math.random(6)..".ogg",511)
+				self:EmitSound("enemies/bosses/re2/em7000/mutate"..math.random(3)..".ogg",511)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+				self:EmitSound("enemies/bosses/re2/em7000/mutate_finish"..math.random(6)..".ogg",511)
+				--self:bonescaleup()
+					self.loco:SetDesiredSpeed(220)
+					self:SetRunSpeed(220)
+					self:SetInvulnerable(false)
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+					
+				end)
+			end
+end
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:StartActivity( ACT_RUN )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
 	end
+
 end
 
 function ENT:OnThink()
-if self:IsAttacking() then
-self.loco:SetDesiredSpeed(0)
-end
+self:RemoveAllDecals()
 if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
 counting = true
 if self:GetNWBool( "Mutated" ) then
 timer.Simple(0.34,function()
-self:EmitSound("re2/em7000/step"..math.random(1,6)..".mp3",511)
+self:EmitSound("enemies/bosses/re2/em7000/step"..math.random(1,6)..".ogg",511)
 counting = false
 end)
 else
 timer.Simple(0.65,function()
-self:EmitSound("re2/em7000/step"..math.random(1,6)..".mp3",511)
+self:EmitSound("enemies/bosses/re2/em7000/step"..math.random(1,6)..".ogg",511)
 counting = false
 end)
 end
@@ -383,7 +396,7 @@ taunting = true
 timer.Simple(6,function()
 taunting = false
 end)
-self:EmitSound("re2/em7000/idle"..math.random(6)..".mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/idle"..math.random(6)..".ogg",400)
 end
 else
 if math.random(0,1000) == 3 then
@@ -393,19 +406,19 @@ taunting = false
 end)
 local taunt =  math.random(0,5)
 if taunt ==1 then
-self:EmitSound("re2/em7000/vo/come_here"..math.random(3)..".mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/vo/come_here"..math.random(3)..".ogg",400)
 end
 if taunt ==2 then
-self:EmitSound("re2/em7000/vo/it_hurts"..math.random(4)..".mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/vo/it_hurts"..math.random(4)..".ogg",400)
 end
 if taunt ==3 then
-self:EmitSound("re2/em7000/vo/go_away"..math.random(3)..".mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/vo/go_away"..math.random(3)..".ogg",400)
 end
 if taunt ==4 then
-self:EmitSound("re2/em7000/vo/help"..math.random(4)..".mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/vo/help"..math.random(4)..".ogg",400)
 end
 if taunt ==5 then
-self:EmitSound("re2/em7000/vo/where_are_you.mp3",400)
+self:EmitSound("enemies/bosses/re2/em7000/vo/where_are_you.ogg",400)
 end
 end
 end

@@ -5,7 +5,7 @@ ENT.PrintName = "Nemesis (Damaged)"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/reuc/ens2.mdl" }
+ENT.Models = { "models/bosses/ens2.mdl" }
 
 ENT.AttackRange = 300
 ENT.DamageLow = 50
@@ -41,12 +41,12 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"re2/em7000/hit_body1.mp3",
-	"re2/em7000/hit_body2.mp3",
-	"re2/em7000/hit_body3.mp3",
-	"re2/em7000/hit_body4.mp3",
-	"re2/em7000/hit_body5.mp3",
-	"re2/em7000/hit_body6.mp3"
+	"enemies/bosses/re2/em7000/hit_body1.ogg",
+	"enemies/bosses/re2/em7000/hit_body2.ogg",
+	"enemies/bosses/re2/em7000/hit_body3.ogg",
+	"enemies/bosses/re2/em7000/hit_body4.ogg",
+	"enemies/bosses/re2/em7000/hit_body5.ogg",
+	"enemies/bosses/re2/em7000/hit_body6.ogg",
 }
 
 ENT.WalkSounds = {
@@ -373,12 +373,6 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnInjured(dmg)
-if math.random(0,100) == 17 then
-self:EmitSound("nemesis/pain.mp3")
-end
-end
-
 function ENT:OnThink()
 if self:IsAttacking() then
 self.loco:SetDesiredSpeed(0)
@@ -386,7 +380,7 @@ end
 if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
 counting = true
 timer.Simple(0.4,function()
-self:EmitSound("re2/em6300/step"..math.random(1,4)..".mp3",511)
+self:EmitSound("enemies/bosses/re2/em6300/step"..math.random(1,4)..".ogg",511)
 counting = false
 end)
 end
@@ -398,7 +392,7 @@ end)
 if math.random(0,1) == 0 then
 self:EmitSound("nemesis/alert"..math.random(2,3)..".mp3")
 else
-self:EmitSound("roach/reuc_redc/nemesis_stars.mp3",511,100)
+self:EmitSound("enemies/bosses/reuc_redc/nemesis_stars.ogg",511,100)
 end
 end
 	if self:GetFlamethrowing() then

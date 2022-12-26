@@ -5,7 +5,7 @@ ENT.PrintName = "Dilophosaurus"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/turok_dilophosaurus.mdl" }
+ENT.Models = { "models/bosses/turok_dilophosaurus.mdl" }
 
 ENT.AttackRange = 155
 ENT.DamageLow = 99
@@ -15,10 +15,7 @@ ENT.DamageHigh = 99
 ENT.AttackSequences = {
 	{seq = "bite_run", dmgtimes = {0.6}},
 	{seq = "bite_stand", dmgtimes = {0.1}},
-	{seq = "bite_walk", dmgtimes = {0.1}},
-	{seq = "headbutt", dmgtimes = {0.6}},
-	{seq = "headbutt_stand", dmgtimes = {0.5}},
-	{seq = "tailsmash", dmgtimes = {0.9}}
+	{seq = "bite_walk", dmgtimes = {0.1}}
 }
 
 ENT.DeathSequences = {
@@ -27,18 +24,17 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"turok dilophosaurus/attack1.mp3",
-	"turok dilophosaurus/attack1.mp3",
-	"turok dilophosaurus/headattack1.mp3",
-	"turok dilophosaurus/headattack2.mp3",
-	"turok dilophosaurus/walkbite1.mp3",
-	"turok dilophosaurus/walkbite2.mp3",
-	"turok dilophosaurus/roar_short1.mp3",
-	"turok dilophosaurus/roar_short2.mp3",
-	"turok dilophosaurus/roar_short3.mp3",
-	"turok dilophosaurus/roar_short4.mp3",
-	"turok dilophosaurus/roar_short5.mp3",
-
+	"enemies/bosses/dildophossaurus/attack1.ogg",
+	"enemies/bosses/dildophossaurus/attack1.ogg",
+	"enemies/bosses/dildophossaurus/headattack1.ogg",
+	"enemies/bosses/dildophossaurus/headattack2.ogg",
+	"enemies/bosses/dildophossaurus/walkbite1.ogg",
+	"enemies/bosses/dildophossaurus/walkbite2.ogg",
+	"enemies/bosses/dildophossaurus/roar_short1.ogg",
+	"enemies/bosses/dildophossaurus/roar_short2.ogg",
+	"enemies/bosses/dildophossaurus/roar_short3.ogg",
+	"enemies/bosses/dildophossaurus/roar_short4.ogg",
+	"enemies/bosses/dildophossaurus/roar_short5.ogg",
 }
 
 ENT.PainSounds = {
@@ -50,37 +46,35 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"turok dilophosaurus/breath1.mp3",
-	"turok dilophosaurus/breath2.mp3",
-	"turok dilophosaurus/breath3.mp3",
-	"turok dilophosaurus/breath4.mp3",
-	"turok dilophosaurus/breath5.mp3",
-	"turok dilophosaurus/breath6.mp3",
-	"turok dilophosaurus/hiss1.mp3",
-	"turok dilophosaurus/hiss2.mp3",
-	"turok dilophosaurus/hiss3.mp3",
-	"turok dilophosaurus/react1.mp3",
-	"turok dilophosaurus/react2.mp3",
-	"turok dilophosaurus/react3.mp3",
-	"turok dilophosaurus/react4.mp3",
-	"turok dilophosaurus/react5.mp3",
-	"turok dilophosaurus/react6.mp3",
-	"turok dilophosaurus/react7.mp3",
-	"turok dilophosaurus/react8.mp3",
-	"turok dilophosaurus/react9.mp3",
-	"turok dilophosaurus/react10.mp3",
-	"turok dilophosaurus/react11.mp3",
-	"turok dilophosaurus/react12.mp3",
-	
+	"enemies/bosses/dildophossaurus/breath1.ogg",
+	"enemies/bosses/dildophossaurus/breath2.ogg",
+	"enemies/bosses/dildophossaurus/breath3.ogg",
+	"enemies/bosses/dildophossaurus/breath4.ogg",
+	"enemies/bosses/dildophossaurus/breath5.ogg",
+	"enemies/bosses/dildophossaurus/breath6.ogg",
+	"enemies/bosses/dildophossaurus/hiss1.ogg",
+	"enemies/bosses/dildophossaurus/hiss2.ogg",
+	"enemies/bosses/dildophossaurus/hiss3.ogg",
+	"enemies/bosses/dildophossaurus/react1.ogg",
+	"enemies/bosses/dildophossaurus/react2.ogg",
+	"enemies/bosses/dildophossaurus/react3.ogg",
+	"enemies/bosses/dildophossaurus/react4.ogg",
+	"enemies/bosses/dildophossaurus/react5.ogg",
+	"enemies/bosses/dildophossaurus/react6.ogg",
+	"enemies/bosses/dildophossaurus/react7.ogg",
+	"enemies/bosses/dildophossaurus/react8.ogg",
+	"enemies/bosses/dildophossaurus/react9.ogg",
+	"enemies/bosses/dildophossaurus/react10.ogg",
+	"enemies/bosses/dildophossaurus/react11.ogg",
+	"enemies/bosses/dildophossaurus/react12.ogg",
 }
 
 ENT.ActStages = {
@@ -217,12 +211,12 @@ function ENT:OnSpawn()
 	if coroutine.running() then
 		
 		local pos = self:GetPos() + (seq == "angryroar" and Vector(0,0,100) or Vector(0,0,450))
-		for i=1,4 do
+		for i=1,2 do
 			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
 		util.ScreenShake(self:GetPos(),5,1000,1.2,2048)
 		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
-		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+		self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 		counting = true
 	self:SetInvulnerable(true)
 		
@@ -240,7 +234,7 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:EmitSound("turok dilophosaurus/roar_short5.mp3",511)
+			self:EmitSound("enemies/bosses/dildophossaurus/roar_short5.ogg",511)
 			util.ScreenShake(self:GetPos(),20,1000,3,2048)
 			counting = false
 			
@@ -263,7 +257,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound(self:EmitSound("turok dilophosaurus/pain4.mp3",511))
+self:EmitSound(self:EmitSound("enemies/bosses/dildophossaurus/pain4.ogg",511))
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -337,106 +331,49 @@ function ENT:OnRemove()
 end
 
 function ENT:StartFlames(time)
-	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
+
 end
 
 function ENT:StopFlames()
-	self:SetStop(false)
+
+end
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
 end
 
 function ENT:OnThink()
 if !self:IsAttacking() and !counting and !dying then
 counting = true
 timer.Simple(0.4,function()
-self:EmitSound("turok dilophosaurus/foot"..math.random(1,4)..".mp3")
+self:EmitSound("enemies/bosses/dildophossaurus/foot"..math.random(1,4)..".ogg")
 util.ScreenShake(self:GetPos(),4,1000,0.5,2048)
 counting = false
 end)
 			end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)

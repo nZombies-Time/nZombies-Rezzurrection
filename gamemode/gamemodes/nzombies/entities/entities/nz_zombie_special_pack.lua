@@ -5,7 +5,7 @@ ENT.PrintName = "The Pack"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"
 
-ENT.Models = { "models/deadspacede/pack.mdl" }
+ENT.Models = { "models/specials/pack.mdl" }
 
 ENT.AttackRange = 80
 ENT.DamageLow = 20
@@ -19,16 +19,15 @@ ENT.AttackSequences = {
 ENT.DeathSequences = {
 	"attack1"
 }
-
 ENT.AttackSounds = {
-	"pack/attack/pack_attack_00.wav",
-	"pack/attack/pack_attack_01.wav",
-	"pack/attack/pack_attack_02.wav",
-	"pack/attack/pack_attack_03.wav",
-	"pack/attack/pack_attack_04.wav",
-	"pack/attack/pack_attack_05.wav",
-	"pack/attack/pack_attack_06.wav",
-	"pack/attack/pack_attack_07.wav"
+	"enemies/specials/pack/attack/pack_attack_00.ogg",
+	"enemies/specials/pack/attack/pack_attack_01.ogg",
+	"enemies/specials/pack/attack/pack_attack_02.ogg",
+	"enemies/specials/pack/attack/pack_attack_03.ogg",
+	"enemies/specials/pack/attack/pack_attack_04.ogg",
+	"enemies/specials/pack/attack/pack_attack_05.ogg",
+	"enemies/specials/pack/attack/pack_attack_06.ogg",
+	"enemies/specials/pack/attack/pack_attack_07.ogg"
 }
 
 ENT.AttackHitSounds = {
@@ -39,23 +38,23 @@ ENT.AttackHitSounds = {
 }
 
 ENT.WalkSounds = {
-	"pack/alert/pack_boy_52.wav",
-	"pack/alert/pack_boy_51.wav",
-	"pack/alert/pack_boy_50.wav",
-	"pack/alert/pack_boy_49.wav",
-	"pack/alert/pack_boy_48.wav",
-	"pack/alert/pack_boy_47.wav",
-	"pack/alert/pack_boy_46.wav",
-	"pack/alert/pack_boy_45.wav",
-	"pack/idle/pack_boy_31.wav",
-	"pack/idle/pack_boy_32.wav",
-	"pack/idle/pack_boy_33.wav",
-	"pack/idle/pack_boy_34.wav",
-	"pack/idle/pack_boy_35.wav",
-	"pack/idle/pack_boy_36.wav",
-	"pack/idle/pack_boy_37.wav",
-	"pack/idle/pack_boy_38.wav",
-	"pack/idle/pack_boy_39.wav"
+	"enemies/specials/pack/alert/pack_boy_52.ogg",
+	"enemies/specials/pack/alert/pack_boy_51.ogg",
+	"enemies/specials/pack/alert/pack_boy_50.ogg",
+	"enemies/specials/pack/alert/pack_boy_49.ogg",
+	"enemies/specials/pack/alert/pack_boy_48.ogg",
+	"enemies/specials/pack/alert/pack_boy_47.ogg",
+	"enemies/specials/pack/alert/pack_boy_46.ogg",
+	"enemies/specials/pack/alert/pack_boy_45.ogg",
+	"enemies/specials/pack/idle/pack_boy_31.ogg",
+	"enemies/specials/pack/idle/pack_boy_32.ogg",
+	"enemies/specials/pack/idle/pack_boy_33.ogg",
+	"enemies/specials/pack/idle/pack_boy_34.ogg",
+	"enemies/specials/pack/idle/pack_boy_35.ogg",
+	"enemies/specials/pack/idle/pack_boy_36.ogg",
+	"enemies/specials/pack/idle/pack_boy_37.ogg",
+	"enemies/specials/pack/idle/pack_boy_38.ogg",
+	"enemies/specials/pack/idle/pack_boy_39.ogg"
 }
 
 ENT.PainSounds = {
@@ -67,10 +66,10 @@ ENT.PainSounds = {
 }
 
 ENT.DeathSounds = {
-	"pack/dead/pack_boy_20.wav",
-	"pack/dead/pack_boy_21.wav",
-	"pack/dead/pack_boy_22.wav",
-	"pack/dead/pack_boy_23.wav"
+	"enemies/specials/pack/dead/pack_boy_20.ogg",
+	"enemies/specials/pack/dead/pack_boy_21.ogg",
+	"enemies/specials/pack/dead/pack_boy_22.ogg",
+	"enemies/specials/pack/dead/pack_boy_23.ogg"
 }
 
 ENT.SprintSounds = {
@@ -126,7 +125,7 @@ function ENT:OnSpawn()
 	self:SetInvulnerable(true)
 	timer.Simple(1.4, function()
 		if IsValid(self) then
-		self:EmitSound("pack/alert/pack_boy_"..math.random(45,52)..".wav",100)
+		self:EmitSound("enemies/specials/pack/alert/pack_boy_"..math.random(45,52)..".ogg",100)
 			self:SetNoDraw(false)
 			self:SetCollisionGroup(COLLISION_GROUP_NONE)
 			self:SetStop(false)

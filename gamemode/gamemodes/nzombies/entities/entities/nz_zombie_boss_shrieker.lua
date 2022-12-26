@@ -5,7 +5,7 @@ ENT.PrintName = "Shrieker"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/temple_zom.mdl" }
+ENT.Models = { "models/bosses/temple_zom.mdl" }
 
 ENT.AttackRange = 250
 ENT.DamageLow = 30
@@ -21,7 +21,7 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"bo1_overhaul/son/scream.mp3",
+	"enemies/bosses/shrieker/scream.ogg",
 }
 
 ENT.PainSounds = {
@@ -33,17 +33,18 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 
 ENT.WalkSounds = {
-	"bo1_overhaul/son/amb1.mp3",
-	"bo1_overhaul/son/amb2.mp3",
-	"bo1_overhaul/son/amb3.mp3"
+	"enemies/bosses/shrieker/amb1.ogg",
+	"enemies/bosses/shrieker/amb2.ogg",
+	"enemies/bosses/shrieker/amb3.ogg"
 }
 
 ENT.ActStages = {
@@ -133,7 +134,7 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(300)
+		self:SetRunSpeed(250)
 		self:SetHealth(350)
 		self:SetMaxHealth(10000)
 		screaming = false
@@ -200,7 +201,7 @@ function ENT:OnSpawn()
 		entParticle:Spawn()
 		entParticle:Activate()
 		entParticle:Fire("kill","",2)
-		self:EmitSound("bo1_overhaul/dirtintro"..math.random(2)..".mp3")
+			self:EmitSound("enemies/bosses/shrieker/spawn.ogg",511)
 		
 		self:SetInvulnerable(true)
 		
@@ -238,7 +239,7 @@ function ENT:OnZombieDeath(dmgInfo)
 
 	timer.Simple(dur - 0.5, function()
 		if IsValid(self) then
-			self:EmitSound("bo1_overhaul/son/explode.mp3")
+			self:EmitSound("enemies/bosses/shrieker/explode.ogg")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -294,6 +295,45 @@ end
 
 function ENT:OnPathTimeOut()
 	
+	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
+	
+		self:SetSpecialAnimation(true)
+				self:SetInvulnerable(true)
+				self:SetBlockAttack(true)
+				
+	
+				
+				timer.Simple(2,function() 
+				self:EmitSound("enemies/bosses/shrieker/scream.ogg",511)
+				ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,0)),Angle(-90,0,0),nil)
+			    for k, v in pairs(ents.FindInSphere(self:GetPos(), 500)) do
+				if IsValid(v) and v:IsValidZombie() and v.IsMooZombie or IsValid(v) and v:IsValidZombie() then
+				if v.IsMooSpecial or v.NZBossType then continue end -- Bomber will ignore itself and Bosses
+					--print("Homeless Man located")
+					--print(v)	-- We're gonna beef up every standard zombie in the Nova Bomber's range
+					if v.SpeedBasedSequences then
+						v:SetRunSpeed(225)
+						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
+						v:SpeedChanged()
+					elseif !v.SpeedBasedSequences or !v.IsMooZombie then -- For non Moo Zombies. Your welcome Laby
+						v:SetRunSpeed(225)
+						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
+						v:SetHealth( nzRound:GetZombieHealth() * 2 )
+					end
+				end
+			end
+			end)
+			
+				self:PlaySequenceAndWait("suicide1")
+				self.loco:SetDesiredSpeed(225)
+			    self:SetRunSpeed(225)
+				self:SetSpecialAnimation(false)
+				self:SetInvulnerable(false)
+				self:SetBlockAttack(false)
+
+				self:StartActivity( ACT_RUN )
+				self.NextClawTime = CurTime() + math.random(10, 13)
+				end
 end
 
 function ENT:IsValidTarget( ent )
@@ -359,7 +399,7 @@ function ENT:OnThink()
 	if !screaming then
 	screaming = true
 		timer.Simple(0.6,function() 
-			for k,v in pairs(ents.FindInSphere(self:GetPos(),1024)) do
+			for k,v in pairs(ents.FindInSphere(self:GetPos(),600)) do
 						if v:IsPlayer() then
 						local walk = v:GetWalkSpeed()
 						local run = v:GetRunSpeed()
@@ -371,101 +411,18 @@ function ENT:OnThink()
 						v:TakeDamageInfo( d )
 							v:SetRunSpeed(25)
 							v:SetWalkSpeed(25)
-							timer.Simple(1.5,function()
+							timer.Simple(1,function()
 								v:SetRunSpeed(run)
 							v:SetWalkSpeed(walk)
 							end)
 						end
 	end
 		ParticleEffect("screamer_scream",self:LocalToWorld(Vector(0,0,55)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/son/scream.mp3",511)
+		self:EmitSound("enemies/bosses/shrieker/scream.ogg",511)
 			end)
 	end
 	
  end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)

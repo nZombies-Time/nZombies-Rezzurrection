@@ -301,6 +301,7 @@ function ENT:OnPathTimeOut()
 				self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())
 				self:SetClawHook(self.ClawHook)
 				self:SetUsingClaw(true)
+				self.ClawHook:SetPanzer(self)
 				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
 				
 				self.NextAction = CurTime() + math.random(1, 5)

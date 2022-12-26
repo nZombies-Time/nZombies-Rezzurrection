@@ -176,21 +176,27 @@ end
 -- Double Points
 nzPowerUps:NewPowerUp("dp", {
 	name = "Double Points",
-	model = "models/nzpowerups/x2.mdl",
+	model = "models/poseurs/double_points.mdl",
 	global = true, -- Global means it will appear for any player and will refresh its own time if more
 	angle = Angle(25,0,0),
 	scale = 1,
 	chance = 5,
 	duration = 30,
-	announcement = "nz/powerups/double_points.mp3",
+	announcement = "powerups/samantha/double_points.ogg",
 	func = function(self, ply)
+	if nzMapping.Settings.negative  then
+		if math.random(0,3) == 3 then
+	ply:TakePoints(1150)
+	ply:ChatPrint( "115 Tax" )
+	end
+	end
 	end,
 })
 
 -- Max Ammo
 nzPowerUps:NewPowerUp("maxammo", {
 	name = "Max Ammo",
-	model = "models/Items/BoxSRounds.mdl",
+	model = "models/poseurs/maxammo.mdl",
 	global = true,
 	angle = Angle(0,0,25),
 	scale = 1.5,
@@ -200,8 +206,21 @@ nzPowerUps:NewPowerUp("maxammo", {
 		nzSounds:Play("MaxAmmo")
 		--nzNotifications:PlaySound("nz/powerups/max_ammo.mp3", 2)
 		-- Give everyone ammo
+		if nzMapping.Settings.negative  then
+		if math.random(0,3) == 3 then
 		for k,v in pairs(player.GetAll()) do
 			v:GiveMaxAmmo()
+		end
+		else
+		for k,v in pairs(player.GetAll()) do
+		v:ChatPrint( "Thank Joe Biden for this" )
+		v:RemoveAllAmmo()
+		end
+		end
+		else
+		for k,v in pairs(player.GetAll()) do
+			v:GiveMaxAmmo()
+		end
 		end
 	end),
 })
@@ -209,7 +228,7 @@ nzPowerUps:NewPowerUp("maxammo", {
 -- Insta Kill
 nzPowerUps:NewPowerUp("insta", {
 	name = "Insta Kill",
-	model = "models/nzpowerups/insta.mdl",
+	model = "models/poseurs/instakill.mdl",
 	global = true,
 	angle = Angle(0,0,0),
 	scale = 1,
@@ -217,37 +236,73 @@ nzPowerUps:NewPowerUp("insta", {
 	duration = 30,
 	announcement = "nz/powerups/insta_kill.mp3",
 	func = function(self, ply)
-		print("Called")
+	if nzMapping.Settings.negative  then
+	if math.random(0,1) == 1 then
+	ply:SetHealth(1)
+	ply:ChatPrint( "FIGHT FOR YOUR LIFE" )
+	end
+	end
 	end,
 })
 
 -- Nuke
 nzPowerUps:NewPowerUp("nuke", {
 	name = "Nuke",
-	model = "models/nzpowerups/nuke.mdl",
+	model = "models/poseurs/nuke.mdl",
 	global = true,
 	angle = Angle(10,0,0),
 	scale = 1,
 	chance = 5,
 	duration = 0,
-	announcement = "nz/powerups/nuke.wav",
+	announcement = "powerups/samantha/nuke.ogg",
 	func = (function(self, ply)
-		nzPowerUps:Nuke(ply:GetPos())
+	
+		
+			if nzMapping.Settings.negative  then
+		if math.random(0,1) == 3 then
+			nzPowerUps:Nuke(ply:GetPos())
+		else
+		for k,v in pairs(player.GetAll()) do
+		v:ChatPrint( "Who didn't pay electric bill?!" )
+		end
+		nzElec:Reset()
+		end
+		else
+			nzPowerUps:Nuke(ply:GetPos())
+		end
 	end),
 })
 
 -- Fire Sale
 nzPowerUps:NewPowerUp("firesale", {
 	name = "Fire Sale",
-	model = "models/nzpowerups/firesale.mdl",
+	model = "models/poseurs/fire_sale.mdl",
 	global = true,
 	angle = Angle(45,0,0),
 	scale = 0.75,
 	chance = 1,
 	duration = 30,
-	announcement = "nz/powerups/fire_sale_announcer.wav",
+	announcement = "powerups/samantha/fire_sale_announcer.ogg",
 	func = (function(self, ply)
-		nzPowerUps:FireSale()
+		
+		if nzMapping.Settings.negative  then
+			if math.random(0,3) == 3 then
+				nzPowerUps:FireSale()
+				else
+					for k,v in pairs(player.GetAll()) do
+						v:ChatPrint( "Stop Gambling Addictions Today" )
+							local tbl = ents.FindByClass("random_box_spawns")
+							for k,v in pairs(tbl) do
+								if IsValid(v) then
+									v:StopSound("nz_firesale_jingle")
+									v:Remove()
+								end
+						end
+				end
+		end
+		else
+			nzPowerUps:FireSale()
+		end
 	end),
 	expirefunc = function()
 		local tbl = ents.FindByClass("random_box_spawns")
@@ -269,7 +324,7 @@ nzPowerUps:NewPowerUp("firesale", {
 -- Carpenter
 nzPowerUps:NewPowerUp("carpenter", {
 	name = "Carpenter",
-	model = "models/nzpowerups/carpenter.mdl",
+	model = "models/poseurs/carpenter.mdl",
 	global = true,
 	angle = Angle(45,0,0),
 	scale = 1,
@@ -286,15 +341,29 @@ nzPowerUps:NewPowerUp("carpenter", {
 -- Zombie Blood
 nzPowerUps:NewPowerUp("zombieblood", {
 	name = "Zombie Blood",
-	model = "models/nzpowerups/zombieblood.mdl",
+	model = "models/poseurs/zombieblood.mdl",
 	global = false, -- Only applies to the player picking it up and time is handled individually per player
 	angle = Angle(0,0,0),
 	scale = 1,
 	chance = 2,
 	duration = 30,
-	announcement = "nz/powerups/zombie_blood.wav",
+	announcement = "powerups/origins/zombie_blood.ogg",
 	func = (function(self, ply)
+	if nzMapping.Settings.negative  then
+	if math.random(0,2) == 2 then
 		ply:SetTargetPriority(TARGET_PRIORITY_NONE)
+		else
+		ply:SetTargetPriority(TARGET_PRIORITY_SPECIAL)
+		local zombls = ents.FindInSphere(ply:GetPos(), 5000)
+		for k,v in pairs(zombls) do
+					if IsValid(v) and v:IsValidZombie() then
+						v:SetTarget(ply)
+					end
+				end
+			end
+			else
+			ply:SetTargetPriority(TARGET_PRIORITY_NONE)
+		end
 	end),
 	expirefunc = function(self, ply) -- ply is only passed if the powerup is non-global
 		ply:SetTargetPriority(TARGET_PRIORITY_PLAYER)
@@ -304,21 +373,35 @@ nzPowerUps:NewPowerUp("zombieblood", {
 -- Death Machine
 nzPowerUps:NewPowerUp("deathmachine", {
 	name = "Death Machine",
-	model = "models/nzpowerups/deathmachine.mdl",
+	model = "models/poseurs/death_machine.mdl",
 	global = false, -- Only applies to the player picking it up and time is handled individually per player
 	angle = Angle(0,0,0),
 	scale = 1,
 	chance = 2,
 	duration = 30,
-	announcement = "nz/powerups/deathmachine.mp3",
+	announcement = "powerups/samantha/deathmachine.ogg",
 	func = (function(self, ply)
+		
+		if nzMapping.Settings.negative  then
+		if math.random(0,3) == 4 then
 		ply:SetUsingSpecialWeapon(true)
 		ply:Give("nz_death_machine")
 		ply:SelectWeapon("nz_death_machine")
+		else
+		
+		ply:Give("nz_death_machine")
+		ply:SelectWeapon("nz_death_machine")
+		ply:SetUsingSpecialWeapon(true)
+		end
+	end
+		ply:Give("nz_death_machine")
+		ply:SelectWeapon("nz_death_machine")
+		ply:SetUsingSpecialWeapon(true)
 	end),
 	expirefunc = function(self, ply) -- ply is only passed if the powerup is non-global
 		ply:SetUsingSpecialWeapon(false)
 		ply:StripWeapon("nz_death_machine")
+		--ply:StripWeapon("nz_tomfoolery")
 		ply:EquipPreviousWeapon()
 	end,
 })

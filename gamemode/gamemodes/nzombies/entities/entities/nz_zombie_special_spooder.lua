@@ -5,7 +5,7 @@ ENT.PrintName = "SUPA SPOODA"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/blackops3/spooder.mdl" }
+ENT.Models = { "models/specials/spooder.mdl" }
 
 ENT.AttackRange = 80
 ENT.DamageLow = 23
@@ -21,10 +21,10 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"roach/bo3/spider/vox/melee_01.mp3",
-	"roach/bo3/spider/vox/melee_02.mp3",
-	"roach/bo3/spider/vox/melee_03.mp3",
-	"roach/bo3/spider/vox/melee_04.mp3"
+	"enemies/specials/spider/vox/melee_01.ogg",
+	"enemies/specials/spider/vox/melee_02.ogg",
+	"enemies/specials/spider/vox/melee_03.ogg",
+	"enemies/specials/spider/vox/melee_04.ogg"
 
 }
 
@@ -37,23 +37,26 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+    "effects/hit/evt_zombie_hit_player_01.ogg",
+    "effects/hit/evt_zombie_hit_player_02.ogg",
+    "effects/hit/evt_zombie_hit_player_03.ogg",
+    "effects/hit/evt_zombie_hit_player_04.ogg",
+    "effects/hit/evt_zombie_hit_player_05.ogg"
 }
 
 ENT.WalkSounds = {
-	"roach/bo3/spider/vox/ambient_01.mp3",
-	"roach/bo3/spider/vox/ambient_02.mp3",
-	"roach/bo3/spider/vox/ambient_03.mp3",
-	"roach/bo3/spider/step_02.mp3",
-	"roach/bo3/spider/step_03.mp3",
-	"roach/bo3/spider/step_04.mp3",
-	"roach/bo3/spider/step_05.mp3",
-	"roach/bo3/spider/step_06.mp3"
+	"enemies/specials/spider/vox/ambient_01.ogg",
+	"enemies/specials/spider/vox/ambient_02.ogg",
+	"enemies/specials/spider/vox/ambient_03.ogg",
+    "enemies/specials/spider/step_01.mp3",
+	"enemies/specials/spider/step_02.mp3",
+	"enemies/specials/spider/step_03.mp3",
+	"enemies/specials/spider/step_04.mp3",
+	"enemies/specials/spider/step_05.mp3",
+	"enemies/specials/spider/step_06.mp3",
+	"enemies/specials/spider/step_07.mp3",
+	"enemies/specials/spider/step_08.mp3",
+	"enemies/specials/spider/step_09.mp3",
 }
 
 ENT.ActStages = {
@@ -187,7 +190,7 @@ function ENT:OnSpawn()
 		local pos = self:GetPos() + (seq == "shoot" and Vector(0,0,100) or Vector(0,0,450))
 		
 		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
-		self:EmitSound("roach/bo3/spider/spawn_01.mp3")
+		self:EmitSound("enemies/specials/spider/spawn_01.ogg")
 	
 		
 		--[[effectData = EffectData()
@@ -213,7 +216,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("roach/bo3/spider/vox/death_01.mp3")
+self:EmitSound("enemies/specials/spider/vox/death_01.ogg")
 ParticleEffect("bo3_margwa_death",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 	timer.Simple(dur, function()
 		if IsValid(self) then
@@ -278,7 +281,7 @@ function ENT:OnPathTimeOut()
 			self:SetSpecialAnimation(true)
 				
 				timer.Simple(22/55, function()
-				self:EmitSound("roach/bo3/spider/spd_attack_0"..math.random(3)..".mp3")
+				self:EmitSound("enemies/specials/spider/spd_attack_0"..math.random(1,3)..".ogg")
 	end)
 				timer.Simple(1, function()self.ClawHook = ents.Create("nz_spider_goo")end)
 				timer.Simple(1, function()self.ClawHook:SetPos(self:LocalToWorld(Vector(0,0,80)))end)

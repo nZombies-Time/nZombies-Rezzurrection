@@ -37,7 +37,7 @@ function ENT:Use( activator, caller )
 	if activator:GetPoints() >=  price and !currentWep.NZWonderWeapon then
 		activator:Buy(price, self, function()
 		activator:TakePoints(price)
-		self:EmitSound("nz/effects/buy.wav")
+		self:EmitSound("effects/ammobox.ogg")
 		currentWep:GiveMaxAmmo() 
 		end)
 		self:SetPrice((price) + (nzRound:GetNumber()/2 * 300))  

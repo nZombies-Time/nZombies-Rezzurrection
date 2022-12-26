@@ -5,7 +5,7 @@ ENT.PrintName = "Raptor"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/turok_raptor.mdl" }
+ENT.Models = { "models/specials/turok_raptor.mdl" }
 
 ENT.AttackRange = 75
 ENT.DamageLow = 20
@@ -13,27 +13,26 @@ ENT.DamageHigh = 24
 
 ENT.AttackSequences = {
 	{seq = "attack", dmgtimes = {0.3}},
-	{seq = "attack2", dmgtimes = {0.5}},
-	{seq = "attack3", dmgtimes = {0.5}},
-	{seq = "attack4", dmgtimes = {0.1}},
-	{seq = "attack4", dmgtimes = {0.4},{0.9}},
-}
+	{seq = "attack2", dmgtimes = {0.5}, 0.9}},
+	{seq = "attack3", dmgtimes = {0.5}}
+
+
 
 ENT.DeathSequences = {
 	"stunnedidle"
 }
 
 ENT.AttackSounds = {
-	"turok raptor/attack1.mp3",
-	"turok raptor/attack2.mp3",
-	"turok raptor/attack3.mp3",
-	"turok raptor/attack4.mp3",
-	"turok raptor/attack5.mp3",
-	"turok raptor/attack6.mp3",
-	"turok raptor/attack7.mp3",
-	"turok raptor/biteattack1.mp3",
-	"turok raptor/biteattack2.mp3",
-	"turok raptor/biteattack3.mp3",
+	"enemies/specials/turok raptor/attack1.ogg",
+	"enemies/specials/turok raptor/attack2.ogg",
+	"enemies/specials/turok raptor/attack3.ogg",
+	"enemies/specials/turok raptor/attack4.ogg",
+	"enemies/specials/turok raptor/attack5.ogg",
+	"enemies/specials/turok raptor/attack6.ogg",
+	"enemies/specials/turok raptor/attack7.ogg",
+	"enemies/specials/turok raptor/biteattack1.ogg",
+	"enemies/specials/turok raptor/biteattack2.ogg",
+	"enemies/specials/turok raptor/biteattack3.ogg",
 
 }
 
@@ -46,26 +45,27 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"turok raptor/breath.mp3",
-	"turok raptor/breath2.mp3",
-	"turok raptor/breath3.mp3",
-	"turok raptor/breath4.mp3",
-	"turok raptor/breath5.mp3",
-	"turok raptor/breath6.mp3",
-	"turok raptor/breath7.mp3",
-	"turok raptor/breath8.mp3",
-	"turok raptor/breath9.mp3",
-	"turok raptor/breath10.mp3",
-	"turok raptor/breath11.mp3",
-	"turok raptor/breath12.mp3",
-	"turok raptor/breath13.mp3"
+	"enemies/specials/turok raptor/breath.ogg",
+	"enemies/specials/turok raptor/breath2.ogg",
+	"enemies/specials/turok raptor/breath3.ogg",
+	"enemies/specials/turok raptor/breath4.ogg",
+	"enemies/specials/turok raptor/breath5.ogg",
+	"enemies/specials/turok raptor/breath6.ogg",
+	"enemies/specials/turok raptor/breath7.ogg",
+	"enemies/specials/turok raptor/breath8.ogg",
+	"enemies/specials/turok raptor/breath9.ogg",
+	"enemies/specials/turok raptor/breath10.ogg",
+	"enemies/specials/turok raptor/breath11.ogg",
+	"enemies/specials/turok raptor/breath12.ogg",
+	"enemies/specials/turok raptor/breath13.ogg"
 
 }
 
@@ -156,7 +156,7 @@ function ENT:StatsInitialize()
 	if SERVER then
 		counting = true
 		dying = false
-		self:SetRunSpeed(275)
+		self:SetRunSpeed(225)
 		self:SetHealth(300)
 		self:SetMaxHealth(10000)
 	end
@@ -207,7 +207,7 @@ function ENT:OnSpawn()
 		local pos = self:GetPos() + (seq == "emerge" and Vector(0,0,100) or Vector(0,0,450))
 		
 		ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(40,-20,0)),Angle(0,0,0),nil)
-		self:EmitSound("turok raptor/scream"..math.random(1,5)..".mp3",511)
+		self:EmitSound("enemies/specials/turok raptor/scream"..math.random(1,5)..".ogg",511)
 	
 		
 		--[[effectData = EffectData()
@@ -234,7 +234,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-	self:EmitSound("turok raptor/death"..math.random(1,12)..".mp3",511)
+	self:EmitSound("enemies/specials/turok raptor/death"..math.random(1,12)..".ogg",511)
 ParticleEffect("bo3_margwa_death",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 	timer.Simple(dur, function()
 		if IsValid(self) then
@@ -307,97 +307,43 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:StartActivity( ACT_RUN )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
+end
+
 function ENT:OnThink()
 if !counting and !dying and self:Health() > 0 then
 counting = true
 timer.Simple(0.25,function()
-self:EmitSound("turok raptor/foot"..math.random(1,7)..".mp3")
+if  self:IsValid() then
+self:EmitSound("enemies/specials/turok raptor/foot"..math.random(1,7)..".ogg")
 counting = false
+end
 end)
 end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)

@@ -10,6 +10,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Int", 0, "EmergeSequenceIndex")
 	self:NetworkVar("Bool", 1, "Decapitated")
 	self:NetworkVar("Bool", 2, "Alive")
+	self:NetworkVar("Bool", 3, "MooSpecial")
 end
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
@@ -36,14 +37,30 @@ ENT.DeathSequences = {
 	"nz_death_f_3",
 	"nz_death_f_4",
 	"nz_death_f_5",
+	"nz_death_f_6",
+	"nz_death_f_7",
+	"nz_death_f_8",
+	"nz_death_f_9",
+	"nz_death_f_10",
 	"nz_death_f_11",
 	"nz_death_f_12",
+	"nz_death_f_13",
 }
 ENT.ElectrocutionSequences = {
 	"nz_death_elec_1",
 	"nz_death_elec_2",
 	"nz_death_elec_3",
 	"nz_death_elec_4",
+}
+
+local CrawlAttackSequences = {
+	{seq = "nz_crawl_attack_v1", dmgtimes = {0.75, 1.65}},
+	{seq = "nz_crawl_attack_v2", dmgtimes = {0.65}},
+}
+
+local CrawlJumpSequences = {
+	{seq = "nz_barricade_crawl_1", speed = 10, time = 3},
+	{seq = "nz_barricade_crawl_2", speed = 10, time = 3},
 }
 
 local AttackSequences = {
@@ -195,14 +212,20 @@ ENT.ActStages = {
 	[4] = {
 		act = ACT_SPRINT,
 		minspeed = 145,
-		attackanims = SprintAttackSequences,
+		attackanims = RunAttackSequences,
 		barricadejumps = SprintJumpSequences,
 	},
 	[5] = {
 		act = ACT_SUPERSPRINT,
-		minspeed = 210,
-		attackanims = SuperSprintAttackSequences,
+		minspeed = 220,
+		attackanims = RunAttackSequences,
 		barricadejumps = SprintJumpSequences,
+	},
+	[6] = {
+		act = ACT_CRAWL,
+		minspeed = 999,
+		attackanims = CrawlAttackSequences,
+		barricadejumps = CrawlJumpSequences,
 	},
 }
 
@@ -221,6 +244,14 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
+			},
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -235,6 +266,14 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v2",
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 			},
 			PassiveSounds = {walksounds},
 		}
@@ -253,6 +292,14 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
+			},
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -270,6 +317,14 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
+			},
 			PassiveSounds = {walksounds},
 		}
 	}},
@@ -286,6 +341,16 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -300,6 +365,16 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v2",
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {walksounds},
 		}
@@ -322,6 +397,16 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -339,6 +424,16 @@ ENT.SequenceTables = {
 				"nz_walk_lowg_v2",
 				"nz_walk_lowg_v3",
 				"nz_walk_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {walksounds},
 		}
@@ -359,6 +454,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -374,6 +479,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v2",
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {walksounds},
 		}
@@ -394,6 +509,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -407,6 +532,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v2",
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {runsounds},
 		}
@@ -429,6 +564,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -450,6 +595,16 @@ ENT.SequenceTables = {
 				"nz_run_lowg_v2",
 				"nz_run_lowg_v3",
 				"nz_run_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {runsounds},
 		}
@@ -474,6 +629,16 @@ ENT.SequenceTables = {
 				"nz_sprint_lowg_v3",
 				"nz_sprint_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -494,6 +659,16 @@ ENT.SequenceTables = {
 				"nz_sprint_lowg_v3",
 				"nz_sprint_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		}
 	}},
@@ -510,6 +685,16 @@ ENT.SequenceTables = {
 				"nz_sprint_lowg_v3",
 				"nz_sprint_lowg_v4",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -523,6 +708,16 @@ ENT.SequenceTables = {
 				"nz_sprint_lowg_v2",
 				"nz_sprint_lowg_v3",
 				"nz_sprint_lowg_v4",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {runsounds},
 		}
@@ -548,6 +743,16 @@ ENT.SequenceTables = {
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -568,6 +773,16 @@ ENT.SequenceTables = {
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		}
 	}},
@@ -581,6 +796,16 @@ ENT.SequenceTables = {
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
 			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
+			},
 			PassiveSounds = {runsounds},
 		},
 		{
@@ -591,6 +816,16 @@ ENT.SequenceTables = {
 			},
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			CrawlMovementSequence = {
+				"nz_crawl_slow_v2",
+				"nz_crawl_v1",
+				"nz_crawl_v2",
 			},
 			PassiveSounds = {runsounds},
 		}
@@ -708,7 +943,6 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
-	self:SetNoDraw(true) --This hides the brief "Default Pose" the zombie does before doing the spawn anim
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(30, 300) )
 			self:SetHealth( math.random(100, 1500) )
@@ -734,20 +968,23 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
+	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	if self:ZombieWaterLevel() >= 1 then
-		ParticleEffect("water_splash_0"..math.random(1,3).."",self:GetPos(),self:GetAngles(),self)
-		self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(2)..".wav")
+		ParticleEffect("water_splash_0"..math.random(1,3).."",self:GetPos()+Vector(0,0,2),self:GetAngles(),self)
+		ParticleEffect("impact_antlion",self:GetPos()+Vector(0,0,-5),self:GetAngles(),self)
+		self:EmitSound("nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3")
 	else
-		ParticleEffect("bo3_zombie_spawn",self:GetPos(),self:GetAngles(),self)
+		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		ParticleEffect("impact_antlion",self:GetPos()+Vector(0,0,-5),self:GetAngles(),self)
 		self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(2)..".wav")
+		self:EmitSound("nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3")
 	end
-
 
 	self:SetSpecialAnimation(true)
 	local seq = self:SelectSpawnSequence()
 	if seq then
-		self:SetNoDraw(false)
 		self:PlaySequenceAndWait(seq)
 		self:SetSpecialAnimation(false)
+		self:CollideWhenPossible()
 	end
 end

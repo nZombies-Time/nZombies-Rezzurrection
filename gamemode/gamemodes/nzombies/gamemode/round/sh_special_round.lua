@@ -716,6 +716,44 @@ nzRound:AddSpecialRoundType("Nova Crawlers", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Nova Bombers", {
+	specialTypes = {
+		["nz_zombie_special_nova_bomber"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 40
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Jumping Jacks", {
+	specialTypes = {
+		["nz_zombie_special_nova_electric"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 40
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
 nzRound:AddSpecialRoundType("Lickers", {
 	specialTypes = {
 		["nz_zombie_special_licker"] = {chance = 100}
@@ -1084,6 +1122,10 @@ nzRound:AddAdditionalZombieType("Lickers", "nz_zombie_special_licker", {
 }) 
 nzRound:AddAdditionalZombieType("Nova Crawlers", "nz_zombie_special_nova", {
 }) 
+nzRound:AddAdditionalZombieType("Nova Bombers", "nz_zombie_special_nova_bomber", {
+}) 
+nzRound:AddAdditionalZombieType("Jumping Jacks", "nz_zombie_special_nova_electric", {
+}) 
 nzRound:AddAdditionalZombieType("Keepers", "nz_zombie_special_keeper", {
 }) 
 nzRound:AddAdditionalZombieType("Hellhounds", "nz_zombie_special_dog", {
@@ -1207,6 +1249,12 @@ function nzRound:GetSpecialType(id)
 	end
 	if id == "Nova Crawlers" then
 	return "nz_zombie_special_nova"
+	end
+	if id == "Nova Bombers" then
+	return "nz_zombie_special_nova_bomber"
+	end
+	if id == "Jumping Jacks" then
+	return "nz_zombie_special_nova_electric"
 	end
 	if id == "Keepers" then
 	return "nz_zombie_special_keeper"

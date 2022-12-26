@@ -43,7 +43,7 @@ function ENT:AddPlank(nosound)
 	self:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
 	if !nosound then
-		self:EmitSound("nz/effects/board_slam_0"..math.random(0,5)..".wav")
+		self:EmitSound("barricade/board_slam_0"..math.random(0,5)..".ogg")
 	end
 end
 
@@ -102,7 +102,7 @@ function ENT:Use( activator, caller )
 			else
 				activator:GivePoints(10)
 			end
-			activator:EmitSound("nz/effects/repair_ching.wav")
+			activator:EmitSound("barricade/repair_ching.ogg")
 			self.NextPlank = CurTime() + (activator:HasUpgrade("speed") and 2/3 or 1)
 		end
 	end

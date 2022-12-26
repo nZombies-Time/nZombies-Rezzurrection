@@ -5,14 +5,14 @@ ENT.PrintName = "George Romero"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/director.mdl" }
+ENT.Models = { "models/bosses/director.mdl" }
 
 ENT.AttackRange = 140
 ENT.DamageLow = 70
 ENT.DamageHigh = 88
 
 ENT.OnDeathSounds = {
-	"bo1_overhaul/dir/vox_director_die_01.mp3","bo1_overhaul/dir/vox_director_die_02.mp3","bo1_overhaul/dir/vox_director_die_03.mp3",
+	"enemies/bosses/dir/vox_director_die_01.ogg","enemies/bosses/dir/vox_director_die_02.ogg","enemies/bosses/dir/vox_director_die_03.ogg",
 }
 
 ENT.AttackSequences = {
@@ -26,20 +26,20 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"bo1_overhaul/dir/vox_director_pain_yell_01.mp3",
-	"bo1_overhaul/dir/vox_director_pain_yell_02.mp3",
-	"bo1_overhaul/dir/vox_director_pain_yell_03.mp3",
+	"enemies/bosses/dir/vox_director_pain_yell_01.ogg",
+	"enemies/bosses/dir/vox_director_pain_yell_02.ogg",
+	"enemies/bosses/dir/vox_director_pain_yell_03.ogg",
 	
 }
 
 ENT.AttackHitSounds = {
-	"bo1_overhaul/dir/sfx/zmb_melee_light_00.mp3",
-	"bo1_overhaul/dir/sfx/zmb_melee_light_01.mp3",
-	"bo1_overhaul/dir/sfx/zmb_melee_light_02.mp3",
+	"enemies/bosses/dir/sfx/zmb_melee_light_00.ogg",
+	"enemies/bosses/dir/sfx/zmb_melee_light_01.ogg",
+	"enemies/bosses/dir/sfx/zmb_melee_light_02.ogg",
 }
 
 ENT.PainSounds = {
-		"physics/flesh/flesh_impact_bullet1.wav",
+	"physics/flesh/flesh_impact_bullet1.wav",
 	"physics/flesh/flesh_impact_bullet2.wav",
 	"physics/flesh/flesh_impact_bullet3.wav",
 	"physics/flesh/flesh_impact_bullet4.wav",
@@ -48,7 +48,6 @@ ENT.PainSounds = {
 
 ENT.WalkSounds = {
 	"empty.wav"
-	
 }
 
 
@@ -199,11 +198,11 @@ self:SetInvulnerable(true)
 		
 		
 		if self:WaterLevel() >= 1 then  
-		self:EmitSound("bo1_overhaul/dir/sfx/_bubbling.mp3",0)
+		self:EmitSound("enemies/bosses/dir/sfx/_bubbling.ogg",0)
 		end
-		self:EmitSound("bo1_overhaul/dir/sfx/_yellow_beam.mp3",0.6)
-		self:EmitSound("bo1_overhaul/dir/sfx/_beam.mp3",1.4)
-		self:EmitSound("bo1_overhaul/dir/sfx/_electric_water.mp3",1.4)
+		self:EmitSound("enemies/bosses/dir/sfx/_yellow_beam.ogg",0.6)
+		self:EmitSound("enemies/bosses/dir/sfx/_beam.ogg",1.4)
+		self:EmitSound("enemies/bosses/dir/sfx/_electric_water.ogg",1.4)
 		
 		
 		ParticleEffect("summon_beam",self:GetPos(),self:GetAngles(),nil)
@@ -212,8 +211,8 @@ self:SetInvulnerable(true)
 	
 		self:SetNoDraw(false)
 		self:PlaySequenceAndWait("emerge")
-		timer.Simple(0.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_0.mp3",511)end)
-		timer.Simple(2.4,function()self:EmitSound("bo1_overhaul/dir/vox/vox_romero_start_1.mp3",511)end)
+		timer.Simple(0.4,function()self:EmitSound("enemies/bosses/dir/vox/vox_romero_start_0.ogg",511)end)
+		timer.Simple(2.4,function()self:EmitSound("enemies/bosses/dir/vox/vox_romero_start_1.ogg",511)end)
 		timer.Simple(14,function() taunting = false end)
 		timer.Simple(2,function()self:SetInvulnerable(false)end)
 		self.IsEmerging = false
@@ -229,21 +228,21 @@ function ENT:OnInjured(dmg, delay)
 	if self:WaterLevel() < 1 and not self.Enraged then
 		self.Enraged = true
 			self.loco:SetDesiredSpeed(275)
-		self:EmitSound("bo1_overhaul/dir/vox_director_angered_0"..math.random(4)..".mp3",511)
+		self:EmitSound("enemies/bosses/dir/vox_director_angered_0"..math.random(4)..".ogg",511)
 		self:SetBodygroup(0,1)
 		util.ScreenShake(self:GetPos(),10000,5000,3,1000)
-		self:EmitSound("bo1_overhaul/dir/sfx/_aggro_2d.mp3",511)
+		self:EmitSound("enemies/bosses/dir/sfx/_aggro_2d.ogg",511)
 		timer.Simple(30,function()
 		self.Enraged = false
 		self:SetBodygroup(0,0)
 		self:SetRunSpeed(69)
 		self.loco:SetDesiredSpeed(69)
-		self:EmitSound("bo1_overhaul/dir/vox/vox_romero_water_"..math.random(2)..".mp3")
+		self:EmitSound("enemies/bosses/dir/vox/vox_romero_water_"..math.random(2)..".ogg")
 		end)
 	elseif self:WaterLevel() >= 1 and not self.Enraged then
 			local seq,dur = self:LookupSequence("yell_water")
 			self:PlaySequenceAndWait("yell_water")
-			self:EmitSound("bo1_overhaul/dir/vox_director_speed_buff_03.mp3",1.4)
+			self:EmitSound("enemies/bosses/dir/vox_director_speed_buff_03.ogg",1.4)
 		end
 	end
 
@@ -287,7 +286,7 @@ function ENT:OnZombieDeath(dmgInfo)
 
 	timer.Simple(dur - 0.5, function()
 		if IsValid(self) then
-			self:EmitSound("bo1_overhaul/dir/vox_director_die_0"..math.random(3)..".mp3")
+			self:EmitSound("enemies/bosses/dir/vox_director_die_0"..math.random(3)..".ogg")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -297,13 +296,13 @@ function ENT:OnZombieDeath(dmgInfo)
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(2)
-				self:EmitSound("bo1_overhaul/dir/sfx/_bubbling.mp3",511)
+				self:EmitSound("enemies/bosses/dir/sfx/_bubbling.ogg",511)
 				local fx = EffectData()
 			fx:SetOrigin(self:GetPos())
 			fx:SetStart(self:GetPos())
 			fx:SetScale(10)
 			util.Effect("WaterSurfaceExplosion",fx)
-	self:EmitSound("bo1_overhaul/dir/sfx/_beam.mp3",511)
+	self:EmitSound("enemies/bosses/dir/sfx/_beam.ogg",511)
 	self:ResetSequence("demerge")
 		end
 	end)
@@ -390,8 +389,8 @@ function ENT:OnPathTimeOut()
 			slamming = true
 			
 			taunting = true
-			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_0"..math.random(0,1)..".mp3",511)
-			self:EmitSound("bo1_overhaul/dir/sfx/zmb_ground_attack_flux.mp3")
+			self:EmitSound("enemies/bosses/dir/sfx/zmb_ground_attack_0"..math.random(0,1)..".ogg",511)
+			self:EmitSound("enemies/bosses/dir/sfx/zmb_ground_attack_flux.ogg")
 			ParticleEffect("romero_club_hit",self:LocalToWorld(Vector(60,-30,0)),Angle(0,0,0),nil)
 			ParticleEffectAttach("romero_club_glow",PATTACH_POINT_FOLLOW,self,4)
 			util.ScreenShake(self:GetPos(),10000,5000,1,1000)
@@ -525,12 +524,12 @@ if !counting and !self:IsAttacking() then
 counting = true
 if self.Enraged then
 timer.Simple(0.34,function()
-self:EmitSound("bo1_overhaul/dir/sfx/step_0"..math.random(1,4)..".mp3")
+self:EmitSound("enemies/bosses/dir/sfx/step_0"..math.random(1,4)..".ogg")
 counting = false
 end)
 else
 timer.Simple(0.8,function()
-self:EmitSound("bo1_overhaul/dir/sfx/step_0"..math.random(1,4)..".mp3")
+self:EmitSound("enemies/bosses/dir/sfx/step_0"..math.random(1,4)..".ogg")
 counting = false
 end)
 end
@@ -539,10 +538,10 @@ if !taunting then
 taunting = true
 timer.Simple(11,function()
 if self.Enraged then
-self:EmitSound("bo1_overhaul/dir/vox/vox_romero_angry_"..math.random(1,5)..".mp3")
+self:EmitSound("enemies/bosses/dir/vox/vox_romero_angry_"..math.random(1,5)..".ogg")
 taunting = false
 else
-self:EmitSound("bo1_overhaul/dir/vox/vox_romero_taunt_"..math.random(1,14)..".mp3")
+self:EmitSound("enemies/bosses/dir/vox/vox_romero_taunt_"..math.random(1,14)..".ogg")
 taunting = false
 end
 end)
@@ -562,10 +561,10 @@ end
 			fx:SetStart(self:GetPos())
 			fx:SetScale(10)
 			util.Effect("WaterSurfaceExplosion",fx)
-		self:EmitSound("bo1_overhaul/dir/sfx/_beam.mp3",511)
+		self:EmitSound("enemies/bosses/dir/sfx/_beam.ogg",511)
 		self:UpdateIdleSounds()
 		
-		self:EmitSound("bo1_overhaul/dir/vox/vox_romero_water_"..math.random(2)..".mp3")
+		self:EmitSound("enemies/bosses/dir/vox/vox_romero_water_"..math.random(2)..".ogg")
 	end
 	
 	if self:GetFlamethrowing() then

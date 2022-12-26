@@ -5,7 +5,7 @@ ENT.PrintName = "Mangler"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/blackops3/manglerraz.mdl" }
+ENT.Models = { "models/bosses/manglerraz.mdl" }
 
 ENT.AttackRange = 115
 ENT.DamageLow = 65
@@ -26,10 +26,10 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"roach/bo3/raz/vox_plr_1_exert_melee_01.mp3",
-	"roach/bo3/raz/vox_plr_1_exert_melee_02.mp3",
-	"roach/bo3/raz/vox_plr_1_exert_melee_03.mp3",
-	"roach/bo3/raz/vox_plr_1_exert_melee_04.mp3"
+	"enemies/bosses/raz/vox_plr_1_exert_melee_01.ogg",
+	"enemies/bosses/raz/vox_plr_1_exert_melee_02.ogg",
+	"enemies/bosses/raz/vox_plr_1_exert_melee_03.ogg",
+	"enemies/bosses/raz/vox_plr_1_exert_melee_04.ogg"
 
 }
 
@@ -43,16 +43,15 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.wav"
+	"empty.wav"
 }
 
 ENT.ActStages = {
@@ -199,8 +198,8 @@ function ENT:OnSpawn()
 		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		ParticleEffect("driese_tp_arrival_ambient_lightning",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		ParticleEffect("driese_tp_arrival_phase1",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		self:EmitSound("roach/bo3/raz/spawn_short.mp3")
-		self:EmitSound("bo1_overhaul/lgtstrike.mp3")
+		self:EmitSound("enemies/bosses/raz/spawn_short.ogg")
+		self:EmitSound("nz/hellhound/spawn/strike.wav")
 		self:SetNoDraw(true)
 	self:SetInvulnerable(true)
 		
@@ -243,7 +242,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("roach/bo3/raz/vox_plr_1_exert_pain_03_alt01.mp3")
+self:EmitSound("enemies/bosses/raz/vox_plr_1_exert_pain_03_alt01.ogg")
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -325,10 +324,10 @@ function ENT:OnPathTimeOut()
 			
 			self:Stop()
 			self:SetSpecialAnimation(true)
-				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
+				self:EmitSound("enemies/bosses/raz/raz_gun_charge.ogg")
 				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
 					local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1, function() self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")end)
+				timer.Simple(1, function() self:EmitSound("enemies/bosses/raz/fire_0"..math.random(3)..".ogg")end)
 				timer.Simple(1, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
 				timer.Simple(1, function()self.ClawHook:SetPos(clawpos)end)
 				timer.Simple(1, function()self.ClawHook:Spawn()end)
@@ -358,34 +357,6 @@ function ENT:OnPathTimeOut()
 			
 		end
 		
-
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
 	end
 	end
 
@@ -454,15 +425,15 @@ function ENT:OnInjured( dmgInfo )
 		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
 		
 		if hitpos:DistToSqr(finalpos) < 100 then
-		print("headshot")
+		--print("headshot")
 			self.ouch = self.ouch + dmgInfo:GetDamage()
 			print(self.ouch)
 			if self.ouch > 300 then
-			print("lose helmet")
+			--print("lose helmet")
 				self.HelmetLost = true
 				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
-				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_03.mp3",511)
+				self:EmitSound("enemies/bosses/newpanzer/mechz_faceplate.ogg",511)
+				self:EmitSound("enemies/bosses/raz/vox_plr_1_exert_charge_0"..math.random(4)..".ogg",511)
 				self:SetBodygroup(1,1)
 				self:SetSpecialAnimation(true)
 				self:SetBlockAttack(true)
@@ -485,19 +456,42 @@ function ENT:OnInjured( dmgInfo )
 	
 end
 
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+			self.Malding = false
+				self:StartActivity( ACT_RUN )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
+end
+
 function ENT:OnThink()
 self:RemoveAllDecals()
-if self:IsAttacking() then
-self:SetSpecialAnimation(true)
-self.loco:SetDesiredSpeed(0)
-self:SetVelocity(Vector(0,0,0))
-timer.Simple(1.1, function()self:SetSpecialAnimation(false)end)
-end
+
 if !self:IsAttacking() then
 if !counting and !dying and !shooting and self:Health() > 0 then
 counting = true
 timer.Simple(0.3,function()
-self:EmitSound("roach/bo3/raz/step_0"..math.random(1,5)..".mp3")
+self:EmitSound("enemies/bosses/raz/step_0"..math.random(1,5)..".ogg")
 counting = false
 end)
 end

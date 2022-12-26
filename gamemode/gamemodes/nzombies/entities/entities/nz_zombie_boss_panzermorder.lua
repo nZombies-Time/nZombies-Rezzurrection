@@ -5,7 +5,7 @@ ENT.PrintName = "Panzermordar"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/codz_megapack/ww2/panzermorder.mdl"}
+ENT.Models = { "models/bosses/panzermorder.mdl"}
 
 ENT.AttackRange = 200
 ENT.DamageLow = 90
@@ -26,18 +26,18 @@ ENT.DeathSequences = {
 
 
 ENT.AttackSounds = {
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v1_03.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_ground_v2_03.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v1_03.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_attack_v2_03.wav"
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v1_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v1_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v1_03.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v2_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v2_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_ground_v2_03.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v1_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v1_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v1_03.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v2_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v2_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_attack_v2_03.ogg"
 }
 
 ENT.PainSounds = {
@@ -49,16 +49,16 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/thrasher/bite_04.mp3",
-	"roach/bo3/thrasher/bite_01.mp3",
-	"roach/bo3/thrasher/bite_02.mp3",
-	"roach/bo3/thrasher/bite_03.mp3",
+	"enemies/bosses/thrasher/bite_04.ogg",
+	"enemies/bosses/thrasher/bite_01.ogg",
+	"enemies/bosses/thrasher/bite_02.ogg",
+	"enemies/bosses/thrasher/bite_03.ogg",
 }
 
 ENT.WalkSounds = {
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_walk_trav_exit_v1_03.wav"
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_trav_exit_v1_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_trav_exit_v1_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_walk_trav_exit_v1_03.ogg"
 	
 }
 
@@ -203,7 +203,7 @@ function ENT:OnSpawn()
 	-- play emerge animation on spawn
 	-- if we have a coroutine else just spawn the zombie without emerging for now.
 	if coroutine.running() then
-		self:SetSpecialAnimation(true)
+		
 		local pos = self:GetPos() + (seq == "s2_zom_brt_roar" and Vector(0,0,100) or Vector(0,0,450))
 		
 		local effectData = EffectData()
@@ -213,9 +213,9 @@ function ENT:OnSpawn()
 		for i=1,8 do
 			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
-		self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_roar_0"..math.random(1,5)..".wav",511)
-		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
-		self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(1,5)..".mp3",511)
+		self:EmitSound("enemies/bosses/panzermorder/vox/s2_zom_brt_roar_0"..math.random(1,5)..".ogg",511)
+		self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
+		self:EmitSound("enemies/bosses/thrasher/dst_rock_quake_0"..math.random(1,5)..".ogg",511)
 	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
@@ -232,9 +232,6 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-		end)
-		self:TimedEvent(dur, function()
-		self:SetSpecialAnimation(false)
 		end)
 		scaledHP = self:Health()
 		print(scaledHP)
@@ -257,7 +254,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:SetCycle(0)
 
 		if IsValid(self) then
-			self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".wav",511)
+			self:EmitSound("enemies/bosses/panzermorder/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".ogg",511)
 		end
 	timer.Simple(dur, function()
 		if IsValid(self) then
@@ -422,58 +419,10 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnInjured( dmgInfo )
-	local hitpos = dmgInfo:GetDamagePosition()
-	
-	if !self.HelmetLost then
-		local bone = self:LookupBone("j_faceplate")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
-		
-		if hitpos:DistToSqr(finalpos) < 50 then
-			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
-			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
-				self.HelmetLost = true
-				--self:ManipulateBonePosition(bone, Vector(0,0,-75))
-				self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/mechz_faceplate.wav",511)
-				self:SetBodygroup(2, 1)
-				self:SetSpecialAnimation(true)
-				self:SetBlockAttack(true)
-				self:ReleasePlayer()
-				self:StopFlames()
-				local id, dur = self:LookupSequence("flinch_head_1")
-				self:ResetSequence(id)
-				self:SetCycle(0)
-				self:SetPlaybackRate(1)
-				self.loco:SetDesiredSpeed(0)
-				self:SetVelocity(Vector(0,0,0))
-				self:TimedEvent(dur, function()
-					self.loco:SetDesiredSpeed(self:GetRunSpeed())
-					self:SetSpecialAnimation(false)
-					self:SetBlockAttack(false)
-				end)
-			end
-		end
-		
-		dmgInfo:ScaleDamage(0.1) -- When the helmet isn't lost, all damage only deals 10%
-	else
-		local bone = self:LookupBone("j_head")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Up()*4
-		
-		if hitpos:DistToSqr(finalpos) < 150 then
-			-- No damage scaling on headshot, we keep it at 1x
-		else
-			dmgInfo:ScaleDamage(0.1) -- When the helmet is lost, a non-headshot still only deals 10%
-		end
-	end
-	
-end
-
 function ENT:OnInjured(dmg)
-
+print(self:Health())
 if self:Health() < scaledHP/2 and self:Health()> scaledHP/5 then
-self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_roar_0"..math.random(1,5)..".wav")
+self:EmitSound("enemies/bosses/panzermorder/vox/s2_zom_brt_roar_0"..math.random(1,5)..".ogg")
 fullHP = false
 halfHP = true
 self.loco:SetDesiredSpeed(210)
@@ -482,26 +431,26 @@ self.AttackSequences = {
 	{seq = "s2_zom_brt_run_attack_v1" , dmgtimes = {0.75,1.2,1.5}}
 }
 self.AttackSounds  = {
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_03.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_04.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_run_attack_v1_05.wav"
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_run_attack_v1_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_run_attack_v1_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_run_attack_v1_03.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_run_attack_v1_04.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_run_attack_v1_05.ogg"
 }
 
 self.WalkSounds = {
-"codz_megapack/ww2/brute/vox/s2_zom_brt_run_01.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_run_02.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_run_03.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_run_04.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_run_05.wav"
+"enemies/bosses/panzermorder/vox/s2_zom_brt_run_01.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_run_02.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_run_03.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_run_04.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_run_05.ogg"
 }
 				
 else if self:Health() < scaledHP/5 and !lowHP then
 lowHP = true
 halfHP = false
 fullHP = false
-self:EmitSound("codz_megapack/ww2/brute/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".wav")
+self:EmitSound("enemies/bosses/panzermorder/vox/s2_zom_brt_stun_down_v1_0"..math.random(1,3)..".ogg")
 self.loco:SetDesiredSpeed(95)
 self:SetRunSpeed(95)
 self:SetAttackRange(250)
@@ -510,33 +459,33 @@ self.AttackSequences = {
 }
 
 self.WalkSounds = {
-"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_01.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_02.wav",
-"codz_megapack/ww2/brute/vox/s2_zom_brt_stun_loop_v1_03.wav"
+"enemies/bosses/panzermorder/vox/s2_zom_brt_stun_loop_v1_01.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_stun_loop_v1_02.ogg",
+"enemies/bosses/panzermorder/vox/s2_zom_brt_stun_loop_v1_03.ogg"
 }
 
 self.AttackSounds  = {
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_01.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_02.wav",
-	"codz_megapack/ww2/brute/vox/s2_zom_brt_stand_atk_lurch_v1_03.wav"
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_stand_atk_lurch_v1_01.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_stand_atk_lurch_v1_02.ogg",
+	"enemies/bosses/panzermorder/vox/s2_zom_brt_stand_atk_lurch_v1_03.ogg"
 }
 end
 end
 end
 
 function ENT:OnThink()
-if !counting and !self:IsAttacking() and !dying and self:Health() > 0 and !self:GetSpecialAnimation() then
+if !counting and !self:IsAttacking() and !dying and self:Health() > 0 then
 counting = true
 --Walking MS
 if halfHP then
 timer.Simple(0.43,function()
-self:EmitSound("codz_megapack/ww2/brute/zmb_fs_run_brute_default2_0"..math.random(1,9)..".wav")
+self:EmitSound("enemies/bosses/panzermorder/zmb_fs_run_brute_default2_0"..math.random(1,9)..".ogg")
 util.ScreenShake(self:GetPos(),3,1000,0.5,2048)
 counting = false
 end)	
 else
 timer.Simple(0.91,function()
-self:EmitSound("codz_megapack/ww2/brute/zmb_fs_walk_brute_default2_0"..math.random(1,9)..".wav")
+self:EmitSound("enemies/bosses/panzermorder/zmb_fs_walk_brute_default2_0"..math.random(1,9)..".ogg")
 util.ScreenShake(self:GetPos(),3,1000,0.5,2048)
 counting = false
 end)
@@ -682,7 +631,7 @@ function ENT:OnBarricadeBlocking( barricade )
 			timer.Simple(0.3, function()
 
 				for i = 1, barricade:GetNumPlanks() do
-					barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".wav", 100, math.random(90, 130))
+					barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".ogg", 100, math.random(90, 130))
 					barricade:RemovePlank()
 				end
 

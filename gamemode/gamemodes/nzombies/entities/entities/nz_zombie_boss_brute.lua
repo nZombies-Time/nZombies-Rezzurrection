@@ -5,16 +5,16 @@ ENT.PrintName = "Brute Necromorph"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/_maz_ter_/deadspace/deadspacenecros/brute_necro_ds1.mdl" }
+ENT.Models = { "models/bosses/brute_necro_ds1.mdl" }
 
-ENT.AttackRange = 143
+ENT.AttackRange = 150
 ENT.DamageLow = 70
 ENT.DamageHigh = 85
 
 
 ENT.AttackSequences = {
-	{seq = "attack", dmgtimes = {0.6}},
-	{seq = "attack2", dmgtimes = {0.6}}
+	{seq = "attack", dmgtimes = {0.5}},
+	{seq = "attack2", dmgtimes = {0.5}}
 }
 
 ENT.DeathSequences = {
@@ -22,10 +22,10 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"brute/brute_attack_01.wav",
-	"brute/brute_attack_02.wav",
-	"brute/brute_attack_03.wav",
-	"brute/brute_attack_04.wav"
+	"enemies/bosses/brute/brute_attack_01.ogg",
+	"enemies/bosses/brute/brute_attack_02.ogg",
+	"enemies/bosses/brute/brute_attack_03.ogg",
+	"enemies/bosses/brute/brute_attack_04.ogg"
 
 }
 
@@ -38,38 +38,33 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg"
 }
 
 ENT.WalkSounds = {
-	"brute/brut_vx_idle_01_nr_00.wav",
-	"brute/brut_vx_idle_01_nr_01.wav",
-	"brute/brut_vx_idle_01_nr_02.wav",
-	"brute/brut_vx_idle_01_nr_03.wav",
-	"brute/brut_vx_idle_01_nr_04.wav",
-	"brute/brut_vx_idle_01_nr_05.wav",
-	"brute/brut_vx_idle_01_nr_06.wav",
-	"brute/brut_vx_idle_01_nr_07.wav",
-	"brute/brut_vx_idle_01_nr_08.wav"
+	"enemies/bosses/brute/brut_vx_idle_01_nr_00.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_01.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_02.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_03.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_04.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_05.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_06.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_07.ogg",
+	"enemies/bosses/brute/brut_vx_idle_01_nr_08.ogg"
 }
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_RUN,
+		act = ACT_WALK,
 		minspeed = 1,
 	},
 	[2] = {
-		act = ACT_RUN,
-		minspeed = 150,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 180
+		act = ACT_WALK,
+		minspeed = 160,
 	}
 }
 
@@ -127,7 +122,7 @@ function ENT:Initialize()
 			self:SetLagCompensated(true)
 		end
 		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
+		self.Malding = false -- Used to save how much damage the light has taken
 		self:SetUsingClaw(false)
 		
 		self.NextAction = 0
@@ -197,7 +192,7 @@ function ENT:OnSpawn()
 		
 		util.ScreenShake(self:GetPos(),5,1000,1.2,2048)
 	
-		self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+		self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 		counting = true
 	self:SetInvulnerable(true)
 		self:SetSpecialAnimation(true)
@@ -216,12 +211,13 @@ function ENT:OnSpawn()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:EmitSound("brute/brute_roar_0"..math.random(1,4)..".wav")
+			self:EmitSound("enemies/bosses/brute/brute_roar_0"..math.random(1,4)..".ogg")
 			util.ScreenShake(self:GetPos(),20,1000,3,2048)
 			counting = false
 			
 		end)
 		self:PlaySequenceAndWait(seq)
+		self:StartActivity( ACT_WALK)
 	end
 end
 
@@ -237,7 +233,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("brute/brut_vx_death_01_nr_00.wav")
+self:EmitSound("enemies/bosses/brute/brut_vx_death_01_nr_00.ogg")
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -255,7 +251,7 @@ function ENT:BodyUpdate()
 
 	local len2d = velocity:Length2D()
 
-	if ( len2d > 88 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_RUN end
+	--if ( len2d > 88 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
 
 	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
@@ -287,83 +283,53 @@ function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
-			timer.Simple(0.2,function()
-				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
-				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
-			end)
-				timer.Simple(29/58, function()
-				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
-				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
-				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
-				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot")
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-				local seq = "taunt"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
+	if math.random(0,5) == 4 and CurTime() > self.NextClawTime then
+		-- Gorilla is not happy\
+		if self.Malding == true then
+		self.Malding = false
+		self.loco:SetDesiredSpeed(100)
+					self:SetRunSpeed(100)
+					self:StartActivity( ACT_WALK)
+		else
+		self:EmitSound("enemies/bosses/brute/brute_roar_0"..math.random(1,4)..".ogg")
+					self.Malding = true
+					self.loco:SetDesiredSpeed(175)
+					self:SetRunSpeed(175)
+					self:StartActivity( ACT_RUN)
 				self.NextAction = CurTime() + math.random(1, 5)
 				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
+				end
+				end
 end
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+			self.Malding = false
+				self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
+end
+
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
@@ -399,22 +365,26 @@ end
 
 
 function ENT:OnThink()
-
-if self:IsAttacking() and self and self:IsValid() then
-self:SetSpecialAnimation(true)
-self.loco:SetDesiredSpeed(0)
-timer.Simple(1.1, function()self:SetSpecialAnimation(false)end)
-end
-if !self:GetSpecialAnimation() then
+if !self:GetSpecialAnimation() and not self:IsAttacking() then
 if !counting and !dying and self:Health() > 0 then
 counting = true
+if self.Malding == true then
 timer.Simple(1,function()
 if self and self:IsValid() then
-self:EmitSound("brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".wav")
+self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".ogg")
 util.ScreenShake(self:GetPos(),5,1000,0.5,2048)
 counting = false
 end
 end)
+else
+timer.Simple(0.45,function()
+if self and self:IsValid() then
+self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".ogg")
+util.ScreenShake(self:GetPos(),3,1000,0.45,2048)
+counting = false
+end
+end)
+end
 end
 end
 

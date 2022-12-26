@@ -5,7 +5,7 @@ ENT.PrintName = "Astronaut"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/bo1_overhaul/astronaut.mdl" }
+ENT.Models = { "models/bosses/astronaut.mdl" }
 
 ENT.AttackRange = 55
 ENT.DamageLow = 30
@@ -33,15 +33,16 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 
 ENT.WalkSounds = {
-"empty.wav"
+"enemies/bosses/ast/breathe_loop_hq.wav"
 }
 
 ENT.ActStages = {
@@ -187,7 +188,7 @@ function ENT:OnSpawn()
 		for i=1,2 do
 			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 		end
-		self:EmitSound("bo1_overhaul/ast/headbutt.mp3",511)
+		self:EmitSound("enemies/bosses/ast/headbutt.ogg",511)
 		counting = true
 	self:SetInvulnerable(true)
 		
@@ -213,8 +214,7 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-	dying = true
-	self:StopSound("bo1_overhaul/ast/breathe_loop_hq.wav" )
+self:StopSound()
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
@@ -227,7 +227,7 @@ function ENT:OnZombieDeath(dmgInfo)
 
 	timer.Simple(dur - 0.5, function()
 		if IsValid(self) then
-			self:EmitSound("bo1_overhaul/ast/pop.mp3")
+			self:EmitSound("enemies/bosses/ast/pop.ogg")
 		end
 	end)
 	timer.Simple(dur, function()
@@ -271,7 +271,7 @@ atkData.dmglow = 1
     atkData.dmgforce = Vector( 0, 0, 0 )
 	atkData.dmgdelay = 1
 		self:Attack( atkData )
-		grabbin = false
+		grabbing = false
 		self.loco:SetDesiredSpeed(51)
 	
 end
@@ -318,15 +318,7 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnThink()
-if !self:IsAttacking() and !counting and !dying and !grabbing then
-counting = true
-timer.Simple(9,function()
-self:EmitSound("bo1_overhaul/ast/breathe_loop_hq.wav")
-counting = false
-end)
-			end
-			
+function ENT:OnThink()	
  if self:IsAttacking() then
  	self.loco:SetDesiredSpeed(0)
 	if !grabbing and !teleporting then
@@ -353,7 +345,7 @@ end)
 							stuckplayer:SetWalkSpeed(walk)
 							teleporting = true
 							 if self:GetPos():Distance( stuckplayer:GetPos() )< 75 then
-							self:EmitSound("bo1_overhaul/ast/pop.mp3",511)
+							self:EmitSound("enemies/bosses/ast/pop.ogg",511)
 							local d = DamageInfo()
 						d:SetDamage( stuckplayer:Health() - 35 )
 						d:SetAttacker( self )
@@ -372,84 +364,6 @@ end)
 	end
 	
  end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
 	
 	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
 		self:ReleasePlayer()
@@ -458,51 +372,11 @@ end)
 end
 
 function ENT:GrabPlayer(ply)
-	if CLIENT then return end
-	
-	
-	self:SetUsingClaw(false)
-	self:SetStop(false)
-	self.loco:SetDesiredSpeed(self:GetRunSpeed())
-	
-	if self:IsValidTarget(ply) then
-		self.GrabbedPlayer = ply
-		
-		self:TimedEvent(0, function()
-			local att = self:GetAttachment(self:LookupAttachment("clawlight"))
-			local pos = att.Pos + att.Ang:Forward()*10
-			
-			ply:SetPos(pos - Vector(0,0,50))
-			ply:SetMoveType(MOVETYPE_NONE)
-		end)
-		
-		
-		self:SetSequence(self:LookupSequence("nz_grapple_flamethrower"))
-		self:SetCycle(0)
-		self:StartFlames()
-	--[[elseif ply then
-		self.loco:SetDesiredSpeed(self:GetRunSpeed())
-		self:SetSpecialAnimation(false)
-		self:SetBlockAttack(false)
-		self:SetStop(false)]]
-	else
-		
-	end
+
 end
 
 function ENT:ReleasePlayer()
-	if IsValid(self.GrabbedPlayer) then
-		self.GrabbedPlayer:SetMoveType(MOVETYPE_WALK)
-	end
-	if IsValid(self.ClawHook) then
-		self.ClawHook:Release()
-	end
-	if !self:GetFlamethrowing() then
-		self:SetStop(false)
-	end
-	self:SetUsingClaw(false)
-	self:SetStop(false)
-	self.loco:SetDesiredSpeed(self:GetRunSpeed())
+	
 end
 
 function ENT:OnBarricadeBlocking( barricade )

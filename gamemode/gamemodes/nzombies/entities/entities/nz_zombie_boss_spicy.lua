@@ -5,7 +5,7 @@ ENT.PrintName = "Fuel Junkie"
 ENT.Category = "Brainz"
 ENT.Author = "Zet0r"
 
-ENT.Models = { "models/nzr/2022/enemies/takieater.mdl" }
+ENT.Models = { "models/bosses/takieater.mdl" }
 
 ENT.AttackRange = 130
 ENT.DamageLow = 40
@@ -31,20 +31,20 @@ ENT.AttackSounds = {
 	"nz/zombies/attack/attack_06.wav",
 	"nz/zombies/attack/attack_07.wav",
 	"nz/zombies/attack/attack_08.wav",
-	"nz/zombies/attack/attack_n_1.wav",
-	"nz/zombies/attack/attack_n_2.wav",
-	"nz/zombies/attack/attack_n_3.wav",
-	"nz/zombies/attack/attack_n_4.wav",
-	"nz/zombies/attack/attack_n_5.wav",
 	"nz/zombies/attack/attack_14.wav",
 	"nz/zombies/attack/attack_15.wav",
 	"nz/zombies/attack/attack_16.wav",
 	"nz/zombies/attack/attack_17.wav",
 	"nz/zombies/attack/attack_18.wav",
 	"nz/zombies/attack/attack_19.wav",
-	"nz/zombies/attack/attack_n_6.wav",
 	"nz/zombies/attack/attack_21.wav",
-	"nz/zombies/attack/attack_22.wav"
+	"nz/zombies/attack/attack_22.wav",
+	"enemies/zombies/zombie/attack/attack_n_1.ogg",
+	"enemies/zombies/zombie/attack/attack_n_2.ogg",
+	"enemies/zombies/zombie/attack/attack_n_3.ogg",
+	"enemies/zombies/zombie/attack/attack_n_4.ogg",
+	"enemies/zombies/zombie/attack/attack_n_5.ogg",
+	"enemies/zombies/zombie/attack/attack_n_6.ogg",
 }
 
 ENT.PainSounds = {
@@ -56,9 +56,9 @@ ENT.PainSounds = {
 }
 
 ENT.WalkSounds = {
-	"bo1_overhaul/son/amb1.mp3",
-	"bo1_overhaul/son/amb2.mp3",
-	"bo1_overhaul/son/amb3.mp3"
+	"enemies/bosses/shrieker/amb1.ogg",
+	"enemies/bosses/shrieker/amb2.ogg",
+	"enemies/bosses/shrieker/amb3.ogg"
 }
 
 ENT.ActStages = {
@@ -203,7 +203,7 @@ function ENT:OnSpawn()
 		self:SetSpecialAnimation(true)
 		local pos = self:GetPos() + (seq == "flinch_head_2" and Vector(0,0,100) or Vector(0,0,450))
 		counting = true
-		self:EmitSound("bo1_overhaul/nap/spawn.mp3",511)
+		self:EmitSound("enemies/bosses/nap/spawn.ogg",511)
 		local entParticle = ents.Create("info_particle_system")
 		entParticle:SetKeyValue("start_active", "1")
 		entParticle:SetKeyValue("effect_name", "napalm_emerge")
@@ -241,7 +241,7 @@ self:EmitSound("bo1_overhaul/son/amb1.mp3")
 		if IsValid(self) then
 			
 			util.ScreenShake(self:GetPos(),12,400,3,1000)
-			self:EmitSound("bo1_overhaul/nap/explode.mp3",511)
+			self:EmitSound("enemies/bosses/nap/explode.ogg",511)
             local ent = ents.Create("env_explosion")
         ent:SetPos(self:GetPos())
         ent:SetAngles(self:GetAngles())
@@ -402,8 +402,8 @@ function ENT:StartFlames(time)
 	--self:EmitSound("codz_megapack/zmb/ai/mechz2/v2/flame/start.wav")
 	
 	timer.Simple(0.7, function()
-	self:EmitSound("bo1_overhaul/son/scream.mp3")
-	self:EmitSound("bo1_overhaul/nap/spawn.mp3")
+	self:EmitSound("enemies/bosses/nap/spawn.ogg")
+	self:EmitSound("enemies/bosses/shrieker/scream.ogg")
 	self:SetFlamethrowing(true)
 	end)
 end
@@ -426,7 +426,7 @@ if !self:IsAttacking() then
 if !counting and !dying and !shooting and self:Health() > 0 and !self:GetFlamethrowing() and !self:GetSpecialAnimation() then
 counting = true
 timer.Simple(0.32,function()
-self:EmitSound("bo1_overhaul/nap/step"..math.random(1,3)..".mp3")
+self:EmitSound("enemies/bosses/nap/step"..math.random(1,3)..".ogg")
 counting = false
 end)
 end

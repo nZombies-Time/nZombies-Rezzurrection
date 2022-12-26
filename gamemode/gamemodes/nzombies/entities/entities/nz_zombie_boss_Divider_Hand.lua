@@ -6,7 +6,7 @@ ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
 ENT.Models = {
-	"models/_maz_ter_/deadspace/deadspacenecros/divider_spawn_hand.mdl"
+	"models/bosses/divider_spawn_hand.mdl"
 }
 
 ENT.AttackRange = 50
@@ -23,9 +23,9 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"divider/component/divider_component_attack-01.wav",
-	"divider/component/divider_component_attack-02.wav",
-	"divider/component/divider_component_attack-03.wav"
+	"enemies/bosses/divider/component/divider_component_attack-01.ogg",
+	"enemies/bosses/divider/component/divider_component_attack-02.ogg",
+	"enemies/bosses/divider/component/divider_component_attack-03.ogg"
 	
 	
 }
@@ -39,23 +39,24 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3"
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"divider/component/footstep/divider_component_footstep-01.wav",
-	"divider/component/footstep/divider_component_footstep-02.wav",
-	"divider/component/footstep/divider_component_footstep-03.wav", 
-"divider/component/footstep/divider_component_footstep-04.wav",
- "divider/component/footstep/divider_component_footstep-05.wav",
- "divider/component/footstep/divider_component_footstep-06.wav", 
-"divider/component/footstep/divider_component_footstep-07.wav", 
-"divider/component/footstep/divider_component_footstep-08.wav",
- "divider/component/footstep/divider_component_footstep-09.wav", 
-"divider/component/footstep/divider_component_footstep-10.wav"
+	"enemies/bosses/divider/component/footstep/divider_component_footstep-01.ogg",
+	"enemies/bosses/divider/component/footstep/divider_component_footstep-02.ogg",
+	"enemies/bosses/divider/component/footstep/divider_component_footstep-03.ogg", 
+"enemies/bosses/divider/component/footstep/divider_component_footstep-04.ogg",
+ "enemies/bosses/divider/component/footstep/divider_component_footstep-05.ogg",
+ "enemies/bosses/divider/component/footstep/divider_component_footstep-06.ogg", 
+"enemies/bosses/divider/component/footstep/divider_component_footstep-07.ogg", 
+"enemies/bosses/divider/component/footstep/divider_component_footstep-08.ogg",
+ "enemies/bosses/divider/component/footstep/divider_component_footstep-09.ogg", 
+"enemies/bosses/divider/component/footstep/divider_component_footstep-10.ogg"
 }
 
 ENT.ActStages = {
@@ -218,7 +219,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-	self:EmitSound("divider/component/divider_component_growl_short_highpitch-0"..math.random(1,6)..".wav")
+	self:EmitSound("enemies/bosses/divider/component/divider_component_growl_short_highpitch-0"..math.random(1,6)..".ogg")
 	self:SetCycle(0)
 		if IsValid(self) then
 				ParticleEffect("baby_dead2",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
@@ -362,7 +363,7 @@ end
 
 function ENT:OnThink()
 if math.random(0,1250) == 49 then
-self:EmitSound("divider/component/divider_component_growl_long-0"..math.random(1,6)..".wav")
+self:EmitSound("enemies/bosses/divider/component/divider_component_growl_long-0"..math.random(1,6)..".ogg")
 end
 
 	if self:GetFlamethrowing() then

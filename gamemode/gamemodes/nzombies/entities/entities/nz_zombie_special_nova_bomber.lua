@@ -10,7 +10,9 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Decapitated")
 	self:NetworkVar("Bool", 1, "Alive")
 	self:NetworkVar("Bool", 2, "MooSpecial")
+	self:NetworkVar("Bool", 3, "StinkyGas") -- For both Bombers and Jacks
 end
+
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -20,8 +22,7 @@ ENT.RedEyes = false
 ENT.IsMooSpecial = true
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/t8/ofc_quadcrawler/moo_codz_t8_nova_crawler.mdl", Skin = 0, Bodygroups = {0,0}},
-	--{Model = "models/moo/_codz_ports/t8/ofc_quadcrawler/moo_codz_t8_nova_bomber.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t8/ofc_quadcrawler/moo_codz_t8_nova_bomber.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 ENT.DeathSequences = {
@@ -170,6 +171,9 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+		self.NextAction = 0
+		self.NextGasTime = 0
+		self.NextPhaseTime = 0
 		self:SetMooSpecial(true)
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 105) )
@@ -204,11 +208,9 @@ function ENT:OnSpawn()
 			self:EmitSound("nz_moo/zombies/vox/_quad/spawn/spawn_0"..math.random(3)..".mp3", 100, math.random(95, 105), 1, 2)
 			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
 			if IsValid(self) then ParticleEffectAttach("panzer_spawn_tp", 3, self, 2) end
-			if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
 		end
 	end)
 end
-
 
 --[[ CUSTOM/MODIFIED THINGS FROM BASE HERE ]]--
 
@@ -225,16 +227,13 @@ end
 
 
 function ENT:DoDeathAnimation(seq) -- Modified death function to have a chance of spawning a gas cloud on death.
-	local GasDeathChance = math.random(2)
 	self.BehaveThread = coroutine.create(function()
 		self:PlaySequenceAndWait(seq)
-		if GasDeathChance == 2 then
-			print("Stinky Child... Gross")
-			local fuckercloud = ents.Create("nova_gas_cloud")
-			fuckercloud:SetPos(self:GetPos())
-			fuckercloud:SetAngles(Angle(0,0,0))
-			fuckercloud:Spawn()
-		end
+		print("Stinky Child... Gross")
+		local fuckercloud = ents.Create("nova_gas_cloud")
+		fuckercloud:SetPos(self:GetPos())
+		fuckercloud:SetAngles(Angle(0,0,0))
+		fuckercloud:Spawn()
 		self:Remove(DamageInfo())
 	end)
 end
@@ -268,3 +267,114 @@ function ENT:PlayAttackAndWait( name, speed )
 	end
 
 end
+
+--[[ JOLTING JACK/NOVA BOMBER RELATED FUNCTIONS HERE! ]]--
+
+function ENT:OnPathTimeOut()
+	local ShootChance = math.random(1, 5) -- Seeing how powerful in certain situations Bombers can be... They have a far less chance of emitting gas.
+	local target = self:GetTarget()
+	local larmfx_tag = self:LookupBone("j_wrist_le")
+	if CurTime() < self.NextAction then return end
+	
+	if ShootChance == 1 and CurTime() > self.NextGasTime then
+	
+		-- Ranged Attack/Plasma Ball or Gas Ball
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+			for k, v in pairs(ents.FindInSphere(self:GetPos(), 150)) do
+				if IsValid(v) and v:IsValidZombie() and v.IsMooZombie or IsValid(v) and v:IsValidZombie() then
+				if v.IsMooSpecial or v.NZBossType then continue end -- Bomber will ignore itself and Bosses
+					--print("Homeless Man located")
+					--print(v)	-- We're gonna beef up every standard zombie in the Nova Bomber's range
+					self:FleeTarget(6) -- 11/26/22: Fuck you I'm running away! THIS FUCKING SUCKS WITH MORE THAN ONE PERSON BTW!!!
+					if v.SpeedBasedSequences then
+						v:EmitSound("nz_moo/zombies/vox/_classic/taunt/taunt_0"..math.random(1,6)..".mp3", 100, math.random(95, 105), 1, 2) -- Will they know?
+						v:SetRunSpeed(250)
+						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
+						v:SetHealth( nzRound:GetZombieHealth() * 2 )
+						v:SpeedChanged()
+					elseif !v.SpeedBasedSequences or !v.IsMooZombie then -- For non Moo Zombies. Your welcome Laby
+						v:SetRunSpeed(250)
+						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
+						v:SetHealth( nzRound:GetZombieHealth() * 2 )
+					end
+				end
+			end
+
+			if IsValid(self) then ParticleEffectAttach("hcea_flood_runner_death", 3, self, 2) end
+			
+			local fuckercloud = ents.Create("nova_gas_cloud")
+			fuckercloud:SetPos(self:GetPos())
+			fuckercloud:SetAngles(Angle(0,0,0))
+			fuckercloud:Spawn()
+
+
+			self.loco:SetDesiredSpeed(0)
+				
+			self:PlaySequenceAndWait("nz_attack_v6")
+				
+			local seq = "nz_attack_v6"
+			local id, dur = self:LookupSequence(seq)
+			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			self:SetSpecialAnimation(false)
+			self:SetBlockAttack(false)
+
+			self.NextAction = CurTime() + math.random(1, 5)
+			self.NextGasTime = CurTime() + math.random(3, 15)
+		end
+	end
+end
+
+function ENT:OnRemove()
+	if IsValid(self.StinkyGas) then self.StinkyGas:Remove() end
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--[[
+
+I've come to make an announcement: Shadow the Hedgehog's a bitch-ass motherfucker, he pissed on my fucking wife. That's right, he took his hedgehog-fuckin' quilly dick out and he pissed on my fucking wife, and he said his dick was "THIS BIG," and I said "that's disgusting," so I'm making a callout post on my Twitter.com: Shadow the Hedgehog, you've got a small dick. It's the size of this walnut except WAY smaller. And guess what? Here's what my dong looks like.
+
+That's right, baby. All points, no quills, no pillows — look at that, it looks like two balls and a bong. He fucked my wife, so guess what, I'm gonna fuck the Earth. That's right, this is what you get: MY SUPER LASER PISS!! Except I'm not gonna piss on the Earth, I'm gonna go higher; I'M PISSING ON THE MOON! How do you like that, Obama?! I PISSED ON THE MOON, YOU IDIOT!
+
+You have twenty-three hours before the piss D R O P L E T S hit the fucking Earth, now get outta my fucking sight, before I piss on you too!
+
+
+]]

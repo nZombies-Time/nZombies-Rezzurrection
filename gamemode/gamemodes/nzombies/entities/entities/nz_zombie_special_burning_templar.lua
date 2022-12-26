@@ -1,6 +1,6 @@
 AddCSLuaFile()
 
-ENT.Base = "nz_zombie_walker_templar"
+ENT.Base = "nz_zombie_walker_origins_templar"
 ENT.PrintName = "Burning Walker (Templar)"
 ENT.Category = "Brainz"
 ENT.Author = "Lolle"

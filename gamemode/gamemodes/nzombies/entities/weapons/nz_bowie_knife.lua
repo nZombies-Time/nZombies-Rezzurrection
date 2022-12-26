@@ -58,6 +58,7 @@ function SWEP:Initialize()
 end
 
 function SWEP:Deploy()
+print("use the newer one instead of this moist trash")
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self.HolsterTime = CurTime() + 2.5
 	self:EmitSound("nz/bowie/draw/bowie_start.wav")

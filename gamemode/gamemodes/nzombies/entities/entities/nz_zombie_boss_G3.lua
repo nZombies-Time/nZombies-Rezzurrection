@@ -7,9 +7,9 @@ ENT.Author = "Laby"
 
 ENT.Models = { "models/roach/re2/g3v3.mdl" }
 
-ENT.AttackRange = 210
-ENT.DamageLow = 1
-ENT.DamageHigh = 1
+ENT.AttackRange = 160
+ENT.DamageLow = 99
+ENT.DamageHigh = 99
 
 
 ENT.AttackSequences = {
@@ -45,8 +45,7 @@ ENT.AttackHitSounds = {
 	"re2/em7000/hit_body2.mp3",
 	"re2/em7000/hit_body3.mp3",
 	"re2/em7000/hit_body4.mp3",
-	"re2/em7000/hit_body5.mp3",
-	"re2/em7000/hit_body6.mp3"
+	"re2/em7000/hit_body5.mp3"
 }
 
 ENT.WalkSounds = {
@@ -59,14 +58,6 @@ ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
 		minspeed = 1,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 160,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 180
 	}
 }
 
@@ -95,7 +86,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -105,7 +96,7 @@ function ENT:Initialize()
 	self:SetRunSpeed( self.RunSpeed ) --fallback
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
 
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+	self:SetCollisionBounds(Vector(-18,-18, 0), Vector(18, 18, 90))
 
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
@@ -114,7 +105,7 @@ function ENT:Initialize()
 	self:SpecialInit()
 	
 	-- Fallback for buggy tool
-	if !self:GetRunSpeed() then self:SetRunSpeed(300) end
+	if !self:GetRunSpeed() then self:SetRunSpeed(145) end
 
 	if SERVER then
 		self.loco:SetDeathDropHeight( self.DeathDropHeight )
@@ -142,7 +133,7 @@ function ENT:StatsInitialize()
 		taunting = true
 		counting = true
 		dying = false
-		self:SetRunSpeed(120)
+		self:SetRunSpeed(145)
 		self:SetHealth(10000)
 		self:SetMaxHealth(100000)
 	end
@@ -223,7 +214,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:Stop()
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:EmitSound("re2/em7200/reaction1.mp3")
+	self:EmitSound("re2/em7200/reaction1.mp3",511)
 	self:ResetSequence(seq)
 	self:SetCycle(0)
 	timer.Simple(dur, function()
@@ -298,20 +289,73 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnInjured(dmg)
+function ENT:OnInjured( dmgInfo )
+dmgInfo:ScaleDamage(0.5)
 if math.random(0,100) == 49 then
 self:EmitSound("re2/em7200/pain"..math.random(3)..".mp3")
 end
+
+		
+			if  dmgInfo:IsDamageType( 64 ) and dmgInfo:GetDamage() > 10  then
+			self:SetInvulnerable(true)
+				print("that was not very nice young man")
+				hasMutated = true
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				local id, dur = self:LookupSequence("reaction")
+				self:ResetSequence(id)
+				self:EmitSound("re2/em7200/reaction1.mp3",511)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+				fuckyoukid = false
+					self.loco:SetDesiredSpeed(145)
+					self:SetRunSpeed(145)
+					self:StartActivity( ACT_WALK)
+					self:SetInvulnerable(false)
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+					
+				end)
+			end
 end
 
-function ENT:OnThink()
-if self:IsAttacking() then
-self.loco:SetDesiredSpeed(0)
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:StartActivity( ACT_WALK )
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
 end
-if !dying and self:Health() > 0 and !counting and !self:IsAttacking() then
+
+
+function ENT:OnThink()
+self:RemoveAllDecals()
+if !dying and self:Health() > 0 and !counting and !self:IsAttacking() and !self:GetSpecialAnimation() then
 counting = true
 timer.Simple(0.5,function()
-self:EmitSound("re2/em7200/step"..math.random(1,3)..".mp3",511)
+self:EmitSound("enemies/bosses/re2/em7100/step"..math.random(1,2)..".ogg",511)
 counting = false
 end)
 end
@@ -326,89 +370,8 @@ else
 self:EmitSound("re2/em7200/breathe"..math.random(3)..".mp3")
 end
 end
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
 
-					p:SetDieTime(math.Rand(0.75, 1.5))
 
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
 end
 
 function ENT:GrabPlayer(ply)

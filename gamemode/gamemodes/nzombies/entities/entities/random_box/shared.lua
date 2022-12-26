@@ -14,36 +14,38 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
-	if (nzMapping.Settings.boxtype =="Original") then
-		self:SetModel("models/hoff/props/mysterybox/box.mdl")
+		if (nzMapping.Settings.boxtype =="Original") then
+	self:SetModel("models/hoff/props/mysterybox/box.mdl")
 	end
 	if (nzMapping.Settings.boxtype =="Origins") then
-		self:SetModel( "models/nzr/originsbox/box.mdl" )
+	self:SetModel( "models/box/originsbox/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-		self:SetModel( "models/nzr/2022/box/motd.mdl" )
-		--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
+	self:SetModel( "models/box/motd/motd.mdl" )
+	--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
-		self:SetModel( "models/wolfkannund_maz_ter_/dsr/Kiosk_MysBox.mdl" )
+	self:SetModel( "models/box/dsr/Kiosk_MysBox.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
-		self:SetModel( "models/nzr/re/box.mdl" )
+	self:SetModel( "models/box/re/box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == nil) then
-		self:SetModel("models/hoff/props/mysterybox/box.mdl")
+	self:SetModel("models/hoff/props/mysterybox/box.mdl")
 	end
+	
 	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
-		self:SetModel( "models/nzr/2022/box/ww2.mdl" )
+	self:SetModel( "models/box/ww2/ww2.mdl" )
 	end
+	
 	if (nzMapping.Settings.boxtype == "DOOM") then
-		self:SetModel( "models/nzr/2022/box/DOOM_on.mdl" )
+	self:SetModel( "models/box/doom/DOOM_on.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
-		self:SetModel( "models/nzr/2022/box/soe.mdl" )
+	self:SetModel( "models/box/soe/soe.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Chaos") then
-		self:SetModel( "models/nzr/2022/box/chaos.mdl" )
+	self:SetModel( "models/box/chaos/chaos.mdl" )
 	end
 	
 	self:PhysicsInit( SOLID_VPHYSICS )
@@ -232,7 +234,7 @@ function ENT:MoveAway()
 
 	timer.Simple(0.1, function()
 		if (!IsValid(self)) then return end
-		self:EmitSound("nz/effects/gone.wav")
+		self:EmitSound("effects/gone.ogg")
 		timer.Simple(0.1, function()
 			if (!IsValid(self)) then return end
 			nzSounds:Play("Bye")

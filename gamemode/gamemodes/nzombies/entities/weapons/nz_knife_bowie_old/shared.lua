@@ -1,9 +1,9 @@
 SWEP.Base = "tfa_melee_base"
 SWEP.Category = "nZombies Buyable Knives"
-SWEP.PrintName = "Bowie Knife (BO3)"
+SWEP.PrintName = "Bowie Knife (Crusty)"
 SWEP.Author		= "Laby" --Author Tooltip
-SWEP.ViewModel = "models/weapons/nz_knives/c_bowie_bo3.mdl"
-SWEP.WorldModel = "models/weapons/tfa_bo3/bowie/w_bowie.mdl"
+SWEP.ViewModel	= "models/weapons/c_bowie_knife.mdl"
+SWEP.WorldModel	= "models/weapons/w_bowie_knife.mdl"
 SWEP.ViewModelFlip = false
 SWEP.ViewModelFOV = 70
 SWEP.UseHands = true
@@ -41,13 +41,32 @@ SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
 
 
 function SWEP:Deploy()
-	self:SendWeaponAnim(ACT_VM_DEPLOY)
-	self.HolsterTime = CurTime() + 3
+print("you had 40 correct choices and you managed to choose the wrong one, contopolations on your lobotomy")
+	self:SendWeaponAnim(ACT_VM_DRAW)
+	self.HolsterTime = CurTime() + 2.5
+	self:EmitSound("nz/bowie/draw/bowie_start.wav")
+	
+	timer.Simple(0.7, function()
+		if IsValid(self) then
+			self:EmitSound("nz/bowie/draw/bowie_turn.wav")
+		end
+	end)
+	timer.Simple(1.4, function()
+		if IsValid(self) then
+			self:EmitSound("nz/bowie/draw/bowie_toss.wav")
+		end
+	end)
+	
+	timer.Simple(1.9, function()
+		if IsValid(self) then
+			self:EmitSound("nz/bowie/draw/bowie_catch.wav")
+		end
+	end)
 end
 
 SWEP.Primary.Attacks = {
 	{
-		['act'] = ACT_VM_HITRIGHT, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
+		['act'] = ACT_VM_PRIMARYATTACK, -- Animation; ACT_VM_THINGY, ideally something unique per-sequence
 		['len'] = 18*5, -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		["src"] = Vector(0, 0, 0), -- Trace source; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
 		["dir"] = Vector(40, 0, -2), -- Trace direction/length; X ( +right, -left ), Y ( +forward, -back ), Z ( +up, -down )
@@ -84,6 +103,17 @@ SWEP.Primary.Attacks = {
 
 SWEP.ImpactDecal = "ManhackCut"
 
+function SWEP:GetViewModelPosition( pos, ang )
+ 
+ 	local newpos = LocalPlayer():EyePos()
+	local newang = LocalPlayer():EyeAngles()
+	local up = newang:Up()
+	
+	newpos = newpos + LocalPlayer():GetAimVector()*6 - up*65
+	
+	return newpos, newang
+ 
+end
 
 if CLIENT then
 	SWEP.WepSelectIconCSO = Material("vgui/killicons/tfa_cso_mastercombatknife")

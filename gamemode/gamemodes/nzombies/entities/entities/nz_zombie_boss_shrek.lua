@@ -5,7 +5,7 @@ ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/nzr/2022/aprilfools/swampwarden.mdl" }
+ENT.Models = { "models/bosses/swampwarden.mdl" }
 
 ENT.AttackRange = 105
 ENT.DamageLow = 65
@@ -22,10 +22,10 @@ ENT.DeathSequences = {
 }
 
 ENT.AttackSounds = {
-	"nz/aprilfools//attack1.wav",
-	"nz/aprilfools//attack2.wav",
-	"nz/aprilfools//attack3.wav",
-	"nz/aprilfools//attack4.wav",
+	"enemies/bosses/shrek/attack1.wav",
+	"enemies/bosses/shrek/attack2.wav",
+	"enemies/bosses/shrek/attack3.wav",
+	"enemies/bosses/shrek/attack4.wav",
 	--"cb/att3.mp3"
 
 }
@@ -39,20 +39,19 @@ ENT.PainSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"cb/step1.mp3",
-	"cb/step2.mp3",
-	"cb/step3.mp3",
-	"cb/step4.mp3",
-	"cb/step5.mp3"
+	"enemies/bosses/cb/step1.ogg",
+	"enemies/bosses/cb/step2.ogg",
+	"enemies/bosses/cb/step3.ogg",
+	"enemies/bosses/cb/step4.ogg",
+	"enemies/bosses/cb/step5.ogg"
 }
 
 ENT.ActStages = {
@@ -189,8 +188,8 @@ function ENT:OnSpawn()
 		local pos = self:GetPos() + (seq == "spawn" and Vector(0,0,100) or Vector(0,0,450))
 		
 		ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/nap/spawn.mp3",511)
-		self:EmitSound("nz/aprilfools/song.wav",511)
+		self:EmitSound("enemies/bosses/nap/spawn.ogg",511)
+		self:EmitSound("enemies/bosses/shrek/song.wav",511)
 		
 		local entParticle = ents.Create("info_particle_system")
 		entParticle:SetKeyValue("start_active", "1")
@@ -200,7 +199,7 @@ function ENT:OnSpawn()
 		entParticle:Spawn()
 		entParticle:Activate()
 		entParticle:Fire("kill","",2)
-		self:EmitSound("nz/aprilfools/taunt1.wav",511)
+		self:EmitSound("enemies/bosses/shrek/taunt1.wav",511)
 	self:SetInvulnerable(true)
 		
 		--[[effectData = EffectData()
@@ -234,7 +233,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("nz/aprilfools//attack4.wav")
+self:EmitSound("enemies/bosses/shrek/attack4.wav")
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()
@@ -284,8 +283,8 @@ function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
+	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
+		-- I SUMMON...DONKEY!
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
@@ -294,73 +293,75 @@ function ENT:OnPathTimeOut()
 			})
 			
 			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
-			timer.Simple(0.2,function()
-				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
-				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
-			end)
-				timer.Simple(29/58, function()
-				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
-				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
-				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
-				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot")
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity)  then
+				self:SetSpecialAnimation(true)
+				self:SetInvulnerable(true)
+				self:SetBlockAttack(true)
+				self:EmitSound("enemies/bosses/shrek/song.wav")
+				self.donkey1 = ents.Create("nz_zombie_special_donkey")
+				self.donkey1:SetPos(self:GetPos() + Vector(0,65,0))
+				self.donkey1:Spawn()
+				self.donkey1:SetHealth(nzRound:GetNumber() * 100)
+				self.donkey2 = ents.Create("nz_zombie_special_donkey")
+				self.donkey2:SetPos(self:GetPos() + Vector(0,-65,0))
+				self.donkey2:Spawn()
+				self.donkey2:SetHealth(nzRound:GetNumber() * 100)
+				ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,65,0)),Angle(0,0,0),nil)
+				ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,-65,0)),Angle(0,0,0),nil)
+				self:PlaySequenceAndWait("summondogs")
+				self:StartActivity( ACT_RUN )
 				
-				local seq = "taunt"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+			
+			
+				self.loco:SetDesiredSpeed(90)
+			    self:SetRunSpeed(90)
 				self:SetSpecialAnimation(false)
+				self:SetInvulnerable(false)
 				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
 				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
+				self.NextClawTime = CurTime() + math.random(10, 13)
+		end
+		end
+	elseif  math.random(0,5) == 3 and CurTime() > self.NextFlameTime and nzElec:IsOn() then
+		-- fuck your perks idiot
+		self:SetSpecialAnimation(true)
+				self:SetInvulnerable(true)
+				self:SetBlockAttack(true)
+			--local perk = ents.FindByClass("perk_machine")[1]
+	--print(nzPerks:Get(perk).name)
+	
+	for k,v in pairs(ents.FindByClass("perk_machine")) do
+			if v:IsOn() then 
+			if SERVER then
+				self:EmitSound("enemies/bosses/shrek/taunt4.wav")
+				v:SetTargetPriority(TARGET_PRIORITY_SPECIAL)
+		self.Target = v
+		self.Funny = true
+		self.loco:SetDesiredSpeed(220)
+			    self:SetRunSpeed(220)
+		break
 			end
 		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
+		end
+	self:PlaySequenceAndWait("enrage")
+
+				self:StartActivity( ACT_RUN )
+				
 			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
+			--fuckyoukid = true
 			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
+				self.loco:SetDesiredSpeed(225)
+			    self:SetRunSpeed(225)
 				self:SetSpecialAnimation(false)
+				self:SetInvulnerable(false)
 				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextClawTime = CurTime() + math.random(10, 13)
 			
 			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
+			self.NextFlameTime = CurTime() + math.random(20, 30)
 		end
 	end
-end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
@@ -404,7 +405,7 @@ function ENT:OnInjured(dmg)
 	dmg:ScaleDamage(1)
 if  !hasTaunted then
 --self:EmitSound("dir/idle_hitpalm1.mp3",511)
-self:EmitSound("nz/aprilfools//taunt2.wav",511)
+self:EmitSound("enemies/bosses/shrek/taunt2.wav",511)
 self:SetBodygroup(1,1)
 self.loco:SetDesiredSpeed(300)
 self:SetRunSpeed(300)
@@ -416,7 +417,7 @@ end
 function ENT:OnThink()
 
 if math.random(0,2500) == 1 then
-self:EmitSound("nz/aprilfools/taunt"..math.random(1,4)..".wav")
+self:EmitSound("enemies/bosses/shrek/taunt"..math.random(1,4)..".wav")
 end
 	if self:GetFlamethrowing() then
 		if !self.NextFireParticle or self.NextFireParticle < CurTime() then

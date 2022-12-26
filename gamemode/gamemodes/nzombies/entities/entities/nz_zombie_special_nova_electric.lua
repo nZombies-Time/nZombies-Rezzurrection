@@ -10,6 +10,31 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Decapitated")
 	self:NetworkVar("Bool", 1, "Alive")
 	self:NetworkVar("Bool", 2, "MooSpecial")
+	self:NetworkVar("Bool", 3, "StinkyGas") -- For both Bombers and Jacks
+	self:NetworkVar("Bool", 4, "PhaseClan") -- Jacks can teleport :)
+end
+
+function ENT:Draw() -- The only odious code here.
+	self:DrawModel()
+	local dlight = DynamicLight( self:EntIndex() )
+	if ( dlight ) then
+		local bone = self:LookupBone("j_spinelower")
+		local pos, ang = self:GetBonePosition(bone)
+		pos = pos 
+		dlight.pos = pos
+		dlight.r = 0
+		dlight.g = 255
+		dlight.b = 255
+		dlight.brightness = 11
+		dlight.Decay = 1000
+		dlight.Size = 28
+		dlight.DieTime = CurTime() + 1
+		dlight.dir = ang:Right() + ang:Forward()
+		dlight.innerangle = 1
+		dlight.outerangle = 1
+		dlight.style = 0
+		dlight.noworld = false
+	end
 end
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
@@ -170,6 +195,9 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+		self.NextAction = 0
+		self.NextGasTime = 0
+		self.NextPhaseTime = 0
 		self:SetMooSpecial(true)
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 105) )
@@ -204,11 +232,9 @@ function ENT:OnSpawn()
 			self:EmitSound("nz_moo/zombies/vox/_quad/spawn/spawn_0"..math.random(3)..".mp3", 100, math.random(95, 105), 1, 2)
 			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
 			if IsValid(self) then ParticleEffectAttach("panzer_spawn_tp", 3, self, 2) end
-			if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
 		end
 	end)
 end
-
 
 --[[ CUSTOM/MODIFIED THINGS FROM BASE HERE ]]--
 
@@ -230,10 +256,19 @@ function ENT:DoDeathAnimation(seq) -- Modified death function to have a chance o
 		self:PlaySequenceAndWait(seq)
 		if GasDeathChance == 2 then
 			print("Stinky Child... Gross")
-			local fuckercloud = ents.Create("nova_gas_cloud")
-			fuckercloud:SetPos(self:GetPos())
-			fuckercloud:SetAngles(Angle(0,0,0))
-			fuckercloud:Spawn()
+			self:EmitSound("nz_moo/zombies/vox/_quad/gas_cloud/cloud_0"..math.random(3)..".mp3", 100, math.random(95, 105), 4, 0)
+			ParticleEffect("novagas_xplo",self:GetPos(),self:GetAngles(),nil)
+			local vaporizer = ents.Create("point_hurt")
+			if !vaporizer:IsValid() then return end
+			vaporizer:SetKeyValue("Damage", 0.25)
+			vaporizer:SetKeyValue("DamageRadius", 100)
+			vaporizer:SetKeyValue("DamageDelay", 0.15)
+			vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
+			vaporizer:SetPos(self:GetPos())
+			vaporizer:SetOwner(self)
+			vaporizer:Spawn()
+			vaporizer:Fire("TurnOn","",0)
+			vaporizer:Fire("kill","",18)
 		end
 		self:Remove(DamageInfo())
 	end)
@@ -267,4 +302,96 @@ function ENT:PlayAttackAndWait( name, speed )
 
 	end
 
+end
+
+--[[ JOLTING JACK/NOVA BOMBER RELATED FUNCTIONS HERE! ]]--
+
+function ENT:OnPathTimeOut()
+	local PhaseShoot = math.random(1, 2) -- A chance to either Shoot a Plasma Ball or Teleport.
+	local target = self:GetTarget()
+	local larmfx_tag = self:LookupBone("j_wrist_le")
+	if CurTime() < self.NextAction then return end
+	
+	if PhaseShoot == 1 and CurTime() > self.NextGasTime then
+	
+		-- Ranged Attack/Plasma Ball or Gas Ball
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+			
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.StinkyGas) then
+
+				self:SetSpecialAnimation(true)
+				for i=1,1 do ParticleEffectAttach("hcea_shield_recharged",PATTACH_POINT_FOLLOW,self,2) end
+				timer.Simple(1, function() if IsValid(self) then self:EmitSound("nz_moo/zombies/vox/_quad/charge/charge_0"..math.random(2)..".mp3",100,math.random(95, 105)) end end)
+				timer.Simple(1, function() if IsValid(self) then self.StinkyGas = ents.Create("nz_joltingjack_shot") end end)
+				timer.Simple(1, function() if IsValid(self) then self.StinkyGas:SetPos(self:GetBonePosition(larmfx_tag)) end end)
+				timer.Simple(1, function() if IsValid(self) then self.StinkyGas:Spawn() end end)
+				timer.Simple(1, function() if IsValid(self) then self.StinkyGas:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.StinkyGas:GetPos()):GetNormalized()) end end)
+				timer.Simple(1, function() if IsValid(self) then self:SetStinkyGas(self.StinkyGas) end end)
+				timer.Simple(1, function() if IsValid(self) then self:StopParticles() end end)
+				
+				-- nZ likes it when YOU are VALID!!!
+
+				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
+				
+				self.loco:SetDesiredSpeed(0)
+				
+				self:PlaySequenceAndWait("nz_attack_v6")
+				
+				local seq = "nz_attack_v6"
+				local id, dur = self:LookupSequence(seq)
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+				self:SetSpecialAnimation(false)
+				self:SetBlockAttack(false)
+				--print("TODAY IS FRIDAY IN CALIFORNIA")
+			
+				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextGasTime = CurTime() + math.random(3, 15)
+			end
+			
+		end
+	elseif PhaseShoot == 2 and CurTime() > self.NextPhaseTime then
+		--Teleport/Phase
+
+		--[[The Nova doesn't actually teleport... Instead, they move SUPER quickly to a new position... With effects to simulate teleporting.]]--
+
+		self:EmitSound("nz_moo/zombies/vox/_quad/teleport/warp_in.mp3", 100)
+		self:SetBlockAttack(true)
+		self:SetSpecialAnimation(true)
+		self:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end
+
+		self:SetMaterial("invisible")
+		self:TimeOut(0.1) -- Timeout so the Nova can move to the new position.
+		self.loco:SetDesiredSpeed( 1000 )
+		self.loco:SetAcceleration( 9000 ) -- Make them move extremely fast too.
+		self:SetTeleporting(true)
+		self:MoveToPos(self:GetPos() + Vector(math.random(-175, 175), math.random(-175, 175), 0), {
+			draw = false,
+			repath = 1,
+			maxage = 0.5 -- There can be times where the Nova will teleport but will fly off a ledge... The low age makes it so the Nova doesn't stay in the teleport state for long and will fix itself.
+		}) 				 -- But now imagine how goofy it is when a Nova does go flying... Very :)
+		--print("trolled")
+
+		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+		self.loco:SetAcceleration( self.Acceleration ) -- Restore everything after "teleport".
+		self:SetCollisionGroup(COLLISION_GROUP_NPC)
+		self:SetMaterial("")
+		self:SetTeleporting(false)
+		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end
+		self:EmitSound("nz_moo/zombies/vox/_quad/teleport/warp_out.mp3", 100)
+		self:SetBlockAttack(false)
+		self:SetSpecialAnimation(false)
+		self.NextAction = CurTime() + math.random(1, 5)
+		self.NextPhaseTime = CurTime() + math.random(3, 9)
+		--print("Teleported")
+	end
+end
+
+function ENT:OnRemove()
+	if IsValid(self.StinkyGas) then self.StinkyGas:Remove() end
 end

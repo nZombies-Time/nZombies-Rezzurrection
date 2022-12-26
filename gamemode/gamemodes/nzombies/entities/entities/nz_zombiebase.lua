@@ -1402,8 +1402,8 @@ function ENT:BodyUpdate()
 			self:SetActStage( self:GetActStage() + 1 )
 		end
 		-- If there is no minspeed for the next stage, someone did something wrong and we just idle :/
-	elseif (curstage and len2d <= curstage.minspeed - range) then
-		self:SetActStage( self:GetActStage() - 1 )
+	--elseif (curstage and len2d <= curstage.minspeed - range) then
+		--self:SetActStage( self:GetActStage() - 1 )
 	elseif (nextstage and len2d >= nextstage.minspeed + range) then
 		self:SetActStage( self:GetActStage() + 1 )
 	elseif !self.ActStages[self:GetActStage() - 1] and len2d < curstage.minspeed - 4 then -- Much smaller range to go back to idling

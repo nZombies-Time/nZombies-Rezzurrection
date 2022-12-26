@@ -11,7 +11,7 @@ function ENT:SetupDataTables()
 end
 
 ENT.Models = {
-	"models/nzr/zetsubou_zombies1.mdl","models/nzr/zetsubou_zombies2.mdl","models/nzr/zetsubou_zombies3.mdl","models/nzr/zetsubou_zombies4.mdl",
+	"models/zombies/zetsubou_zombies1.mdl","models/zombies/zetsubou_zombies2.mdl","models/zombies/zetsubou_zombies3.mdl","models/zombies/zetsubou_zombies4.mdl",
 }
 
 local AttackSequences = {

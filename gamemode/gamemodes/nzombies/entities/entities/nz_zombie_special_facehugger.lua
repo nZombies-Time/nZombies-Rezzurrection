@@ -5,7 +5,7 @@ ENT.PrintName = "Facehugger"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/player/kuristaja/cm/facehugger/facehugger.mdl" }
+ENT.Models = { "models/specials/facehugger.mdl" }
 
 ENT.AttackRange = 50
 ENT.DamageLow = 16
@@ -21,12 +21,6 @@ ENT.DeathSequences = {
 	"burrowin"
 }
 
-ENT.AttackSounds = {
-	"npc/headcrab/attack1.wav",
-	"npc/headcrab/attack2.wav",
-	"npc/headcrab/attack3.wav"
-
-}
 
 ENT.AttackSounds = {
 	"npc/headcrab/attack1.wav",
@@ -35,20 +29,23 @@ ENT.AttackSounds = {
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"effects/hit/evt_zombie_hit_player_01.ogg",
+	"effects/hit/evt_zombie_hit_player_02.ogg",
+	"effects/hit/evt_zombie_hit_player_03.ogg",
+	"effects/hit/evt_zombie_hit_player_04.ogg",
+	"effects/hit/evt_zombie_hit_player_05.ogg",
 }
 
 ENT.WalkSounds = {
-	"roach/bo3/spider/step_02.mp3",
-	"roach/bo3/spider/step_03.mp3",
-	"roach/bo3/spider/step_04.mp3",
-	"roach/bo3/spider/step_05.mp3",
-	"roach/bo3/spider/step_06.mp3"
+    "enemies/specials/spider/step_01.mp3",
+	"enemies/specials/spider/step_02.mp3",
+	"enemies/specials/spider/step_03.mp3",
+	"enemies/specials/spider/step_04.mp3",
+	"enemies/specials/spider/step_05.mp3",
+	"enemies/specials/spider/step_06.mp3",
+	"enemies/specials/spider/step_07.mp3",
+	"enemies/specials/spider/step_08.mp3",
+	"enemies/specials/spider/step_09.mp3",
 }
 
 ENT.ActStages = {
@@ -211,7 +208,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
 	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("roach/bo3/spider/vox/death_01.mp3")
+self:EmitSound("enemies/specials/spider/vox/death_01.ogg")
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			self:Remove()

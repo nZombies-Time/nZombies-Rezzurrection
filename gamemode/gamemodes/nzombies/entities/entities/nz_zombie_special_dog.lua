@@ -1,21 +1,41 @@
 AddCSLuaFile()
 
-ENT.Base = "nz_zombiebase"
+ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle"
+ENT.Author = "Lolle and Moo"
 
-ENT.Models = { "models/moo/pupper/moo_zombie_woofer.mdl" }
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "Decapitated")
+	self:NetworkVar("Bool", 1, "Alive")
+	self:NetworkVar("Bool", 2, "MooSpecial")
+end
+
+if CLIENT then return end -- Client doesn't really need anything beyond the basics
+
+ENT.SpeedBasedSequences = true
+ENT.IsMooZombie = true
 ENT.RedEyes = true
+ENT.IsMooSpecial = true
 ENT.AttackRange = 80
-ENT.DamageLow = 20
-ENT.DamageHigh = 35
 
-ENT.AttackSequences = {
-	{seq = "nz_attack1"},
-	{seq = "nz_attack2"},
-	{seq = "nz_attack3"},
+ENT.Models = {
+	{Model = "models/moo/pupper/moo_zombie_woofer.mdl", Skin = 0, Bodygroups = {0,0}},
 }
+
+local spawn = {"nz_sleep_wake_fast"}
+
+local AttackSequences = {
+	{seq = "nz_attack1", dmgtimes = {0.3}},
+	{seq = "nz_attack2", dmgtimes = {0.3}},
+	{seq = "nz_attack3", dmgtimes = {0.3}},
+}
+
+local JumpSequences = {
+	{seq = ACT_JUMP, speed = 30},
+}
+
+ENT.IdleSequence = "nz_idle1"
 
 ENT.DeathSequences = {
 	"nz_death1",
@@ -47,6 +67,24 @@ ENT.WalkSounds = {
 	"nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3",
 	"nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3",
 	"nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"
+}
+
+local walksounds = {
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_00.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_01.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_02.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_03.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_04.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3"),
+	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"),
+}
+
+local runsounds = {
+	Sound("nz/hellhound/close/close_00.wav"),
+	Sound("nz/hellhound/close/close_01.wav"),
+	Sound("nz/hellhound/close/close_02.wav"),
+	Sound("nz/hellhound/close/close_03.wav"),
 }
 
 ENT.PainSounds = {
@@ -81,179 +119,151 @@ ENT.SprintSounds = {
 	"nz/hellhound/close/close_03.wav",
 }
 
-ENT.JumpSequences = {seq = ACT_JUMP, speed = 30}
-
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 5,
-	},
-	[2] = {
-		act = ACT_WALK_ANGRY,
-		minspeed = 50,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 150,
-	},
-	[4] = {
-		act = ACT_RUN,
-		minspeed = 160,
-	},
+		minspeed = 0,
+		attackanims = AttackSequences,
+		barricadejumps = JumpSequences,
+	}
+}
+
+ENT.SequenceTables = {
+	{Threshold = 0, Sequences = {
+		{
+			SpawnSequence = {spawn},
+			MovementSequence = {
+				"nz_search",
+				"nz_walk",
+			},
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 150, Sequences = {
+		{
+			SpawnSequence = {spawn},
+			MovementSequence = {
+				"nz_run1",
+			},
+			PassiveSounds = {runsounds},
+		},
+	}}
 }
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(250)
-		self:SetHealth(100)
-		self:SetNoDraw(true)
+		self.Sprinting = false
+		self:SetRunSpeed( 125 )
+		self.loco:SetDesiredSpeed( 125 )
+		--[[if not nzRound:InState( ROUND_CREATE ) or nzRound:GetNumber() == -1 then
+			self:SetHealth( nzRound:GetNumber() * 1.5 + 150 )
+			print(self:Health())
+		else
+			self:SetHealth( math.random(120, 1200) ) -- Creative/Infinite Round Health
+		end]]
 	end
 	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 48))
-	self:SetSolid(SOLID_BBOX)
-
-	--PrintTable(self:GetSequenceList())
 end
 
 function ENT:OnSpawn()
 	self:SetNoDraw(true)
 	self:SetInvulnerable(true)
 	self:SetBlockAttack(true)
+	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
+	self:SetSpecialAnimation(true)
 
 	self:EmitSound("bo1_overhaul/hhound/prespawn.mp3",511,100)
-	ParticleEffect("driese_tp_arrival_phase1",self:GetPos(),self:GetAngles(),nil)
+	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)
 
-	timer.Simple(1.4, function()
-		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+	local seq = self:SelectSpawnSequence()
+	if seq then
+		self:PlaySequenceAndWait(seq)
 		self:EmitSound("bo1_overhaul/lgtstrike.mp3",511,100)
-		ParticleEffect("driese_tp_arrival_phase2",self:GetPos(),self:GetAngles(),nil)
-
 		self:SetNoDraw(false)
-		self:SetTarget(self:GetPriorityTarget())
 		self:SetInvulnerable(nil)
 		self:SetBlockAttack(false)
+		self:SetSpecialAnimation(false)
+		self:CollideWhenPossible()
+		self:ResetMovementSequence()
+		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 		self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 100, math.random(85, 105), 1, 2)
+	end
+
+	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
+end
+
+function ENT:PerformDeath(dmgInfo)
+	if self:GetSpecialAnimation() then
+		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		if IsValid(self) then
+			ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
+			self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
+			self:Remove()
+		end
+	else
+		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+	end
+end
+
+function ENT:DoDeathAnimation(seq)
+	self.BehaveThread = coroutine.create(function()
+		self:PlaySequenceAndWait(seq)
+		if IsValid(self) then
+			ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
+			self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
+			self:Remove()
+		end
 	end)
-
-	nzRound:SetNextSpawnTime(CurTime() + 2) -- This one spawning delays others by 3 seconds
-end
-
-function ENT:OnZombieDeath(dmgInfo)
-	if self:IsValid() then ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self) end
-	self:SetNoDraw(true)
-	self:SetRunSpeed(0)
-	self.loco:SetVelocity(Vector(0,0,0))
-	self:Stop()
-	self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
-	self:EmitSound(self.DeathSounds[math.random(#self.DeathSounds)], 100, math.random(85, 105))
-end
-
-function ENT:BodyUpdate()
-	self.CalcIdeal = ACT_IDLE
-	
-	local len2d = self:GetVelocity():Length2D()
-	
-	if len2d > 150 then self.CalcIdeal = ACT_RUN
-	elseif len2d > 50 then self.CalcIdeal = ACT_WALK_ANGRY
-	elseif len2d > 5 then self.CalcIdeal = ACT_WALK end
-	
-	if self:IsJumping() and self:WaterLevel() <= 0 then self.CalcIdeal = ACT_JUMP end
-	
-	if not self:GetSpecialAnimation() and not self:IsAttacking() then
-		if self:GetActivity() ~= self.CalcIdeal and not self:GetStop() then self:StartActivity(self.CalcIdeal) end
-
-		self:BodyMoveXY()
-	end
-
-	self:FrameAdvance()
-end
-
-function ENT:OnTargetInAttackRange()
-    local attack_data = {}
-    
-    attack_data.dmglow = 35
-    attack_data.dmghigh = 40
-    attack_data.dmgforce = Vector(0, 0, 0)
-	attack_data.dmgdelay = 0.3
-	
-    self:Attack(attack_data)
 end
 
 
-function ENT:GetPriorityTarget()
-	--hellhounds target differently --it's who killed the most?
-	if GetConVar("nz_zombie_debug"):GetBool() then print(self, "Retargeting") end
-	
-	self:SetLastTargetCheck(CurTime())
-	
-	-- Well if he exists and he is targetable, just target this guy!
-	if IsValid(self:GetTarget()) and self:GetTarget():GetTargetPriority() > 0 then
-		local dist = self:GetRangeSquaredTo( self:GetTarget():GetPos() )
-		if dist < 500000 then --if they are within 10000 units
-			if not self.sprinting then
-				self:EmitSound(self.SprintSounds[math.random(#self.SprintSounds)], 100, math.random(85, 105))
-				self.sprinting = true
-			end
-			
-			self:SetRunSpeed(250)
-			self.loco:SetDesiredSpeed(self:GetRunSpeed())
-		elseif not self.sprinting then
-			self:SetRunSpeed(100)
-			self.loco:SetDesiredSpeed(self:GetRunSpeed())
-		end
-		
-		return self:GetTarget()
-	end
-
-	-- Otherwise, we just loop through all to try and target again
-	local allEnts = ents.GetAll()
-
-	local bestTarget = nil
-	local lowest
-
-	--local possibleTargets = ents.FindInSphere( self:GetPos(), self:GetTargetCheckRange())
-
-	for _, target in pairs(allEnts) do
-		if self:IsValidTarget(target) then
-			if target:GetTargetPriority() == TARGET_PRIORITY_ALWAYS then return target end
-			if !lowest then
-				lowest = target.hellhoundtarget -- Set the lowest variable if not yet
-				bestTarget = target -- Also mark this for the best target so he isn't ignored
-			end
-
-			if lowest and (!target.hellhoundtarget or target.hellhoundtarget < lowest) then -- If the variable exists and this player is lower than that amount
-				bestTarget = target -- Mark him for the potential target
-				lowest = target.hellhoundtarget or 0 -- And set the new lowest to continue the loop with
-			end
-
-			if !lowest then -- If no players had any target values (lowest was never set, first ever hellhound)
-				local players = player.GetAllTargetable()
-				bestTarget = players[math.random(#players)] -- Then pick a random player
-			end
+function ENT:OnPathTimeOut()
+	local distToTarget = self:GetPos():Distance(self:GetTargetPosition())
+	if IsValid(self:GetTarget()) then
+		if not self.Sprinting and distToTarget < 750 then
+			self.Sprinting = true
+			self:SetRunSpeed( 275 )
+			self.loco:SetDesiredSpeed( 275 )
+			self:SpeedChanged()
+			self:ResetMovementSequence()
+			self:EmitSound("nz/hellhound/close/close_0"..math.random(3)..".wav",100,math.random(95,105),1,2)
 		end
 	end
-
-	if self:IsValidTarget(bestTarget) then -- If we found a valid target
-		local targetDist = self:GetRangeSquaredTo( bestTarget:GetPos() )
-		if targetDist < 1000 then -- Under this distance, we will break into sprint
-			self:EmitSound( self.SprintSounds[ math.random( #self.SprintSounds ) ], 100 )
-			self.sprinting = true -- Once sprinting, you won't stop
-			self:SetRunSpeed(250)
-		else -- Otherwise we'll just search (towards him)
-			self:SetRunSpeed(100)
-			self.sprinting = nil
-		end
-		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		-- Apply the new target numbers
-		bestTarget.hellhoundtarget = bestTarget.hellhoundtarget and bestTarget.hellhoundtarget + 1 or 1
-		self:SetTarget(bestTarget) -- Well we found a target, we kinda have to force it
-
-		return bestTarget
-	else self:TimeOut(0.2) end
 end
 
-function ENT:IsValidTarget(ent)
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:ResetMovementSequence()
+				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+			end
+			return
+		end
+		if self:IsValidTarget( self:GetTarget() ) then
+			self.loco:FaceTowards( self:GetTarget():GetPos() )
+		end
+
+		coroutine.yield()
+
+	end
+
+end
+
+function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	
-	--Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
-	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
 end
