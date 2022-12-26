@@ -45,7 +45,7 @@ function nzRound:Prepare( time )
 	
 	for k,v in pairs(ents.FindByClass("stinky_lever")) do
 		if v:Getohfuck(true) then
-		local tbl = {[225] = 100}
+		local tbl = {[250] = 100}
 		self:SetZombieSpeeds(tbl )
 		--you fool owl boy, you've fallen for the classic blunder
 		break;

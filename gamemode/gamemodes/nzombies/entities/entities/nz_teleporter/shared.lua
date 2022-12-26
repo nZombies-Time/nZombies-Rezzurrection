@@ -51,7 +51,7 @@ end
 
 
 function ENT:Update()
-self:SetModel("models/nz_der_riese_waw/zombie_teleporter_pad.mdl")
+self:SetModel("models/teleporters/der_riese/zombie_teleporter_pad.mdl")
 self:SetModelType(1)
 		--if self:GetModelType() == 1 then
 		--if self:IsOn() then

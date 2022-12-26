@@ -735,7 +735,7 @@ nzRound:AddSpecialRoundType("Nova Bombers", {
 	end
 end) -- No round func or end func
 
-nzRound:AddSpecialRoundType("Jumping Jacks", {
+nzRound:AddSpecialRoundType("Jolting Jacks", {
 	specialTypes = {
 		["nz_zombie_special_nova_electric"] = {chance = 100}
 	},
@@ -1124,7 +1124,7 @@ nzRound:AddAdditionalZombieType("Nova Crawlers", "nz_zombie_special_nova", {
 }) 
 nzRound:AddAdditionalZombieType("Nova Bombers", "nz_zombie_special_nova_bomber", {
 }) 
-nzRound:AddAdditionalZombieType("Jumping Jacks", "nz_zombie_special_nova_electric", {
+nzRound:AddAdditionalZombieType("Jolting Jacks", "nz_zombie_special_nova_electric", {
 }) 
 nzRound:AddAdditionalZombieType("Keepers", "nz_zombie_special_keeper", {
 }) 
@@ -1253,7 +1253,7 @@ function nzRound:GetSpecialType(id)
 	if id == "Nova Bombers" then
 	return "nz_zombie_special_nova_bomber"
 	end
-	if id == "Jumping Jacks" then
+	if id == "Jolting Jacks" then
 	return "nz_zombie_special_nova_electric"
 	end
 	if id == "Keepers" then
