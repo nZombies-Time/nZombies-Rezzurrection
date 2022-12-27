@@ -1031,7 +1031,8 @@ if SERVER then
 			if !goal then
 				local jumpHeight = math.abs(self:GetTarget():GetPos()[3] - self:GetPos()[3]) * 2
 				if jumpHeight > 100 then -- While we do want them to jump to make exploiting on props harder, we DON'T want them to jump if the player is not high enough away
-					local should_attack = true --math.random(3) == 1 -- We mainly want to jump at cheaters, but let's also hit them randomly so they shit their pants
+					local should_
+					= true --math.random(3) == 1 -- We mainly want to jump at cheaters, but let's also hit them randomly so they shit their pants
 					if jumpHeight > 150 then -- Hitting them from here won't do shit, just jump.
 						should_attack = false
 					end
@@ -1277,7 +1278,7 @@ function ENT:Attack( data )
 					dmgInfo:SetDamageForce( (self:GetTarget():GetPos() - self:GetPos()) * 7 + Vector( 0, 0, 16 ) )
 					self:GetTarget():TakeDamageInfo(dmgInfo)
 					if !IsValid(self:GetTarget()) then return end
-					self:GetTarget():EmitSound( "nz/zombies/attack/player_hit_"..math.random(0,5)..".wav", SNDLVL_TALKING, math.random(95,105))
+					self:GetTarget():EmitSound( "nz_moo/zombies/plr_impact/_zhd/evt_zombie_hit_player_0"..math.random(0,5)..".mp3", SNDLVL_TALKING, math.random(95,105))
 					self:GetTarget():ViewPunch( VectorRand():Angle() * 0.01 )
 				end
 			end)
