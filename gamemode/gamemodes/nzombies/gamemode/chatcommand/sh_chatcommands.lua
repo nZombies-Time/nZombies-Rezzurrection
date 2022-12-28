@@ -10,6 +10,12 @@ nzChatCommand.Add("/cheats", CLIENT, function(ply, text)
 	end
 end, false, "Opens the cheat panel.")
 
+
+concommand.Add("nz_spawnpowerup", function(ply, cmd, args)
+    if ply:IsSuperAdmin() then
+        nzPowerUps:SpawnPowerUp(ply:GetPos () + ply:EyeAngles():Forward()*135, args[1])
+    end
+end)
 -- Chat Commands
 
 nzChatCommand.Add("/help", SERVER, function(ply, text)

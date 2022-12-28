@@ -295,7 +295,7 @@ nzPowerUps:NewPowerUp("firesale", {
 							for k,v in pairs(tbl) do
 								if IsValid(v) then
 									v:StopSound("nz_firesale_jingle")
-									v:Remove()
+									v:MarkForRemoval()
 								end
 						end
 				end
@@ -341,7 +341,7 @@ nzPowerUps:NewPowerUp("carpenter", {
 -- Zombie Blood
 nzPowerUps:NewPowerUp("zombieblood", {
 	name = "Zombie Blood",
-	model = "models/poseurs/zombieblood.mdl",
+	model = "models/poseurs/zombie_blood.mdl",
 	global = false, -- Only applies to the player picking it up and time is handled individually per player
 	angle = Angle(0,0,0),
 	scale = 1,

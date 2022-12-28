@@ -2,11 +2,11 @@
 {
 	"base"		"base"
     "title"  "nZombies Rezzurrection"
-    "version"   "4.0"
+    "version"   "5.0"
     "menusystem"	"1"
     "maps"	"^nz_"
 
-    "author_name"   "Alig96, Zet0r, Lolle"
+    "author_name"   "Alig96, Zet0r, Lolle, Laby,Ghostlymoo,Flamingfox, Ethorbit, Ruko"
     "author_email"  ""
 
     "icon"  ""

@@ -7,7 +7,7 @@ SWEP.Spawnable			= false
 SWEP.AdminSpawnable		= false
 
 SWEP.ViewModel			= "models/nzr/2022/perks/v_perkbottle.mdl"
-SWEP.WorldModel			= "models/yolojoenshit/bo3perks/bottle/perk_bottle_bo3.mdl"
+SWEP.WorldModel			= "models/perks/bottle/perk_bottle_bo3.mdl"
 
 SWEP.UseHands 			= true
 
