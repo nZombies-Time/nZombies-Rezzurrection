@@ -36,6 +36,10 @@ ENT.DeathSequences = {
 	"nz_death_v2"
 }
 
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
 local AttackSequences = {
 	{seq = "nz_attack_v1", dmgtimes = {0.7}},
 	{seq = "nz_attack_v2", dmgtimes = {0.7}},
@@ -46,20 +50,20 @@ local JumpSequences = {
 }
 
 local walksounds = {
-	Sound("roach/bo3/thrasher/vox/ambient_01.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_02.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_03.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_04.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_05.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_06.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_07.mp3"),
-	Sound("roach/bo3/thrasher/vox/ambient_08.mp3")
+	Sound("enemies/bosses/thrasher/vox/ambient_01.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_02.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_03.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_04.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_05.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_06.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_07.ogg"),
+	Sound("enemies/bosses/thrasher/vox/ambient_08.ogg")
 }
 
 ENT.AttackSounds = {
-	"roach/bo3/thrasher/vox/attack_01.mp3",
-	"roach/bo3/thrasher/vox/attack_02.mp3",
-	"roach/bo3/thrasher/vox/attack_03.mp3"
+	"enemies/bosses/thrasher/vox/attack_01.ogg",
+	"enemies/bosses/thrasher/vox/attack_02.ogg",
+	"enemies/bosses/thrasher/vox/attack_03.ogg"
 }
 
 ENT.PainSounds = {
@@ -70,9 +74,9 @@ ENT.PainSounds = {
 }
 
 ENT.DeathSounds = {
-	"roach/bo3/thrasher/vox/death_01.mp3",
-	"roach/bo3/thrasher/vox/death_02.mp3",
-	"roach/bo3/thrasher/vox/death_03.mp3",
+	"enemies/bosses/thrasher/vox/death_01.ogg",
+	"enemies/bosses/thrasher/vox/death_02.ogg",
+	"enemies/bosses/thrasher/vox/death_03.ogg",
 }
 
 ENT.ActStages = {
@@ -124,13 +128,13 @@ end
 function ENT:OnSpawn()
 
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
-	self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(2)..".mp3",511)
-	self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+	self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
+	self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 	ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),Angle(0,0,0),nil)
 	self:SetInvulnerable(true)
 
-	self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
-	self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
+	self:EmitSound("enemies/bosses/thrasher/teleport_in_01.ogg",511)
+	self:EmitSound("enemies/bosses/thrasher/dst_rock_quake_0"..math.random(1,5)..".ogg",511)
 	for i=1,1 do
 		ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 	end
@@ -185,7 +189,7 @@ function ENT:OnPathTimeOut()
 				if math.random(100) == 69 then
 					self:EmitSound("Thrasher_roar_laby.wav",511)
 				else
-					self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(1,2)..".mp3",511)
+					self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
 				end
 				self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 				self:SetSpecialAnimation(true)
@@ -196,23 +200,25 @@ function ENT:OnPathTimeOut()
 				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
 				self:PlaySequenceAndWait("nz_anger")
 				timer.Simple(1, function()
-					self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
-					self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
+					self:EmitSound("enemies/bosses/thrasher/teleport_in_01.ogg",511)
+					self:EmitSound("enemies/bosses/thrasher/dst_rock_quake_0"..math.random(1,5)..".ogg",511)
 					for i=1,1 do
 						ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 					end
 				end)
 				self:PlaySequenceAndWait("nz_trav_teleport_out")
-				self:SetPos( target:GetPos() + (Vector(60,60,0)) )
-				self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(2)..".mp3",511)
-				self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+
+				local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
+				self:SetPos( pos )
+				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
+				self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 				ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),Angle(0,0,0),nil)
-					
+
 				local ang1 = (target:GetPos() - self:GetPos()):Angle()
 				self:SetAngles(Angle(ang1[1], ang1[2] + 10, ang1[3]))
 				self:PlaySequenceAndWait("nz_trav_teleport_in")
 				self:CollideWhenPossible()
-				
+
 				local ang2 = (target:GetPos() - self:GetPos()):Angle()
 				self:SetAngles(Angle(ang2[1], ang2[2] + 10, ang2[3]))
 				timer.Simple(2, function()
@@ -256,23 +262,25 @@ function ENT:OnPathTimeOut()
 				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
 	
 				timer.Simple(1, function()
-					self:EmitSound("roach/bo3/thrasher/teleport_in_01.mp3",511)
-					self:EmitSound("roach/bo3/thrasher/dst_rock_quake_0"..math.random(5)..".mp3",511)
+					self:EmitSound("enemies/bosses/thrasher/teleport_in_01.ogg",511)
+					self:EmitSound("enemies/bosses/thrasher/dst_rock_quake_0"..math.random(1,5)..".ogg",511)
 					for i=1,1 do
 						ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
 					end	
 				end)
 				self:PlaySequenceAndWait("nz_trav_teleport_out")
-				self:SetPos( target:GetPos() + (Vector(60,60,0)) )
-				self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(1,2)..".mp3",511)
-				self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+
+				local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
+				self:SetPos( pos )
+				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
+				self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 				ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),Angle(0,0,0),nil)	
-			
+
 				local ang1 = (target:GetPos() - self:GetPos()):Angle()
 				self:SetAngles(Angle(ang1[1], ang1[2] + 10, ang1[3]))
 				self:PlaySequenceAndWait("nz_trav_teleport_in")
 				self:CollideWhenPossible()
-				
+
 				local ang2 = (target:GetPos() - self:GetPos()):Angle()
 				self:SetAngles(Angle(ang2[1], ang2[2] + 10, ang2[3]))
 				self:SetSpecialAnimation(false)
@@ -283,7 +291,8 @@ function ENT:OnPathTimeOut()
 				self.NextTeleporTime = CurTime() + math.random(1, 8)
 			elseif not enraged and actionchance == 1 and CurTime() > self.NextAction then
 				enraged = true -- OOOOOOO PISS EM
-				self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(1,2)..".mp3",511)
+				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
+				self:EmitSound("enemies/bosses/thrasher/enrage_imp_00.ogg",511)
 				ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)	
 				self:PlaySequenceAndWait("nz_anger")
 				self:SetRunSpeed(150)
@@ -367,7 +376,7 @@ function ENT:Attack( data )
 		for k,v in pairs(data.attackseq.dmgtimes) do
 			self:TimedEvent( v, function()
 				if self.AttackSounds then self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) end
-				self:EmitSound( "npc/vort/claw_swing1.wav", 90, math.random(95, 105))
+				self:EmitSound( "enemies/bosses/thrasher/swing_0"..math.random(1,7)..".ogg", 90, math.random(95, 105))
 				if !self:GetStop() and self:IsValidTarget( self:GetTarget() ) and self:TargetInRange( self:GetAttackRange() + 10 ) then
 					local dmgInfo = DamageInfo()
 					dmgInfo:SetAttacker( self )

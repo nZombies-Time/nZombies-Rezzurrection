@@ -5,7 +5,7 @@ ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/roach/re2/g3v3.mdl" }
+ENT.Models = { "models/bosses/g3v3.mdl" }
 
 ENT.AttackRange = 160
 ENT.DamageLow = 99

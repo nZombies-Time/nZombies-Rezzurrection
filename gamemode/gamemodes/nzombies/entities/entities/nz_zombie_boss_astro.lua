@@ -214,7 +214,7 @@ function ENT:OnSpawn()
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-self:StopSound()
+self:StopSound("enemies/bosses/ast/breathe_loop_hq.wav")
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
