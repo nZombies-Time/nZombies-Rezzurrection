@@ -803,7 +803,7 @@ nzPerks:NewPerk("vigor", {
 	name = "Vigor Rush",
 	name_skin = "Bang Bangs (Big Damage)",
 	name_holo = "Horny Highballer",
-	model = "models/nzr/2022/perks/vending_vigor.mdl",
+	model = "models/perks/cperks/vigorrush/vigor.mdl",
 	skin = "models/perks/IWperks/bang/mc_mtl_p7_zm_vending_doubletap2.mdl",
 	off_skin = 1,
 	on_skin = 0,
