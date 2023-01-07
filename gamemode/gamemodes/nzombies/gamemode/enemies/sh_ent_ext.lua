@@ -1,7 +1,8 @@
 TARGET_PRIORITY_NONE = 0
 TARGET_PRIORITY_PLAYER = 1
-TARGET_PRIORITY_SPECIAL = 2
-TARGET_PRIORITY_MAX = 2
+TARGET_PRIORITY_FUNNY = 2
+TARGET_PRIORITY_SPECIAL = 3
+TARGET_PRIORITY_MAX = 3
 -- Someone could add a new priority level by doing this:
 -- TARGET_PRIORITY_CUSTOM = TARGET_PRIORITY_MAX + 1
 -- TARGET_PRIORITY_MAX = TARGET_PRIORITY_MAX + 1
@@ -118,6 +119,11 @@ nzEnemies:AddValidZombieType("nz_zombie_walker_greenrun")
 nzEnemies:AddValidZombieType("nz_zombie_walker_deathtrooper")
 nzEnemies:AddValidZombieType("nz_zombie_walker_skeleton")
 nzEnemies:AddValidZombieType("nz_zombie_walker_zetsubou")
+nzEnemies:AddValidZombieType("nz_zombie_walker_ascension_classic")
+nzEnemies:AddValidZombieType("nz_zombie_walker_diemachine")
+nzEnemies:AddValidZombieType("nz_zombie_walker_moon_classic")
+nzEnemies:AddValidZombieType("nz_zombie_walker_orange")
+nzEnemies:AddValidZombieType("nz_zombie_walker_kino")
 nzEnemies:AddValidZombieType("nz_zombie_walker_xeno")
 nzEnemies:AddValidZombieType("nz_zombie_walker_necromorph")
 nzEnemies:AddValidZombieType("nz_zombie_special_burning")

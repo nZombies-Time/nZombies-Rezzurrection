@@ -291,7 +291,7 @@ function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
+	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
 		-- I SUMMON...DONKEY!
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
@@ -343,7 +343,7 @@ function ENT:OnPathTimeOut()
 			if v:IsOn() then 
 			if SERVER then
 				self:EmitSound("enemies/bosses/cb/taunt_staff2.ogg")
-				v:SetTargetPriority(TARGET_PRIORITY_SPECIAL)
+				v:SetTargetPriority(TARGET_PRIORITY_FUNNY)
 		self.Target = v
 		self.Funny = true
 		self.loco:SetDesiredSpeed(220)
@@ -505,6 +505,10 @@ function ENT:ReleasePlayer()
 	self.loco:SetDesiredSpeed(self:GetRunSpeed())
 end
 
+function ENT:IsValidTarget( ent )
+	if not ent then return false end
+	return IsValid( ent ) 
+end
 
 function ENT:OnBarricadeBlocking( barricade )
 	if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then

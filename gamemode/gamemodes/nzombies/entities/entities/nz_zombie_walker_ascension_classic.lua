@@ -20,9 +20,9 @@ ENT.IsMooZombie = true
 ENT.RedEyes = true
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/t5/pentagon/moo_codz_t5_kleinist.mdl", Skin = 0, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t5/pentagon/moo_codz_t5_militarypolice.mdl", Skin = 0, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t5/pentagon/moo_codz_t5_worker.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t5/cosmo/moo_codz_t5_cosmo_cosmon.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t5/cosmo/moo_codz_t5_cosmo_scienceteam.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t5/cosmo/moo_codz_t5_cosmo_spetz.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 local spawnslow = {"nz_spawn_ground_ad_v2", "nz_spawn_ground_climbout_fast"}

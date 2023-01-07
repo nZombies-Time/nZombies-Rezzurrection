@@ -486,13 +486,19 @@ function nzRound:AddZombieType(id, class)
 	end
 end
 
-nzRound:AddZombieType("Kino der Toten", "nz_zombie_walker", {
+nzRound:AddZombieType("Kino der Toten (Chronicles)", "nz_zombie_walker", {
 }) 
-nzRound:AddZombieType("Ascension", "nz_zombie_walker_ascension", {
+nzRound:AddZombieType("Kino der Toten", "nz_zombie_walker_kino", {
+}) 
+nzRound:AddZombieType("Ascension", "nz_zombie_walker_ascension_classic", {
+}) 
+nzRound:AddZombieType("Ascension (Chronicles)", "nz_zombie_walker_ascension", {
 }) 
 nzRound:AddZombieType("Call of the Dead", "nz_zombie_walker_cotd", {
 }) 
 nzRound:AddZombieType("FIVE", "nz_zombie_walker_five", {
+}) 
+nzRound:AddZombieType("Classified", "nz_zombie_walker_classified", {
 }) 
 nzRound:AddZombieType("Gorod Krovi", "nz_zombie_walker_gorodkrovi", {
 }) 
@@ -508,7 +514,9 @@ nzRound:AddZombieType("World War 1 Soldiers", "nz_zombie_walker_origins_soldier"
 }) 
 nzRound:AddZombieType("Crusader Zombies", "nz_zombie_walker_origins_templar", {
 }) 
-nzRound:AddZombieType("Moon", "nz_zombie_walker_moon", {
+nzRound:AddZombieType("Moon", "nz_zombie_walker_moon_classic", {
+}) 
+nzRound:AddZombieType("Moon (Chronicles)", "nz_zombie_walker_moon", {
 }) 
 nzRound:AddZombieType("Area 51 Guard", "nz_zombie_walker_moon_guard", {
 }) 
@@ -530,6 +538,10 @@ nzRound:AddZombieType("Zombies in Spaceland", "nz_zombie_walker_clown", {
 }) 
 nzRound:AddZombieType("Deathtrooper", "nz_zombie_walker_deathtrooper", {
 }) 
+nzRound:AddZombieType("Die Maschine", "nz_zombie_walker_diemachine", {
+}) 
+nzRound:AddZombieType("Tag der Toten", "nz_zombie_walker_orange", {
+})
 nzRound:AddZombieType("Skeleton", "nz_zombie_walker_skeleton", {
 }) 
 nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
@@ -542,7 +554,25 @@ function nzRound:GetZombieType(id)
 	if id == "Skeleton" then
 	return "nz_zombie_walker_skeleton"
 	end
-		if id == "Deathtrooper" then
+	if id == "Kino der Toten (Chronicles)" then
+	return "nz_zombie_walker"
+	end
+	if id == "Ascension (Chronicles)" then
+	return "nz_zombie_walker_ascension"
+	end
+	if id == "Classified" then
+	return "nz_zombie_walker_classified"
+	end
+		if id == "Moon (Chronicles)" then
+	return "nz_zombie_walker_moon"
+	end
+	if id == "Die Maschine" then
+	return "nz_zombie_walker_diemachine"
+	end
+	if id == "Tag der Toten" then
+	return "nz_zombie_walker_orange"
+	end
+	if id == "Deathtrooper" then
 	return "nz_zombie_walker_deathtrooper"
 	end
 		if id == "Zombies in Spaceland" then
@@ -582,7 +612,7 @@ function nzRound:GetZombieType(id)
 	return "nz_zombie_walker_necromorph"
 	end
 	if id == "Kino der Toten" then
-	return "nz_zombie_walker"
+	return "nz_zombie_walker_kino"
 	end
 	if id == "Origins" then
 	return "nz_zombie_walker_origins"

@@ -1867,9 +1867,12 @@ function ENT:RemoveTarget()
 	self:SetTarget( nil )
 end
 
-function ENT:IsValidTarget( ent )
+
+function ENT:IsValidTarget(ent)
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE
+	
+	--Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 
 function ENT:GetIgnoredTargets()
