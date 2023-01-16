@@ -27,7 +27,7 @@ ENT.AttackSounds = {
 	"enemies/specials/bot/funny/attack4.wav",
 	"enemies/specials/bot/funny/attack5.wav",
 	"enemies/specials/bot/funny/attack6.wav",
-	"enemies/specials/bot/funny/attack7.wav".
+	"enemies/specials/bot/funny/attack7.wav",
 	"enemies/specials/bot/funny/attack8.wav",
 	"enemies/specials/bot/funny/attack9.wav",
 	"enemies/specials/bot/funny/attack10.wav"
