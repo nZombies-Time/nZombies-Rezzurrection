@@ -589,6 +589,7 @@ nzMapping:AddSaveModule("DoorSetup", {
 	end,
 })
 
+
 nzMapping:AddSaveModule("BreakEntry", {
 	savefunc = function()
 		local break_entry = {}
@@ -598,13 +599,15 @@ nzMapping:AddSaveModule("BreakEntry", {
 				angle = v:GetAngles(),
 				planks = v:GetHasPlanks(),
 				jump = v:GetTriggerJumps(),
+				prop = v:GetProp() or 0,
 			})
 		end
 		return break_entry
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump)
+		if not v.prop then v.prop = 0 end 
+			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.prop)
 		end
 	end,
 	cleanents = {"breakable_entry", "breakable_entry_plank"},

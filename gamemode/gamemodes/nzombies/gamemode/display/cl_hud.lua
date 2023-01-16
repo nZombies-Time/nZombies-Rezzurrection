@@ -32,6 +32,9 @@ function GetFontType(id)
 		if id == "Warprint" then
 	return "grit"
 	end
+		if id == "Black Ops 1" then
+	return "bo1"
+	end
 		if id == "Road Rage" then
 	return "rage"
 	end
@@ -492,6 +495,12 @@ local function PerksHud()
 			end
 			if iconType == "Hololive" then
 				surface.SetMaterial(nzPerks:Get(v).icon_holo)
+			end
+			if iconType == "WW2" then
+				surface.SetMaterial(nzPerks:Get(v).icon_ww2)
+			end
+			if iconType == "Shadows of Evil" then
+				surface.SetMaterial(nzPerks:Get(v).icon_soe)
 			end
 			if iconType == "Cold War" then
 				surface.SetMaterial(nzPerks:Get(v).icon_cw)

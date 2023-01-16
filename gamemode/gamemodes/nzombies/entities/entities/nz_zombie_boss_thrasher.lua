@@ -171,104 +171,6 @@ function ENT:DoDeathAnimation(seq)
 	end)
 end
 
-local function GetClearPaths(ent, pos, tiles)
-	local clearPaths = {}
-	local filter = player.GetAll()
-	for _, tile in pairs( tiles ) do
-		local tr = util.TraceLine({
-			start = pos,
-			endpos = tile,
-			filter = filter,
-			mask = MASK_PLAYERSOLID
-		})
-		
-		if not tr.Hit and util.IsInWorld(tile) then
-			table.insert( clearPaths, tile )
-		end
-	end
-	
-	return clearPaths
-end
-
-local function GetSurroundingTiles(ent, pos)
-	local tiles = {}
-	local x, y, z
-	local minBound, maxBound = ent:OBBMins(), ent:OBBMaxs()
-	local checkRange = math.max(12, maxBound.x, maxBound.y)
-	
-	for z = -1, 1, 1 do
-		for y = -1, 1, 1 do
-			for x = -1, 1, 1 do
-				local testTile = Vector(x,y,z)
-				testTile:Mul( checkRange )
-				local tilePos = pos + testTile
-				table.insert( tiles, tilePos )
-			end
-		end
-	end
-	
-	return tiles
-end
-
-local function CollisionBoxClear(ent, pos, minBound, maxBound)
-	local filter = {ent}
-	local tr = util.TraceEntity({
-		start = pos,
-		endpos = pos,
-		filter = filter,
-		mask = MASK_PLAYERSOLID
-	}, ent)
-
-	return !tr.StartSolid || !tr.AllSolid
-end
-
-function ENT:FindSpotBehindPlayer(pos, count, range, stepd, stepu)
-	local targ = self:GetTarget()
-	pos = pos or targ:GetPos()
-	range = range or 100
-	stepd = stepd or 25
-	stepu = stepu or 25
-	count = count or 6
-
-	if navmesh.IsLoaded() then
-		local tab = navmesh.Find(pos, range, stepd, stepu)
-		local postab = {}
-
-		for i=1, count do
-			for _, nav in RandomPairs(tab) do
-				if IsValid(nav) and not nav:IsUnderwater() then
-					local testpos = nav:GetRandomPoint()
-					local norm = (testpos - pos):GetNormal()
-
-					if targ:GetAimVector():Dot(norm) < 0 then
-						table.insert(postab, testpos)
-						break
-					end
-				end
-			end
-		end
-
-		if not table.IsEmpty(postab) then
-			table.sort(postab, function(a, b) return a:DistToSqr(pos) < b:DistToSqr(pos) end)
-			pos = postab[1]
-		end
-	end
-
-	local minBound, maxBound = self:OBBMins(), self:OBBMaxs()
-	if not CollisionBoxClear( self, pos, minBound, maxBound ) then
-		local surroundingTiles = GetSurroundingTiles( self, pos )
-		local clearPaths = GetClearPaths( self, pos, surroundingTiles )	
-		for _, tile in pairs( clearPaths ) do
-			if CollisionBoxClear( self, tile, minBound, maxBound ) then
-				pos = tile
-				break
-			end
-		end
-	end
-
-	return pos
-end
-
 function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	local actionchance = math.random(10)
@@ -308,8 +210,8 @@ function ENT:OnPathTimeOut()
 
 				local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
 				self:SetPos( pos )
-				self:EmitSound("roach/bo3/thrasher/vox/spawn_0"..math.random(2)..".mp3",511)
-				self:EmitSound("roach/bo3/thrasher/tele_hand_up.mp3",511)
+				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
+				self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 				ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),Angle(0,0,0),nil)
 
 				local ang1 = (target:GetPos() - self:GetPos()):Angle()
@@ -371,7 +273,7 @@ function ENT:OnPathTimeOut()
 				local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
 				self:SetPos( pos )
 				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
-				self:EmitSound("enemies/bosses/thrasher/enrage_imp_00.ogg",511)
+				self:EmitSound("enemies/bosses/thrasher/tele_hand_up.ogg",511)
 				ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),Angle(0,0,0),nil)	
 
 				local ang1 = (target:GetPos() - self:GetPos()):Angle()
@@ -391,7 +293,7 @@ function ENT:OnPathTimeOut()
 				enraged = true -- OOOOOOO PISS EM
 				self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
 				self:EmitSound("enemies/bosses/thrasher/enrage_imp_00.ogg",511)
-				ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)
+				ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)	
 				self:PlaySequenceAndWait("nz_anger")
 				self:SetRunSpeed(150)
 				self.loco:SetDesiredSpeed(150)

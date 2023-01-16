@@ -7,58 +7,53 @@ ENT.Author			= "Zet0r"
 ENT.Contact			= "Don't"
 ENT.Purpose			= ""
 ENT.Instructions	= ""
-ENT.Rotated = false
 
 function ENT:Initialize()
-	if (nzMapping.Settings.boxtype =="Original") then
-	self:SetModel( "models/nzprops/mysterybox_pile.mdl" )
+	--self:SetModel("models/moo/nzprops/moo_mysterybox_pile_bunny.mdl")
+	
+	
+		if (nzMapping.Settings.boxtype =="Original") then
+	 self:SetModel("models/nzprops/mysterybox_pile.mdl")
 	end
 	if (nzMapping.Settings.boxtype =="Origins") then
-	self:SetModel( "models/box/originsbox/base.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/bo2/tomb_box.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/box/motd/motd_base.mdl" )
-	--self:SetModelScale( self:GetModelScale() * 0.6, 0 )
+	self:SetModel( "models/nzr/2022/magicbox/motd_base.mdl" )
 	end
 	if (nzMapping.Settings.boxtype =="Dead Space") then
-	self:SetModel( "models/box/dsr/kiosk_base.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/kiosk_base.mdl" )
 	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
 	end
 	if (nzMapping.Settings.boxtype =="Resident Evil") then
-	self:SetModel( "models/box/re/missing.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/missing.mdl" )
 	end
 	
 	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
-	self:SetModel( "models/box/ww2/ww2.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/ww2.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "DOOM") then
-	self:SetModel( "models/box/doom/DOOM.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/doom.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Chaos") then
-	self:SetModel( "models/box/chaos/chaos_away.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/chaos_away.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
-	self:SetModel( "models/box/soe/soe_base.mdl" )
+	self:SetModel( "models/nzr/2022/magicbox/soe_base.mdl" )
 	end
 	if (nzMapping.Settings.boxtype == nil) then
-	self:SetModel( "models/nzprops/mysterybox_pile.mdl" )
+	self:SetModel("models/nzprops/mysterybox_pile.mdl")
 	end
 	
-	--self:SetModelScale( self:GetModelScale() * 0.8, 0 )
-	self:SetColor( Color(255, 255, 255) )
-	--self:SetAngles( Color(255, 255, 255) )
-	self:SetMoveType( MOVETYPE_NONE )
-	self:SetSolid( SOLID_VPHYSICS )
-	local ang = self:GetAngles()
-	if !self.Rotated then
-	--self:SetAngles(ang + Angle(0, 45, 0))
-	self.Rotated = true
-	end
-	--self:SetNotSolid(true)
-	--self:SetCollisionGroup( COLLISION_GROUP_DEBRIS_TRIGGER )
-	--self:DrawShadow( false )
+	self:PhysicsInit(SOLID_NONE)
+	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	self:SetMoveType(MOVETYPE_NONE)
+	self:SetSolid(SOLID_OBB)
+
+	if CLIENT then return end
+	self:SetTrigger(true)
 end
 
-if CLIENT then
-	
+function ENT:PhysicsCollide(data, phys)
+	self:SetMoveType(MOVETYPE_NONE)
 end

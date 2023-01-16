@@ -244,6 +244,7 @@ self:EmitSound("enemies/bosses/newpanzer/killimp.ogg")
 	end)
 	timer.Simple(dur, function()
 		if IsValid(self) then
+		nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
 			self:Remove()
 			util.ScreenShake(self:GetPos(),12,400,3,1000)
 			ParticleEffect("bo3_panzer_explosion",self:GetPos(),Angle(0,0,0),nil)

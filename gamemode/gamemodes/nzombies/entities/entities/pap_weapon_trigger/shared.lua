@@ -28,6 +28,8 @@ end
 
 function ENT:Use( activator, caller )
 	if activator == self:GetPaPOwner() then
+		nzPowerUps.HasPaped = true
+
 		local class = self:GetWepClass()
 		local weapon
 		if self.RerollingAtts then

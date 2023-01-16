@@ -12,17 +12,6 @@ if SERVER then
 		self:SetTargetPriority(TARGET_PRIORITY_NONE)
 		self:SetHealth(100)
 
-		if self:HasPerk("whoswho") then
-			self.HasWhosWho = true
-			timer.Simple(5, function()
-				-- If you choose to use Tombstone within these seconds, you won't make a clone and will get Who's Who back from Tombstone
-				if IsValid(self) and !self:GetNotDowned() then
-					--print("Should've respawned by now")
-					nzRevive:CreateWhosWhoClone(self)
-					nzRevive:RespawnWithWhosWho(self)
-				end
-			end)
-		end
 		if self:HasPerk("tombstone") then
 			nzRevive.Players[id].tombstone = true
 		end
@@ -35,10 +24,18 @@ if SERVER then
 					self:RevivePlayer(self)
 				end
 			end)
-			--print(self, "Downed with solo revive")
 		end
 
 		self.OldPerks = self:GetPerks()
+		self.OldWeapons = {}
+
+		for k, v in pairs(self:GetWeapons()) do
+			if v.IsTFAWeapon then
+				if v.NZSpecialCategory == "display" then continue end
+
+				table.insert(self.OldWeapons, {class = v:GetClass(), pap = v:HasNZModifier("pap")})
+			end
+		end
 
 		self:RemovePerks()
 		self:RemoveUpgrades()
@@ -68,36 +65,33 @@ if SERVER then
 	function playerMeta:RevivePlayer(revivor, nosync)
 		local id = self:EntIndex()
 		if !nzRevive.Players[id] then return end
-		--self:AnimResetGestureSlot(GESTURE_SLOT_CUSTOM)
 		nzRevive.Players[id] = nil
 		if !nosync then
 			hook.Call("PlayerRevived", nzRevive, self, revivor)
 		end
 		self:SetTargetPriority(TARGET_PRIORITY_NONE)
         timer.Simple(2, function()
-        if (IsValid(self)) and self:IsPlaying() then
-        self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
-     end
-   end)
-		self.HasWhosWho = nil
+			if (IsValid(self)) and self:IsPlaying() then
+				self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+			end
+		end)
+
 		if IsValid(revivor) and revivor:IsPlayer() then
 			if self.DownPoints then
 				revivor:GivePoints(self.DownPoints)
 			end
-			revivor:StripWeapon("nz_revive_morphine") -- Remove the viewmodel again
 		end
+
 		self.DownPoints = nil
-		self.HasWhosWho = nil
 		self.DownedWithSoloRevive = nil
-		
-		self:SetPos(self:GetPos() + Vector(0,0,25))
+
 		self:ResetHull()
 	end
 
 	function playerMeta:StartRevive(revivor, nosync)
 		local id = self:EntIndex()
-		if !nzRevive.Players[id] then return end -- Not even downed
-		if nzRevive.Players[id].ReviveTime then return end -- Already being revived
+		if !nzRevive.Players[id] then return end
+		if nzRevive.Players[id].ReviveTime then return end
 
 		nzRevive.Players[id].ReviveTime = CurTime()
 		nzRevive.Players[id].RevivePlayer = revivor
@@ -105,8 +99,8 @@ if SERVER then
 
 		print("Started revive", self, revivor)
 
-		if revivor:GetNotDowned() then -- You can revive yourself while downed with Solo Quick Revive
-			revivor:Give("nz_revive_morphine") -- Give them the viewmodel
+		if revivor:GetNotDowned() then
+			--revivor:Give("nz_revive_morphine") -- Give them the viewmodel
 		end
 
 		if !nosync then hook.Call("PlayerBeingRevived", nzRevive, self, revivor) end
@@ -114,13 +108,9 @@ if SERVER then
 
 	function playerMeta:StopRevive(nosync)
 		local id = self:EntIndex()
-		if !nzRevive.Players[id] then return end -- Not even downed
+		if !nzRevive.Players[id] then return end
 
 		local revivor = nzRevive.Players[id].RevivePlayer
-		if IsValid(revivor) then
-			revivor:StripWeapon("nz_revive_morphine") -- Remove the revivors viewmodel
-		end
-
 		nzRevive.Players[id].ReviveTime = nil
 		nzRevive.Players[id].RevivePlayer = nil
 
@@ -134,9 +124,8 @@ if SERVER then
 		if !nzRevive.Players[id] then return end
 
 		local revivor = nzRevive.Players[id].RevivePlayer
-		if IsValid(revivor) then -- This shouldn't happen as players can't die if they are currently being revived
-			revivor:StripWeapon("nz_revive_morphine") -- Remove the revivors if someone was reviving viewmodel
-		end
+
+		if !nosync then hook.Call("PlayerKilled", nzRevive, self) end
 
 		nzRevive.Players[id] = nil
 		if !nokill then
@@ -146,20 +135,17 @@ if SERVER then
 				self:Kill()
 			end
 		end
-		if !nosync then hook.Call("PlayerKilled", nzRevive, self) end
-		self.HasWhosWho = nil
+
 		self.DownPoints = nil
 		self.DownedWithSoloRevive = nil
+
 		for k,v in pairs(player.GetAllPlayingAndAlive()) do
 			v:TakePoints(math.Round(v:GetPoints()*0.1, -1), true)
 		end
 		
 		self:RemoveAllPowerUps()
-		
-		--self:SetPos(self:GetPos() + Vector(0,0,25))
 		self:ResetHull()
 	end
-
 end
 
 function playerMeta:GetNotDowned()
@@ -182,11 +168,4 @@ end
 
 function playerMeta:GetPlayerReviving()
 	return self.Reviving
-end
-
--- We overwrite the shoot pos function here so we can set it to the lower angle when downed
-local oldshootpos = playerMeta.GetShootPos
-function playerMeta:GetShootPos()
-	if self:GetNotDowned() then return oldshootpos(self) end
-	return oldshootpos(self) + Vector(0,0,-15)
 end

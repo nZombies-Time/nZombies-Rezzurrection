@@ -10,8 +10,7 @@ function XYCompassToScreen(pos, boundary)
 	
 	eyedir:Rotate(Angle(0,-90,0))
 	local newdirx = eyedir:Dot(dir)
-	--draw.SimpleText(newdirx, "nz.display.hud.small", ScrW()/2, ScrH() - 50, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	
+
 	return ScrW()/2 + (newdirx*w/2), math.Clamp(pos:ToScreen().y, boundary, h)
 end
 
@@ -42,6 +41,9 @@ function GetFontType(id)
 	end
 	if id == "BO4" then
 	return "blackops4"
+	end
+	if id == "Black Ops 1" then
+	return "bo1"
 	end
 		if id == "Comic Sans" then
 	return "xd"
@@ -100,45 +102,21 @@ function nzRevive:ResetColorFade()
 		 [ "$pp_colour_mulb" ] = 0
 	}
 	fade = 1
-	
-	--print("Color reset!")
-end
-
-local function CalcDownView(ply, pos, ang, fov, znear, zfar)
-	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local pos = pos + Vector(0,0,-15)
-		local ang = ang + Angle(0,0,20)
-		
-		return {origin = pos, angles = ang, fov = fov, znear = znear, zfar = zfar, drawviewer = false }
-	end
-end
-
-local function CalcDownViewmodelView(wep, vm, oldpos, oldang, pos, ang)
-	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local oldpos = oldpos + Vector(0,0,-15)
-		local oldang = oldang + Angle(0,0,20)
-		if wep:IsCW2() or wep:IsFAS2() then oldpos = oldpos + oldang:Up() * -100 end
-		
-		return oldpos, oldang
-	end
 end
 
 local function DrawColorModulation()
 	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local fadeadd = ((1/GetConVar("nz_downtime"):GetFloat()) * FrameTime()) * -1 	-- Change 45 to the revival time
+		local fadeadd = ((1/GetConVar("nz_downtime"):GetFloat()) * FrameTime()) * -1
 		tab[ "$pp_colour_colour" ] = math.Approach(tab[ "$pp_colour_colour" ], 0, fadeadd)
 		tab[ "$pp_colour_addr" ] = math.Approach(tab[ "$pp_colour_addr" ], 0.5, fadeadd *-0.5)
 		tab[ "$pp_colour_mulr" ] = math.Approach(tab[ "$pp_colour_mulr" ], 1, -fadeadd)
 		tab[ "$pp_colour_mulg" ] = math.Approach(tab[ "$pp_colour_mulg" ], 0, fadeadd)
 		tab[ "$pp_colour_mulb" ] = math.Approach(tab[ "$pp_colour_mulb" ], 0, fadeadd)
-		
-		--print(fadeadd, tab[ "$pp_colour_colour" ], tab[ "$pp_colour_brightness" ]) 
 		DrawColorModify(tab)
 	end
 end
 
 function surface.DrawTexturedRectRotatedPoint( x, y, w, h, rot, x0, y0 )
-
 	local c = math.cos( math.rad( rot ) )
 	local s = math.sin( math.rad( rot ) )
 
@@ -146,19 +124,16 @@ function surface.DrawTexturedRectRotatedPoint( x, y, w, h, rot, x0, y0 )
 	local newy = y0 * c + x0 * s
 
 	surface.DrawTexturedRectRotated( x + newx, y + newy, w, h, rot )
-
 end
 
 local function DrawDownedPlayers()
-	
 	for k,v in pairs(nzRevive.Players) do
 		local ply = Entity(k)
-		if IsValid(ply) then -- If they're outside PVS, don't draw the icon at all
+		if IsValid(ply) then
 			if ply == LocalPlayer() then return end
 			local posxy = (ply:GetPos() + Vector(0,0,35)):ToScreen()
 			local dir = ((ply:GetPos() + Vector(0,0,35)) - EyeVector()*2):GetNormal():ToScreen()
-			--print(posxy["x"], posxy["y"], posxy["visible"])
-			
+
 			if posxy.x - 35 < 60 or posxy.x - 35 > ScrW()-130 or posxy.y - 50 < 60 or posxy.y - 50 > ScrH()-110 then
 				posxy.x, posxy.y = XYCompassToScreen((ply:GetPos() + Vector(0,0,35)), 60)
 			end
@@ -169,10 +144,7 @@ local function DrawDownedPlayers()
 			else
 				surface.SetDrawColor(255, 150 - (CurTime() - v.DownTime)*(150/GetConVar("nz_downtime"):GetFloat()), 0)
 			end
-			
-			--draw.SimpleText(v.ReviveTime and "REVIVING" or "DOWNED", font, posxy["x"], posxy["y"] + 10, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			--draw.SimpleText(k:Nick(), font2, posxy["x"], posxy["y"] - 20, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			
+
 			surface.DrawTexturedRect(posxy.x - 35, posxy.y - 50, 70, 50)
 		end	
 	end
@@ -195,7 +167,6 @@ local function DrawRevivalProgress()
 end
 
 local function DrawDownedNotify()
-
 	if !LocalPlayer():GetNotDowned() then
 		local text = "YOU NEED HELP!"
 		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
@@ -206,12 +177,10 @@ local function DrawDownedNotify()
 		end
 		draw.SimpleText(text, font, ScrW() / 2, ScrH() * 0.9, Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
-
 end
 
 function nzRevive:DownedHeadsUp(ply, text)
 	nzRevive.Notify[ply] = {time = CurTime(), text = text}
-	--PrintTable(nzRevive.Notify[ply])
 end
 
 function nzRevive:CustomNotify(text, time)
@@ -221,7 +190,6 @@ function nzRevive:CustomNotify(text, time)
 	else
 		table.insert(nzRevive.Notify, {time = CurTime() + 5, text = text})
 	end
-	--PrintTable(nzRevive.Notify[ply])
 end
 
 local function DrawDownedHeadsUp()
@@ -230,8 +198,7 @@ local function DrawDownedHeadsUp()
 	local offset = 20
 	local max = 2
 	local c = 0
-	--table.SortByMember(nz.nzRevive.Data.Notify, "time")
-	
+
 	for k,v in pairs(nzRevive.Notify) do
 		if type(k) == "Player" and IsValid(k) then
 			local fade = math.Clamp(CurTime() - v.time - 5, 0, 1)
@@ -291,7 +258,6 @@ local senttombstonerequest = false
 
 local function DrawTombstoneProgress()
 	if LocalPlayer():GetDownedWithTombstone() then
-	
 		local killtime = 1
 		
 		if LocalPlayer():KeyDown(IN_USE) then
@@ -318,25 +284,7 @@ local function DrawTombstoneProgress()
 	end
 end
 
-local whoswhoactive = false
-net.Receive("nz_WhosWhoActive", function()
-	whoswhoactive = net.ReadBool()
-end)
-local whoswhomat = "models/shadertest/shader4"
-local firemat = "models/onfire"
-
-local function DrawWhosWhoOverlay()
-	if whoswhoactive then
-		DrawMaterialOverlay(whoswhomat, 0.03)
-	end
-	--[[if LocalPlayer():IsOnFire() then
-		DrawMaterialOverlay("firemat", 1)
-	end]]
-end
-
 -- Hooks
-hook.Add("CalcView", "CalcDownedView", CalcDownView )
-hook.Add("CalcViewModelView", "CalcDownedViewmodelView", CalcDownViewmodelView )
 hook.Add("RenderScreenspaceEffects", "DrawColorModulation", DrawColorModulation)
 hook.Add("HUDPaint", "DrawDamageOverlay", DrawDamagedOverlay)
 hook.Add("HUDPaint", "DrawDownedPlayers", DrawDownedPlayers )
@@ -345,4 +293,3 @@ hook.Add("HUDPaint", "DrawRevivalProgress", DrawRevivalProgress )
 hook.Add("HUDPaint", "DrawDownedPlayersNotify", DrawDownedHeadsUp )
 hook.Add("HUDPaint", "DrawTombstoneNotify", DrawTombstoneNotify )
 hook.Add("HUDPaint", "DrawTombstoneProgress", DrawTombstoneProgress )
-hook.Add("RenderScreenspaceEffects", "DrawWhosWhoOverlay", DrawWhosWhoOverlay )

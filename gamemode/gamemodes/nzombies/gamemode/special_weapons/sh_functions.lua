@@ -329,6 +329,7 @@ if CLIENT then
 		
 		for k,v in pairs(ply.NZSpecialWeapons) do
 			local key = input.IsKeyDown(ply:GetInfoNum("nz_key_"..k, defaultkeys[k] or -1))
+			local mouse = input.IsMouseDown(ply:GetInfoNum("nz_key_"..k, defaultkeys[k] or -1))
 			if key then
 				id = k
 				wep = v
@@ -386,6 +387,7 @@ hook.Add( "PostRender", "example_screenshot", function()
 
 	file.Write( "image.png", data )
 end )
+
 hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	if but == ply:GetInfoNum("nz_key_knife", KEY_V) or
 	but == ply:GetInfoNum("nz_key_grenade", KEY_G) or
@@ -397,66 +399,7 @@ hook.Add("PlayerButtonDown", "nzSpecialWeaponsHandler", function(ply, but)
 	this should be more reliable, because DoAnimationEvent is Third person ONLY, 
 	this is why it broke in single player" --]]
 	
-	--Electric Cherry Bits
-	
-	local wep = ply:GetActiveWeapon()
-	if !IsValid(wep) then return end
-	
-	local ammocount = wep:GetPrimaryAmmoType()
-	
-	if wep:Clip1() >= wep:GetMaxClip1() then
-		ply.nzCherryReload = false
-	end
-	
-	local reloadId = ply:GetInfoNum("+reload", KEY_R)
-
-		if but == reloadId and ply.nzCherryReload == false then
-			if nzRound:InState( ROUND_CREATE ) then
-			-- if input.IsKeyDown( KEY_Z ) then
-			 
-			-- end
-			end
-			
-			if ply:HasPerk("cherry") then
-
-				if IsValid(wep) and wep:Clip1() < wep:GetMaxClip1() and ply:GetAmmoCount(ammocount) > 1 then
-					ply.nzCherryReload = true
-					local pct = 1 - (wep:Clip1()/wep:GetMaxClip1())
-					local pos, ang = ply:GetPos() + ply:GetAimVector()*10 + Vector(0,0,50), ply:GetAimVector()
-				
-					if SERVER then --Occasionally spits errors in single player console if I DONT do this
-					nzEffects:Tesla( {
-						pos = ply:GetPos() + Vector(0,0,50),
-						ent = ply,
-						turnOn = true,
-						dieTime = 1,
-						lifetimeMin = 0.05*pct,
-						lifetimeMax = 0.1*pct,
-						intervalMin = 0.01,
-						intervalMax = 0.02,
-					})
-						local zombies = ents.FindInSphere(ply:GetPos(), 250*pct)
-						local d = DamageInfo()
-						d:SetDamage( 40*pct ) --this can be scaled with double tap and vigour rush
-						d:SetDamageType( DMG_BULLET )
-						d:SetAttacker(ply)
-						d:SetInflictor(ply)
-						
-						for k,v in pairs(zombies) do
-							if nzConfig.ValidEnemies[v:GetClass()] then
-								v:TakeDamageInfo(d)
-							end
-						end
-					end
-				end
-			end
-		end
-	
-	if id and (ply:GetNotDowned() or id == "knife") and !ply:GetUsingSpecialWeapon() then
-		
-	end
-	
-
+	if id and (ply:GetNotDowned() or id == "knife") and !ply:GetUsingSpecialWeapon() then end
 end)
 
 hook.Add("PlayerButtonUp", "nzSpecialWeaponsThrow", function(ply, but)
@@ -466,7 +409,6 @@ hook.Add("PlayerButtonUp", "nzSpecialWeaponsThrow", function(ply, but)
 		ply.nzSpecialButtonDown = false
 	end
 end)
-
 
 local wep = FindMetaTable("Weapon")
 local ply = FindMetaTable("Player")

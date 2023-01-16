@@ -16,17 +16,29 @@ end
 -- Stops players from moving if downed
 hook.Add( "SetupMove", "nzFreezePlayersDowned", function( ply, mv, cmd )
 	if !ply:GetNotDowned() then
-		mv:SetMaxClientSpeed( downedspeed )
-		mv:RemoveKeys(IN_JUMP + IN_DUCK)
-		
-		--[[if mv:GetVelocity():Length2D() > 10 then -- Can't shoot while crawling!
-			mv:RemoveKeys(IN_ATTACK + IN_ATTACK2) -- Doesn't work for some reason? :(
-		end]]
+		mv:SetMaxClientSpeed(downedspeed)
 	end
 end )
 
-hook.Add("PlayerSpawn", "SetupHands", function(ply)
+hook.Add("StartCommand", "nzPlayerDownFake", function(ply, cmd)
+	if !ply:GetNotDowned() then
+		cmd:RemoveKey(IN_SPEED)
+		cmd:RemoveKey(IN_JUMP)
+		cmd:SetButtons(bit.bor(cmd:GetButtons(), IN_DUCK))
+	end
+end)
 
+hook.Add("PlayerSwitchWeapon", "nzPlayerWeaponSwap", function(ply, oldWep, newWep)
+	if not IsValid(ply) or not IsValid(newWep) then return end
+
+	if not ply:HasPerk("mulekick") then
+		if newWep:GetNWInt("SwitchSlot", 0) == 3 then
+			return true
+		end
+	end
+end)
+
+hook.Add("PlayerSpawn", "SetupHands", function(ply)
 	local mdl = ply:GetInfo( "cl_playermodel" )
 	ply:SetModel(mdl)
 	
@@ -52,5 +64,4 @@ hook.Add("PlayerSpawn", "SetupHands", function(ply)
 	timer.Simple(0, function()
 		if IsValid(ply) then ply:SetupHands() end
 	end)
-	
 end)

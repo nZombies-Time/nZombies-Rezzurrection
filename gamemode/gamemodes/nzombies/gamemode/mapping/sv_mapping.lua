@@ -540,7 +540,7 @@ end
 	
 end
 
-function nzMapping:BreakEntry(pos, ang, planks, jump, ply)
+function nzMapping:BreakEntry(pos, ang, planks, jump,prop, ply)
 	local planks = planks
 	if planks == nil then planks = true else planks = tobool(planks) end
 	local jump = jump
@@ -548,6 +548,7 @@ function nzMapping:BreakEntry(pos, ang, planks, jump, ply)
 
 	local entry = ents.Create( "breakable_entry" )
 	entry:SetPos( pos )
+	entry:SetProp( prop )
 	entry:SetAngles( ang )
 	entry:SetHasPlanks(planks)
 	entry:SetTriggerJumps(jump)

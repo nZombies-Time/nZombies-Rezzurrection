@@ -58,6 +58,10 @@ ENT.DeathSequences = {
 	"nz_death_v6"
 }
 
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
 local AttackSequences = {
 	{seq = "nz_attack_v1", dmgtimes = {0.7}},
 	{seq = "nz_attack_v2", dmgtimes = {0.5}},
@@ -256,19 +260,10 @@ function ENT:DoDeathAnimation(seq) -- Modified death function to have a chance o
 		self:PlaySequenceAndWait(seq)
 		if GasDeathChance == 2 then
 			print("Stinky Child... Gross")
-			self:EmitSound("nz_moo/zombies/vox/_quad/gas_cloud/cloud_0"..math.random(3)..".mp3", 100, math.random(95, 105), 4, 0)
-			ParticleEffect("novagas_xplo",self:GetPos(),self:GetAngles(),nil)
-			local vaporizer = ents.Create("point_hurt")
-			if !vaporizer:IsValid() then return end
-			vaporizer:SetKeyValue("Damage", 0.25)
-			vaporizer:SetKeyValue("DamageRadius", 100)
-			vaporizer:SetKeyValue("DamageDelay", 0.15)
-			vaporizer:SetKeyValue("DamageType",DMG_NERVEGAS)
-			vaporizer:SetPos(self:GetPos())
-			vaporizer:SetOwner(self)
-			vaporizer:Spawn()
-			vaporizer:Fire("TurnOn","",0)
-			vaporizer:Fire("kill","",18)
+			local fuckercloud = ents.Create("nova_gas_cloud")
+			fuckercloud:SetPos(self:GetPos())
+			fuckercloud:SetAngles(Angle(0,0,0))
+			fuckercloud:Spawn()
 		end
 		self:Remove(DamageInfo())
 	end)

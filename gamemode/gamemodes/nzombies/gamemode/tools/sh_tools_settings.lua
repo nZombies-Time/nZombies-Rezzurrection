@@ -74,7 +74,7 @@ nzTools:CreateTool("settings", {
 		valz["Row46"] = data.range or 2000
 		valz["Row47"] = data.sharing or false
 		valz["Row48"] = data.eemdl or "Hula Doll"
-		valz["Row49"] = data.negative or false
+		valz["Row49"] = data.comedy or false
 		valz["RBoxWeps"] = data.RBoxWeps or {}
 		valz["ACRow1"] = data.ac == nil and false or data.ac
 		valz["ACRow2"] = data.acwarn == nil and true or data.acwarn
@@ -92,6 +92,7 @@ nzTools:CreateTool("settings", {
 				wunderfizzlist[k] = {true, v}
 			end
 		end
+
 
 		valz["Wunderfizz"] = data.wunderfizzperklist == nil and wunderfizzlist or data.wunderfizzperklist
 
@@ -578,7 +579,7 @@ nzTools:CreateTool("settings", {
 			Row49:Setup( "Boolean" )
 			Row49:SetValue( valz["Row49"] )
 			Row49.DataChanged = function( _, val ) valz["Row49"] = val end
-			Row49:SetTooltip("To be a box communist or not to be a box communist")
+			Row49:SetTooltip("Comedy")
 		
 		
 		if nzTools.Advanced then
@@ -639,7 +640,7 @@ nzTools:CreateTool("settings", {
 			if !tonumber(valz["Row46"]) then data.range = 0 else data.range = tonumber(valz["Row46"]) end
 			if !valz["Row47"] then data.sharing = nil else data.sharing = valz["Row47"] end
 			if !valz["Row48"] then data.eemdl = "Hula Doll" else data.eemdl = valz["Row48"] end
-			if !valz["Row49"] then data.negative = nil else data.negative = valz["Row49"] end
+			if !valz["Row49"] then data.comedy = nil else data.comedy = valz["Row49"] end
 			if !valz["RBoxWeps"] or table.Count(valz["RBoxWeps"]) < 1 then data.rboxweps = nil else data.rboxweps = valz["RBoxWeps"] end
 			if valz["Wunderfizz"] == nil then data.wunderfizzperklist = wunderfizzlist else data.wunderfizzperklist = valz["Wunderfizz"] end
 			if valz["ACRow1"] == nil then data.ac = false else data.ac = tobool(valz["ACRow1"]) end

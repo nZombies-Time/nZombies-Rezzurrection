@@ -25,8 +25,10 @@ ENT.Models = {
 	{Model = "models/moo/_codz_ports/t5/coast/moo_codz_t5_coast_soldier.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-local spawnslow = {"nz_spawn_ground_ad_v2", "nz_spawn_ground_climbout_fast"}
-local spawnfast = {"nz_spawn_ground_quickrise_v1", "nz_spawn_ground_quickrise_v2", "nz_spawn_ground_quickrise_v3"}
+local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}
+local spawnrun = {"nz_spawn_ground_v1_run"}
+local spawnfast = {"nz_spawn_ground_climbout_fast"}
+local spawnsuperfast = {"nz_spawn_ground_quickrise_v1", "nz_spawn_ground_quickrise_v2", "nz_spawn_ground_quickrise_v3"}
 
 ENT.DeathSequences = {
 	"nz_death_f_1",
@@ -50,6 +52,13 @@ ENT.ElectrocutionSequences = {
 	"nz_death_elec_4",
 }
 
+ENT.BarricadeTearSequences = {
+	"nz_legacy_door_tear_high",
+	"nz_legacy_door_tear_low",
+	"nz_legacy_door_tear_left",
+	"nz_legacy_door_tear_right",
+}
+
 local CrawlAttackSequences = {
 	{seq = "nz_crawl_attack_v1", dmgtimes = {0.75, 1.65}},
 	{seq = "nz_crawl_attack_v2", dmgtimes = {0.65}},
@@ -65,35 +74,101 @@ local AttackSequences = {
 	{seq = "nz_attack_stand_au_1", dmgtimes = {0.75, 1.25}},
 	{seq = "nz_fwd_ad_attack_v1", dmgtimes = {0.95, 1.35}},
 	{seq = "nz_fwd_ad_attack_v2", dmgtimes = {0.85, 1.30}},
+	{seq = "nz_legacy_attack_v3", dmgtimes = {0.25}},
+	{seq = "nz_legacy_attack_v4", dmgtimes = {0.35}},
+	{seq = "nz_legacy_attack_v11", dmgtimes = {1.00}},
+	{seq = "nz_legacy_attack_superwindmill", dmgtimes = {0.50, 1.00, 1.50, 2.00}}, -- Just don't get Superwind Mill'd 5 head.
 }
 
 local WalkAttackSequences = {
-	{seq = "nz_walk_ad_attack_v1", dmgtimes = {0.15}},
-	{seq = "nz_walk_ad_attack_v2", dmgtimes = {0.35, 0.85}},
-	{seq = "nz_walk_ad_attack_v3", dmgtimes = {0.45}},
-	{seq = "nz_walk_ad_attack_v4", dmgtimes = {0.25, 0.75}},
+	{seq = "nz_walking_attack_v1", dmgtimes = {1.45}},
+	{seq = "nz_walking_attack_v2", dmgtimes = {1.4}},
+	{seq = "nz_walking_attack_v3", dmgtimes = {0.75}},
+	{seq = "nz_walking_attack_v4", dmgtimes = {1.65}},
+	{seq = "nz_walking_attack_v5", dmgtimes = {1.85}},
 }
 
 local RunAttackSequences = {
-	{seq = "nz_run_ad_attack_v1", dmgtimes = {0.45}},
-	{seq = "nz_run_ad_attack_v2", dmgtimes = {0.45}},
-	{seq = "nz_run_ad_attack_v3", dmgtimes = {0.25}},
-	{seq = "nz_run_ad_attack_v4", dmgtimes = {0.25}},
+	{seq = "nz_running_attack_v1", dmgtimes = {0.75}},
+	{seq = "nz_running_attack_v2", dmgtimes = {0.75}},
+	{seq = "nz_running_attack_v3", dmgtimes = {0.70}},
+	{seq = "nz_running_attack_v4", dmgtimes = {0.80}},
+	{seq = "nz_running_attack_v5", dmgtimes = {0.75}},
+}
+
+local SprintAttackSequences = {
+	{seq = "nz_sprinting_attack_v1", dmgtimes = {0.40}},
+	{seq = "nz_sprinting_attack_v2", dmgtimes = {0.85}},
+	{seq = "nz_sprinting_attack_v3", dmgtimes = {0.50}},
+	{seq = "nz_sprinting_attack_v4", dmgtimes = {0.40}},
+	{seq = "nz_sprinting_attack_v5", dmgtimes = {0.35}},
+}
+
+local SuperSprintAttackSequences = {
+	{seq = "nz_supersprinting_attack_v1", dmgtimes = {0.40}},
+	{seq = "nz_supersprinting_attack_v2", dmgtimes = {0.35}},
+	{seq = "nz_supersprinting_attack_v3", dmgtimes = {0.45}},
+	{seq = "nz_supersprinting_attack_v4", dmgtimes = {0.40}},
 }
 
 local JumpSequences = {
-	{seq = "nz_barricade_trav_walk_1", speed = 25, time = 2.7},
-	{seq = "nz_barricade_trav_walk_2", speed = 25, time = 2.7},
-	{seq = "nz_barricade_trav_walk_3", speed = 15, time = 2},
-	{seq = "nz_barricade_trav_walk_4", speed = 15, time = 2},
+	{seq = "nz_barricade_trav_walk_1", speed = 25, time = 3},
+	{seq = "nz_barricade_trav_walk_2", speed = 25, time = 3},
+	{seq = "nz_barricade_trav_walk_3", speed = 15, time = 2.5},
+	{seq = "nz_barricade_trav_walk_4", speed = 15, time = 2.5},
 }
+
 local RunJumpSequences = {
-	{seq = "nz_barricade_run_1", speed = 35, time = 1},
+	{seq = "nz_barricade_run_1", speed = 35, time = 1.5},
 }
+
 local SprintJumpSequences = {
-	{seq = "nz_barricade_sprint_1", speed = 50, time = 1},
-	{seq = "nz_barricade_sprint_2", speed = 30, time = 1},
+	{seq = "nz_barricade_sprint_1", speed = 50, time = 1.25},
+	{seq = "nz_barricade_sprint_2", speed = 30, time = 1.25},
 }
+local walksounds = {
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_07.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_08.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_09.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_10.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_11.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_12.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_1/amb_13.mp3"),
+
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_07.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_08.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_09.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_10.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_11.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_12.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_2/amb_13.mp3"),
+
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_07.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_08.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/amb/series_3/amb_09.mp3"),
+}
+
 local walksounds = {
 	Sound("nz_moo/zombies/vox/_classic/amb/amb_00.mp3"),
 	Sound("nz_moo/zombies/vox/_classic/amb/amb_01.mp3"),
@@ -118,36 +193,36 @@ local runsounds = {
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 0,
+		minspeed = 1,
 		attackanims = AttackSequences,
 		barricadejumps = JumpSequences,
 	},
 	[2] = {
 		act = ACT_WALK_ANGRY,
-		minspeed = 50,
+		minspeed = 35,
 		attackanims = WalkAttackSequences,
 		barricadejumps = JumpSequences,
 	},
 	[3] = {
 		act = ACT_RUN,
-		minspeed = 75,
+		minspeed = 60,
 		attackanims = RunAttackSequences,
 		barricadejumps = RunJumpSequences,
 	},
 	[4] = {
 		act = ACT_SPRINT,
 		minspeed = 145,
-		attackanims = RunAttackSequences,
+		attackanims = SprintAttackSequences,
 		barricadejumps = SprintJumpSequences,
 	},
 	[5] = {
 		act = ACT_SUPERSPRINT,
-		minspeed = 220,
-		attackanims = RunAttackSequences,
+		minspeed = 200,
+		attackanims = SuperSprintAttackSequences,
 		barricadejumps = SprintJumpSequences,
 	},
 	[6] = {
-		act = ACT_CRAWL,
+		act = ACT_CRAWL, -- Only for crawlers, NEVER GO THIS HIGH!
 		minspeed = 999,
 		attackanims = CrawlAttackSequences,
 		barricadejumps = CrawlJumpSequences,
@@ -159,160 +234,18 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnslow},
 			MovementSequence = {
-				"nz_walk_ad5",
-				"nz_walk_ad6",
-				--"nz_walk_au_goose",
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v1",
-			},
-			PassiveSounds = {walksounds},
-		},
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
-				"nz_walk_au5",
-				"nz_walk_au6",
-				--"nz_walk_au_goose", -- This is the goosestep walk aka marching anim that german soldier zombies use.
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v1",
-			},
-			PassiveSounds = {walksounds},
-		}
-	}},
-	{Threshold = 30, Sequences = {
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
 				"nz_walk_ad1",
 				"nz_walk_ad2",
 				"nz_walk_ad3",
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v1",
-			},
-			PassiveSounds = {walksounds},
-		},
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
-				"nz_walk_au1",
-				"nz_walk_au2",
-				"nz_walk_au3",
-				"nz_walk_au13",
-				"nz_walk_au15",
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v1",
-			},
-			PassiveSounds = {walksounds},
-		}
-	}},
-	{Threshold = 45, Sequences = {
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
-				"nz_walk_ad19",
-				"nz_walk_ad23",
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {walksounds},
-		},
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
-				"nz_walk_au10",
-				"nz_walk_au11",
-				"nz_walk_au12",
-			},
-			LowgMovementSequence = {
-				"nz_walk_lowg_v1",
-				"nz_walk_lowg_v2",
-				"nz_walk_lowg_v3",
-				"nz_walk_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {walksounds},
-		}
-	}},
-	{Threshold = 55, Sequences = {
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
 				"nz_walk_ad4",
 				"nz_walk_ad7",
+				"nz_walk_ad5",
+				"nz_walk_ad6",
+				"nz_walk_ad19",
 				"nz_walk_ad20",
 				"nz_walk_ad21",
 				"nz_walk_ad22",
+				"nz_walk_ad23",
 				"nz_walk_ad24",
 				"nz_walk_ad25",
 			},
@@ -328,6 +261,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -337,9 +271,19 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnslow},
 			MovementSequence = {
+				"nz_walk_au1",
+				"nz_walk_au2",
+				"nz_walk_au3",
 				"nz_walk_au4",
+				"nz_walk_au5",
+				"nz_walk_au6",
 				"nz_walk_au7",
 				"nz_walk_au8",
+				"nz_walk_au10",
+				"nz_walk_au11",
+				"nz_walk_au12",
+				"nz_walk_au13",
+				"nz_walk_au15",
 				"nz_walk_au20",
 				"nz_walk_au21",
 				"nz_walk_au23",
@@ -356,6 +300,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -363,69 +308,26 @@ ENT.SequenceTables = {
 			PassiveSounds = {walksounds},
 		}
 	}},
-	{Threshold = 65, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
-			SpawnSequence = {spawnslow},
+			SpawnSequence = {spawnrun},
 			MovementSequence = {
-				"nz_run_ad8",
-				"nz_run_ad11",
 				"nz_walk_fast_ad1",
 				"nz_walk_fast_ad2",
 				"nz_walk_fast_ad3",
-			},
-			LowgMovementSequence = {
-				"nz_run_lowg_v1",
-				"nz_run_lowg_v2",
-				"nz_run_lowg_v3",
-				"nz_run_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {walksounds},
-		},
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
-				"nz_run_au5",
-				"nz_walk_fast_au1",
-				"nz_walk_fast_au2",
-				"nz_walk_fast_au3",
-			},
-			LowgMovementSequence = {
-				"nz_run_lowg_v1",
-				"nz_run_lowg_v2",
-				"nz_run_lowg_v3",
-				"nz_run_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {walksounds},
-		}
-	}},
-	{Threshold = 85, Sequences = {
-		{
-			SpawnSequence = {spawnslow},
-			MovementSequence = {
+				"nz_run_ad1",
+				"nz_run_ad2",
+				"nz_run_ad3",
+				"nz_run_ad4",
 				"nz_run_ad7",
+				"nz_run_ad8",
+				"nz_run_ad11",
+				"nz_run_ad12",
+				"nz_run_ad14",
 				"nz_run_ad20",
 				"nz_run_ad21",
 				"nz_run_ad22",
+				"nz_run_ad23",
 				"nz_run_ad24",
 			},
 			LowgMovementSequence = {
@@ -440,6 +342,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -447,71 +350,22 @@ ENT.SequenceTables = {
 			PassiveSounds = {runsounds},
 		},
 		{
-			SpawnSequence = {spawnslow},
+			SpawnSequence = {spawnrun},
 			MovementSequence = {
-				"nz_run_au20",
-				"nz_run_au22",
-			},
-			LowgMovementSequence = {
-				"nz_run_lowg_v1",
-				"nz_run_lowg_v2",
-				"nz_run_lowg_v3",
-				"nz_run_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
-		}
-	}},
-	{Threshold = 110, Sequences = {
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
-				"nz_run_ad1",
-				"nz_run_ad2",
-				"nz_run_ad3",
-				"nz_run_ad4",
-				"nz_run_ad12",
-				"nz_run_ad14",
-				"nz_run_ad23",
-			},
-			LowgMovementSequence = {
-				"nz_run_lowg_v1",
-				"nz_run_lowg_v2",
-				"nz_run_lowg_v3",
-				"nz_run_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
-		},
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
+				"nz_walk_fast_au1",
+				"nz_walk_fast_au2",
+				"nz_walk_fast_au3",
 				"nz_run_au1",
 				"nz_run_au2",
 				"nz_run_au3",
 				"nz_run_au4",
+				"nz_run_au5",
 				"nz_run_au9",
 				"nz_run_au11",
 				"nz_run_au13",
+				"nz_run_au20",
 				"nz_run_au21",
+				"nz_run_au22",
 				"nz_run_au23",
 				"nz_run_au24",
 			},
@@ -527,6 +381,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -534,73 +389,17 @@ ENT.SequenceTables = {
 			PassiveSounds = {runsounds},
 		}
 	}},
-	{Threshold = 150, Sequences = {
+	{Threshold = 71, Sequences = {
 		{
 			SpawnSequence = {spawnfast},
 			MovementSequence = {
 				"nz_sprint_ad1",
 				"nz_sprint_ad2",
-				--"nz_sprint_ad3",
-				--"nz_sprint_ad4",
 				"nz_sprint_ad5",
 				"nz_sprint_ad21",
 				"nz_sprint_ad22",
 				"nz_sprint_ad23",
 				"nz_sprint_ad24",
-			},
-			LowgMovementSequence = {
-				"nz_sprint_lowg_v1",
-				"nz_sprint_lowg_v2",
-				"nz_sprint_lowg_v3",
-				"nz_sprint_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
-		},
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
-				"nz_sprint_au1",
-				"nz_sprint_au2",
-				--"nz_sprint_au3",
-				--"nz_sprint_au4",
-				"nz_sprint_au20",
-				"nz_sprint_au21",
-				"nz_sprint_au22",
-				"nz_sprint_au25",
-			},
-			LowgMovementSequence = {
-				"nz_sprint_lowg_v1",
-				"nz_sprint_lowg_v2",
-				"nz_sprint_lowg_v3",
-				"nz_sprint_lowg_v4",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
-		}
-	}},
-	{Threshold = 195, Sequences = {
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
 				"nz_fast_sprint_v1",
 				"nz_fast_sprint_v2",
 			},
@@ -616,6 +415,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -625,6 +425,12 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnfast},
 			MovementSequence = {
+				"nz_sprint_au1",
+				"nz_sprint_au2",
+				"nz_sprint_au20",
+				"nz_sprint_au21",
+				"nz_sprint_au22",
+				"nz_sprint_au25",
 				"nz_fast_sprint_v3",
 				"nz_fast_sprint_v4",
 			},
@@ -640,6 +446,7 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
@@ -647,9 +454,9 @@ ENT.SequenceTables = {
 			PassiveSounds = {runsounds},
 		}
 	}},
-	{Threshold = 210, Sequences = {
+	{Threshold = 155, Sequences = {
 		{
-			SpawnSequence = {spawnfast},
+			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
 				"nz_supersprint_ad1",
 				"nz_supersprint_ad2",
@@ -674,14 +481,15 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
+			PassiveSounds = {walksounds},
 		},
 		{
-			SpawnSequence = {spawnfast},
+			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
 				"nz_supersprint_au1",
 				"nz_supersprint_au2",
@@ -704,55 +512,12 @@ ENT.SequenceTables = {
 				"nz_blackhole_3",
 			},
 			CrawlMovementSequence = {
+				"nz_crawl_slow_v1",
 				"nz_crawl_slow_v2",
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
-		}
-	}},
-	{Threshold = 280, Sequences = {
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
-				"nz_crazysprint_v1",
-				"nz_crazysprint_v2",
-			},
-			LowgMovementSequence = {
-				"nz_supersprint_lowg",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
-		},
-		{
-			SpawnSequence = {spawnfast},
-			MovementSequence = {
-				"nz_crazysprint_v1",
-				"nz_crazysprint_v2",
-			},
-			LowgMovementSequence = {
-				"nz_supersprint_lowg",
-			},
-			BlackholeMovementSequence = {
-				"nz_blackhole_1",
-				"nz_blackhole_2",
-				"nz_blackhole_3",
-			},
-			CrawlMovementSequence = {
-				"nz_crawl_slow_v2",
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-			},
-			PassiveSounds = {runsounds},
+			PassiveSounds = {walksounds},
 		}
 	}}
 }
@@ -854,12 +619,12 @@ ENT.BehindSounds = {
 function ENT:StatsInitialize()
 	if SERVER then
 		if nzRound:GetNumber() == -1 then
-			self:SetRunSpeed( math.random(30, 300) )
+			self:SetRunSpeed( math.random(25, 220) )
 			self:SetHealth( math.random(100, 1500) )
 		else
-			local speeds = nzRound:GetZombieSpeeds()
+			local speeds = nzRound:GetZombieCoDSpeeds()
 			if speeds then
-				self:SetRunSpeed( nzMisc.WeightedRandom(speeds) )
+				self:SetRunSpeed( nzMisc.WeightedRandom(speeds) + math.random(0,35) )
 			else
 				self:SetRunSpeed( 100 )
 			end
@@ -878,17 +643,30 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
-	if self:ZombieWaterLevel() >= 1 then
-		ParticleEffect("water_splash_0"..math.random(1,3).."",self:GetPos()+Vector(0,0,2),self:GetAngles(),self)
-		ParticleEffect("impact_antlion",self:GetPos()+Vector(0,0,-5),self:GetAngles(),self)
-		self:EmitSound("nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3")
-	else
-		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-		ParticleEffect("impact_antlion",self:GetPos()+Vector(0,0,-5),self:GetAngles(),self)
-		self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(2)..".wav")
-		self:EmitSound("nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3")
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
+
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
+	if tr.Hit then
+		local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+		self:EmitSound(finalsound)
 	end
+
+	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
+	ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+	ParticleEffect("impact_antlion",self:GetPos()+Vector(0,0,-4),self:GetAngles(),self)
+
+	self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+
+	self:Sound()
 
 	self:SetSpecialAnimation(true)
 	local seq = self:SelectSpawnSequence()

@@ -282,12 +282,6 @@ surface.CreateFont( "nz.ammo.rage", {
 	weight =  50,
 	antialias = true,
 } )
-surface.CreateFont( "nz.ammo2.rage", {
-	font ="Road Rage",
-	size = 20,
-	weight =  50,
-	antialias = true,
-} )
 surface.CreateFont( "nz.rounds.rage", {
 	font = "Road Rage", //Avenir Next
 	extended = true,
@@ -295,6 +289,46 @@ surface.CreateFont( "nz.rounds.rage", {
 	weight = 30,
 	antialias = true,
 } )
+surface.CreateFont( "nz.ammo2.rage", {
+	font ="Road Rage",
+	size = 20,
+	weight =  50,
+	antialias = true,
+} )
+--Black Ops 1
+surface.CreateFont( "nz.main.bo1", {
+	font = "HelveticaNeue Condensed",
+	size =  60,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.small.bo1", {
+	font = "HelveticaNeue Condensed",
+	extended = true,
+	size = 45,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.points.bo1", {
+	font ="HelveticaNeue Condensed",
+	extended = true,
+	size =  38,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo1", {
+	font = "HelveticaNeue Condensed",
+	size = 35,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo2.bo1", {
+	font = "HelveticaNeue Condensed",
+	size = 20,
+	weight =  50,
+	antialias = true,
+} )
+
 --Black Rose
 surface.CreateFont( "nz.main.rose", {
 	font ="Black Rose",

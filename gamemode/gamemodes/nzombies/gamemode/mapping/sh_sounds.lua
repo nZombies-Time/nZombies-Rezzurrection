@@ -13,17 +13,17 @@ nzSounds.struct = { -- For use with 'data' when creating config menu options
     "roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "dogroundsnd", "gameendsnd", -- main event sounds
     "spawnsnd", "grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
     "boxshakesnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxopensnd", "boxclosesnd",	-- mystery box sounds
-	"eesong","papshot" --new sounds as of 115 day
+	"eesong","papshot", "bonuspointssnd", "bonfiresalesnd", "firstroundstartsnd", "whoswholoopersnd" --new sounds as of 115 day
 }
 
 nzSounds.Sounds = {}
 nzSounds.Sounds.Custom = {}
 nzSounds.Sounds.Default = {}
 
-nzSounds.Sounds.Default.RoundStart = "nz/round/round_start.mp3"
-nzSounds.Sounds.Default.RoundEnd = "nz/round/round_end.mp3"
-nzSounds.Sounds.Default.SpecialRoundStart = "nz/round/special_round_start.wav"
-nzSounds.Sounds.Default.SpecialRoundEnd = "nz/round/special_round_end.wav"
+nzSounds.Sounds.Default.RoundStart = "nz_moo/round/classic_redone/start3.mp3"
+nzSounds.Sounds.Default.RoundEnd = "nz_moo/round/classic_redone/end3.mp3"
+nzSounds.Sounds.Default.SpecialRoundStart = "nz_moo/round/classic_redone/special_start.mp3"
+nzSounds.Sounds.Default.SpecialRoundEnd = "nz_moo/round/classic_redone/special_end.mp3"
 nzSounds.Sounds.Default.DogRound = "nz/round/dog_start.wav"
 nzSounds.Sounds.Default.GameEnd = "nz/round/game_over_4.mp3"
 nzSounds.Sounds.Default.Spawn = "nz/powerups/power_up_spawn.wav"
@@ -45,7 +45,10 @@ nzSounds.Sounds.Default.Open = "nzr/announcer/mysterybox/box_open.mp3"
 nzSounds.Sounds.Default.Close = "nzr/announcer/mysterybox/box_close.mp3"
 nzSounds.Sounds.Default.Music = ""
 nzSounds.Sounds.Default.UpgradedShoot = "nz/effects/pap_shoot_glock20.wav"
---nzSounds.MainEvents = {"RoundStart", "RoundEnd", "SpecialRoundStart", "SpecialRoundEnd", "GameEnd", "DogRound"}
+nzSounds.Sounds.Default.BonusPoints = "nz_moo/announcer/sammantha/announce_bonus.mp3"
+nzSounds.Sounds.Default.BonFireSale = "nz_moo/announcer/sammantha/announce_bonsale.mp3"
+nzSounds.Sounds.Default.FirstRoundStart = "nz_moo/round/classic_redone/splash.mp3"
+nzSounds.Sounds.Default.WhosWhoLooper = "nzr/2022/perks/chuggabud/ww_looper.wav"
 
 function nzSounds:RefreshSounds()
     
@@ -74,6 +77,10 @@ function nzSounds:RefreshSounds()
     nzSounds.Sounds.Custom.Close = nzMapping.Settings.boxclosesnd
 	nzSounds.Sounds.Custom.Music = nzMapping.Settings.eesong
 	nzSounds.Sounds.Custom.UpgradedShoot = nzMapping.Settings.papshot
+    nzSounds.Sounds.Custom.BonusPoints = nzMapping.Settings.bonuspointssnd
+    nzSounds.Sounds.Custom.BonFireSale = nzMapping.Settings.bonfiresalesnd
+    nzSounds.Sounds.Custom.FirstRoundStart = nzMapping.Settings.firstroundstartsnd
+    nzSounds.Sounds.Custom.WhosWhoLooper = nzMapping.Settings.whoswholoopersnd
     if (!table.IsEmpty(nzMapping.Settings) and table.IsEmpty(nzSounds.Sounds.Custom)) then
         nzSounds.Sounds.Custom = table.Copy(nzSounds.Sounds.Default)
     end

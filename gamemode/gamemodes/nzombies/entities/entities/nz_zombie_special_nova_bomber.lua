@@ -34,6 +34,10 @@ ENT.DeathSequences = {
 	"nz_death_v6"
 }
 
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
 local AttackSequences = {
 	{seq = "nz_attack_v1", dmgtimes = {0.7}},
 	{seq = "nz_attack_v2", dmgtimes = {0.5}},

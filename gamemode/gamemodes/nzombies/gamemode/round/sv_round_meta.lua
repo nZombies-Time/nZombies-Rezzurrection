@@ -93,6 +93,14 @@ function nzRound:SetZombieSpeeds( tbl )
 	self.ZombieSpeeds = tbl
 end
 
+function nzRound:GetZombieCoDSpeeds()
+	return self.ZombieSpeedsCoD
+end
+function nzRound:SetZombieCoDSpeeds( tbl )
+	self.ZombieSpeedsCoD = tbl
+end
+
+
 function nzRound:SetGlobalZombieData( tbl )
 	self:SetZombiesMax(tbl.maxzombies or 5)
 	self:SetZombieHealth(tbl.health or 75)

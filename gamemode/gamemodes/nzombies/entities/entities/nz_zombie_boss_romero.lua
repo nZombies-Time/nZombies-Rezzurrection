@@ -291,6 +291,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	end)
 	timer.Simple(dur, function()
 		if IsValid(self) then
+		nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
 			self:Remove()
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )

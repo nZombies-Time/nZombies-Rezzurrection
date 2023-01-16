@@ -203,8 +203,10 @@ nzRound:AddIconType("Black Ops 3", "nz_zombie_walker", {})
 nzRound:AddIconType("Black Ops 4", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Infinite Warfare", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Modern Warfare", "nz_zombie_walker", {}) 
+nzRound:AddIconType("WW2", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Cold War", "nz_zombie_walker", {}) 
 nzRound:AddIconType("April Fools", "nz_zombie_walker", {}) 
+nzRound:AddIconType("Shadows of Evil", "nz_zombie_walker", {}) 
 nzRound:AddIconType("No Background", "nz_zombie_walker", {}) 
 nzRound:AddIconType("Hololive", "nz_zombie_walker", {}) 
 
@@ -235,6 +237,12 @@ function nzRound:GetIconType(id)
 	end
 		if id == "April Fools" then
 	return "April Fools"
+	end
+	if id == "WW2" then
+	return "WW2"
+	end
+	if id == "Shadows of Evil" then
+	return "Shadows of Evil"
 	end
 	if id == "Hololive" then
 	return "Hololive"
@@ -270,6 +278,7 @@ nzRound:AddFontType("BO2/3", "nz_zombie_walker", {})
 nzRound:AddFontType("BO4", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Comic Sans", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Warprint", "nz_zombie_walker", {}) 
+nzRound:AddFontType("Black Ops 1", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Road Rage", "nz_zombie_walker", {}) 
 nzRound:AddFontType("Black Rose", "nz_zombie_walker", {})  
 nzRound:AddFontType("Reborn", "nz_zombie_walker", {}) 
@@ -376,6 +385,10 @@ nzRound:AddHUDType("Simple (Outline)", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Breen Desk", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Black Ops 4", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Spongebob", "nz_zombie_walker", {
+}) 
 nzRound:AddHUDType("Castle", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Sus", "nz_zombie_walker", {
@@ -414,6 +427,12 @@ function nzRound:GetHUDType(id)
 	end
 	if id == "Black Ops 1" then
 	return "bo1.png"
+	end
+	if id == "Black Ops 4" then
+	return "bo4.png"
+	end
+	if id == "Spongebob" then
+	return "sponge.png"
 	end
 		if id == "Buried" then
 	return "buried_hud.png"
@@ -504,6 +523,8 @@ nzRound:AddZombieType("Gorod Krovi", "nz_zombie_walker_gorodkrovi", {
 }) 
 nzRound:AddZombieType("Mob of the Dead", "nz_zombie_walker_motd", {
 })
+nzRound:AddZombieType("Der Riese", "nz_zombie_walker_derriese", {
+})
 nzRound:AddZombieType("Shadows of Evil", "nz_zombie_walker_soemale", {
 }) 
 nzRound:AddZombieType("Zetsubou no Shima", "nz_zombie_walker_zetsubou", {
@@ -556,6 +577,9 @@ function nzRound:GetZombieType(id)
 	end
 	if id == "Kino der Toten (Chronicles)" then
 	return "nz_zombie_walker"
+	end
+	if id == "Der Riese" then
+	return "nz_zombie_walker_derriese"
 	end
 	if id == "Ascension (Chronicles)" then
 	return "nz_zombie_walker_ascension"
@@ -648,6 +672,7 @@ function nzRound:GetZombieType(id)
 	return "nz_zombie_walker_sumpf"
 	end
 	if id == nil then
+	print("you fucked up")
 	return "nz_zombie_walker"
 	end
 end
@@ -860,6 +885,44 @@ nzRound:AddSpecialRoundType("The Pack (Dead Space)", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Sentinel Bots", {
+	specialTypes = {
+		["nz_zombie_special_bot"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 100
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Bomber Zombies", {
+	specialTypes = {
+		["nz_zombie_special_bomba"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 75
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
 nzRound:AddSpecialRoundType("Spiders", {
 	specialTypes = {
 		["nz_zombie_special_spooder"] = {chance = 100}
@@ -886,6 +949,7 @@ nzRound:AddSpecialRoundType("Burning Zombies", {
 	normalDelay = 0.75,
 	normalCountMod = function(original) return original * 0.5 end, -- Half the normal count here
 }) -- No special functions or anything really
+
 
 nzRound:AddSpecialRoundType("Burning Zombies (Ascension)", {
 	normalTypes = {
@@ -1050,13 +1114,21 @@ function nzRound:AddAdditionalZombieType(id, class)
 	end
 end
 
-nzRound:AddAdditionalZombieType("Nazi Zombies", "nz_zombie_walker", {
+nzRound:AddAdditionalZombieType("Nazi Zombies", "nz_zombie_walker_classic", {
 }) 
-nzRound:AddAdditionalZombieType("Ascension Zombies", "nz_zombie_walker_ascension", {
+nzRound:AddAdditionalZombieType("Nazi Zombies (Chronicles)", "nz_zombie_walker", {
+}) 
+nzRound:AddAdditionalZombieType("Der Riese", "nz_zombie_walker_derriese", {
+}) 
+nzRound:AddAdditionalZombieType("Ascension Zombies", "nz_zombie_walker_ascension_classic", {
+}) 
+nzRound:AddAdditionalZombieType("Ascension Zombies (Chronicles)", "nz_zombie_walker_ascension", {
 }) 
 nzRound:AddAdditionalZombieType("Siberian Zombies", "nz_zombie_walker_cotd", {
 }) 
-nzRound:AddAdditionalZombieType("Pentagon Zombies", "nz_zombie_walker_five", {
+nzRound:AddAdditionalZombieType("Pentagon Zombies", "nz_zombie_walker_five_classic", {
+}) 
+nzRound:AddAdditionalZombieType("Pentagon Zombies (Chronicles)", "nz_zombie_walker_five", {
 }) 
 nzRound:AddAdditionalZombieType("Gorod Krovi Zombies", "nz_zombie_walker_gorodkrovi", {
 }) 
@@ -1072,7 +1144,9 @@ nzRound:AddAdditionalZombieType("World War 1 Soldiers", "nz_zombie_walker_origin
 }) 
 nzRound:AddAdditionalZombieType("Crusader Zombies", "nz_zombie_walker_origins_templar", {
 }) 
-nzRound:AddAdditionalZombieType("Moon Zombies", "nz_zombie_walker_moon", {
+nzRound:AddAdditionalZombieType("Moon Zombies", "nz_zombie_walker_moon_classic", {
+}) 
+nzRound:AddAdditionalZombieType("Moon Zombies (Chronicles)", "nz_zombie_walker_moon", {
 }) 
 nzRound:AddAdditionalZombieType("Moon Tech Zombies", "nz_zombie_walker_moon_tech", {
 })
@@ -1093,6 +1167,10 @@ nzRound:AddAdditionalZombieType("Nuketown Zombies", "nz_zombie_walker_nuketown",
 nzRound:AddAdditionalZombieType("Clowns", "nz_zombie_walker_clown", {
 }) 
 nzRound:AddAdditionalZombieType("Deathtroopers", "nz_zombie_walker_deathtrooper", {
+}) 
+nzRound:AddAdditionalZombieType("Dark Aether Zombies", "nz_zombie_walker_diemachine", {
+}) 
+nzRound:AddAdditionalZombieType("Siberian Honor Guards", "nz_zombie_walker_orange", {
 }) 
 nzRound:AddAdditionalZombieType("Skeletons", "nz_zombie_walker_skeleton", {
 }) 
@@ -1162,11 +1240,17 @@ nzRound:AddAdditionalZombieType("Hellhounds", "nz_zombie_special_dog", {
 }) 
 nzRound:AddAdditionalZombieType("Helldonkeys", "nz_zombie_special_donkey", {
 }) 
+nzRound:AddAdditionalZombieType("Bomber Zombie", "nz_zombie_special_bomba", {
+}) 
+nzRound:AddAdditionalZombieType("Sentinel Bots", "nz_zombie_special_bot", {
+}) 
 nzRound:AddAdditionalZombieType("Panzer", "nz_zombie_boss_panzer", {
 }) 
 nzRound:AddAdditionalZombieType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
 }) 
 nzRound:AddAdditionalZombieType("Brute (Dead Space)", "nz_zombie_boss_brute", {
+})
+nzRound:AddAdditionalZombieType("Ubermorph", "nz_zombie_boss_ubermorph", {
 })
 nzRound:AddAdditionalZombieType("Brutus", "nz_zombie_boss_brutus", {
 }) 
@@ -1353,12 +1437,18 @@ function nzRound:GetSpecialType(id)
 	return "nz_zombie_walker_nuketown"
 	end
 	if id == "Ascension Zombies" then
+	return "nz_zombie_walker_ascension_classic"
+	end
+		if id == "Ascension Zombies (Chronicles)" then
 	return "nz_zombie_walker_ascension"
 	end
 	if id == "Siberian Zombies" then
 	return "nz_zombie_walker_cotd"
 	end
 	if id == "Pentagon Zombies" then
+	return "nz_zombie_walker_five_classic"
+	end
+	if id == "Pentagon Zombies (Chronicles)" then
 	return "nz_zombie_walker_five"
 	end
 	if id == "Gorod Krovi Zombies" then
@@ -1370,14 +1460,20 @@ function nzRound:GetSpecialType(id)
 	if id == "Zetsubou no Shima Zombies" then
 	return "nz_zombie_walker_zetsubou"
 	end
+	if id == "Der Riese" then
+	return "nz_zombie_walker_derriese"
+	end
 	if id == "Xenomorphs" then
 	return "nz_zombie_walker_xeno"
 	end
 	if id == "Necromorphs" then
 	return "nz_zombie_walker_necromorph"
 	end
-	if id == "Nazi Zombies" then
+	if id == "Nazi Zombies (Chronicles)" then
 	return "nz_zombie_walker"
+	end
+		if id == "Nazi Zombies" then
+	return "nz_zombie_walker_classic"
 	end
 	if id == "Origins Zombies" then
 	return "nz_zombie_walker_origins"
@@ -1388,8 +1484,11 @@ function nzRound:GetSpecialType(id)
 	if id == "Crusader Zombies" then
 	return "nz_zombie_walker_origins_templar"
 	end
-	if id == "Moon Zombies" then
+	if id == "Moon Zombies (Chronicles)" then
 	return "nz_zombie_walker_moon"
+	end
+	if id == "Moon Zombies" then
+	return "nz_zombie_walker_moon_classic"
 	end
 	if id == "Moon Tech Zombies" then
 	return "nz_zombie_walker_moon_tech"
@@ -1400,6 +1499,12 @@ function nzRound:GetSpecialType(id)
 	if id == "Western Zombies" then
 	return "nz_zombie_walker_buried"
 	end
+	if id == "Siberian Honor Guards" then
+	return "nz_zombie_walker_orange"
+	end
+		if id == "Dark Aether Zombies" then
+	return "nz_zombie_walker_diemachine"
+	end
 	if id == "Der Eisendrache Zombies" then
 	return "nz_zombie_walker_eisendrache"
 	end
@@ -1408,6 +1513,15 @@ function nzRound:GetSpecialType(id)
 	end
 	if id == "Shi no Numa Zombies" then
 	return "nz_zombie_walker_sumpf"
+	end
+	if id == "Bomber Zombie" then
+	return "nz_zombie_special_bomba"
+	end
+	if id == "Sentinel Bots" then
+	return "nz_zombie_special_bot"
+	end
+	if id == "Ubermorph" then
+	return "nz_zombie_boss_ubermorph"
 	end
 	if id == nil then
 	return "nz_zombie_special_dog"

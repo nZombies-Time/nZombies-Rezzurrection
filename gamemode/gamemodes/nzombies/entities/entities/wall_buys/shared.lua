@@ -15,8 +15,9 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Bool", 1, "Flipped" )
 end
 
-local flipscale = Vector(1.5, 0.01, 1.5) 	-- Decides on which axis it flattens the outline
-local normalscale = Vector(0.01, 1.5, 1.5) 	-- based on the bool self:GetFlipped()
+local flipscale = Vector(0.85, 0.01, 0.85) 	-- Decides on which axis it flattens the outline
+local oldflipscale = Vector(1.5, 0.01, 1.5) -- Decides on which axis it flattens the outline
+local normalscale = Vector(0.01, 1, 1) 	-- based on the bool self:GetFlipped()
 
 
 CreateClientConVar("nz_outlinedetail", "4", true) -- Controls the outline creation
@@ -69,7 +70,7 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 	local wep = weapons.Get(self:GetWepClass())
 	if !wep then self:RemoveOutline() return end
 	local model = wep.WM or wep.WorldModel
-	
+
 	-- Precache the model whenever it changes, including on spawn
 	util.PrecacheModel(wep.WM or wep.WorldModel)
 	
@@ -86,10 +87,10 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 		self.Chalk1:SetAngles(ang)
 		self.Chalk1:SetMaterial("chalk.png")
 		--self.Chalk:SetModelScale(1.7)
-			
+
 		local mat = Matrix()
-		mat:Scale( self.Flipped and flipscale or normalscale )
-			
+		mat:Scale( self.Flipped and oldflipscale or normalscale )
+
 		self.Chalk1:EnableMatrix( "RenderMultiply", mat )
 		self.Chalk1:SetNoDraw(true)
 		self.Chalk1:SetParent(self)
@@ -104,8 +105,8 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 		--self.Chalk:SetModelScale(1.7)
 			
 		mat = Matrix()
-		mat:Scale( self.Flipped and flipscale or normalscale )
-			
+		mat:Scale( self.Flipped and oldflipscale or normalscale )
+	
 		self.Chalk2:EnableMatrix( "RenderMultiply", mat )
 		self.Chalk2:SetNoDraw(true)
 		self.Chalk2:SetParent(self)
@@ -120,8 +121,8 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 		--self.Chalk:SetModelScale(1.7)
 			
 		mat = Matrix()
-		mat:Scale( self.Flipped and flipscale or normalscale )
-			
+		mat:Scale( self.Flipped and oldflipscale or normalscale )
+
 		self.Chalk3:EnableMatrix( "RenderMultiply", mat )
 		self.Chalk3:SetNoDraw(true)
 		self.Chalk3:SetParent(self)
@@ -136,8 +137,8 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 		--self.Chalk:SetModelScale(1.7)
 			
 		mat = Matrix()
-		mat:Scale( self.Flipped and flipscale or normalscale )
-			
+		mat:Scale( self.Flipped and oldflipscale or normalscale )
+
 		self.Chalk4:EnableMatrix( "RenderMultiply", mat )
 		self.Chalk4:SetNoDraw(true)
 		self.Chalk4:SetParent(self)
@@ -150,8 +151,8 @@ chalkmaterial = Material("chalk.png", "VertexLitGeneric")
 		self.ChalkCenter:SetMaterial("chalk.png")
 			
 		mat = Matrix()
-		mat:Scale( self.Flipped and flipscale or normalscale )
-			
+		mat:Scale( self.Flipped and oldflipscale or normalscale )
+	
 		self.ChalkCenter:EnableMatrix( "RenderMultiply", mat )
 		self.ChalkCenter:SetNoDraw(true)
 		self.ChalkCenter:SetParent(self)
@@ -191,7 +192,9 @@ if SERVER then
 			--self:SetFlipped(false)
 		end
 		self:SetModel(model)
-		self:SetModelScale( 1.5, 0 )
+
+		self:SetModelScale(1.5, 0)
+
 		self.WeaponGive = weapon
 		self.Price = price
 		self:SetWepClass(weapon)
@@ -210,111 +213,100 @@ if SERVER then
 		self.upgrade = ""
 		end
 		self.savegun = 0
-		--print(upgrade)
-		--self.upgrade2  = nzWeps:GetReplacement(upgrade)
 	end
-	
+
 	function ENT:ToggleRotate()
 		local ang = self:GetAngles()
 		self:SetFlipped(!self:GetFlipped())
-		--self:SetAngles(self:GetAngles() + Angle(0,90,0))
 		ang:RotateAroundAxis(ang:Up(), 90)
 		self:SetAngles(ang)
-		--print(self:GetFlipped())
 	end
 
 	function ENT:Use( activator, caller )
 		local price = self.Price
-		
+
 		local wep
 		for k,v in pairs(activator:GetWeapons()) do
 			if v:GetClass() == self.WeaponGive then wep = v break end
 		end
+
 		if !wep then wep = weapons.Get(self.WeaponGive) end
 		if !wep then return end
-		local ammo_type = wep.Primary.Ammo
 
+		local ammo_type = wep.Primary.Ammo
 		local ammo_price = math.ceil((price - (price % 10))/2)
-		local ammo_price_pap = 4500
+		local ammo_price_pap = self:GetFlipped() and 4500 or math.ceil((price - (price % 10))/2)
 		local curr_ammo = activator:GetAmmoCount( ammo_type )
 		local give_ammo = nzWeps:CalculateMaxAmmo(self.WeaponGive) - curr_ammo
-		  if (self:GetWepClass() == "nz_grenade") then 
-            local nade = activator:GetItem("grenade")
-            if (activator:HasPerk("widowswine") and (!nade or nade and nade.price < 4000)) then
-                ammo_price = 4000
-            elseif (nade and ammo_price < nade.price) then
-                ammo_price = nade.price
-            end
-        end 
-		--print(ammo_type, curr_ammo, give_ammo)
-	--	local ReplacementTable = {}
-	--	table.Empty(ReplacementTable )
-	  --   table.Add( ReplacementTable, nzWeps:GetAllReplacements(self.WeaponGive) )
-		 
-		 if activator:HasWeapon(self.upgrade) then
-		 self.saveGun = 1
-		 
-		 giveboolet = true
-		 end
-		 if activator:HasWeapon(self.upgrade2) then
-		 giveboolet = true
-	
-		 self.saveGun = 2
-		 end
-		--for i = 1,  table.Count(ReplacementTable ) do
-		--print(tostring(ReplacementTable[i]))
-		--if activator:HasWeapon( tostring(ReplacementTable[i])) then
-		--giveboolet = true
-		--local saveGun = ReplacementTable[i]
-		--end
-		--end
-		if !activator:HasWeapon( self.WeaponGive ) and !giveboolet then
-		
+
+		if self:GetWepClass() == "tfa_bo1_m67" then 
+			ammo_type = "nz_grenade"
+			ammo_price = activator:HasPerk("widowswine") and 4500 or 250
+		end
+
+		if activator:HasWeapon(self.upgrade) then
+			giveboolet = true
+			self.saveGun = 1
+		end
+
+		if activator:HasWeapon(self.upgrade2) then
+			giveboolet = true
+			self.saveGun = 2
+		end
+
+		if !activator:HasWeapon(self.WeaponGive) and !giveboolet then
 			activator:Buy(price, self, function()
-				 if (self.WeaponGive == "nz_grenade") then   -- This can mess up grenade pricing, don't give them it
-                    local wep = activator:GetItem("grenade")
-                    if (istable(wep)) then
-                        activator:SetAmmo(wep.ammo, "nz_grenade")
-                    end
+				self:SetBought(true)
+				self:EmitSound("nz/effects/wallbuy_purchase.mp3")
 
-                    activator:TakePoints(ammo_price)
-                    return false
-                else
-                    local wep = activator:Give(self.WeaponGive)
-                    if (wep:GetSpecialCategory() == "specialgrenade") then
-                        activator:SetAmmo(3, "nz_specialgrenade")
-                    end
-    
-                    timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
-                end
+				if self.WeaponGive == "tfa_bo1_m67" then
+					activator:SetAmmo(4, "nz_grenade")
+					activator:TakePoints(ammo_price)
+					return false
+				else
+					local wep = activator:Give(self.WeaponGive)
+					if wep:GetSpecialCategory() == "specialgrenade" then
+						activator:SetAmmo(3, "nz_specialgrenade")
+					end
+					timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
+				end
 
-                self:SetBought(true)
-                return true
+				return true
 			end)
 		elseif string.lower(ammo_type) != "none" and ammo_type != -1 then
-				if giveboolet then
+			if giveboolet then
 				if self.saveGun == 1 then
-				--local wep = weapons.Get(weapon)
-				--local wep = activator:GetWeapon(self.upgrade)
-				self.wop = activator:GetWeapon(self.upgrade)
-				print("lv1")
+					self.wop = activator:GetWeapon(self.upgrade)
 				end
 				if self.saveGun == 2 then
-				--local wep = activator:GetWeapon(self.upgrade2)
-				self.wop = activator:GetWeapon(self.upgrade2)
-				print("lv2")
+					self.wop = activator:GetWeapon(self.upgrade2)
 				end
-				else
-			self.wop = activator:GetWeapon(self.WeaponGive)
-			
+			else
+				self.wop = activator:GetWeapon(self.WeaponGive)
 			end
-			print(self.WeaponGive)
-			print(self.upgrade)
-			print(self.upgrade2)
-			print(self.wop)
-			--local String = table.ToString( activator:GetWeapon(weapons.Get(self.WeaponGive).NZPaPReplacement), "fucking gmod", true )
-			--print(table.HasValue(activator:GetWeapons(), "apple"), table.HasValue(mytable, "test"))
-			--print( String )
+
+			if self.WeaponGive == "tfa_bo1_m67" then
+				if not self:GetBought() then
+					self:SetBought(true)
+					self:EmitSound("nz/effects/wallbuy_purchase.mp3")
+				end
+
+				activator:SetAmmo(4, "nz_grenade")
+				activator:TakePoints(ammo_price)
+				return true
+			else
+				if not self:GetBought() then
+					self:SetBought(true)
+					self:EmitSound("nz/effects/wallbuy_purchase.mp3")
+				end
+
+				local wep = activator:GetWeapon(self.WeaponGive)
+				if IsValid(wep) and wep:GetSpecialCategory() == "specialgrenade" then
+					activator:SetAmmo(3, "nz_specialgrenade")
+				end
+				timer.Simple(0, function() if IsValid(wep) then wep:GiveMaxAmmo() end end)
+			end
+
 			if self.wop:HasNZModifier("pap") then
 				activator:Buy(ammo_price_pap, self, function()
 					if give_ammo != 0 then
@@ -322,10 +314,10 @@ if SERVER then
 						return true
 					else
 						print("Max Clip!")
-						return false -- Didn't work, don't take points!
+						return false
 					end
 				end)
-			else	-- Refill ammo
+			else
 				activator:Buy(ammo_price, self, function()
 					if give_ammo != 0 then
 						self.wop:GiveMaxAmmo()
@@ -337,6 +329,7 @@ if SERVER then
 				end)
 			end
 		end
+
 		giveboolet = false
 		return
 	end
@@ -369,7 +362,7 @@ if CLIENT then
 	end
 
 	local glow = Material( "sprites/light_ignorez" )
-	local white = Color(0,200,255,50)
+	local white = Color(0,200,255,0)
 	
 	function ENT:Draw()
 		--self:DrawModel()
@@ -416,7 +409,20 @@ if CLIENT then
 					render.SetBlend(1)
 					render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 					cam.Start3D2D(pos,ang,1)
+					--[[local price = self.Price
 						--surface.SetDrawColor(0,0,0)
+						if price > 7500 then
+							surface.SetDrawColor(255,240,165)
+						elseif price <= 7500 then
+							surface.SetDrawColor(255,201,165)
+						elseif price <= 3000 then
+							surface.SetDrawColor(226,165,255)
+						elseif price <= 1500 then
+							surface.SetDrawColor(165,179,255)
+						elseif price <= 750 then
+							surface.SetDrawColor(192,255,165)
+						end]]
+
 						surface.SetDrawColor(255,255,255)
 						surface.DrawRect(-ScrW(),-ScrH(),ScrW()*2,ScrH()*2)
 						--surface.SetMaterial(chalkmaterial)

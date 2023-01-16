@@ -11,49 +11,47 @@ local HealthRegenFast = {
 
 hook.Add( "Think", "RegenHealth", function()
 	for k,v in pairs( player.GetAll() ) do
-		if v:HasUpgrade("revive") then
-		if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegenFast.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegenFast.Delay) then
-			v.lastregen = CurTime()
-			v:SetHealth( math.Clamp(v:Health() + HealthRegenFast.Amount, 0, v:GetMaxHealth() ) )
-		end
+		if v:HasPerk("revive") then
+			if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegenFast.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegenFast.Delay) then
+				v.lastregen = CurTime()
+				v:SetHealth( math.Clamp(v:Health() + HealthRegenFast.Amount, 0, v:GetMaxHealth() ) )
+			end
 		else
-		if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegen.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegen.Delay) then
-			v.lastregen = CurTime()
-			v:SetHealth( math.Clamp(v:Health() + HealthRegen.Amount, 0, v:GetMaxHealth() ) )
-		end
+			if v:Alive() and v:GetNotDowned() and v:Health() < v:GetMaxHealth() and (!v.lastregen or CurTime() > v.lastregen + HealthRegen.Rate) and (!v.lasthit or CurTime() > v.lasthit + HealthRegen.Delay) then
+				v.lastregen = CurTime()
+				v:SetHealth( math.Clamp(v:Health() + HealthRegen.Amount, 0, v:GetMaxHealth() ) )
+			end
 		end
 	end
-end )
+end)
 
 hook.Add( "EntityTakeDamage", "PreventHealthRegen", function(ent, dmginfo)
 	if ent:IsPlayer() and ent:GetNotDowned() then
 		ent.lasthit = CurTime()
 	end
-	if  ent:IsPlayer() and dmginfo:IsDamageType( 8388608 ) then
+	if ent:IsPlayer() and dmginfo:IsDamageType( 8388608 ) then
 		dmginfo:ScaleDamage( 0 )
 	end
 	
-	if  ent:IsPlayer() and dmginfo:IsDamageType( 262144 ) then
-		if ent:HasPerk("mask") then
-			if ent:HasUpgrade("mask") then
+	if ent:IsPlayer() and dmginfo:IsDamageType( 262144 ) then
+		if ent:HasPerk("mask") and ent:HasUpgrade("mask") then
 			dmginfo:ScaleDamage( 0.01 )
-			else
-		dmginfo:ScaleDamage( 0.25 )
-		end
+		else
+			dmginfo:ScaleDamage( 0.25 )
 		end
 	end
+
 	attacker = dmginfo:GetAttacker()
 	if ent:IsPlayer() and dmginfo:IsDamageType( 16 ) and !attacker:IsPlayer() then
-			
-			if  ent:GetPerks()  then
+		if ent:GetPerks() then
 			perks = ent:GetPerks()
 			if not table.IsEmpty(perks) then
-			perkLost = perks[math.random(1, #perks)]
+				perkLost = perks[math.random(1, #perks)]
 				ent:RemovePerk(perkLost, true)
 			else
 			end
-			end
-			dmginfo:SetDamage( ent:Health()- 25 )
+		end
+		dmginfo:SetDamage( ent:Health()- 25 )
 		 -- Taken from whoswho.
         local pos = nil
 		local spawns = {}
@@ -85,15 +83,15 @@ hook.Add( "EntityTakeDamage", "PreventHealthRegen", function(ent, dmginfo)
 			end
 			if !IsValid(spawns[1]) then -- Still no open linked ones?! Spawn at a random player spawnpoint
 				local pspawns = ents.FindByClass("player_spawns")
-					pos = pspawns[math.random(#pspawns)]:GetPos()
+				pos = pspawns[math.random(#pspawns)]:GetPos()
 			else
 				pos = spawns[math.random(#spawns)]:GetPos()
 			end
 		else
 			-- There exists no special spawnpoints - Use regular player spawns
 			local pspawns = ents.FindByClass("player_spawns")
-				pos = pspawns[math.random(#pspawns)]:GetPos()
+			pos = pspawns[math.random(#pspawns)]:GetPos()
 		end
 	if pos then ent:SetPos(pos) end            
-			end
+	end
 end)

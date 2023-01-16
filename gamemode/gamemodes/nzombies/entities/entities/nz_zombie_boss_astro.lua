@@ -1,283 +1,135 @@
 AddCSLuaFile()
 
-ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Astronaut"
+ENT.Base = "nz_zombiebase_moo"
+ENT.PrintName = "Astronaut(Assdonut) or THE CYCLOPS"
 ENT.Category = "Brainz"
-ENT.Author = "Laby"
+ENT.Author = "Laby and Moo"
 
-ENT.Models = { "models/bosses/astronaut.mdl" }
+--[[
+	TODO:
+	Slow the player when grabbed.("We did it.")
+	Blast the player back on death.
+]]
 
-ENT.AttackRange = 55
-ENT.DamageLow = 30
-ENT.DamageHigh = 32
+if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
+ENT.SpeedBasedSequences = true
+ENT.IsMooZombie = true
+ENT.RedEyes = false
+ENT.IsMooSpecial = true
 
-ENT.AttackSequences = {
-	{seq = "attack"}
+ENT.AttackRange = 72
+
+ENT.Models = {
+	{Model = "models/moo/_codz_ports/t7/moon/moo_codz_t7_moon_assdonut.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-ENT.DeathSequences = {
-	"death1", "death2"
+ENT.BarricadeTearSequences = {
+	"nz_legacy_door_tear_high",
+	"nz_legacy_door_tear_low",
+	"nz_legacy_door_tear_left",
+	"nz_legacy_door_tear_right",
 }
 
-ENT.AttackSounds = {
-	"empty.wav"
+local AttackSequences = {
+	{seq = "nz_astro_headbutt"},
 }
 
-ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+local JumpSequences = {
+	{seq = "nz_barricade_trav_walk_1", speed = 25, time = 3},
+	{seq = "nz_barricade_trav_walk_2", speed = 25, time = 3},
+	{seq = "nz_barricade_trav_walk_3", speed = 15, time = 2.5},
+	{seq = "nz_barricade_trav_walk_4", speed = 15, time = 2.5},
 }
 
-ENT.AttackHitSounds = {
-	"effects/hit/evt_zombie_hit_player_01.ogg",
-	"effects/hit/evt_zombie_hit_player_02.ogg",
-	"effects/hit/evt_zombie_hit_player_03.ogg",
-	"effects/hit/evt_zombie_hit_player_04.ogg",
-	"effects/hit/evt_zombie_hit_player_05.ogg",
-}
-
-
-ENT.WalkSounds = {
-"enemies/bosses/ast/breathe_loop_hq.wav"
+local walksounds = {
+	Sound("nz_moo/zombies/vox/_astro/amb_vox/amb_00.mp3"),
+	Sound("nz_moo/zombies/vox/_astro/amb_vox/amb_01.mp3"),
+	Sound("nz_moo/zombies/vox/_astro/amb_vox/amb_02.mp3"),
+	Sound("nz_moo/zombies/vox/_astro/amb_vox/amb_03.mp3"),
 }
 
 ENT.ActStages = {
 	[1] = {
 		act = ACT_WALK,
-		minspeed = 50,
-	},
-	[2] = {
-		act = ACT_WALK_ANGRY,
-		minspeed = 90,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 100,
-	},
-	[4] = {
-		act = ACT_RUN,
-		minspeed = 100
+		minspeed = 0,
+		attackanims = AttackSequences,
+		barricadejumps = JumpSequences,
 	}
 }
 
--- We overwrite the Init function because we do not change bodygroups randomly!
-function ENT:Initialize()
+ENT.SequenceTables = {
+	{Threshold = 0, Sequences = {
+		{
+			MovementSequence = {
+				"nz_astro_walk_v1",
+				"nz_astro_walk_v2",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 70, Sequences = {
+		{
+			MovementSequence = {
+				"nz_supersprint_lowg"
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			PassiveSounds = {walksounds},
+		},
+	}}
+}
 
-	self:Precache()
+ENT.DeathSounds = {
+	"nz_moo/zombies/vox/mute_00.wav"
+}
 
-	self:SetModel( self.Models[math.random( #self.Models )] )
-
-	self:SetJumping( false )
-	self:SetLastLand( CurTime() + 1 ) --prevent jumping after spawn
-	self:SetLastTargetCheck( CurTime() )
-	self:SetLastTargetChange( CurTime() )
-
-	--sounds
-	self:SetNextMoanSound( CurTime() + 1 )
-
-	--stuck prevetion
-	self:SetLastPush( CurTime() )
-	self:SetLastPostionSave( CurTime() )
-	self:SetStuckAt( self:GetPos() )
-	self:SetStuckCounter( 0 )
-	
-	self:SetAttacking( false )
-	self:SetLastAttack( CurTime() )
-	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(3000) -- 0 for no distance restriction (infinite)
-
-	--target ignore
-	self:ResetIgnores()
-
-	self:SetHealth( 75 ) --fallback
-
-	self:SetRunSpeed( self.RunSpeed ) --fallback
-	self:SetWalkSpeed( self.WalkSpeed ) --fallback
-
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
-
-	self:SetActStage(0)
-	self:SetSpecialAnimation(false)
-
-	self:StatsInitialize()
-	self:SpecialInit()
-	
-	-- Fallback for buggy tool
-	if !self:GetRunSpeed() then self:SetRunSpeed(150) end
-
-	if SERVER then
-		self.loco:SetDeathDropHeight( self.DeathDropHeight )
-		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		self.loco:SetAcceleration( self.Acceleration )
-		self.loco:SetJumpHeight( self.JumpHeight )
-		if GetConVar("nz_zombie_lagcompensated"):GetBool() then
-			self:SetLagCompensated(true)
-		end
-		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
-		self:SetUsingClaw(false)
-		
-		self.NextAction = 0
-		self.NextClawTime = 0
-		self.NextFlameTime = 0
-	end
-	
-	self.ZombieAlive = true
-
-end
+ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, play these sounds instead
+ENT.BehindSounds = {
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+}
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(52)
+		self:SetRunSpeed(35)
 		self:SetHealth(10000)
 		self:SetMaxHealth(100000)
-		counting = true
 		grabbing = false
-		dying = false
-		teleporting = false
+		gobyebye = false
+		trexarms = 0
+		malding = false
 	end
-
-	--PrintTable(self:GetSequenceList())
 end
 
 function ENT:SpecialInit()
-
 	if CLIENT then
-		--make them invisible for a really short duration to blend the emerge sequences
-		self:SetNoDraw(true)
-		self:TimedEvent( 0.5, function()
-			self:SetNoDraw(false)
-		end)
-
-		self:SetRenderClipPlaneEnabled( true )
-		self:SetRenderClipPlane(self:GetUp(), self:GetUp():Dot(self:GetPos()))
-
-		self:TimedEvent( 2, function()
-			self:SetRenderClipPlaneEnabled(false)
-		end)
-
 	end
-end
-
-function ENT:InitDataTables()
-	self:NetworkVar("Entity", 0, "ClawHook")
-	self:NetworkVar("Bool", 1, "UsingClaw")
-	self:NetworkVar("Bool", 2, "Flamethrowing")
 end
 
 function ENT:OnSpawn()
-	local seq = "land"
-	local tr = util.TraceLine({
-		start = self:GetPos() + Vector(0,0,500),
-		endpos = self:GetPos(),
-		filter = self,
-		mask = MASK_SOLID_BRUSHONLY,
-	})
-	if tr.Hit then seq = "land" end
-	local _, dur = self:LookupSequence(seq)
-
-	-- play emerge animation on spawn
-	-- if we have a coroutine else just spawn the zombie without emerging for now.
-	if coroutine.running() then
-		
-		local pos = self:GetPos() + (seq == "land" and Vector(0,0,100) or Vector(0,0,450))
-		for i=1,2 do
-			ParticleEffect("bo3_panzer_landing",self:LocalToWorld(Vector(20+(i*2),20,0)),Angle(0,0,0),nil)
-		end
-		self:EmitSound("enemies/bosses/ast/headbutt.ogg",511)
-		counting = true
-	self:SetInvulnerable(true)
-		
-		--[[effectData = EffectData()
-		effectData:SetStart( pos + Vector(0, 0, 1000) )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude( 0.75 )
-		util.Effect("lightning_strike", effectData)]]
-		
-		self:TimedEvent(dur, function()
-			--dust cloud
-			self:SetPos(self:GetPos() + Vector(0,0,0))
-			self:SetInvulnerable(false)
-			local effectData = EffectData()
-			effectData:SetStart( self:GetPos() )
-			effectData:SetOrigin( self:GetPos() )
-			effectData:SetMagnitude(1)
-			counting = false
-			
-		end)
-		self:PlaySequenceAndWait(seq)
-	end
+	self:EmitSound("nz_moo/zombies/vox/_astro/spawn_flux.mp3", 511, math.random(95, 105))
+	self:EmitSound("nz_moo/zombies/vox/_astro/breath.wav", 75, math.random(95, 105), 1, 3)
+	ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
 end
 
-function ENT:OnZombieDeath(dmgInfo)
-self:StopSound("enemies/bosses/ast/breathe_loop_hq.wav")
-	self:ReleasePlayer()
-	self:StopFlames()
-	self:SetRunSpeed(0)
-	self.loco:SetVelocity(Vector(0,0,0))
-	self:Stop()
-	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:ResetSequence(seq)
-	self:SetCycle(0)
-
-	timer.Simple(dur - 0.5, function()
-		if IsValid(self) then
-			self:EmitSound("enemies/bosses/ast/pop.ogg")
-		end
-	end)
-	timer.Simple(dur, function()
-		if IsValid(self) then
-			self:Remove()
-		end
-	end)
-
+function ENT:PerformDeath(dmgInfo)
+	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+	self:StopSound("nz_moo/zombies/vox/_astro/breath.wav")
+	nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
+	self:Explode(0)
+	self:Remove(dmgInfo)
 end
 
-function ENT:BodyUpdate()
-
-	self.CalcIdeal = ACT_IDLE
-
-	local velocity = self:GetVelocity()
-
-	local len2d = velocity:Length2D()
-
-	if ( len2d > 5 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 600 ) then self.CalcIdeal = ACT_WALK end
-
-	if self:IsJumping() and self:WaterLevel() <= 0 then
-		self.CalcIdeal = ACT_JUMP
-	end
-
-	if !self:GetSpecialAnimation() and !self:IsAttacking() then
-		if self:GetActivity() != self.CalcIdeal and !self:GetStop() then self:StartActivity(self.CalcIdeal) end
-
-		if self.ActStages[self:GetActStage()] then
-			self:BodyMoveXY()
-		end
-	end
-
-	self:FrameAdvance()
-
-end
-
-function ENT:OnTargetInAttackRange()
-local atkData = {}
-atkData.dmglow = 1
-    atkData.dmghigh = 1
-    atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 1
-		self:Attack( atkData )
-		grabbing = false
-		self.loco:SetDesiredSpeed(51)
-	
-end
-
-function ENT:OnPathTimeOut()
-	
+function ENT:OnRemove()
+	self:StopSound("nz_moo/zombies/vox/_astro/breath.wav")
 end
 
 function ENT:IsValidTarget( ent )
@@ -286,156 +138,318 @@ function ENT:IsValidTarget( ent )
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 
--- This function is run every time a path times out, once every 1 seconds of pathing
+function ENT:OnBarricadeBlocking( barricade, dir ) -- Moo Mark, I'd like to say that this function while it gets the job done is disgusting to look at and is overall odious.
+	if not self:GetSpecialAnimation() then
+		if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
+			if barricade:GetNumPlanks() > 0 then
 
-if CLIENT then
-	local eyeGlow =  Material( "sprites/redglow1" )
-	local white = Color( 255, 255, 255, 255 )
-	local lightglow = Material( "sprites/physg_glow1_noz" )
-	local lightyellow = Color( 255, 255, 200, 200 )
-	local clawglow = Material( "sprites/orangecore1" )
-	local clawred = Color( 255, 100, 100, 255 )
-	function ENT:Draw()
-		self:DrawModel()
+				self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
+				local seq, dur
+
+				local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
+				local crawlattacktbl = self.ActStages[6] and self.ActStages[6].attackanims or self.CrawlAttackSequences
+				local taunttbl = self.TauntSequences
+				local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
+				local crawltarget = type(crawlattacktbl) == "table" and crawlattacktbl[math.random(#crawlattacktbl)] or crawlattacktbl
+
+				local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
+				local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
+				local taunt = type(taunttbl) == "table" and taunttbl[math.random(#taunttbl)] or taunttbl
 		
-		
 
-	end
-end
-
-function ENT:OnRemove()
-	if IsValid(self.ClawHook) then self.ClawHook:Remove() end
-	if IsValid(self.GrabbedPlayer) then self.GrabbedPlayer:SetMoveType(MOVETYPE_WALK) end
-	if IsValid(self.FireEmitter) then self.FireEmitter:Finish() end
-end
-
-function ENT:StartFlames(time)
-	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
-end
-
-function ENT:StopFlames()
-	self:SetStop(false)
-end
-
-function ENT:OnThink()	
- if self:IsAttacking() then
- 	self.loco:SetDesiredSpeed(0)
-	if !grabbing and !teleporting then
-	grabbing = true
-			local firstplayer = false
-			local stuckplayer 
-			for k,v in pairs(ents.FindInSphere(self:GetPos(),80)) do
-					if v:IsPlayer() then
-						if !firstPlayer then
-						stuckplayer = v
-						firstplayer = true
-						end
-						
+				if self:GetCrawler() then
+					if type(crawltarget) == "table" then
+						seq, dur = self:LookupSequenceAct(crawltarget.seq)
+					elseif crawltarget then -- It is a string or ACT
+						seq, dur = self:LookupSequenceAct(crawltarget)
+					else
+						seq, dur = self:LookupSequence("swing")
 					end
-					if stuckplayer then
-						
-						local walk = stuckplayer:GetWalkSpeed()
-						local run = stuckplayer:GetRunSpeed()
-							stuckplayer:SetRunSpeed(25)
-							stuckplayer:SetWalkSpeed(25)
-							timer.Simple(2,function()
-							if !teleporting then
-							stuckplayer:SetRunSpeed(run)
-							stuckplayer:SetWalkSpeed(walk)
-							teleporting = true
-							 if self:GetPos():Distance( stuckplayer:GetPos() )< 75 then
-							self:EmitSound("enemies/bosses/ast/pop.ogg",511)
-							local d = DamageInfo()
-						d:SetDamage( stuckplayer:Health() - 35 )
-						d:SetAttacker( self )
-						d:SetDamageType( DMG_VEHICLE ) 
-						stuckplayer:TakeDamageInfo( d )
-						end
-						end
-						end)
-						timer.Simple(3,function()
-								
-							grabbing = false
-							teleporting = false
-							end)
-							end
-			end
-	end
-	
- end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
-end
-
-function ENT:GrabPlayer(ply)
-
-end
-
-function ENT:ReleasePlayer()
-	
-end
-
-function ENT:OnBarricadeBlocking( barricade )
-	if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-		if barricade:GetNumPlanks() > 0 then
-			timer.Simple(0.3, function()
-
-				for i = 1, barricade:GetNumPlanks() do
-					barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".wav", 100, math.random(90, 130))
-					barricade:RemovePlank()
+				else
+					if type(teartarget) == "table" then
+						seq, dur = self:LookupSequenceAct(teartarget.seq)
+					elseif target then -- It is a string or ACT
+						seq, dur = self:LookupSequenceAct(teartarget)
+					else
+						seq, dur = self:LookupSequence("swing")
+					end
 				end
 
-			end)
+				self:SetAttacking(true)
 
-			self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-			
-			local seq, dur
+				timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
+					if IsValid(self) and self:Alive() then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
+						barricade:EmitSound("nz_moo/barricade/snap/board_snap_zhd_0" .. math.random(1, 6) .. ".mp3", 100, math.random(90, 130))
+						barricade:RemovePlank()
+					end
+				end)
 
-			local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
-			local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-			
-			if type(target) == "table" then
-				seq, dur = self:LookupSequenceAct(target.seq)
-			elseif target then -- It is a string or ACT
-				seq, dur = self:LookupSequenceAct(target)
-			else
-				seq, dur = self:LookupSequence("swing")
-			end
-			
-			self:SetAttacking(true)
-			self:PlaySequenceAndWait(seq, 1)
-			self:SetLastAttack(CurTime())
-			self:SetAttacking(false)
-			self:UpdateSequence()
-			if coroutine.running() then
-				coroutine.wait(2 - dur)
-			end
+				self:PlaySequenceAndWait(seq, 1)
 
-			-- this will cause zombies to attack the barricade until it's destroyed
-			local stillBlocked = self:CheckForBarricade()
-			if stillBlocked then
-				self:OnBarricadeBlocking(stillBlocked)
-				return
-			end
+				self:SetLastAttack(CurTime())
+				
+				self:SetAttacking(false)
+				if coroutine.running() then
+					coroutine.wait(2 - dur)
+				end
 
-			-- Attacking a new barricade resets the counter
-			self.BarricadeJumpTries = 0
-		elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-			local dist = barricade:GetPos():DistToSqr(self:GetPos())
-			if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
-				self:TriggerBarricadeJump()
+				-- this will cause zombies to attack the barricade until it's destroyed
+				local stillBlocked, dir = self:CheckForBarricade()
+				if stillBlocked then
+					self:OnBarricadeBlocking(stillBlocked, dir)
+					return
+				end
+
+				-- Attacking a new barricade resets the counter
 				self.BarricadeJumpTries = 0
+			elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
+				local dist = barricade:GetPos():DistToSqr(self:GetPos())
+				if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
+					self:TriggerBarricadeJump(barricade, dir)
+					self.BarricadeJumpTries = 0
+				else
+					-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
+					self.BarricadeJumpTries = self.BarricadeJumpTries + 1
+					-- Otherwise they'd get continuously stuck on slightly bigger props :( <--- Fuck your sad face, Love Moo.
+				end
 			else
-				-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
-				self.BarricadeJumpTries = self.BarricadeJumpTries + 1
-				-- Otherwise they'd get continuously stuck on slightly bigger props :(
+				self:SetAttacking(false)
 			end
-		else
-			self:SetAttacking(false)
 		end
+	end
+end
+
+function ENT:OnThink()
+	if self:TargetInAttackRange() then
+		if SERVER then
+		end
+	end
+end
+
+if SERVER then
+	function ENT:GetFleeDestination(target) -- Get the place where we are fleeing to, added by: Ethorbit
+		return self:GetPos() + (self:GetPos() - target:GetPos()):GetNormalized() * (self.FleeDistance or 300)
+	end
+
+	function ENT:RunBehaviour()
+
+		self:Retarget()
+		self:SpawnZombie()
+
+		while (true) do
+
+			if self.EventMask and not self.DoCollideWhenPossible then
+				self:SetSolidMask(MASK_NPCSOLID)
+			end
+			if !self:GetStop() and self:GetFleeing() then -- Admittedly this was rushed, I took no time to understand how this can be achieved with nextbot pathing so I just made a short navmesh algorithm for fleeing. Sorry. Created by Ethorbit.
+				self:SetTimedOut(false)
+
+				local target = self:GetTarget()
+				if IsValid(target) then
+					self:SetLastFlee(CurTime())
+					self:ResetMovementSequence() -- They'll comically slide away if this isn't here.
+					self:MoveToPos(self:GetFleeDestination(target), {lookahead = 0, maxage = 3})
+					self:SetLastFlee(CurTime())
+				end
+			end
+			if !self:GetFleeing() and !self:GetStop() and CurTime() > self:GetLastFlee() + 2 then
+				self:SetTimedOut(false)
+				local ct = CurTime()
+				if ct >= self.NextRetarget then
+					local oldtarget = self.Target
+					self:Retarget() --The overall process of looking for targets is handled much like how it is in nZu. While it may not save much fps in solo... Turns out this can vastly help the performance of multiplayer games.
+				end
+				if not self:HasTarget() and not self:IsValidTarget(self:GetTarget()) then
+					self:OnNoTarget()
+				else
+					local path = self:ChaseTarget()
+					if path == "failed" then
+						self:SetTargetUnreachable(true)
+					end
+					if path == "ok" then
+						if self:TargetInAttackRange() then
+							--print("Give me your assets.")
+							local livecripplereaction = ents.Create("astro_slow")
+							livecripplereaction:SetPos(self:GetPos())
+							livecripplereaction:SetAngles(Angle(0,0,0))
+							livecripplereaction:Spawn()
+
+							self:OnTargetInAttackRange()
+							if self:TargetInAttackRange() then
+								gobyebye = true
+								if gobyebye then
+									gobyebye = false
+									--print("You go to brazil now.")
+									if malding then
+										for k,v in pairs(ents.FindInSphere(self:GetPos(),100)) do
+											if v:IsValidZombie() and v.IsMooSpecial or v.NZBossType then continue end
+											self:EmitSound("weapons/tfa_bo3/gersch/gersh_teleport.wav",511, 70)
+											local d = DamageInfo()
+											d:SetDamage( v:Health() - 50 )
+											d:SetAttacker( self )
+											d:SetDamageType( DMG_VEHICLE ) 
+											v:TakeDamageInfo( d )
+										end
+									else
+										for k,v in pairs(ents.FindInSphere(self:GetPos(),self:GetAttackRange())) do
+											if v:IsValidZombie() and v.IsMooSpecial or v.NZBossType then continue end
+											self:EmitSound("weapons/tfa_bo3/gersch/gersh_teleport.wav",511)
+											local d = DamageInfo()
+											d:SetDamage( v:Health() - 35 )
+											d:SetAttacker( self )
+											d:SetDamageType( DMG_VEHICLE ) 
+											v:TakeDamageInfo( d )
+										end
+									end
+									if self:GetTarget():IsPlayer() then
+										self:GetTarget():ViewPunch( VectorRand():Angle() * 0.1 )
+									end
+									if malding then
+										--print("He's no longer malding.")
+										self:SetRunSpeed(35)
+										self:SpeedChanged()
+										malding = false
+										trexarms = 0
+									end
+								end
+							else
+								self:PlaySequenceAndWait("nz_astro_headbutt_release")
+								trexarms = trexarms + 1
+								--print(trexarms)
+								if trexarms >= 3 and not malding then -- If you somehow manage to make him mald unintentionally... You're bad at video games.
+									--print("Look what you've done Yoshi... You've angered the Scuba Diver.")
+									print("F L I N T L O C K W O O D ! ! !")
+									self:SetRunSpeed(70)
+									self:SpeedChanged()
+									malding = true
+								end
+							end
+						else
+							self:TimeOut(0.1)
+						end
+					elseif path == "timeout" then --asume pathing timedout, maybe we are stuck maybe we are blocked by barricades
+						self:SetTargetUnreachable(true)
+						self:OnPathTimeOut()
+					else
+						self:TimeOut(2)
+					end
+				end
+			else
+				self:TimeOut(2)
+			end
+			if not self.NextSound or self.NextSound < CurTime() and not self:GetAttacking() and self:Alive() then
+				self:Sound() -- Moo Mark 12/7/22: Moved this out of the THINK function since I thought it was a little stupid.
+			end
+		end
+	end
+end
+
+function ENT:Explode(dmg, suicide)
+    for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
+        if not v:IsWorld() and v:IsSolid() then
+            v:SetVelocity(((v:GetPos() - self:GetPos()):GetNormalized()*175) + v:GetUp()*225)
+            
+            if v:IsValidZombie() then
+                local damage = DamageInfo()
+                damage:SetAttacker(self)
+                damage:SetDamageType(DMG_MISSILEDEFENSE)
+                damage:SetDamage(v:Health() + 666)
+                damage:SetDamageForce(v:GetUp()*22000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
+                damage:SetDamagePosition(v:EyePos())
+                v:TakeDamageInfo(damage)
+            end
+
+            if v:IsPlayer() then
+            	v:SetGroundEntity(nil)
+                v:ViewPunch(Angle(-25,math.random(-10, 10),0))
+            end
+        end
+    end
+	ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
+	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_pop.mp3", 511, math.random(95, 105))
+	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
+    if suicide then self:TakeDamage(self:Health() + 666, self, self) end
+end
+
+-- A standard attack you can use it or create something fancy yourself
+function ENT:Attack( data )
+
+	self:SetLastAttack(CurTime())
+
+	data = data or {}
+	
+	data.attackseq = data.attackseq
+	if !data.attackseq then
+		local curstage = self:GetActStage()
+		local actstage = self.ActStages[curstage]
+		if !self:GetCrawler() and !actstage and curstage <= 0 then actstage = self.ActStages[1] end
+		--if self:GetCrawler() then self.CrawlAttackSequences end
+		
+		local attacktbl = actstage and actstage.attackanims or self.AttackSequences
+		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
+		
+		if type(target) == "table" then
+			local id, dur = self:LookupSequenceAct(target.seq)
+			if !target.dmgtimes then
+			data.attackseq = {seq = id, dmgtimes =  {0.5} }
+			else
+			data.attackseq = {seq = id, dmgtimes = target.dmgtimes }
+			end
+			data.attackdur = dur
+		elseif target then -- It is a string or ACT
+			local id, dur = self:LookupSequenceAct(attacktbl)
+			data.attackseq = {seq = id, dmgtimes = {dur/2}}
+			data.attackdur = dur
+		else
+			local id, dur = self:LookupSequence("swing")
+			data.attackseq = {seq = id, dmgtimes = {1}}
+			data.attackdur = dur
+		end
+	end
+	
+	self:SetAttacking( true )
+	
+	self:TimedEvent(data.attackdur, function()
+		self:SetAttacking(false)
+		self:SetLastAttack(CurTime())
+	end)
+
+	self:PlayAttackAndWait(data.attackseq.seq, 1)
+end
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+				self:StartActivity( ACT_WALK )
+				if !self:GetCrawler() then
+					self.loco:SetDesiredSpeed( self:GetRunSpeed() )
+				end
+			end
+			return
+		end
+		if self:IsValidTarget( self:GetTarget() ) then
+			if malding then
+				self.loco:SetDesiredSpeed( 85 ) -- YOU SHALL PAY WITH YOUR PERKS
+				self.loco:Approach( self:GetTarget():GetPos(), 10 )
+				self.loco:FaceTowards( self:GetTarget():GetPos() )
+			else
+				self.loco:SetDesiredSpeed( 25 )
+				self.loco:Approach( self:GetTarget():GetPos(), 10 )
+				self.loco:FaceTowards( self:GetTarget():GetPos() )
+			end
+		end
+		coroutine.yield()
 	end
 end

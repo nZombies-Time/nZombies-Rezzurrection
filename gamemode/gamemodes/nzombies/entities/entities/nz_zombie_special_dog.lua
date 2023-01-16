@@ -35,12 +35,24 @@ local JumpSequences = {
 	{seq = ACT_JUMP, speed = 30},
 }
 
+
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
 ENT.IdleSequence = "nz_idle1"
 
 ENT.DeathSequences = {
 	"nz_death1",
 	"nz_death2",
 	"nz_death3",
+}
+
+ENT.ElectrocutionSequences = {
+	"nz_electrocuted1",
+	"nz_electrocuted2",
+	"nz_electrocuted3",
+	"nz_electrocuted4",
 }
 
 ENT.AttackSounds = {
@@ -172,13 +184,13 @@ function ENT:OnSpawn()
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	self:SetSpecialAnimation(true)
 
-	self:EmitSound("bo1_overhaul/hhound/prespawn.mp3",511,100)
+	self:EmitSound("nz/hellhound/spawn/prespawn.wav",511,100)
 	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)
 
 	local seq = self:SelectSpawnSequence()
 	if seq then
 		self:PlaySequenceAndWait(seq)
-		self:EmitSound("bo1_overhaul/lgtstrike.mp3",511,100)
+		self:EmitSound("nz/hellhound/spawn/strike.wav",511,100)
 		self:SetNoDraw(false)
 		self:SetInvulnerable(nil)
 		self:SetBlockAttack(false)
@@ -186,7 +198,7 @@ function ENT:OnSpawn()
 		self:CollideWhenPossible()
 		self:ResetMovementSequence()
 		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
-		self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 100, math.random(85, 105), 1, 2)
+		self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 511, math.random(85, 105), 1, 2)
 	end
 
 	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
@@ -201,8 +213,13 @@ function ENT:PerformDeath(dmgInfo)
 			self:Remove()
 		end
 	else
+		if dmgInfo:GetDamageType() == DMG_SHOCK then
+		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		self:DoDeathAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
+	else
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+	end
 	end
 end
 

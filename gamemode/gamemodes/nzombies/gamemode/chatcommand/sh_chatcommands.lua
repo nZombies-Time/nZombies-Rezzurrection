@@ -1,3 +1,48 @@
+concommand.Add("spawnpowerup", function(ply, cmd, args)
+    if ply.IsSuperAdmin and ply:IsSuperAdmin() then
+        nzPowerUps:SpawnPowerUp(ply:GetEyeTrace().HitPos - (ply:GetEyeTrace().HitNormal*40), args[1])
+    end
+end)
+
+concommand.Add("nz_superglue", function(ply, cmd, args, argStr)
+	if IsValid(ply) then
+		ply:EquipPreviousWeapon()
+	end
+end)
+
+concommand.Add("triggerpowerup", function(ply, cmd, args)
+    if ply.IsSuperAdmin and ply:IsSuperAdmin() then
+        nzPowerUps:Activate(args[1], ply)
+    end
+end)
+
+nzChatCommand.Add("/fixbarricades", SERVER, function(ply, text) -- Moo Mark: Added this so new barricades can automatically be reposed correctly(Just don't do it more than once.)
+    if IsValid(ply) and ply:IsAdmin() then
+        for k, v in pairs(ents.FindByClass("breakable_entry")) do
+        	v:SetPos(v:GetPos() - Vector(0,0,45))
+    	end
+    end
+end, false, "Fixes the positions on ALL the barricades if they're using the old ones.")
+
+nzChatCommand.Add("/revertbarricades", SERVER, function(ply, text)
+    if IsValid(ply) and ply:IsAdmin() then
+        for k, v in pairs(ents.FindByClass("breakable_entry")) do
+        	v:SetPos(v:GetPos() + Vector(0,0,45))
+    	end
+    end
+end, false, "Reverts barricade's positions back to the original ones.")
+
+nzChatCommand.Add("/clearscoreboard", SERVER, function(ply, text)
+    if IsValid(ply) and ply:IsAdmin() then
+        for k, v in pairs(player.GetAll()) do
+            v:SetPoints(0)
+            v:SetTotalKills(0)
+            v:SetTotalDowns(0)
+            v:SetTotalRevives(0)
+        end
+    end
+end, false, "Clears the Scoreboard.")
+
 nzChatCommand.Add("/cheats", CLIENT, function(ply, text)
 	if CLIENT then
 		if !IsValid(g_nz_cheats) then
@@ -6,17 +51,9 @@ nzChatCommand.Add("/cheats", CLIENT, function(ply, text)
 			g_nz_cheats:Remove()
 		end
 	else
-		return true -- Doesn't block the command (client does this instead)
+		return true
 	end
 end, false, "Opens the cheat panel.")
-
-
-concommand.Add("nz_spawnpowerup", function(ply, cmd, args)
-    if ply:IsSuperAdmin() then
-        nzPowerUps:SpawnPowerUp(ply:GetPos () + ply:EyeAngles():Forward()*135, args[1])
-    end
-end)
--- Chat Commands
 
 nzChatCommand.Add("/help", SERVER, function(ply, text)
 	ply:PrintMessage( HUD_PRINTTALK, "-----" )

@@ -42,15 +42,18 @@ function nzRound:Prepare( time )
 	self:SetZombiesMax( nzCurves.GenerateMaxZombies(self:GetNumber()) )
 
 	self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
+	self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
 	
 	for k,v in pairs(ents.FindByClass("stinky_lever")) do
 		if v:Getohfuck(true) then
 		local tbl = {[250] = 100}
 		self:SetZombieSpeeds(tbl )
+		self:SetZombieCoDSpeeds( tbl )
 		--you fool owl boy, you've fallen for the classic blunder
 		break;
 		else
 		self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
+		self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
 		end
 	end
 
@@ -694,8 +697,10 @@ function nzRound:SetupGame()
 		-- Setup barricades
 		if v:GetClass() == "breakable_entry" then
 			v:ResetPlanks()
+			v:SetBodygroup(1,v:GetProp())
 		end
 	end
+
 
 	-- Empty the link table
 	table.Empty(nzDoors.OpenedLinks)

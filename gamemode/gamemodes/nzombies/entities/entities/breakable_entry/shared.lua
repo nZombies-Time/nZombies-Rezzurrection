@@ -8,20 +8,22 @@ ENT.Contact			= "Don't"
 ENT.Purpose			= ""
 ENT.Instructions	= ""
 
-ENT.NZOnlyVisibleInCreative = true
 
 -- models/props_interiors/elevatorshaft_door01a.mdl
 -- models/props_debris/wood_board02a.mdl
 function ENT:Initialize()
 
-	self:SetModel("models/props_c17/fence01b.mdl")
+	self:SetModel("models/nzr/barricade/barricade.mdl")
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	--self:SetHealth(0)
 	self:SetCustomCollisionCheck(true)
 	self.NextPlank = CurTime()
-
+	self:SetBodygroup(1,self:GetProp())
+	--self:SetBodygroup(0,0)
+	print(self:GetProp())
+	--self:SetAngles( Angle(0,180,0 ))
 	self.Planks = {}
 
 	if SERVER then
@@ -34,6 +36,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 0, "NumPlanks" )
 	self:NetworkVar( "Bool", 0, "HasPlanks" )
 	self:NetworkVar( "Bool", 1, "TriggerJumps" )
+	self:NetworkVar( "Int", 1, "Prop" )
 
 end
 
@@ -73,11 +76,12 @@ function ENT:RemovePlank()
 	table.RemoveByValue(self.Planks, plank)
 	self:SetNumPlanks( self:GetNumPlanks() - 1 )
 	if self:GetNumPlanks() == 0 then
-	self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
+	--self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
 	end
 end
 
 function ENT:ResetPlanks(nosoundoverride)
+	self:SetBodygroup(0,1)
 	for i=1, table.Count(self.Planks) do
 		self:RemovePlank()
 	end
@@ -145,12 +149,17 @@ end)
 
 if CLIENT then
 	function ENT:Draw()
-		if ConVarExists("nz_creative_preview") and !GetConVar("nz_creative_preview"):GetBool() and nzRound:InState( ROUND_CREATE ) then
-			self:DrawModel()
+	self:DrawModel()
+		if nzRound:InState( ROUND_INIT ) then
+			self:SetBodygroup(1,self:GetProp())
+			self:SetBodygroup(0,1)
+		elseif nzRound:InState( ROUND_CREATE ) then
+			self:SetBodygroup(0,0)
 		end
 	end
 else
 	function ENT:Think()
+	
 		if self.CollisionResetTime and self.CollisionResetTime < CurTime() then
 			self:SetSolid(SOLID_VPHYSICS)
 			self.CollisionResetTime = nil

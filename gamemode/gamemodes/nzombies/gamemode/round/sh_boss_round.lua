@@ -106,16 +106,16 @@ if SERVER then
 			end
 		end)
 	end
-	
-	hook.Add( "OnGameBegin", "nzBossInit", function()
+
+	hook.Add("OnGameBegin", "nzBossInit", function()
 		nzRound:SetBossType(nzMapping.Settings.bosstype)
 		local data = nzRound:GetBossData()
 		if data then
 			data.initfunc()
 		end
 	end)
-	
-	hook.Add( "OnBossKilled", "nzInfinityBossReengange", function()
+
+	hook.Add("OnBossKilled", "nzInfinityBossReengange", function()
 		local round = nzRound:GetNumber()
 		if round == -1 then
 			local diff = nzRound:GetNextBossRound() - round
@@ -126,7 +126,22 @@ if SERVER then
 			end
 		end
 	end)
-	
+
+	hook.Add("OnBossKilled", "nzBossRewards", function(ent)
+		local round = nzRound:GetNumber()
+		if round == -1 then return end
+
+		for _, ply in pairs(player.GetAll()) do
+			ply:GivePoints(1000)
+		end
+
+		local chance = math.random(10)
+		if chance <= 1 then
+			nzPowerUps:SpawnPowerUp(ent:GetPos(), "bonfiresale")
+		elseif chance <= 5 then
+			nzPowerUps:SpawnPowerUp(ent:GetPos(), "maxammo")
+		end
+	end)
 end
 
 nzRound.BossData = nzRound.BossData or {}
@@ -172,8 +187,11 @@ nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -192,8 +210,11 @@ nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -212,8 +233,34 @@ nzRound:AddBossType("Panzermorder", "nz_zombie_boss_panzermorder", {
 		nzRound:SetNextBossRound(math.random(11,13)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Ubermorph", "nz_zombie_boss_ubermorph", {
+	specialspawn = true,
+	health = 3000,
+	scale = 2000,
+	dmgmul = 1,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -232,11 +279,14 @@ nzRound:AddBossType("Cosmonaut(Round 7-8)", "nz_zombie_boss_astro", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(4,6)) -- Delay further boss spawning by 3-5 rounds after its death
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(1,2)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
 			attacker:GivePoints(500) -- Give killer 500 points if not downed
 		end
@@ -252,8 +302,11 @@ nzRound:AddBossType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
 		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -272,8 +325,11 @@ nzRound:AddBossType("Brute (Dead Space)", "nz_zombie_boss_brute", {
 		nzRound:SetNextBossRound(math.random(6,7)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(2,3)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -292,8 +348,11 @@ nzRound:AddBossType("Brutus", "nz_zombie_boss_brutus", {
 		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -312,8 +371,11 @@ nzRound:AddBossType("Avogadro", "nz_zombie_boss_avogadro", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -332,8 +394,11 @@ nzRound:AddBossType("Swamp Warden", "nz_zombie_boss_shrek", {
 		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -352,8 +417,11 @@ nzRound:AddBossType("Divider (Dead Space)", "nz_zombie_boss_Divider", {
 		nzRound:SetNextBossRound(math.random(4,6)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -372,8 +440,11 @@ nzRound:AddBossType("William Birkin", "nz_zombie_boss_G1", {
 		nzRound:SetNextBossRound(math.random(11,13)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(7,8)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -392,8 +463,11 @@ nzRound:AddBossType("The Mangler", "nz_zombie_boss_mangler", {
 		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -412,8 +486,11 @@ nzRound:AddBossType("Fuel Junkie", "nz_zombie_boss_spicy", {
 		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(2,4)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -432,8 +509,11 @@ nzRound:AddBossType("The Margwa", "nz_zombie_boss_margwa", {
 		nzRound:SetNextBossRound(math.random(8,11)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -452,8 +532,11 @@ nzRound:AddBossType("Napalm Zombie", "nz_zombie_boss_Napalm", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,4)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -472,8 +555,11 @@ nzRound:AddBossType("Nemesis", "nz_zombie_boss_Nemesis", {
 		nzRound:SetNextBossRound(math.random(8,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,7)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -492,8 +578,11 @@ nzRound:AddBossType("George Romero", "nz_zombie_boss_romero", {
 		nzRound:SetNextBossRound(math.random(2,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
-		self:SetMaxHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,6)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -512,8 +601,11 @@ nzRound:AddBossType("George Romero (Round 1)", "nz_zombie_boss_romero", {
 		nzRound:SetNextBossRound(1) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
-		self:SetMaxHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,8)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -532,11 +624,14 @@ nzRound:AddBossType("Cosmonaut (Round 2)", "nz_zombie_boss_astro", {
 		nzRound:SetNextBossRound(2) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
-		self:SetMaxHealth(nzRound:GetBossData(self.NZBossType).health * #player.GetAllPlaying())
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,8)) -- Delay further boss spawning by 3-5 rounds after its death
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(1,2)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
 			attacker:GivePoints(500) -- Give killer 500 points if not downed
 		end
@@ -552,8 +647,11 @@ nzRound:AddBossType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
@@ -572,8 +670,11 @@ nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
 		nzRound:SetNextBossRound(math.random(7,11)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
-		self:SetHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
-		self:SetMaxHealth(nzRound:GetNumber() * nzRound:GetBossData(self.NZBossType).scale + nzRound:GetBossData(self.NZBossType).health)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death

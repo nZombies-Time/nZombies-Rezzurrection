@@ -18,11 +18,11 @@ if SERVER then
 	function ENT:Initialize()
 
 		local model = self.MyModel and self.MyModel or  "models/missiles/rpg_rocket_cod4rm.mdl"
-		
 		self.Class = self:GetClass()
 		
 		self:SetModel(model)
 		ParticleEffectAttach("rocket_smoke",PATTACH_ABSORIGIN_FOLLOW,self,0)
+			--self:SetSequence( "fly_suicide" )
 		self:PhysicsInit(SOLID_OBB)
 		self:SetSolid(SOLID_NONE)
 		self:SetTrigger(true)
@@ -44,7 +44,7 @@ if SERVER then
 		end
 	end
 function ENT:Launch(dir)
-	self:SetLocalVelocity(dir * 1450)
+	self:SetLocalVelocity(dir * 1500)
 	self:SetAngles(((dir)):Angle())
 	self.AutoReturnTime = CurTime() + 5
 end
@@ -57,7 +57,7 @@ if ent:IsPlayer() or ent:IsWorld() then
 	ent:SetPos(self:GetPos())
 	ent:SetAngles(self:GetAngles())
 	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "75")
+	ent:SetKeyValue("imagnitude", "40")
 	ent:Fire("explode")
 			self.ExplosionLight1 = ents.Create("light_dynamic")
 		self.ExplosionLight1:SetKeyValue("brightness", "4")
@@ -84,7 +84,7 @@ if ent:IsPlayer() or ent:IsWorld() then
 	ent:SetPos(self:GetPos())
 	ent:SetAngles(self:GetAngles())
 	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "75")
+	ent:SetKeyValue("imagnitude", "40")
 	ent:Fire("explode")
 			self.ExplosionLight1 = ents.Create("light_dynamic")
 		self.ExplosionLight1:SetKeyValue("brightness", "4")

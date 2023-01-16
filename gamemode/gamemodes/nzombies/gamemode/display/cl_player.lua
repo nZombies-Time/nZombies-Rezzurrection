@@ -28,7 +28,12 @@ function player:GetHUDPointsType(id)
 	if id == "Sus" then
 	 return "kawaii_hud_score.png"
 	end
-	
+	if id == "Black Ops 4" then
+	 return "bo4s.png"
+	end
+	if id == "Spongebob" then
+	 return "spongesmall.png"
+	end
 	if id == "Breen Desk" then
 	 return "buried_score1.png"
 	end

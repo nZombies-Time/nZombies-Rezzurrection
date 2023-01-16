@@ -7,7 +7,7 @@ if SERVER then
 	util.AddNetworkString( "nzPowerUps.SyncPlayer" )
 	util.AddNetworkString( "nzPowerUps.SyncPlayerFull" )
 	util.AddNetworkString( "nzPowerUps.Nuke" ) -- See the nuke function in sv_powerups
-	
+
 	function nzPowerUps:SendSync(receiver)
 		local data = table.Copy(self.ActivePowerUps)
 		
@@ -66,15 +66,16 @@ if CLIENT then
 	local function ReceiveNukeEffect()
 		local fade = 0
 		local rising = true
+		surface.PlaySound("nz_moo/powerups/nuke_flux.mp3") -- BOOM!
 		hook.Add("RenderScreenspaceEffects", "DrawNukeEffect", function()
 			if rising then
-				fade = fade + 2000*FrameTime()
-				if fade >= 1000 then 
-					fade = 255
+				if fade <= 135 then
+					fade = fade + 1000*FrameTime()
+				else
 					rising = false
 				end
 			else
-				fade = fade - 100*FrameTime()
+				fade = fade - 75*FrameTime()
 				if fade <= 0 then
 					hook.Remove("RenderScreenspaceEffects", "DrawNukeEffect")
 				end
@@ -83,7 +84,7 @@ if CLIENT then
 			surface.DrawRect(-ScrW(),-ScrH(),ScrW()*2,ScrH()*2)
 		end)
 	end
-	
+
 	-- Receivers 
 	net.Receive( "nzPowerUps.Sync", ReceivePowerupSync )
 	net.Receive( "nzPowerUps.SyncPlayer", ReceivePowerupPlayerSync )
