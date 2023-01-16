@@ -42,3 +42,5 @@ game.AddParticles("particles/blackops3zombies_fx.pcf")
 	PrecacheParticleSystem("bo3_thrasher_blood")
 	
 	PrecacheParticleSystem("bo3_zombie_spawn")
+	game.AddParticles("particles/sentinel_laser.pcf")
+	PrecacheParticleSystem("sentinel_laser")
