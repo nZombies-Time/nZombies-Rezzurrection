@@ -328,7 +328,13 @@ surface.CreateFont( "nz.ammo2.bo1", {
 	weight =  50,
 	antialias = true,
 } )
-
+surface.CreateFont( "nz.rounds.bo1", {
+	font = "Black Rose", //Avenir Next
+	extended = true,
+	size = 400,
+	weight = 30,
+	antialias = true,
+} )
 --Black Rose
 surface.CreateFont( "nz.main.rose", {
 	font ="Black Rose",

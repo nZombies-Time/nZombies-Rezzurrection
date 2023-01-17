@@ -6,7 +6,7 @@ ENT.PrintName = "nz_spawn_zombie_extra3"
 ENT.NZOnlyVisibleInCreative = true
 
 function ENT:Initialize()
-	self:SetModel( "models/nz_zombie/zombie_rerig_animated.mdl" )
+	self:SetModel( "models/player/odessa.mdl" )
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetCollisionGroup( COLLISION_GROUP_WEAPON )

@@ -187,7 +187,7 @@ function ENT:Use(activator, caller)
 					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
 						self:EmitSound("nz/machines/jingle/IW/"..id.."_get.wav", 75, math.random(97, 103))
 					else
-						self:EmitSound("nz_moo/perkacolas/"..id.."_sting.mp3", 75, math.random(97, 103))
+						self:EmitSound("nz/machines/jingle/"..id.."_get.ogg", 75, math.random(97, 103))
 					end
 
 					return true

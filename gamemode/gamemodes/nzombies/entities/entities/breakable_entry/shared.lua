@@ -12,7 +12,6 @@ ENT.Instructions	= ""
 -- models/props_interiors/elevatorshaft_door01a.mdl
 -- models/props_debris/wood_board02a.mdl
 function ENT:Initialize()
-
 	self:SetModel("models/nzr/barricade/barricade.mdl")
 	self:SetMoveType( MOVETYPE_NONE )
 	self:SetSolid( SOLID_VPHYSICS )
@@ -81,7 +80,7 @@ function ENT:RemovePlank()
 end
 
 function ENT:ResetPlanks(nosoundoverride)
-	self:SetBodygroup(0,1)
+	--self:SetBodygroup(0,1)
 	for i=1, table.Count(self.Planks) do
 		self:RemovePlank()
 	end
@@ -114,11 +113,13 @@ end
 
 function ENT:SpawnPlank()
 	-- Spawn
+
 	local angs = {-60,-70,60,70}
 	local plank = ents.Create("breakable_entry_plank")
-	local min = self:GetTriggerJumps() and 0 or -45
-	plank:SetPos( self:GetPos()+Vector(0,0, math.random( min, 45 )) )
+	local min = self:GetTriggerJumps() and 10 
+	plank:SetPos( self:GetPos()+Vector(0,0, math.random( 10, 45 )) )
 	plank:SetAngles( Angle(0,self:GetAngles().y, table.Random(angs)) )
+	plank:SetParent(self)
 	plank:Spawn()
 	plank:SetParent(self)
 	plank:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
@@ -154,7 +155,11 @@ if CLIENT then
 			self:SetBodygroup(1,self:GetProp())
 			self:SetBodygroup(0,1)
 		elseif nzRound:InState( ROUND_CREATE ) then
+			if GetConVar("nz_creative_preview"):GetBool() then
+			self:SetBodygroup(0,1)
+			else
 			self:SetBodygroup(0,0)
+			end
 		end
 	end
 else

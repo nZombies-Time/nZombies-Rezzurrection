@@ -696,6 +696,11 @@ nzTools:CreateTool("settings", {
 			presets:AddChoice("Avogadro")
 			presets:AddChoice("Warden")
 			presets:AddChoice("Laby")
+			presets:AddChoice("Ghostlymoo")
+			presets:AddChoice("Meme Demon")
+			presets:AddChoice("Rainbow Bot")
+			presets:AddChoice("FlamingFox")
+			presets:AddChoice("Afton")
 			presets.OnSelect = function(self, index, value)
 				if (value == "Richtofen") then
 					colorChoose:SetColor(Color(0, 255, 255))
@@ -705,6 +710,16 @@ nzTools:CreateTool("settings", {
 					colorChoose:SetColor(Color(255, 255, 255))
 				elseif (value == "Laby") then
 					colorChoose:SetColor(Color(34, 177, 76))
+				elseif (value == "Ghostlymoo") then
+					colorChoose:SetColor(Color(73, 20, 207))
+				elseif (value == "Meme Demon") then
+					colorChoose:SetColor(Color(241, 224, 75))
+				elseif (value == "Rainbow Bot") then
+					colorChoose:SetColor(Color(241, 75, 238))	
+				elseif (value == "FlamingFox") then
+					colorChoose:SetColor(Color(255, 102, 0))	
+				elseif (value == "Afton") then
+					colorChoose:SetColor(Color(182, 231, 35))							
 				elseif (value == "Warden") then
 					colorChoose:SetColor(Color(255, 0, 0))	
 				end
