@@ -46,25 +46,6 @@ hook.Add("GetFallDamage", "nzFallDamage", function(ply, speed)
 	return (speed / 10)
 end)
 
-hook.Add("OnPlayerHitGround", "nzPlayerHitGround", function(ply, inWater, onFloater, speed)
-	if ply:HasPerk("phd") then
-		if speed >= 400 then
-			if IsFirstTimePredicted() then
-				ParticleEffect("nz_perks_phd", ply:GetPos() + Vector(0,0,4), Angle(0,0,0))
-				ply:EmitSound("NZ.PHD.Wubz")
-				ply:EmitSound("NZ.PHD.Impact")
-			end
-			ply:ViewPunch(Angle(10, math.Rand(-5,5), math.Rand(-5,5)))
-
-			if SERVER then
-				local mult = math.min(math.floor(speed/400), 3)
-				util.BlastDamage(ply:GetActiveWeapon(), ply, ply:GetPos(), 150*mult, 2500*mult)
-				util.ScreenShake(ply:GetPos(), 100, 255, 2, 512)
-			end
-		end
-	end
-end)
-
 hook.Add("ScalePlayerDamage", "nzFriendlyFire", function(ply, hitgroup, dmginfo)
 	if IsValid(dmginfo:GetAttacker()) and dmginfo:GetAttacker():IsPlayer() then
 		dmginfo:ScaleDamage(0)
@@ -75,18 +56,6 @@ end)
 hook.Add("PlayerShouldTakeDamage", "nzPlayerIgnoreDamage", function(ply, ent, dmg)
 	if not ply:GetNotDowned() then
 		return false
-	end
-
-	if ent:IsPlayer() then
-		if ent == ply then
-			return !ply:HasPerk("phd") and !ply.SELFIMMUNE
-		else
-			if ent:HasPerk("gum") then
-				return true
-			else
-				return false
-			end
-		end
 	end
 
 	if dmg and ent:IsValidZombie() and ply:HasPerk("whoswho") and (ply:Health() - dmg:GetDamage()) <= 0 then
@@ -172,6 +141,18 @@ hook.Add("PlayerShouldTakeDamage", "nzPlayerIgnoreDamage", function(ply, ent, dm
 		ply:SetAmmo(ply:GetAmmoCount(nade) - 1, nade)
 
 		return false
+	end
+
+	if ent:IsPlayer() then
+		if ent == ply then
+			return !ply:HasPerk("phd") and !ply.SELFIMMUNE
+		else
+			if ent:HasPerk("gum") then
+				return true
+			else
+				return false
+			end
+		end
 	end
 end)
 

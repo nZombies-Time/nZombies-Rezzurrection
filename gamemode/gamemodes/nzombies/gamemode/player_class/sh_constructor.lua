@@ -65,3 +65,22 @@ hook.Add("PlayerSpawn", "SetupHands", function(ply)
 		if IsValid(ply) then ply:SetupHands() end
 	end)
 end)
+
+hook.Add("OnPlayerHitGround", "nzPlayerHitGround", function(ply, inWater, onFloater, speed)
+	if ply:HasPerk("phd") then
+		if speed >= 400 then
+			if IsFirstTimePredicted() then
+				ParticleEffect("nz_perks_phd", ply:GetPos() + Vector(0,0,4), Angle(0,0,0))
+				ply:EmitSound("NZ.PHD.Wubz")
+				ply:EmitSound("NZ.PHD.Impact")
+			end
+			ply:ViewPunch(Angle(10, math.Rand(-5,5), math.Rand(-5,5)))
+
+			if SERVER then
+				local mult = math.min(math.floor(speed/400), 3)
+				util.BlastDamage(ply:GetActiveWeapon(), ply, ply:GetPos(), 150*mult, 2500*mult)
+				util.ScreenShake(ply:GetPos(), 100, 255, 2, 512)
+			end
+		end
+	end
+end)
