@@ -151,15 +151,15 @@ end)
 if CLIENT then
 	function ENT:Draw()
 	self:DrawModel()
-		if nzRound:InState( ROUND_INIT ) then
-			self:SetBodygroup(1,self:GetProp())
-			self:SetBodygroup(0,1)
-		elseif nzRound:InState( ROUND_CREATE ) then
-			if GetConVar("nz_creative_preview"):GetBool() then
-			self:SetBodygroup(0,1)
-			else
+	self:SetBodygroup(1,self:GetProp())
+		if nzRound:InState( ROUND_CREATE ) and not GetConVar("nz_creative_preview"):GetBool() then
+		--if GetConVar("nz_creative_preview"):GetBool() then
+			--self:SetBodygroup(0,1)
+			--else
 			self:SetBodygroup(0,0)
-			end
+			--end
+		else
+				self:SetBodygroup(0,1)
 		end
 	end
 else

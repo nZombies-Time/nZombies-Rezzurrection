@@ -19,7 +19,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
-	local speed = self:GetBuyer():HasPerk("time")
+	local speed = self:GetBuyer():HasUpgrade("speed")
 
 	self:SetMoveType(MOVETYPE_NOCLIP)
 	self:SetLocalVelocity(self:GetAngles():Up() * (speed and 17 or 5))

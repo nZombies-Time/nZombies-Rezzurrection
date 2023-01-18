@@ -136,7 +136,7 @@ SWEP.SpeedColaActivities = {
 
 SWEP.EventTable = {
 [ACT_VM_DRAW] = {
-{ ["time"] = 0, ["type"] = "lua", value = function(self) if self:GetOwner():HasPerk("time") then self.SequenceRateOverride[ACT_VM_DRAW] = 45 / 30 end end, client = true, server = true},
+{ ["time"] = 0, ["type"] = "lua", value = function(self) if self:GetOwner():HasUpgrade("speed") then self.SequenceRateOverride[ACT_VM_DRAW] = 45 / 30 end end, client = true, server = true},
 { ["time"] = 10 / 30, ["type"] = "sound", ["value"] = Sound("NZ.Hands.Knuckle0") },
 { ["time"] = 40 / 30, ["type"] = "sound", ["value"] = Sound("NZ.Hands.Knuckle1") },
 },

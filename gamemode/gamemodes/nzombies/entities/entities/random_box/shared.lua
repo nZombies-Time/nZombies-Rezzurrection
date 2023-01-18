@@ -157,7 +157,7 @@ function ENT:SpawnWeapon(activator, class)
 
 	wep.Box = self
 
-	if activator:HasPerk("time") then
+	if activator:HasUpgrade("speed") then
 		self:EmitSound("nz_moo/effects/box_jingle_timeslip.mp3")
 	else
 		nzSounds:PlayEnt("Jingle", self)

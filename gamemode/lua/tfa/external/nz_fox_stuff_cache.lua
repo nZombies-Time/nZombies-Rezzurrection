@@ -251,7 +251,7 @@ if nzombies then
 		hook.Add("OnPlayerPickupPowerUp", "nztemporalgift", function(ply, id, ent)
 			local fuck = false
 			for k, v in pairs(player.GetAll()) do
-				if v:HasUpgrade("time") then
+				if v:HasUpgrade("speed") then
 					fuck = true	
 				break end
 			end
