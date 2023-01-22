@@ -841,6 +841,7 @@ function ENT:OnLeaveGround( ent )
 	self:SetJumping( true )
 end
 
+
 function ENT:OnNavAreaChanged(old, new)
 	if bit.band(new:GetAttributes(), NAV_MESH_JUMP) != 0 then
 		--dont make jumps in the wrong direction
@@ -2143,7 +2144,7 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 
 function ENT:GetIgnoredTargets()
