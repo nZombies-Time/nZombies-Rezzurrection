@@ -1701,8 +1701,12 @@ function ENT:RemoveTarget()
 end
 
 function ENT:IsValidTarget( ent )
-	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE
+	if not ent then return false end
+	if  not self:GetClass() == "nz_zombie_boss_brutus" then
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+	else
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE
+	end
 end
 
 function ENT:GetIgnoredTargets()
