@@ -301,7 +301,7 @@ end
 function ENT:OnInjured( dmgInfo )
 			if dmginfo:IsDamageType( 2097152 )  then
 				dmginfo:ScaleDamage( 3 )
-			return
+			end
 			
 			if  self:Health() < (baseHealth / 3) and self:GetRunSpeed() > 60  then
 			self:SetInvulnerable(true)
