@@ -445,13 +445,15 @@ nzMapping:AddSaveModule("ElecSpawns", {
 			table.insert(elec_spawn, {
 			pos = v:GetPos(),
 			angle = v:GetAngles( ),
+			limited - v:GetLimited(),
+			aoe = v:GetAOE(),
 			})
 		end
 		return elec_spawn
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:Electric(v.pos, v.angle)
+			nzMapping:Electric(v.pos, v.angle, v.limited, v.aoe)
 		end
 	end,
 	cleanents = {"power_box", "button_elec"}, -- Cleans two entity types

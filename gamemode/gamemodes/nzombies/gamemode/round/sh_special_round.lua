@@ -393,10 +393,25 @@ nzRound:AddHUDType("Castle", "nz_zombie_walker", {
 }) 
 nzRound:AddHUDType("Sus", "nz_zombie_walker", {
 }) 
+nzRound:AddHUDType("Chemical Spill", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("666", "nz_zombie_walker", {
+}) 
+nzRound:AddHUDType("Fallout", "nz_zombie_walker", {
+}) 
 
 function nzRound:GetHUDType(id)
 	if id == "Black Ops 3" then
 	return "b03_hud.png"
+	end
+	if id == "Chemical Spill" then
+	return "hazard.png"
+	end
+	if id == "666" then
+	return "chained.png"
+	end
+	if id == "Fallout" then
+	return "fallout.png"
 	end
 	if id == "Cold War" then
 	return "cw_hud.png"
@@ -771,6 +786,25 @@ nzRound:AddSpecialRoundType("Nova Crawlers", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Radroaches", {
+	specialTypes = {
+		["nz_zombie_special_roach"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 30
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
 nzRound:AddSpecialRoundType("Nova Bombers", {
 	specialTypes = {
 		["nz_zombie_special_nova_bomber"] = {chance = 100}
@@ -782,7 +816,7 @@ nzRound:AddSpecialRoundType("Nova Bombers", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-	local hp = 40
+	local hp = 65
 	for i=1,nzRound:GetNumber() do 
 	hp = hp* 1.1
 								end 
@@ -801,7 +835,7 @@ nzRound:AddSpecialRoundType("Jolting Jacks", {
 	if round == -1 then
 		dog:SetHealth(math.random(120, 1200))
 	else
-	local hp = 40
+	local hp = 50
 	for i=1,nzRound:GetNumber() do 
 	hp = hp* 1.1
 								end 
@@ -1114,6 +1148,13 @@ function nzRound:AddAdditionalZombieType(id, class)
 	end
 end
 
+
+nzRound:AddAdditionalZombieType("Radroaches", "nz_zombie_walker_roach", {
+}) 
+nzRound:AddAdditionalZombieType("Hitler", "nz_zombie_walker_hillturr", {
+}) 
+nzRound:AddAdditionalZombieType("Pickpocket Gecko", "nz_zombie_walker_gex", {
+}) 
 nzRound:AddAdditionalZombieType("Nazi Zombies", "nz_zombie_walker_classic", {
 }) 
 nzRound:AddAdditionalZombieType("Nazi Zombies (Chronicles)", "nz_zombie_walker", {
@@ -1276,9 +1317,19 @@ nzRound:AddAdditionalZombieType("Thrasher", "nz_zombie_boss_thrasher", {
 })    
 nzRound:AddAdditionalZombieType("Avogadro", "nz_zombie_boss_avogadro", {
 })  
+
 function nzRound:GetSpecialType(id)
 	if id == "Panzer (Der Eisendrache)" then
 	return "nz_zombie_boss_panzer_bo3"
+	end
+	if id == "Radroaches" then
+	return "nz_zombie_boss_roach"
+	end
+	if id == "Hitler" then
+	return "nz_zombie_boss_hillturr"
+	end
+	if id == "Pickpocket Gecko" then
+	return "nz_zombie_boss_gex"
 	end
 	if id == "Fuel Junkie" then
 	return "nz_zombie_boss_spicy"

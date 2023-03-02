@@ -66,27 +66,6 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_quad/amb/amb_12.mp3"),
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 75,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[3] = {
-		act = ACT_SPRINT,
-		minspeed = 145,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-}
-
 ENT.IdleSequence = "nz_idle_v1"
 
 ENT.SequenceTables = {
@@ -97,26 +76,32 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 35, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
 			MovementSequence = {
 				"nz_crawl_run_v1",
 				"nz_crawl_run_v2",
 				"nz_crawl_run_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 95, Sequences = {
+	{Threshold = 71, Sequences = {
 		{
 			MovementSequence = {
-				--"nz_crawl_sprint_v1", -- This anim looks poo poo most the time.
+				"nz_crawl_sprint_v1", -- This anim looks poo poo most the time. 1/24/23: Ok maybe not anymore since 1:1 speed exists now.
 				"nz_crawl_sprint_v2",
 				"nz_crawl_sprint_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}

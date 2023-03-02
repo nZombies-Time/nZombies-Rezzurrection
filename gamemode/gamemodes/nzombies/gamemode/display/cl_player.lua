@@ -38,6 +38,14 @@ function player:GetHUDPointsType(id)
 	 return "buried_score1.png"
 	end
 	
+	if id == "Chemical Spill" then
+	 return "bo1s.png"
+	end
+	
+	if id == "666" then
+	 return "chained_small.png"
+	end
+	
 	if id == "Infinite Warfare" then
 	 return "iw_hud_score.png"
 	end
@@ -70,6 +78,9 @@ function player:GetHUDPointsType(id)
 	end
 	if id == "Covenant" then
 	return "covenant_score1.png"
+	end
+	if id == "Fallout" then
+	return "fallout_small.png"
 	end
 	if id == "UNSC" then
 	return "unsc_score1.png"

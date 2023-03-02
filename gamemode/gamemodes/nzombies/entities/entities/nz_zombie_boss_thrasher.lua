@@ -79,15 +79,6 @@ ENT.DeathSounds = {
 	"enemies/bosses/thrasher/vox/death_03.ogg",
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	}
-}
-
 ENT.IdleSequence = "nz_idle"
 
 ENT.SequenceTables = {
@@ -98,6 +89,8 @@ ENT.SequenceTables = {
 				"nz_walk_v1",
 				"nz_walk_v2",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
@@ -108,6 +101,8 @@ ENT.SequenceTables = {
 				"nz_run_v1",
 				"nz_run_v2",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}
@@ -115,6 +110,12 @@ ENT.SequenceTables = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+
 		enraged = false
 		self.NextAction = 0
 		self.NextTeleporTime = 0
@@ -343,12 +344,8 @@ function ENT:Attack( data )
 	
 	data.attackseq = data.attackseq
 	if !data.attackseq then
-		local curstage = self:GetActStage()
-		local actstage = self.ActStages[curstage]
-		if !self:GetCrawler() and !actstage and curstage <= 0 then actstage = self.ActStages[1] end
-		--if self:GetCrawler() then self.CrawlAttackSequences end
 		
-		local attacktbl = actstage and actstage.attackanims or self.AttackSequences
+		local attacktbl = self.AttackSequences
 		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
 		
 		if type(target) == "table" then

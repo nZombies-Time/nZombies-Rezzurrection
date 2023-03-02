@@ -16,24 +16,24 @@ end
 
 function ENT:Draw() -- The only odious code here.
 	self:DrawModel()
-	local dlight = DynamicLight( self:EntIndex() )
-	if ( dlight ) then
+	local elight = DynamicLight( self:EntIndex() )
+	if ( elight ) then
 		local bone = self:LookupBone("j_spinelower")
 		local pos, ang = self:GetBonePosition(bone)
 		pos = pos 
-		dlight.pos = pos
-		dlight.r = 0
-		dlight.g = 255
-		dlight.b = 255
-		dlight.brightness = 11
-		dlight.Decay = 1000
-		dlight.Size = 28
-		dlight.DieTime = CurTime() + 1
-		dlight.dir = ang:Right() + ang:Forward()
-		dlight.innerangle = 1
-		dlight.outerangle = 1
-		dlight.style = 0
-		dlight.noworld = false
+		elight.pos = pos
+		elight.r = 0
+		elight.g = 255
+		elight.b = 255
+		elight.brightness = 11
+		elight.Decay = 1000
+		elight.Size = 28
+		elight.DieTime = CurTime() + 1
+		elight.dir = ang:Right() + ang:Forward()
+		elight.innerangle = 1
+		elight.outerangle = 1
+		elight.style = 0
+		elight.noworld = false
 	end
 end
 
@@ -91,27 +91,6 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_quad/amb/amb_12.mp3"),
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 75,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[3] = {
-		act = ACT_SPRINT,
-		minspeed = 145,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-}
-
 ENT.IdleSequence = "nz_idle_v1"
 
 ENT.SequenceTables = {
@@ -122,26 +101,32 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 35, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
 			MovementSequence = {
 				"nz_crawl_run_v1",
 				"nz_crawl_run_v2",
 				"nz_crawl_run_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 95, Sequences = {
+	{Threshold = 71, Sequences = {
 		{
 			MovementSequence = {
-				--"nz_crawl_sprint_v1", -- This anim looks poo poo most the time.
+				"nz_crawl_sprint_v1",
 				"nz_crawl_sprint_v2",
 				"nz_crawl_sprint_v3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}

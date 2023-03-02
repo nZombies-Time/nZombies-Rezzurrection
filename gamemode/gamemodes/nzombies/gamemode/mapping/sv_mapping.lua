@@ -1,4 +1,4 @@
---
+	--
 
 function nzMapping:ZedSpawn(pos, link,animskip,barricade, ply)
 
@@ -311,16 +311,18 @@ function nzMapping:PropBuy(pos, ang, model, flags, ply)
 	return prop
 end
 
-function nzMapping:Electric(pos, ang, model, ply)
-	--THERE CAN ONLY BE ONE TRUE HERO
-	local prevs = ents.FindByClass("power_box")
-	if prevs[1] != nil then
-		prevs[1]:Remove()
-	end
+function nzMapping:Electric(pos, ang,limited,aoe, ply)
+	--THERE CAN ONLY BE ONE TRUE HERO, actually thats cap this is my zombie acadummya
+	--local prevs = ents.FindByClass("power_box")
+	--if prevs[1] != nil then
+	--	prevs[1]:Remove()
+	--end
 
 	local ent = ents.Create( "power_box" )
 	ent:SetPos( pos )
 	ent:SetAngles( ang )
+	ent:SetLimited(limited)
+	ent:SetAOE(aoe or 1000)
 	ent:Spawn()
 	ent:PhysicsInit( SOLID_VPHYSICS )
 

@@ -224,6 +224,52 @@ nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
 	end,
 })
 
+nzRound:AddBossType("Hitler", "nz_zombie_boss_hillturr", {
+	specialspawn = true,
+	health = 1500,
+	scale = 800,
+	dmgmul = 0.1,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(8,9)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+})
+
+nzRound:AddBossType("Pickpocket Gecko", "nz_zombie_boss_gex", {
+	specialspawn = true,
+	health = 700,
+	scale = 1000,
+	dmgmul = 0.1,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(14,16)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+})
+
 nzRound:AddBossType("Panzermorder", "nz_zombie_boss_panzermorder", {
 	specialspawn = true,
 	health = 3500,

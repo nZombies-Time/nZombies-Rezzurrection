@@ -49,15 +49,6 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_astro/amb_vox/amb_03.mp3"),
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	}
-}
-
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
@@ -70,6 +61,8 @@ ENT.SequenceTables = {
 				"nz_blackhole_2",
 				"nz_blackhole_3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
@@ -83,6 +76,8 @@ ENT.SequenceTables = {
 				"nz_blackhole_2",
 				"nz_blackhole_3",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}
@@ -99,9 +94,13 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 		self:SetRunSpeed(35)
-		self:SetHealth(10000)
-		self:SetMaxHealth(100000)
+
 		grabbing = false
 		gobyebye = false
 		trexarms = 0
@@ -123,7 +122,6 @@ end
 function ENT:PerformDeath(dmgInfo)
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 	self:StopSound("nz_moo/zombies/vox/_astro/breath.wav")
-	nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
 	self:Explode(0)
 	self:Remove(dmgInfo)
 end
@@ -317,8 +315,8 @@ if SERVER then
 								trexarms = trexarms + 1
 								--print(trexarms)
 								if trexarms >= 3 and not malding then -- If you somehow manage to make him mald unintentionally... You're bad at video games.
-									--print("Look what you've done Yoshi... You've angered the Scuba Diver.")
-									print("F L I N T L O C K W O O D ! ! !")
+									print("Look what you've done Yoshi... You've angered the Scuba Diver.")
+									--print("F L I N T L O C K W O O D ! ! !")
 									self:SetRunSpeed(70)
 									self:SpeedChanged()
 									malding = true
@@ -380,12 +378,8 @@ function ENT:Attack( data )
 	
 	data.attackseq = data.attackseq
 	if !data.attackseq then
-		local curstage = self:GetActStage()
-		local actstage = self.ActStages[curstage]
-		if !self:GetCrawler() and !actstage and curstage <= 0 then actstage = self.ActStages[1] end
-		--if self:GetCrawler() then self.CrawlAttackSequences end
 		
-		local attacktbl = actstage and actstage.attackanims or self.AttackSequences
+		local attacktbl = self.AttackSequences
 		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
 		
 		if type(target) == "table" then
