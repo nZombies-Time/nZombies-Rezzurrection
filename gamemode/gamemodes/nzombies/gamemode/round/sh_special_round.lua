@@ -1149,11 +1149,11 @@ function nzRound:AddAdditionalZombieType(id, class)
 end
 
 
-nzRound:AddAdditionalZombieType("Radroaches", "nz_zombie_walker_roach", {
+nzRound:AddAdditionalZombieType("Radroaches", "nz_zombie_special_roach", {
 }) 
-nzRound:AddAdditionalZombieType("Hitler", "nz_zombie_walker_hillturr", {
+nzRound:AddAdditionalZombieType("Hitler", "nz_zombie_boss_hillturr", {
 }) 
-nzRound:AddAdditionalZombieType("Pickpocket Gecko", "nz_zombie_walker_gex", {
+nzRound:AddAdditionalZombieType("Pickpocket Gecko", "nz_zombie_boss_gex", {
 }) 
 nzRound:AddAdditionalZombieType("Nazi Zombies", "nz_zombie_walker_classic", {
 }) 
@@ -1323,7 +1323,7 @@ function nzRound:GetSpecialType(id)
 	return "nz_zombie_boss_panzer_bo3"
 	end
 	if id == "Radroaches" then
-	return "nz_zombie_boss_roach"
+	return "nz_zombie_special_roach"
 	end
 	if id == "Hitler" then
 	return "nz_zombie_boss_hillturr"
