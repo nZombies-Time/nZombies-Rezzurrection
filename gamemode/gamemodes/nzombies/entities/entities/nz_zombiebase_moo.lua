@@ -753,11 +753,11 @@ function ENT:OnBarricadeBlocking( barricade, dir ) -- Moo Mark, I'd like to say 
 
 				timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
 					if IsValid(self) and self:Alive() then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
-						if barricade:GetBoardType() == 2 then
-							barricade:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav", 90, math.random(90, 110))
-						else
+						--if barricade:GetBoardType() == 2 then
+							--barricade:EmitSound("physics/metal/metal_box_break"..math.random(1,2)..".wav", 90, math.random(90, 110))
+						--else
 							barricade:EmitSound("nz_moo/barricade/snap/board_snap_zhd_0" .. math.random(1, 6) .. ".mp3", 100, math.random(90, 130))
-						end
+						--end
 						barricade:RemovePlank()
 					end
 				end)

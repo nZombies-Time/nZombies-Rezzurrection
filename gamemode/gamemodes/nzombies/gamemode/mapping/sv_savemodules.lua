@@ -445,7 +445,7 @@ nzMapping:AddSaveModule("ElecSpawns", {
 			table.insert(elec_spawn, {
 			pos = v:GetPos(),
 			angle = v:GetAngles( ),
-			limited - v:GetLimited(),
+			limited = v:GetLimited(),
 			aoe = v:GetAOE(),
 			})
 		end
