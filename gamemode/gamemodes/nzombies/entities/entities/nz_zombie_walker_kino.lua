@@ -204,8 +204,8 @@ ENT.SequenceTables = {
 				"nz_walk_ad24",
 				"nz_walk_ad25",
 				"nz_walk_au_goose",
-				"nz_legacy_walk_dazed",
-				"nz_legacy_walk_v9",
+				--"nz_legacy_walk_dazed",
+				--"nz_legacy_walk_v9",
 			},
 			LowgMovementSequence = {
 				"nz_walk_lowg_v1",
@@ -224,6 +224,13 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -266,6 +273,13 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
 			PassiveSounds = {walksounds},
 		}
 	}},
@@ -310,7 +324,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
+			PassiveSounds = {walksounds},
 		},
 		{
 			SpawnSequence = {spawnrun},
@@ -351,7 +372,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
+			PassiveSounds = {walksounds},
 		}
 	}},
 	{Threshold = 71, Sequences = {
@@ -389,7 +417,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
+			PassiveSounds = {walksounds},
 		},
 		{
 			SpawnSequence = {spawnfast},
@@ -424,7 +459,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
-			PassiveSounds = {runsounds},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
+			PassiveSounds = {walksounds},
 		}
 	}},
 	{Threshold = 155, Sequences = {
@@ -459,6 +501,13 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
 			PassiveSounds = {walksounds},
 		},
 		{
@@ -490,6 +539,13 @@ ENT.SequenceTables = {
 				"nz_crawl_v1",
 				"nz_crawl_v2",
 			},
+			AttackSequences = {WalkAttackSequences},
+			StandAttackSequences = {AttackSequences},
+			CrawlAttackSequences = {CrawlAttackSequences},
+
+			JumpSequences = {JumpSequences},
+			CrawlJumpSequences = {CrawlJumpSequences},
+
 			PassiveSounds = {walksounds},
 		}
 	}}
