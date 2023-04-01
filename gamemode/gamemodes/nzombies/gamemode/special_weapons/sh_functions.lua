@@ -528,9 +528,15 @@ function GM:PlayerSwitchWeapon(ply, oldwep, newwep)
 				local ammo = GetNZAmmoID(newwep:GetSpecialCategory())
 				if !ammo or ply:GetAmmoCount(ammo) >= 1 then
 				
-					if not newwep.NoInstantHolster then
+					       if not newwep.NoInstantDraw then
                         local holster = oldwep.Holster
-                        oldwep.Holster = function() return true end -- Allow instant holstering
+                        oldwep.Holster = function()
+                            if oldwep.IsTFAWeapon then
+                                oldwep:SetStatus(TFA.Enum.STATUS_HOLSTER_FINAL)
+                            end
+                            holster(oldwep)
+                            return true 
+                        end -- Allow instant holstering
                         timer.Simple(0, function() oldwep.Holster = holster end)
                     end
 					
