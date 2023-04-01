@@ -156,13 +156,16 @@ function MenuToolBar:Init()
 				self:SetText( "READY" )
 			end
 			self.DoClick = function()
-				if LocalPlayer():IsReady() then
-					RunConsoleCommand( "nz_chatcommand", "/unready" )
-				else
-					RunConsoleCommand( "nz_chatcommand", "/ready" )
-					RunConsoleCommand( "nz_settings" )
-				end
-			end
+                if LocalPlayer():IsReady() then
+                    RunConsoleCommand( "nz_chatcommand", "/unready" )
+                else
+                    if nzRound:InState( ROUND_CREATE ) then
+                        RunConsoleCommand( "nz_chatcommand", "/create" )
+                    end
+                    RunConsoleCommand( "nz_chatcommand", "/ready" )
+                    RunConsoleCommand( "nz_settings" )
+                end
+            end
 		end
 	end
 

@@ -234,10 +234,3 @@ SWEP.Offset = {
         },
 		Scale = 1.0
 }
-
-
-
-SWEP.ViewModelBoneMods = {
-	["ValveBiped.Bip01_R_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(-2, 0, 0), angle = Angle(0, 0, 0) },
-	["ValveBiped.Bip01_L_Forearm"] = { scale = Vector(1, 1, 1), pos = Vector(2, 0, 0), angle = Angle(0, 0, 0) }
-}

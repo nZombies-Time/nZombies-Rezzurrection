@@ -3,13 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Astronaut(Assdonut) or THE CYCLOPS"
 ENT.Category = "Brainz"
-ENT.Author = "Laby and Moo"
-
---[[
-	TODO:
-	Slow the player when grabbed.("We did it.")
-	Blast the player back on death.
-]]
+ENT.Author = "Laby and GhostlyMoo"
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -19,6 +13,8 @@ ENT.RedEyes = false
 ENT.IsMooSpecial = true
 
 ENT.AttackRange = 72
+
+ENT.TraversalCheckRange = 40
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/moon/moo_codz_t7_moon_assdonut.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -97,8 +93,13 @@ function ENT:StatsInitialize()
 		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		if nzRound:InState( ROUND_CREATE ) then
+			self:SetHealth(500)
+			self:SetMaxHealth(500)
+		else
+			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		end
 		self:SetRunSpeed(35)
 
 		grabbing = false
@@ -134,87 +135,6 @@ function ENT:IsValidTarget( ent )
 	if !ent then return false end
 	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
-end
-
-function ENT:OnBarricadeBlocking( barricade, dir ) -- Moo Mark, I'd like to say that this function while it gets the job done is disgusting to look at and is overall odious.
-	if not self:GetSpecialAnimation() then
-		if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-			if barricade:GetNumPlanks() > 0 then
-
-				self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-				local seq, dur
-
-				local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
-				local crawlattacktbl = self.ActStages[6] and self.ActStages[6].attackanims or self.CrawlAttackSequences
-				local taunttbl = self.TauntSequences
-				local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-				local crawltarget = type(crawlattacktbl) == "table" and crawlattacktbl[math.random(#crawlattacktbl)] or crawlattacktbl
-
-				local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
-				local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
-				local taunt = type(taunttbl) == "table" and taunttbl[math.random(#taunttbl)] or taunttbl
-		
-
-				if self:GetCrawler() then
-					if type(crawltarget) == "table" then
-						seq, dur = self:LookupSequenceAct(crawltarget.seq)
-					elseif crawltarget then -- It is a string or ACT
-						seq, dur = self:LookupSequenceAct(crawltarget)
-					else
-						seq, dur = self:LookupSequence("swing")
-					end
-				else
-					if type(teartarget) == "table" then
-						seq, dur = self:LookupSequenceAct(teartarget.seq)
-					elseif target then -- It is a string or ACT
-						seq, dur = self:LookupSequenceAct(teartarget)
-					else
-						seq, dur = self:LookupSequence("swing")
-					end
-				end
-
-				self:SetAttacking(true)
-
-				timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
-					if IsValid(self) and self:Alive() then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
-						barricade:EmitSound("nz_moo/barricade/snap/board_snap_zhd_0" .. math.random(1, 6) .. ".mp3", 100, math.random(90, 130))
-						barricade:RemovePlank()
-					end
-				end)
-
-				self:PlaySequenceAndWait(seq, 1)
-
-				self:SetLastAttack(CurTime())
-				
-				self:SetAttacking(false)
-				if coroutine.running() then
-					coroutine.wait(2 - dur)
-				end
-
-				-- this will cause zombies to attack the barricade until it's destroyed
-				local stillBlocked, dir = self:CheckForBarricade()
-				if stillBlocked then
-					self:OnBarricadeBlocking(stillBlocked, dir)
-					return
-				end
-
-				-- Attacking a new barricade resets the counter
-				self.BarricadeJumpTries = 0
-			elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-				local dist = barricade:GetPos():DistToSqr(self:GetPos())
-				if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
-					self:TriggerBarricadeJump(barricade, dir)
-					self.BarricadeJumpTries = 0
-				else
-					-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
-					self.BarricadeJumpTries = self.BarricadeJumpTries + 1
-					-- Otherwise they'd get continuously stuck on slightly bigger props :( <--- Fuck your sad face, Love Moo.
-				end
-			else
-				self:SetAttacking(false)
-			end
-		end
-	end
 end
 
 function ENT:OnThink()
@@ -368,6 +288,134 @@ function ENT:Explode(dmg, suicide)
 	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
     if suicide then self:TakeDamage(self:Health() + 666, self, self) end
 end
+
+function ENT:OnBarricadeBlocking( barricade, dir )
+		if not self:GetSpecialAnimation() then
+			if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
+				
+				if barricade:GetNumPlanks() > 0 then
+					local warppos = barricade:GetPos() + dir * 50
+					local currentpos
+					local currentb = barricade
+					if !self:GetIsBusy() then -- When the zombie initially comes in contact with the barricade.
+						self:MoveToPos(warppos, { lookahead = 20, tolerance = 20, draw = false, maxage = 3, repath = 3, })
+
+						self:TimeOut(0.5) -- An intentional and W@W authentic stall.
+						self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
+					end
+					
+					self:SetIsBusy(true)
+					currentpos = self:GetPos()
+					if currentpos ~= warppos then
+						self:SetPos(Vector(warppos.x,warppos.y,currentpos.z))
+					end
+					self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
+
+					if IsValid(barricade.ZombieUsing) then -- Moo Mark 3/15/23: Trying out something where only one zombie can actively attack a barricade at a time.
+						--local no, fuckoff = self:CheckForBarricade()
+						self:TimeOut(1)
+						if barricade then
+							self:OnBarricadeBlocking(barricade, dir)
+							return
+						end
+					else
+						local seq, dur
+
+						local attacktbl = self.AttackSequences
+						if self:GetCrawler() then
+							attacktbl = self.CrawlAttackSequences
+						end
+
+						local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
+						local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
+						local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
+					
+						if not self.IsMooSpecial and not self:GetCrawler() then -- Don't let special zombies use the tear anims.
+							if type(teartarget) == "table" then
+								seq, dur = self:LookupSequenceAct(teartarget.seq)
+							elseif teartarget then -- It is a string or ACT
+								seq, dur = self:LookupSequenceAct(teartarget)
+							else
+								seq, dur = self:LookupSequence("swing")
+							end
+						else
+							if type(target) == "table" then
+								seq, dur = self:LookupSequenceAct(target.seq)
+							elseif target then -- It is a string or ACT
+								seq, dur = self:LookupSequenceAct(target)
+							else
+								seq, dur = self:LookupSequence("swing")
+							end
+						end
+
+						local planktopull = barricade:BeginPlankPull(self)
+						local planknumber -- fucking piece of shit
+						if planktopull then
+							planknumber = planktopull:GetFlags()
+						end
+
+						if !IsValid(barricade.ZombieUsing) then
+							barricade:HasZombie(self) -- Blocks any other zombie from attacking the barricade.
+						end
+
+						if self.AttackSounds then self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) end
+						if self.IsMooSpecial then
+							if planknumber ~= nil then
+								if !self:GetCrawler() then
+									self:PlaySequenceAndWait("nz_boardtear_aligned_m_"..planknumber.."_grab")
+									if IsValid(self) and self:Alive() then
+										if IsValid(planktopull) then
+											barricade:RemovePlank(planktopull)
+										end
+									end
+									self:PlaySequenceAndWait("nz_boardtear_aligned_m_"..planknumber.."_pull")
+								else
+									self:PlaySequenceAndWait("nz_crawl_boardtear_aligned_m_"..planknumber.."_grab")
+									if IsValid(self) and self:Alive() then
+										if IsValid(planktopull) then
+											barricade:RemovePlank(planktopull)
+										end
+									end
+									self:PlaySequenceAndWait("nz_crawl_boardtear_aligned_m_"..planknumber.."_pull")
+								end
+							end
+						else
+							timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
+								if IsValid(self) and self:Alive() and IsValid(planktopull) then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
+									barricade:RemovePlank(planktopull)
+								end
+							end)
+
+							self:PlaySequenceAndWait(seq)
+						end
+
+						self:SetLastAttack(CurTime())
+						if math.random(100) <= 25 and !self:GetCrawler() and !self.IsMooSpecial then -- The higher the number, the more likely a zombie will taunt.
+							self:SetStuckCounter( 0 ) --This is just to make sure a zombie won't despawn at a barricade.
+							local seq,s = self:SelectTauntSequence()
+							if seq then
+								self:PlaySequenceAndWait(seq)
+							end
+						end
+
+						-- this will cause zombies to attack the barricade until it's destroyed
+						--local fuckyou, asshole = self:CheckForBarricade()
+						if barricade then
+							self:OnBarricadeBlocking(barricade, dir)
+							return
+						end
+					end
+				elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
+					self:TimeOut(0.5)
+					self:TriggerBarricadeJump(barricade, dir)
+				else
+					self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
+					self:CollideWhenPossible()
+					self:SetIsBusy(false)
+				end
+			end
+		end
+	end
 
 -- A standard attack you can use it or create something fancy yourself
 function ENT:Attack( data )

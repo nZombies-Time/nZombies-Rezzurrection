@@ -147,15 +147,20 @@ function nzPowerUps:CleanUp()
 end
 
 function nzPowerUps:Carpenter(nopoints)
-	-- Repair them all
-	for k,v in pairs(ents.FindByClass("breakable_entry")) do
-		if v:IsValid() then
-			for i=1, GetConVar("nz_difficulty_barricade_planks_max"):GetInt() do
-				if i > #v.Planks then -- The barricades actually use the animated function now... So they look extra fancy when a Carpenter is active.
-					v:AddPlank()
-				end
+	-- Repair them all, More nZU code? no way.
+	local pos = pos or Vector()
+	local barricades = ents.FindByClass("breakable_entry")
+	local max = 0
+	for k,v in pairs(barricades) do
+		local t = v:GetPos():Distance(pos)/2000 -- 1 second for every 2,000 units
+		if t > max then
+			max = t
+		end
+		timer.Simple(t, function()
+			if IsValid(v) then
+				v:FullRepair()
 			end
-		end	
+		end)
 	end
 	
 	-- Give the players a set amount of points

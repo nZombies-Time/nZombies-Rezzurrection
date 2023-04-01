@@ -17,6 +17,14 @@ function nzDoors:OpenDoor( ent, ply )
 		ent:UnlockDoor()
 	end
 	
+	-- Merge Nav Groups
+	if ent.navgroup1 and ent.navgroup2 then
+		nzNav.Functions.MergeNavGroups(ent.navgroup1, ent.navgroup2)
+	end
+	if ent.linkedmeshes then
+		nzNav.Functions.OnNavMeshUnlocked(ent.linkedmeshes)
+	end
+	
 	-- Sync
 	if link != nil then
 		self.OpenedLinks[link] = true
@@ -149,7 +157,7 @@ function nzDoors.OnUseDoor( ply, ent )
 	if !ply:GetNotDowned() then return false end
 	
 	-- Players can't use stuff while using special weapons! (Perk bottles, knives, etc)
-	if IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon():IsSpecial() then return false end
+	if IsValid(ply:GetActiveWeapon()) and (ply:GetActiveWeapon():IsSpecial() and !ply:GetActiveWeapon().AllowInteraction) then return false end
 	
 	if ent:IsBuyableEntity() then
 		if ent.buyable == nil or tobool(ent.buyable) then

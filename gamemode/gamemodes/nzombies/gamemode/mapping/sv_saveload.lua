@@ -34,7 +34,11 @@ function nzMapping:SaveConfig(name)
 	end
 
 	-- These are hardcoded and run after any modules, meaning they can't be overwritten
+	nzNav.ResetNavGroupMerges()
 	main["NavTable"] = nzNav.Locks
+	main["NavTableData"] = nzNav.Data
+	main["NavGroups"] = nzNav.NavGroups
+	main["NavGroupIDs"] = nzNav.NavGroupIDs
 	main["MapSettings"] = self.Settings
 	main["RemoveProps"] = self.MarkedProps
 
@@ -102,6 +106,13 @@ function nzMapping:ClearConfig(noclean)
 	nzNav.Locks = {}
 	nzMapping.Settings = {}
 	nzMapping.MarkedProps = {}
+
+	--Reset Navigation table
+	for k,v in pairs(nzNav.Data) do
+		navmesh.GetNavAreaByID(k):SetAttributes(v.prev)
+	end
+	
+	nzNav.Data = {}
 	
 	for k,v in pairs(player.GetAll()) do
 		nzMapping:SendMapData(v)
@@ -124,7 +135,7 @@ end
 function nzMapping:LoadConfig( name, loader )
 
 	hook.Call("PreConfigLoad")
-	
+
 	local filepath = "nz/" .. name
 	local location = "DATA"
 	local official = false
@@ -216,6 +227,29 @@ function nzMapping:LoadConfig( name, loader )
 			nzNav.Locks = data.NavTable
 		end
 		
+		//NavTable saved
+		if data.NavTableData then
+			nzNav.Data = data.NavTableData
+			//Re-enable navmesh visualization
+			if nzNav.Data ~= nil then
+				for k,v in pairs(nzNav.Data) do
+					local navarea = navmesh.GetNavAreaByID(k)
+					if v.link then
+						navarea:SetAttributes(NAV_MESH_STOP)
+					else
+						navarea:SetAttributes(NAV_MESH_AVOID)
+					end
+				end
+			end
+		end
+
+		if data.NavGroups then
+			nzNav.NavGroups = data.NavGroups
+		end
+		if data.NavGroupIDs then
+			nzNav.NavGroupIDs = data.NavGroupIDs
+		end
+
 		for k,v in pairs(player.GetAll()) do
 			nzMapping:SendMapData(v)
 		end
@@ -235,6 +269,9 @@ function nzMapping:LoadConfig( name, loader )
 			end
 		end
 
+		-- Generate all auto navmesh merging so we don't have to save that manually
+		nzNav.Functions.AutoGenerateAutoMergeLinks()
+
 		nzMapping:CheckMismatch( loader )
 
 		-- Set the current config name, we will use this to load scripts via mismatch window
@@ -249,10 +286,10 @@ function nzMapping:LoadConfig( name, loader )
 				end
 			end
 		end
-
+		 InitZombieTypes()
 		print("[nZ] Finished loading map config.")
 		for i, playr in ipairs( player.GetAll() ) do
-		playr:ChatPrint( "Make sure you press submit on map settings to update your config to the newest gamemode version!" )
+			playr:ChatPrint( "Make sure you press submit on map settings to update your config to the newest gamemode version!" )
 		end
 		hook.Call("PostConfigLoad", nil, true)
 	else

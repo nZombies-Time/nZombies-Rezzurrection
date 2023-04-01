@@ -25,7 +25,7 @@ local WalkAttackSequences = {
 	{seq = "Attack2", dmgtimes = {0.35, 0.85}},
 	{seq = "Attack3", dmgtimes = {0.2}},
 	{seq = "Attack4", dmgtimes = {0.5}},
-	{seq = "Attack7", dmgtimes = {0.3, 0.6, 0.9, 1.2}}, --MR. ELECTRIC, KILL THIS NIGGA!
+	{seq = "Attack7", dmgtimes = {0.3, 0.6, 0.9, 1.2}},
 	{seq = "Attack13", dmgtimes = {0.5}}
 }
 local RunAttackSequences = {

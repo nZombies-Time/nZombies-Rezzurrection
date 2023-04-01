@@ -174,6 +174,9 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings.comedy = (data.comedy) or nil
 	end
 
+	if data.navgroupbased then
+		nzMapping.Settings.navgroupbased = (data.navgroupbased) or nil
+	end
 
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns
 	nzMapping.Settings.spawnperround = data.spawnperround == nil and 0 or data.spawnperround

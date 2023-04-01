@@ -4,7 +4,7 @@ function nzItemCarry.OnPlayerPickItemUp( ply, ent )
 	if !ply:GetNotDowned() then return false end
 	
 	-- Players can't pick stuff up while using special weapons! (Perk bottles, knives, etc)
-	if IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon():IsSpecial() then return false end
+	if IsValid(ply:GetActiveWeapon()) and (ply:GetActiveWeapon():IsSpecial() and !ply:GetActiveWeapon().AllowInteraction) then return false end
 	
 	-- Used in map scripting
 	if ent.OnUsed and type(ent.OnUsed) == "function" then

@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
 function ENT:SetupDataTables()
@@ -11,6 +11,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 1, "Alive")
 	self:NetworkVar("Bool", 2, "MooSpecial")
 	self:NetworkVar("Bool", 3, "StinkyGas") -- For both Bombers and Jacks
+	self:NetworkVar("Bool", 4, "WaterBuff")
 end
 
 
@@ -321,17 +322,6 @@ end
 function ENT:OnRemove()
 	if IsValid(self.StinkyGas) then self.StinkyGas:Remove() end
 end
-
-
-
-
-
-
-
-
-
-
-
 
 
 

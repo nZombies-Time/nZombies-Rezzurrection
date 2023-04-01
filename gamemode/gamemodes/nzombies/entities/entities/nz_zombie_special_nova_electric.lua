@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
 function ENT:SetupDataTables()
@@ -11,12 +11,13 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 1, "Alive")
 	self:NetworkVar("Bool", 2, "MooSpecial")
 	self:NetworkVar("Bool", 3, "StinkyGas") -- For both Bombers and Jacks
-	self:NetworkVar("Bool", 4, "PhaseClan") -- Jacks can teleport :)
+	self:NetworkVar("Bool", 4, "PhaseClan") -- Jacks can teleport
+	self:NetworkVar("Bool", 5, "WaterBuff")
 end
 
 function ENT:Draw() -- The only odious code here.
 	self:DrawModel()
-	local elight = DynamicLight( self:EntIndex() )
+	local elight = DynamicLight( self:EntIndex(), true )
 	if ( elight ) then
 		local bone = self:LookupBone("j_spinelower")
 		local pos, ang = self:GetBonePosition(bone)
@@ -343,12 +344,12 @@ function ENT:OnPathTimeOut()
 		self:SetBlockAttack(true)
 		self:SetSpecialAnimation(true)
 		self:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+		self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
 		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end
 
 		self:SetMaterial("invisible")
 		self:TimeOut(0.1) -- Timeout so the Nova can move to the new position.
-		self.loco:SetDesiredSpeed( 1000 )
-		self.loco:SetAcceleration( 9000 ) -- Make them move extremely fast too.
+		self.loco:SetDesiredSpeed( 1000 ) -- Make them move extremely fast too.
 		self:SetTeleporting(true)
 		self:MoveToPos(self:GetPos() + Vector(math.random(-175, 175), math.random(-175, 175), 0), {
 			draw = false,
@@ -357,9 +358,8 @@ function ENT:OnPathTimeOut()
 		}) 				 -- But now imagine how goofy it is when a Nova does go flying... Very :)
 		--print("trolled")
 
-		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		self.loco:SetAcceleration( self.Acceleration ) -- Restore everything after "teleport".
-		self:SetCollisionGroup(COLLISION_GROUP_NPC)
+		self.loco:SetDesiredSpeed( self:GetRunSpeed() ) -- Restore everything after "teleport".
+		self:CollideWhenPossible()
 		self:SetMaterial("")
 		self:SetTeleporting(false)
 		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end

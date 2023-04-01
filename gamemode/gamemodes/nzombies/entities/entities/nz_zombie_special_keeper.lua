@@ -3,15 +3,8 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
-
-function ENT:SetupDataTables()
-	self:NetworkVar("Int", 0, "EmergeSequenceIndex")
-	self:NetworkVar("Bool", 1, "Decapitated")
-	self:NetworkVar("Bool", 2, "Alive")
-	self:NetworkVar("Bool", 3, "MooSpecial")
-end
 
 function ENT:Draw() //Runs every frame
 	self:DrawModel()

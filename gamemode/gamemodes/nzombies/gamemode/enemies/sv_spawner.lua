@@ -13,7 +13,11 @@ if Spawner == nil then
 		-- roundNum: the round this spawner was created (after this round teh spawn will be removed)
 		constructor = function(self, spointClass, data, zombiesToSpawn, spawnDelay, roundNum)
 			self.sSpointClass = spointClass or "nz_spawn_zombie_normal"
+			if comedyday then
+			self.tData = data or {["nz_zombie_walker_anchovy"] = {chance = 100}}
+			else
 			self.tData = data or {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}
+			end
 			self.iZombiesToSpawn = zombiesToSpawn or 5
 			self.tSpawns = ents.FindByClass(self.sSpointClass)
 			self.tValidSpawns = {}
@@ -100,13 +104,27 @@ function Spawner:UpdateValidSpawns()
 
 	local average = self:GetAverageWeight()
 	local total = 0
+	local plys = player.GetAllTargetable()
 	for _, spawn in pairs(self.tSpawns) do
-		-- reset the zombiesToSpawn value on every Spawnpoint
 		spawn:SetZombiesToSpawn(0)
-		if spawn:GetSpawnWeight() <= average then
-			if spawn.link == nil or nzDoors:IsLinkOpened( spawn.link ) then
-				table.insert(self.tValidSpawns, spawn)
-				total = total + spawn:GetSpawnWeight()
+		if spawn.link == nil or nzDoors:IsLinkOpened( spawn.link ) then
+			if nzMapping.Settings.navgroupbased then
+				--print("fuck-a-doodledoo we're using nav groups.")
+				for _, ply in pairs(plys) do
+                    --print("goofy")
+                    if IsValid(ply) and ply:IsInWorld() and nzNav.Functions.IsInSameNavGroup(ply, spawn) then
+                        --print("spawns found.")
+                        if spawn:GetSpawnWeight() <= average then
+                            table.insert(self.tValidSpawns, spawn)
+                            total = total + spawn:GetSpawnWeight()
+                        end
+                    end
+                end
+			else
+				if spawn:GetSpawnWeight() <= average then
+					table.insert(self.tValidSpawns, spawn)
+					total = total + spawn:GetSpawnWeight()
+				end
 			end
 		end
 	end

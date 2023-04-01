@@ -3,14 +3,8 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
-
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-end
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 

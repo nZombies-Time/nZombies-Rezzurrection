@@ -21,15 +21,26 @@ if SERVER then
 	end
 	
 	function nzRound:SetBossType(id)
+	local comedyday = os.date("%d-%m") == "01-04"
 		if id == "None" then
 			self.BossType = nil -- "None" makes a nil key
 		else
+			if comedyday then
+			self.BossType = "Larry the Lobster"
+			else
 			self.BossType = id or "Panzer" -- A nil id defaults to "Panzer", otherwise id
+			end
 		end
 	end
 	
 	function nzRound:GetBossType(id)
+		local comedyday = os.date("%d-%m") == "01-04"
+		if comedyday then
+		self.BossType = "Larry the Lobster"
 		return self.BossType
+		else
+		return self.BossType
+		end
 	end
 	
 	function nzRound:GetBossData(id)
@@ -203,8 +214,8 @@ nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
 
 nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
 	specialspawn = true,
-	health = 1000,
-	scale = 750,
+	health = 850,
+	scale = 600,
 	dmgmul = 0.1,
 	initfunc = function()
 		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
@@ -714,6 +725,29 @@ nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
 	dmgmul = 1,
 	initfunc = function()
 		nzRound:SetNextBossRound(math.random(7,11)) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(500) -- Give killer 500 points if not downed
+		end
+	end,
+}) -- No onhit function, we don't give points on hit for this guy
+
+nzRound:AddBossType("Larry the Lobster", "nz_zombie_boss_larry", {
+	specialspawn = true,
+	health = 3000,
+	scale = 1000,
+	dmgmul = 1,
+	initfunc = function()
+		nzRound:SetNextBossRound(math.random(2,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)

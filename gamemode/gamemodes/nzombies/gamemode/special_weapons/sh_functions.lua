@@ -528,9 +528,11 @@ function GM:PlayerSwitchWeapon(ply, oldwep, newwep)
 				local ammo = GetNZAmmoID(newwep:GetSpecialCategory())
 				if !ammo or ply:GetAmmoCount(ammo) >= 1 then
 				
-					local holster = oldwep.Holster
-					oldwep.Holster = function() return true end -- Allow instant holstering
-					timer.Simple(0, function() oldwep.Holster = holster end)
+					if not newwep.NoInstantHolster then
+                        local holster = oldwep.Holster
+                        oldwep.Holster = function() return true end -- Allow instant holstering
+                        timer.Simple(0, function() oldwep.Holster = holster end)
+                    end
 					
 					ply:SetUsingSpecialWeapon(true)
 					return false -- We allow it when it's either not using ammo or we have enough

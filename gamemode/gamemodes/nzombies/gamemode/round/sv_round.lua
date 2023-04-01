@@ -217,7 +217,12 @@ function nzRound:Prepare( time )
 
 	-- else just do regular walker spawning
 	else
+		local comedyday = os.date("%d-%m") == "01-04"
+		if comedyday then
+		local normalSpawner = Spawner("nz_spawn_zombie_normal", {["nz_zombie_walker_anchovy"] = {chance = 100}}, self:GetZombiesMax())
+		else
 		local normalSpawner = Spawner("nz_spawn_zombie_normal", {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}, self:GetZombiesMax())
+		end
 		-- after round 20 spawn some hellhounds aswell (half of the round number 21: 10, 22: 11, 23: 11, 24: 12 ...)
 		
 		if nzMapping.Settings.newwave1 then

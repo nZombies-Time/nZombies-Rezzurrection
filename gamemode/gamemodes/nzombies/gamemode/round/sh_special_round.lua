@@ -401,6 +401,10 @@ nzRound:AddHUDType("Fallout", "nz_zombie_walker", {
 }) 
 
 function nzRound:GetHUDType(id)
+	local comedyday = os.date("%d-%m") == "01-04"
+	if comedyday then
+	return "sponge.png"
+	else
 	if id == "Black Ops 3" then
 	return "b03_hud.png"
 	end
@@ -500,6 +504,7 @@ function nzRound:GetHUDType(id)
 	if id == nil then
 	return "origins_hud.png"
 	end
+	end
 end
 
 
@@ -572,6 +577,8 @@ nzRound:AddZombieType("Nuketown", "nz_zombie_walker_nuketown", {
 }) 
 nzRound:AddZombieType("Zombies in Spaceland", "nz_zombie_walker_clown", {
 }) 
+nzRound:AddZombieType("ANCHOVIES", "nz_zombie_walker_anchovy", {
+}) 
 nzRound:AddZombieType("Deathtrooper", "nz_zombie_walker_deathtrooper", {
 }) 
 nzRound:AddZombieType("Die Maschine", "nz_zombie_walker_diemachine", {
@@ -616,6 +623,9 @@ function nzRound:GetZombieType(id)
 	end
 		if id == "Zombies in Spaceland" then
 	return "nz_zombie_walker_clown"
+	end
+	if id == "ANCHOVIES" then
+	return "nz_zombie_walker_anchovy"
 	end
 		if id == "Tranzit" then
 	return "nz_zombie_walker_greenrun" 
@@ -1207,6 +1217,8 @@ nzRound:AddAdditionalZombieType("Nuketown Zombies", "nz_zombie_walker_nuketown",
 }) 
 nzRound:AddAdditionalZombieType("Clowns", "nz_zombie_walker_clown", {
 }) 
+nzRound:AddAdditionalZombieType("ANCHOVIES", "nz_zombie_walker_anchovy", {
+}) 
 nzRound:AddAdditionalZombieType("Deathtroopers", "nz_zombie_walker_deathtrooper", {
 }) 
 nzRound:AddAdditionalZombieType("Dark Aether Zombies", "nz_zombie_walker_diemachine", {
@@ -1315,6 +1327,8 @@ nzRound:AddAdditionalZombieType("Nemesis", "nz_zombie_boss_nemesis", {
 })
 nzRound:AddAdditionalZombieType("Thrasher", "nz_zombie_boss_thrasher", {
 })    
+nzRound:AddAdditionalZombieType("Larry the Lobster", "nz_zombie_boss_larry", {
+})   
 nzRound:AddAdditionalZombieType("Avogadro", "nz_zombie_boss_avogadro", {
 })  
 
@@ -1469,6 +1483,9 @@ function nzRound:GetSpecialType(id)
 	if id == "Thrasher" then
 	return "nz_zombie_boss_thrasher"
 	end
+	if id == "Larry the Lobster" then
+	return "nz_zombie_boss_larry"
+	end
 	if id == "Skeletons" then
 	return "nz_zombie_walker_skeleton"
 	end
@@ -1477,6 +1494,9 @@ function nzRound:GetSpecialType(id)
 	end
 		if id == "Clowns" then
 	return "nz_zombie_walker_clown"
+	end
+	if id == "ANCHOVIES" then
+	return "nz_zombie_walker_anchovy"
 	end
 		if id == "Tranzit Zombies" then
 	return "nz_zombie_walker_greenrun" 

@@ -17,6 +17,10 @@ local bloodline_gun = Material("bloodline_score2.png", "unlitgeneric smooth")
 }]]
 
 function GetFontType(id)
+	local comedyday = os.date("%d-%m") == "01-04"
+	if comedyday then
+	return "krabs"
+	else
 	if id == "Classic NZ" then
 	return "classic"
 	end
@@ -73,6 +77,7 @@ function GetFontType(id)
 	end
 	if id == nil then
 	return "default"
+	end
 	end
 end
 

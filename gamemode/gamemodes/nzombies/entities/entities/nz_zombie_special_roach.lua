@@ -10,6 +10,7 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Decapitated")
 	self:NetworkVar("Bool", 1, "Alive")
 	self:NetworkVar("Bool", 2, "MooSpecial")
+	self:NetworkVar("Bool", 3, "WaterBuff")
 end
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
@@ -18,6 +19,8 @@ ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = false
 ENT.IsMooSpecial = true
+
+ENT.TraversalCheckRange = 40
 
 ENT.Models = {
 	{Model = "models/specials/radroach.mdl", Skin = 0, Bodygroups = {0,0}},

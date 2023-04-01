@@ -27,6 +27,8 @@ ENT.Acceleration = 400
 ENT.DamageLow = 35
 ENT.DamageHigh = 45
 
+ENT.TraversalCheckRange = 40 -- From Moo Base
+
 
 -- important for ent:IsZombie()
 ENT.bIsZombie = true
@@ -41,6 +43,8 @@ AccessorFunc( ENT, "fLastTargetCheck", "LastTargetCheck", FORCE_NUMBER)
 AccessorFunc( ENT, "fLastAtack", "LastAttack", FORCE_NUMBER)
 AccessorFunc( ENT, "fLastTargetChange", "LastTargetChange", FORCE_NUMBER)
 AccessorFunc( ENT, "fTargetCheckRange", "TargetCheckRange", FORCE_NUMBER)
+
+AccessorFunc( ENT, "fTraversalCheckRange", "TraversalCheckRange", FORCE_NUMBER) -- From Moo Base
 
 --sounds
 AccessorFunc( ENT, "fNextMoanSound", "NextMoanSound", FORCE_NUMBER)
@@ -76,6 +80,12 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Precache()
+
+	--[[ From Moo Base(THIS IS HERE BECAUSE OTHER ENEMIES USING THIS BASE OVERRIDE THEIR INITIALIZE FUNC) ]]--
+	self.Climbing = false
+	self.NextClimb = 0
+	self:SetTraversalCheckRange( self.TraversalCheckRange )
+	--[[ From Moo Base(THIS IS HERE BECAUSE OTHER ENEMIES USING THIS BASE OVERRIDE THEIR INITIALIZE FUNC) ]]--
 
 	for _,v in pairs(self.Models) do
 		util.PrecacheModel( v )
@@ -142,11 +152,12 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	if  nzMapping.Settings.range then
-	self:SetTargetCheckRange(nzMapping.Settings.range)
-else
-self:SetTargetCheckRange(2000)
-end	-- 0 for no distance restriction (infinite)
+
+	if nzMapping.Settings.range then
+		self:SetTargetCheckRange(nzMapping.Settings.range)
+	else
+		self:SetTargetCheckRange(2000)
+	end	-- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -397,6 +408,79 @@ function ENT:Stop()
 	self:SetTarget(nil)
 end
 
+--[[ From Moo Base ]]--
+if SERVER then
+	function ENT:TraversalCheck()
+		if !self:GetSpecialAnimation() and !self:GetAttacking() and !self.Climbing and CurTime() > self.NextClimb then
+
+			local anim = false
+			local finalpos = self:GetPos()
+			local tr6 = util.TraceLine({start = self:GetPos() + self:GetUp()*200, endpos = self:GetPos() + self:GetUp()*200 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 200
+			local tr5 = util.TraceLine({start = self:GetPos() + self:GetUp()*160, endpos = self:GetPos() + self:GetUp()*160 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 160
+			local tr4 = util.TraceLine({start = self:GetPos() + self:GetUp()*120, endpos = self:GetPos() + self:GetUp()*120 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 120
+			local tr3 = util.TraceLine({start = self:GetPos() + self:GetUp()*96, endpos = self:GetPos() + self:GetUp()*96 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 96
+			local tr2 = util.TraceLine({start = self:GetPos() + self:GetUp()*72, endpos = self:GetPos() + self:GetUp()*72 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 72
+			local tr1 = util.TraceLine({start = self:GetPos() + self:GetUp()*48, endpos = self:GetPos() + self:GetUp()*48 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 48
+			local tr0 = util.TraceLine({start = self:GetPos() + self:GetUp()*36, endpos = self:GetPos() + self:GetUp()*36 + self:GetForward()*40, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end}) -- 36
+			local tru = util.TraceLine({start = self:GetPos(), endpos = self:GetPos() + self:GetUp()*200, filter = self and function(ent) if ent:IsValidZombie() then return false end end})
+			
+			debugoverlay.Line(self:GetPos() + self:GetUp()*200, self:GetPos() + self:GetUp()*200 + self:GetForward()*self.TraversalCheckRange, 1, Color( 255, 100, 100 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*160, self:GetPos() + self:GetUp()*160 + self:GetForward()*self.TraversalCheckRange, 1, Color( 255, 0, 255 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*120, self:GetPos() + self:GetUp()*120 + self:GetForward()*self.TraversalCheckRange, 1, Color( 255, 255, 0 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*96, self:GetPos() + self:GetUp()*96 + self:GetForward()*self.TraversalCheckRange, 1, Color( 255, 0, 0 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*72, self:GetPos() + self:GetUp()*72 + self:GetForward()*self.TraversalCheckRange, 1, Color( 0, 255, 0 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*48, self:GetPos() + self:GetUp()*48 + self:GetForward()*self.TraversalCheckRange, 1, Color( 0, 0, 255 ), false)
+			debugoverlay.Line(self:GetPos() + self:GetUp()*36, self:GetPos() + self:GetUp()*36 + self:GetForward()*self.TraversalCheckRange, 1, Color( 255, 10, 50 ), false)
+
+			if !IsValid(tru.Entity) then
+				if IsValid(tr6.Entity) then
+				local tr6b = util.TraceLine({start = self:GetPos() + self:GetUp()*260, endpos = self:GetPos() + self:GetUp()*260 + self:GetForward()*self.TraversalCheckRange, filter = function(ent) if (ent:GetClass() == "jumptrav_block") then return true end end})
+				if !IsValid(tr6b.Entity) then
+					anim = true
+					finalpos = tr6.HitPos
+				end
+				elseif IsValid(tr5.Entity) then
+					anim = true
+					finalpos = tr5.HitPos
+				elseif IsValid(tr4.Entity) then
+					anim = true
+					finalpos = tr4.HitPos
+				elseif IsValid(tr3.Entity) then
+					anim = true
+					finalpos = tr3.HitPos
+				elseif IsValid(tr2.Entity) then
+					anim = true
+					finalpos = tr2.HitPos
+				elseif IsValid(tr1.Entity) then
+					anim = true
+					finalpos = tr1.HitPos
+				elseif IsValid(tr0.Entity) then
+					anim = true
+					finalpos = tr0.HitPos
+				end
+			end
+			if anim ~= false then
+				if IsValid(self) then
+					self:TimeOut(0.35)
+					self.Climbing = true
+					self:SetSpecialAnimation(true)
+					self:SetPos(finalpos)
+					local effectData = EffectData()
+					effectData:SetOrigin( self:GetPos() + Vector(0, 0, 50)  )
+					effectData:SetMagnitude( 1 )
+					effectData:SetEntity(nil)
+					util.Effect("panzer_spawn_tp", effectData) -- Express Portal to their destination.
+					self:TimeOut(0.25)
+					self:SetSpecialAnimation(false)
+					self.Climbing = false
+				end
+			end
+			self.NextClimb = CurTime() + 0.25
+		end
+	end
+end
+--[[ From Moo Base ]]--
+
 --Draw correct eyes
 local eyeglow =  Material( "nz/zlight" )
 local defaultColor = Color(0, 255, 255, 255)
@@ -475,10 +559,24 @@ end
 function ENT:OnBarricadeBlocking( barricade, dir )
 	if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
 		if barricade:GetNumPlanks() > 0 then
+
+			--[[ Stuff from Moo's Base so old base enemies can still interact with barricades ]]--
+			local planktopull = barricade:BeginPlankPull(self)
+			local planknumber -- fucking piece of shit
+			if planktopull then
+				planknumber = planktopull:GetFlags()
+			end
+
+			if !IsValid(barricade.ZombieUsing) then
+				barricade:HasZombie(self)
+			end
+					
 			timer.Simple(0.3, function()
-				barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".wav", 100, math.random(90, 130))
-				barricade:RemovePlank()
+				if IsValid(planktopull) then
+					barricade:RemovePlank(planktopull)
+				end
 			end)
+			--[[ Stuff from Moo's Base so old base enemies can still interact with barricades ]]--
 
 			self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
 			
@@ -834,6 +932,9 @@ function ENT:ChaseTarget( options )
 		if self:IsMovingIntoObject() then
             self:ApplyRandomPush(400)
         end
+
+        self:TraversalCheck() -- From Moo Base
+
 		coroutine.yield()
 
 	end

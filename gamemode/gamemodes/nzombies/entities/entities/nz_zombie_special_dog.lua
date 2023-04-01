@@ -3,13 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle and Moo"
-
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-end
+ENT.Author = "GhostlyMoo"
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -146,7 +140,7 @@ function ENT:OnSpawn()
 	self:SetMaterial("invisible")
 	self:SetInvulnerable(true)
 	self:SetBlockAttack(true)
-	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
+	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 
 	self:EmitSound("nz/hellhound/spawn/prespawn.wav",511,100)
 	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)

@@ -601,6 +601,8 @@ nzMapping:AddSaveModule("BreakEntry", {
 				angle = v:GetAngles(),
 				planks = v:GetHasPlanks(),
 				jump = v:GetTriggerJumps(),
+				--classic = v:GetClassicPatern(),
+				boardtype = v:GetBoardType(),
 				prop = v:GetProp() or 0,
 			})
 		end
@@ -608,11 +610,11 @@ nzMapping:AddSaveModule("BreakEntry", {
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-		if not v.prop then v.prop = 0 end 
-			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.prop)
+			if not v.prop then v.prop = 0 end 
+			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.boardtype, v.prop)
 		end
 	end,
-	cleanents = {"breakable_entry", "breakable_entry_plank"},
+	cleanents = {"breakable_entry", "breakable_entry_plank", "breakable_entry_bar"},
 	postrestorefunc = function(data)
 		-- Now we respawn them! :D
 		for k,v in pairs(ents.FindByClass("breakable_entry")) do

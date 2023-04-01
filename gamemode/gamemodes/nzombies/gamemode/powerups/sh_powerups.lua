@@ -384,7 +384,7 @@ nzPowerUps:NewPowerUp("deathmachine", {
 	global = false, -- Only applies to the player picking it up and time is handled individually per player
 	angle = Angle(0,0,0),
 	scale = 1,
-	chance = 2,
+	chance = 0,
 	duration = 30,
 	announcement = "nz/powerups/deathmachine.mp3",
 	func = (function(self, ply)
