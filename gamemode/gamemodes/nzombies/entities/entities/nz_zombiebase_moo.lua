@@ -1568,15 +1568,97 @@ if SERVER then
 
 	function ENT:ChaseTargetPath( options )
 
-		local path = Path( "Follow" )
+	options = options or {}
 
-		path:SetMinLookAheadDistance( 10 )
-		path:SetGoalTolerance( 30 ) -- Don't let this be near or higher than the attack range...
+	local path = Path( "Follow" )
+	path:SetMinLookAheadDistance( 10 )
+	path:SetGoalTolerance( 30 )
 
-		path:Compute(self, self:GetTarget():GetPos(), self.ComputePath)
+	--[[local targetPos = options.target:GetPos()
+	--set the goal to the closet navmesh
+	local goal = navmesh.GetNearestNavArea(targetPos, false, 100)
+	goal = goal and goal:GetClosestPointOnArea(targetPos) or targetPos--]]
 
-		return path
+	-- Custom path computer, the same as default but not pathing through locked nav areas.
+	path:Compute( self, options.target:GetPos(),  function( area, fromArea, ladder, elevator, length )
+		if ( !IsValid( fromArea ) ) then
+			-- First area in path, no cost
+			return 0
+		else
+			if ( !self.loco:IsAreaTraversable( area ) ) then
+				-- Our locomotor says we can't move here
+				return -1
+			end
+			-- Prevent movement through either locked navareas or areas with closed doors
+			if (nzNav.Locks[area:GetID()]) then
+				if nzNav.Locks[area:GetID()].link then
+					if !nzDoors:IsLinkOpened( nzNav.Locks[area:GetID()].link ) then
+						return -1
+					end
+				elseif nzNav.Locks[area:GetID()].locked then
+				return -1 end
+			end
+			-- Compute distance traveled along path so far
+			local dist = 0
+			--[[if ( IsValid( ladder ) ) then
+				dist = ladder:GetLength()
+			elseif ( length > 0 ) then
+				--optimization to avoid recomputing length
+				dist = length
+			else
+				dist = ( area:GetCenter() - fromArea:GetCenter() ):GetLength()
+			end]]--
+			local cost = dist + fromArea:GetCostSoFar()
+			--check height change
+			local deltaZ = fromArea:ComputeAdjacentConnectionHeightChange( area )
+			if ( deltaZ >= self.loco:GetStepHeight() ) then
+				-- use player default max jump height even thouh teh zombie will jump a bit higher
+				if ( deltaZ >= 64 ) then
+					--Include ladders in pathing:
+					--currently disableddue to the lack of a loco:Climb function
+					--[[if IsValid( ladder ) then
+						if ladder:GetTopForwardArea():GetID() == area:GetID() then
+							return cost
+						end
+					end --]]
+					--too high to reach
+					return -1
+				end
+				--jumping is slower than flat ground
+				local jumpPenalty = 1.1
+				cost = cost + jumpPenalty * dist
+			elseif ( deltaZ < -self.loco:GetDeathDropHeight() ) then
+				--too far to drop
+				return -1
+			end
+			return cost
+		end
+	end)
+
+	-- this will replace nav groups
+	-- we do this after pathing to know when this happens
+	local lastSeg = path:LastSegment()
+
+	-- a little more complicated that i thought but it should do the trick
+	if lastSeg then
+	if (!IsValid(self:GetTargetNavArea())) then return end
+		if self:GetTargetNavArea() and lastSeg.area:GetID() != self:GetTargetNavArea():GetID() then
+			if !nzNav.Locks[self:GetTargetNavArea():GetID()] or nzNav.Locks[self:GetTargetNavArea():GetID()].locked then
+				self:IgnoreTarget(self:GetTarget())
+				-- trigger a retarget
+				self:SetLastTargetCheck(CurTime() - 1)
+				self:TimeOut(0.5)
+				return nil
+			end
+		else
+			self:ResetIgnores()
+			return path
+		end
 	end
+
+	return path
+
+end
 end
 
 function ENT:IsAllowedToMove()
