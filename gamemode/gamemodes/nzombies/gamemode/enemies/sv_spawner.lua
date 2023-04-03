@@ -13,11 +13,7 @@ if Spawner == nil then
 		-- roundNum: the round this spawner was created (after this round teh spawn will be removed)
 		constructor = function(self, spointClass, data, zombiesToSpawn, spawnDelay, roundNum)
 			self.sSpointClass = spointClass or "nz_spawn_zombie_normal"
-			if comedyday then
-			self.tData = data or {["nz_zombie_walker_anchovy"] = {chance = 100}}
-			else
 			self.tData = data or {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}
-			end
 			self.iZombiesToSpawn = zombiesToSpawn or 5
 			self.tSpawns = ents.FindByClass(self.sSpointClass)
 			self.tValidSpawns = {}

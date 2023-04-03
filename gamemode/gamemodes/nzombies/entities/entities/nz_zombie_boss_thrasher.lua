@@ -22,8 +22,7 @@ ENT.AttackRange = 100
 ENT.TraversalCheckRange = 80
 
 ENT.Models = {
-	--{Model = "models/moo/_codz_ports/t7/island/thrasher/moo_codz_t7_thrasher.mdl", Skin = 0, Bodygroups = {0,0}},
-	{Model = "models/larry.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t7/island/thrasher/moo_codz_t7_thrasher.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 local spawn = {"nz_trav_teleport_in"}

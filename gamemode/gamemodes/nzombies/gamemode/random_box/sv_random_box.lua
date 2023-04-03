@@ -19,12 +19,13 @@ function nzRandomBox.Spawn(exclude, first)
 		local pos = rand:GetPos()
 		local ang = rand:GetAngles()
 		
-		if (nzMapping.Settings.boxtype == "Original") then
-		box:SetPos( pos + ang:Up()*10 + ang:Right()*7 )
-	else
-		box:SetPos(pos)
-	end
-		
+		 -- new
+        local BoxType = nzMapping.Settings.boxtype
+        if (BoxType == "Original" or BoxType == nil) then
+            box:SetPos( pos + ang:Up()*10 + ang:Right()*7 )
+        else
+            box:SetPos(pos)
+        end
 		box:SetAngles( ang )
 		box:Spawn()
 		--box:PhysicsInit( SOLID_VPHYSICS )

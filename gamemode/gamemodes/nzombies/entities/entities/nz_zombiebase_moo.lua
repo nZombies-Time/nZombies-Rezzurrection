@@ -1580,7 +1580,7 @@ if SERVER then
 	goal = goal and goal:GetClosestPointOnArea(targetPos) or targetPos--]]
 
 	-- Custom path computer, the same as default but not pathing through locked nav areas.
-	path:Compute( self, options.target:GetPos(),  function( area, fromArea, ladder, elevator, length )
+	path:Compute( self, self:GetTarget():GetPos(),  function( area, fromArea, ladder, elevator, length )
 		if ( !IsValid( fromArea ) ) then
 			-- First area in path, no cost
 			return 0

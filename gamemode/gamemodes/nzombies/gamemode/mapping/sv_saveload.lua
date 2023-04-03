@@ -286,7 +286,7 @@ function nzMapping:LoadConfig( name, loader )
 				end
 			end
 		end
-		 InitZombieTypes()
+	-- InitZombieTypes()
 		print("[nZ] Finished loading map config.")
 		for i, playr in ipairs( player.GetAll() ) do
 			playr:ChatPrint( "Make sure you press submit on map settings to update your config to the newest gamemode version!" )
