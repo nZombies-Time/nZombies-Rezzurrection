@@ -156,8 +156,10 @@ function nzDoors.OnUseDoor( ply, ent )
 	-- Downed players can't use anything!
 	if !ply:GetNotDowned() then return false end
 	
-	-- Players can't use stuff while using special weapons! (Perk bottles, knives, etc)
-	if IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon():IsSpecial() then return false end
+	 -- Players can't use stuff while using special weapons! (Perk bottles, knives, etc)
+    if IsValid(ply:GetActiveWeapon()) and (ply:GetActiveWeapon():IsSpecial() and !ply:GetActiveWeapon().AllowInteraction) then 
+        return false 
+    end
 	
 	if ent:IsBuyableEntity() then
 		if ent.buyable == nil or tobool(ent.buyable) then
