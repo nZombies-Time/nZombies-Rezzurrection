@@ -487,7 +487,7 @@ if SERVER then
 				if IsValid(ply) then
 					local oldwep = ply:GetSpecialWeaponFromCategory(wep:GetSpecialCategory())
 
-					if IsValid(oldwep) then ply:StripWeapon(oldwep:GetClass()) end
+					--if IsValid(oldwep) then ply:StripWeapon(oldwep:GetClass()) end
 
 					ply:AddSpecialWeapon(wep)
 				end
