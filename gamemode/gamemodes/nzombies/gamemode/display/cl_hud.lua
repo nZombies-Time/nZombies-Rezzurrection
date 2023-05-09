@@ -602,7 +602,15 @@ local function StartChangeRound()
 	print(nzRound:GetNumber(), nzRound:IsSpecial())
 	
 	local lastround = nzRound:GetNumber()
-
+	
+	if round_num >= lastround + 1 and lastround + 1 > 0 then
+        hook.Remove("HUDPaint", "nz_roundnumWhiteFade")
+        round_white = 0
+        round_alpha = 255
+        round_num = lastround + 1
+        return
+    end
+	
 	if lastround >= 1 then
 		if prevroundspecial then
 			--surface.PlaySound("nz/round/special_round_end.wav")
