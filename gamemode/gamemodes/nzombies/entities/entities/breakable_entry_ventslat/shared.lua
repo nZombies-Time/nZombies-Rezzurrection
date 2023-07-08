@@ -11,6 +11,7 @@ ENT.Instructions	= ""
 function ENT:Initialize()
 	self:SetModel("models/moo/_codz_ports_props/t7/p7_zm_moo_vent_slat/moo_codz_p7_barricade_ventslat.mdl")
 	self.AutomaticFrameAdvance = true
+	self.Torn = true
 	self:SetMoveType( MOVETYPE_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
 	--self:SetModelScale(1)

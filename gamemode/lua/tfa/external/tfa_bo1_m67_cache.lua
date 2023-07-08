@@ -38,7 +38,7 @@ hook.Add("SetupMove", "nzknifeshmove", function(ply, mv, cmd)
 	if IsValid(wep) and wep.CanKnifeLunge then
 		if ply:IsOnGround() and wep:GetLunging() and IsValid(ply:GetKnifingTarget()) then
 			mv:SetVelocity((ply:GetKnifingTarget():GetPos() - ply:GetPos()):GetNormalized() * (wep.KnifeLungeSpeed or 800))
-			if ply:GetPos():DistToSqr(ply:GetKnifingTarget():GetPos()) <= 32^2 then
+			if ply:GetPos():DistToSqr(ply:GetKnifingTarget():GetPos()) <= 1024 then
 				mv:SetVelocity(vector_origin)
 				wep:SetLunging(false)
 			end
@@ -79,7 +79,7 @@ hook.Add("PlayerButtonDown", "nzKOBEEE", function(ply, but)
 	if not IsValid(ply) then return end
 	if but == ply:GetInfoNum("nz_key_grenade", KEY_G) then
 		for k, v in pairs(ents.FindInSphere(ply:GetPos(), 64)) do
-			if v:GetClass() == "bo1_m67_grenade" then
+			if v:GetClass() == "bo1_m67_grenade" and v:GetCreationTime() + 0.25 < CurTime() then
 				local wep = ply:GetWeapon("tfa_bo1_m67")
 				if IsValid(wep) then //if ur at full and pickup someone elses nade, youll still lose one
 					ply:SetAmmo(ply:GetAmmoCount("nz_grenade") + 1, "nz_grenade") //but thats just the cost of doin buisness
@@ -99,43 +99,3 @@ hook.Add("PlayerButtonDown", "nzKOBEEE", function(ply, but)
 		end
 	end
 end)
-
-if CLIENT then
-	hook.Add("HUDPaint", "nzfucknade_hud", function()
-		local ply = LocalPlayer()
-		if not IsValid(ply) then return end
-
-		local dents = {}
-		local lookfor = {
-			["bo1_m67_grenade"] = true,
-		}
-
-		for _, ent in pairs(ents.FindInSphere(ply:GetPos(), 400)) do
-			if lookfor[ent:GetClass()] and (ent.spawntime + 1) < CurTime() and ply == ent:GetOwner() then
-				local dir = ply:EyeAngles():Forward()
-				local facing = (ply:GetPos() - ent:GetPos()):GetNormalized()
-				if (facing:Dot(dir) + 1) / 2 > 0.45 then
-					table.insert(dents, ent)
-				end
-			end
-		end
-
-		for _, ent in ipairs(dents) do
-			local totaldist = 400^2
-			local distfade = 400^2
-			local playerpos = ply:GetPos():DistToSqr(ent:GetPos())
-			local fadefac = 1 - math.Clamp((playerpos - totaldist + distfade) / distfade, 0, 1)
-
-			local dir = (ent:GetPos() - ply:GetShootPos()):Angle()
-			dir = dir - EyeAngles()
-			local angle = dir.y + 90
-
-			local x = (math.cos(math.rad(angle)) * ScreenScale(90)) + ScrW() / 2
-			local y = (math.sin(math.rad(angle)) * -ScreenScale(90)) + ScrH() / 2
-
-			surface.SetMaterial(Material("vgui/hud/hud_grenadeicon.png", "smooth unlitgeneric"))
-			surface.SetDrawColor(255,255,255,255*fadefac)
-			surface.DrawTexturedRect(x, y, ScreenScale(24), ScreenScale(24))
-		end
-	end)
-end

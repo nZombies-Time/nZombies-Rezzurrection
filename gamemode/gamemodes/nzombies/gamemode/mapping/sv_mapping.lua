@@ -728,11 +728,13 @@ end
 
 -- Physgun Hooks
 local ghostentities = {
-	["prop_buys"] = true,
-	["wall_block"] = true,
-	["breakable_entry"] = true,
-	["invis_wall"] = true,
-	--["wall_buys"] = true,
+    ["prop_buys"] = true,
+    ["wall_block"] = true,
+    ["breakable_entry"] = true,
+    ["invis_wall"] = true,
+    ["invis_wall_zombie"] = true,
+    ["jumptrav_block"] = true,
+    --["wall_buys"] = true,
 }
 local function onPhysgunPickup( ply, ent )
 	local class = ent:GetClass()

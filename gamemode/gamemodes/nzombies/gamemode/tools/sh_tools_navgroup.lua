@@ -179,7 +179,7 @@ nzTools:CreateTool("navgroup", {
 		textw2:CenterHorizontal()
 
 		local textw3 = vgui.Create("DLabel", panel)
-		textw3:SetText("The ID must be represented via a letter or word such as 'start'")
+		textw3:SetText("The ID must be represented via a letter or word such as 'start'. DO NOT USE NUMBERS OR PERISH")
 		textw3:SetFont("Trebuchet18")
 		textw3:SetTextColor( Color(50, 50, 50) )
 		textw3:SizeToContents()

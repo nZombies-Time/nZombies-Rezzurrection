@@ -58,8 +58,8 @@ hook.Add("PlayerShouldTakeDamage", "nzPlayerIgnoreDamage", function(ply, ent, dm
 		return false
 	end
 
-	if dmg and ent:IsValidZombie() and ply:HasPerk("whoswho") and (ply:Health() - dmg:GetDamage()) <= 0 then
-		if ply:GetNW2Float("nz.ChuggaDelay") < CurTime() then
+	if dmg and ent:IsValidZombie() then
+		if ply:HasPerk("whoswho") and ply:GetNW2Float("nz.ChuggaDelay") < CurTime() and (ply:Health() - dmg:GetDamage()) <= 0 then
 			local available = ents.FindByClass("nz_spawn_zombie_special")
 			local pos = ply:GetPos()
 			local spawns = {}
@@ -96,28 +96,27 @@ hook.Add("PlayerShouldTakeDamage", "nzPlayerIgnoreDamage", function(ply, ent, dm
 			timer.Simple(0, function()
 				if not IsValid(ply) then return end
 
-				local damage = DamageInfo()
-				damage:SetAttacker(ply)
-				damage:SetInflictor(ply:GetActiveWeapon())
-				damage:SetDamageType(DMG_MISSILEDEFENSE)
-
-				for k, v in pairs(ents.FindInSphere(ply:WorldSpaceCenter(), 200)) do
-					if v:IsNPC() or v:IsNextBot() then
-						if v.NZBossType then continue end
-
-						damage:SetDamage(v:Health() + 666)
-						damage:SetDamageForce(v:GetUp()*10000 + (v:GetPos() - ply:GetPos()):GetNormalized()*15000)
-						damage:SetDamagePosition(v:EyePos())
-
-						v:TakeDamageInfo(damage)
-					end
-				end
-
 				ply:SetPos(pos)
 				ply:EmitSound("NZ.ChuggaBud.Teleport")
 				ParticleEffect("bo3_qed_explode_1", ply:WorldSpaceCenter(), Angle(0,0,0))
 
 				nzSounds:Play("WhosWhoLooper", ply)
+
+				local damage = DamageInfo()
+				damage:SetAttacker(ply)
+				damage:SetInflictor(ply:GetActiveWeapon())
+				damage:SetDamageType(DMG_MISSILEDEFENSE)
+
+				for k, v in pairs(ents.FindInSphere(ply:WorldSpaceCenter(), 150)) do
+					if v:IsNPC() or v:IsNextBot() then
+						if v.NZBossType then continue end
+
+						damage:SetDamage(75)
+						damage:SetDamagePosition(v:WorldSpaceCenter())
+
+						v:TakeDamageInfo(damage)
+					end
+				end
 			end)
 
 			ply:SetNW2Float("nz.ChuggaDelay", CurTime() + 180)
@@ -170,21 +169,30 @@ hook.Add("EntityTakeDamage", "nzPlayerTakeDamage", function(ply, dmginfo)
 		end
 	end
 
-	if ply:HasPerk("tortoise") and (ply.GetShield and not IsValid(ply:GetShield())) then
-		if IsValid(ent) and ent:IsValidZombie() then
+	if IsValid(ent) and ent:IsValidZombie() then
+		if ply:HasPerk("winters") and (nzRound:InState(ROUND_CREATE) or ply:GetNW2Int("nz.WailCount", 0) > 0) and ply:GetNW2Float("nz.WailDelay", 0) < CurTime() and ply:Health() < ply:GetMaxHealth() then
+			local freeze = ents.Create("winterswail_effect")
+			freeze:SetPos(ply:WorldSpaceCenter())
+			freeze:SetParent(ply)
+			freeze:SetOwner(ply)
+			freeze:SetAttacker(ply)
+			freeze:SetInflictor(ply:GetActiveWeapon())
+			freeze:SetAngles(Angle(0,0,0))
+			freeze:Spawn()
+
+			ply:SetNW2Float("nz.WailDelay", CurTime() + 30)
+			ply:SetNW2Int("nz.WailCount", math.max(ply:GetNW2Int("nz.WailCount",0) - 1, 0))
+		end
+
+		if ply:HasPerk("tortoise") and (ply.GetShield and not IsValid(ply:GetShield())) then
 			local dot = (ent:GetPos() - ply:GetPos()):Dot(ply:GetAimVector())
 
 			if dot < 0 then
-				if ply.TortDelay < CurTime() and ply.TortCount > 0 then
-					ply.TortCount = 0
-				end
-
-				local scale = math.Clamp(ply.TortCount / 10, 0, 1)
-
+				local scale = math.Clamp(ply:GetNW2Int("nz.TortCount", 0) / 10, 0, 1)
 				dmginfo:ScaleDamage(0.5 + (scale * 0.5))
 
-				ply.TortCount = ply.TortCount + 1
-				ply.TortDelay = CurTime() + 10
+				ply:SetNW2Int("nz.TortCount", ply:GetNW2Int("nz.TortCount",0) + 1)
+				ply:SetNW2Float("nz.TortDelay", CurTime() + 10)
 			end
 		end
 	end
@@ -216,6 +224,10 @@ hook.Add("PostEntityTakeDamage", "nzPostPlayerTakeDamage", function(ply, dmginfo
 	if not IsValid(ply) then return end
 	if not ply:IsPlayer() then return end
 
+	if took then
+		ply:SetNW2Float("nz.LastHit", CurTime())
+	end
+
 	if took and ply:HasPerk("fire") and ply:GetNW2Float("nz.BurnDelay", 0) < CurTime() then
 		local ent = dmginfo:GetAttacker()
 		if IsValid(ent) and ent:IsValidZombie() then
@@ -229,7 +241,9 @@ hook.Add("PostEntityTakeDamage", "nzPostPlayerTakeDamage", function(ply, dmginfo
 
 			fire:Spawn()
 
-			ply:SetNW2Float("nz.BurnDelay", CurTime() + (ply:HasUpgrade("fire") and 20 or 40))
+			local time = (ply:HasUpgrade("fire") and 10 or 20) * math.max(ply:GetNW2Int("nz.BurnCount", 1), 1)
+			ply:SetNW2Float("nz.BurnDelay", CurTime() + time)
+			ply:SetNW2Int("nz.BurnCount", math.min(ply:GetNW2Int("nz.BurnCount", 0) + 1), 10)
 		end
 	end
 end)
@@ -238,16 +252,22 @@ hook.Add("PlayerSpawn", "nzPlayerSpawnVars", function(ply, trans)
 	ply:SetNW2Bool("nz.GinMod", false)
 	ply:SetNW2Float("nz.DeadshotDecay", 1)
 
-	ply.TortDelay = 0
-	ply.TortCount = 1
+	ply:SetNW2Int("nz.TortDelay", 1)
+	ply:SetNW2Int("nz.TortCount", 1)
 
-	ply.ZombShellDelay = 1
-	ply.ZombShellCount = 1
+	ply:SetNW2Int("nz.ZombShellDelay", 1)
+	ply:SetNW2Int("nz.ZombShellCount", 0)
 
-	ply.ElementalPOPChance = 0
-	ply.ElementalPOPDelay = 0
+	ply:SetNW2Int("nz.EPopDelay", 1)
+	ply:SetNW2Int("nz.EPopChance", 0)
 
-	ply.DeadshotChance = 0
+	ply:SetNW2Int("nz.DeadshotChance", 0)
+
+	ply:SetNW2Float("nz.BurnDelay", 1)
+	ply:SetNW2Int("nz.BurnCount", 0)
+
+	ply:SetNW2Int("nz.WailDelay", 1)
+	ply:SetNW2Int("nz.WailCount", 3)
 end)
 
 hook.Add("PlayerDowned", "nzPlayerDown", function(ply)
@@ -259,8 +279,8 @@ hook.Add("PlayerDowned", "nzPlayerDown", function(ply)
 			damage:SetInflictor(IsValid(ply:GetActiveWeapon()) and ply:GetActiveWeapon() or ply)
 			damage:SetDamageType(DMG_BLAST_SURFACE)
 
-			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 500)) do
-				if v:IsValidZombie() then
+			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 400)) do
+				if v:IsValidZombie() and not v.NZBossType then
 					damage:SetDamagePosition(v:EyePos())
 					damage:SetDamageForce(v:GetUp()*8000 + (v:GetPos() - ply:GetPos()):GetNormalized()*10000)
 
@@ -281,6 +301,17 @@ hook.Add("PlayerDowned", "nzPlayerDown", function(ply)
 	end
 end)
 
+hook.Add("PlayerPostThink", "nzStatsResetPlayer", function(ply) //hopefully not too wastefull
+	if ply:HasPerk("tortoise") then
+		if ply:GetNW2Float("nz.TortDelay", 0) < CurTime() and ply:GetNW2Int("nz.TortCount", 0) > 0 then
+			ply:SetNW2Int("nz.TortCount", 0)
+		end
+		if ply:GetNW2Float("nz.CherryDelay", 0) < CurTime() and ply:GetNW2Int("nz.CherryCount", 0) > 0 then
+			ply:SetNW2Int("nz.CherryCount", 0)
+		end
+	end
+end)
+
 hook.Add("OnEntityCreated", "nodmglolfucku", function(ent)
 	timer.Simple(0, function()
 		if not IsValid(ent) then return end
@@ -291,4 +322,73 @@ hook.Add("OnEntityCreated", "nodmglolfucku", function(ent)
 			end
 		end
 	end)
+end)
+
+util.AddNetworkString("nz_WhosWhoTeleRequest")
+
+net.Receive("nz_WhosWhoTeleRequest", function(len, ply)
+	if ply:HasUpgrade("whoswho") and ply:GetNW2Float("nz.ChuggaTeleDelay",0) < CurTime() then
+		local available = ents.FindByClass("nz_spawn_zombie_special")
+		local pos = ply:GetPos()
+		local spawns = {}
+
+		if IsValid(available[1]) then
+			for k,v in pairs(available) do
+				if v.link == nil or nzDoors:IsLinkOpened(v.link) then
+					if v:IsSuitable() then
+						table.insert(spawns, v)
+					end
+				end
+			end
+			if !IsValid(spawns[1]) then
+				local pspawns = ents.FindByClass("player_spawns")
+				if !IsValid(pspawns[1]) then
+					ply:ChatPrint("Couldnt find an escape boss, sorry 'bout that.")
+				else
+					pos = pspawns[math.random(#pspawns)]:GetPos()
+				end
+			else
+				pos = spawns[math.random(#spawns)]:GetPos()
+			end
+		else
+			local pspawns = ents.FindByClass("player_spawns")
+			if IsValid(pspawns[1]) then
+				pos = pspawns[math.random(#pspawns)]:GetPos()
+			end
+		end
+
+		local moo = Entity(1) //if moo is ingame and host, 10% chance to just tp to him lol
+		if ply:EntIndex() ~= moo:EntIndex() and moo:SteamID64() == "76561198162014458" and math.random(10) == 1 then
+			pos = moo:GetPos()
+		end
+
+		ply:EmitSound("NZ.ChuggaBud.Sweet")
+		ply:ViewPunch(Angle(-4, math.Rand(-6, 6), 0))
+		ply:SetPos(pos)
+
+		timer.Simple(0, function()
+			if not IsValid(ply) then return end
+			ply:SetPos(pos)
+			ply:EmitSound("NZ.ChuggaBud.Teleport")
+			ParticleEffect("bo3_qed_explode_1", ply:WorldSpaceCenter(), Angle(0,0,0))
+
+			nzSounds:Play("WhosWhoLooper", ply)
+
+			local damage = DamageInfo()
+			damage:SetAttacker(ply)
+			damage:SetInflictor(ply:GetActiveWeapon())
+			damage:SetDamageType(DMG_MISSILEDEFENSE)
+
+			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 80)) do
+				if v:IsNPC() or v:IsNextBot() then
+					if v.NZBossType then continue end
+					damage:SetDamage(75)
+					damage:SetDamagePosition(v:WorldSpaceCenter())
+					v:TakeDamageInfo(damage)
+				end
+			end
+		end)
+
+		ply:SetNW2Float("nz.ChuggaTeleDelay", CurTime() + 10)
+	end
 end)

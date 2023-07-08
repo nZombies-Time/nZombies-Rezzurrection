@@ -30,43 +30,23 @@ end)
 function nzPowerUps:Nuke(pos, nopoints, noeffect)
 	-- Kill them all
 	local highesttime = 0
-	if pos and type(pos) == "Vector" then
-		for k,v in pairs(ents.GetAll()) do
-			if v:IsValidZombie() and !v.NZBossType then
-				if IsValid(v) then
-					v:SetBlockAttack(true) -- They cannot attack now!
-					-- Delay the death by the distance from the position in milliseconds
-					local time = v:GetPos():Distance(pos)/2000
-					if time > highesttime then highesttime = time end
-					timer.Simple(time, function()
-						if IsValid(v) then
-							v:Remove() --Zombies remove now cause nukes like to crash the game on the old method.
-							if nzRound:InProgress() then
-								nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 ) -- Zombies dying from a nuke actually count towards the round now.
-							end
-						end
-					end)
-				end
-			end
-		end
-	else
-		for k,v in pairs(ents.GetAll()) do
-			if v:IsValidZombie() and !v.NZBossType then
-				print(v, IsValid(v))
-				if IsValid(v) then
-					timer.Simple(0.1, function()
-						if IsValid(v) then
-							v:Remove()
-							if nzRound:InProgress() then
-								nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 ) -- Zombies dying from a nuke actually count towards the round now.
-							end
-						end
-					end)
-				end
+	
+	for _,v in pairs(ents.GetAll()) do
+		if v:IsValidZombie() and !v.NZBossType then
+			if IsValid(v) then
+				v:SetBlockAttack(true)
+
+				local insta = DamageInfo()
+				insta:SetAttacker(Entity(0))
+				insta:SetDamageType(DMG_SHOCK)
+				insta:SetDamage(v:Health() + 666)
+				v:TakeDamageInfo(insta)
+				v:EmitSound("nz_moo/zombies/vox/nuke_death/soul_0"..math.random(0,10)..".mp3", 100, math.random(85,115))	
 			end
 		end
 	end
 	
+
 	-- Give the players a set amount of points
 	if not nopoints then
 		timer.Simple(highesttime, function()
@@ -151,6 +131,8 @@ function nzPowerUps:Carpenter(nopoints)
 	local pos = pos or Vector()
 	local barricades = ents.FindByClass("breakable_entry")
 	local max = 0
+	local repaired = 0
+	local PowerupData = self:Get("carpenter")
 	for k,v in pairs(barricades) do
 		local t = v:GetPos():Distance(pos)/2000 -- 1 second for every 2,000 units
 		if t > max then
@@ -158,17 +140,28 @@ function nzPowerUps:Carpenter(nopoints)
 		end
 		timer.Simple(t, function()
 			if IsValid(v) then
-				v:FullRepair()
+				if !IsValid(v.ZombieUsing) then
+					v:FullRepair()
+					repaired = repaired + 1
+					if repaired == #barricades then
+						self.ActivePowerUps["carpenter"] = (self.ActivePowerUps["carpenter"] or CurTime()) - PowerupData.duration
+						for k,v in pairs(player.GetAll()) do
+							if v:IsPlayer() then
+								v:GivePoints(200)
+							end
+						end
+					end
+				end
 			end
 		end)
 	end
 	
 	-- Give the players a set amount of points
-	if not nopoints then
+	--[[if not nopoints then
 		for k,v in pairs(player.GetAll()) do
 			if v:IsPlayer() then
 				v:GivePoints(200)
 			end
 		end
-	end
+	end]]
 end

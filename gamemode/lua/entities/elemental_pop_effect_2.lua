@@ -28,7 +28,7 @@ ENT.Spawnable = false
 ENT.AdminOnly = false
 
 --[Parameters]--
-ENT.MaxChain = 24
+ENT.MaxChain = 8
 ENT.ZapRange = 300
 
 function ENT:SetupDataTables()
@@ -151,7 +151,7 @@ end
 
 function ENT:FindNearestEntity(pos, tab)
 	local nearbyents = {}
-	for k, v in pairs(ents.FindInSphere(pos, 200)) do
+	for k, v in pairs(ents.FindInSphere(pos, self.ZapRange)) do
 		if v:IsValidZombie() and v:Health() > 0 then
 			if !table.HasValue(tab, v) then
 				table.insert(nearbyents, v)

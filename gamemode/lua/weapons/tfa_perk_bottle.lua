@@ -19,7 +19,7 @@ SWEP.ViewModelFOV = 65
 SWEP.WorldModel = "models/nzr/2022/perks/w_perk_bottle.mdl"
 SWEP.HoldType = "slam"
 SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 2
+SWEP.CameraAttachmentScale = 1
 SWEP.VMPos = Vector(0, 0, 0)
 SWEP.VMAng = Vector(0, 0, 0)
 SWEP.VMPos_Additive = true
@@ -95,7 +95,13 @@ SWEP.SpeedColaActivities = {
 
 SWEP.EventTable = {
 [ACT_VM_DRAW] = {
-{ ["time"] = 0, ["type"] = "lua", value = function(self) if self:GetOwner():HasUpgrade("speed") then self.SequenceRateOverride[ACT_VM_DRAW] = 45 / 30 end end, client = true, server = true},
+{ ["time"] = 0, ["type"] = "lua", value = function(self)
+	if self:GetOwner():HasUpgrade("speed") then
+		self.SequenceRateOverride[ACT_VM_DRAW] = 45 / 30
+	else
+		self.SequenceRateOverride[ACT_VM_DRAW] = 30 / 30
+	end
+end, client = true, server = true},
 { ["time"] = 0, ["type"] = "lua", value = function(self) self:GetOwner():SetUsingSpecialWeapon(true) end, client = false, server = true},
 { ["time"] = 15 / 30, ["type"] = "sound", ["value"] = Sound("NZ.Bottle.Open") },
 { ["time"] = 25 / 30, ["type"] = "sound", ["value"] = Sound("NZ.Bottle.Drink") },

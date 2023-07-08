@@ -80,11 +80,6 @@ ENT.Initialize = function(self)
 	self:SetNotSolid(true)
 	self:SetMoveType(MOVETYPE_NONE)
 
-	local p = self:GetParent()
-	if SERVER and IsValid(p) then
-		p:Ignite(4)
-	end
-
 	if CLIENT then return end
 	self.statusStart = CurTime()
 	self.duration = 0.1
@@ -97,6 +92,10 @@ ENT.UpdateDuration = function(self, newtime)
 	end
 
 	if self.statusEnd - CurTime() > newtime then return end
+	local p = self:GetParent()
+	if SERVER and IsValid(p) and p.Ignite then
+		p:Ignite(newtime)
+	end
 
     self.duration = newtime
     self.statusEnd = CurTime() + newtime
@@ -105,11 +104,7 @@ end
 ENT.Think = function(self)
 	if CLIENT then return false end
 
-	local p = self:GetParent()
 	if self.statusEnd < CurTime() then
-		if IsValid(p) then
-			self:InflictDamage(p)
-		end
 		self:Remove()
 		return false
 	end
@@ -123,15 +118,19 @@ ENT.InflictDamage = function(self, ent)
 	ent:EmitSound("NZ.POP.BlastFurnace.Die")
 
 	local damage = DamageInfo()
-	damage:SetDamageType(DMG_BURN)
+	damage:SetDamageType(DMG_MISSILEDEFENSE)
 	damage:SetDamage(ent:Health() + 666)
 	damage:SetAttacker(IsValid(self:GetAttacker()) and self:GetAttacker() or self)
 	damage:SetInflictor(IsValid(self:GetInflictor()) and self:GetInflictor() or self)
 	damage:SetDamagePosition(ent:EyePos())
-	damage:SetDamageForce(ent:GetUp())
+	damage:SetDamageForce(vector_up)
 
 	ent:TakeDamageInfo(damage)
 end
 
 ENT.OnRemove = function(self)
+	local p = self:GetParent()
+	if SERVER and IsValid(p) then
+		self:InflictDamage(p)
+	end
 end

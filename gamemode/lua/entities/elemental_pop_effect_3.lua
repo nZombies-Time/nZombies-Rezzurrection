@@ -31,6 +31,7 @@ ENT.RPM = 400
 ENT.ClipSize = 20
 ENT.MuzzleAttach = 1
 ENT.Kills = 0
+ENT.MaxKills = 24
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Activated")
@@ -188,6 +189,11 @@ function ENT:Think()
 		if self.ActivateTime < CurTime() and not self:GetActivated() then
 			self:SetActivated(true)
 		end
+
+		if self.Kills >= self.MaxKills then
+			self:Remove()
+			return false
+		end
 	end
 
 	self:NextThink(CurTime())
@@ -196,6 +202,7 @@ end
 
 function ENT:FakePrimaryAttack()
 	local wep = self:GetActiveWeapon()
+	if not IsValid(wep) then return end
 	local shootpos = wep.GetMuzzlePos and wep:GetMuzzlePos().Pos or wep:GetPos()
 
 	self:SetShootPos(shootpos)
@@ -203,6 +210,7 @@ function ENT:FakePrimaryAttack()
 
 	for k, v in pairs(ents.FindInSphere(shootpos, 200)) do
 		if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 then
+			if self.Kills >= self.MaxKills then break end
 			if v.NZBossType then continue end
 			if v.Alive and not v:Alive() then continue end
 			if table.HasValue(self.TargetsToIgnore, v) then continue end
@@ -230,6 +238,7 @@ function ENT:InflictDamage(ent)
 	damage:SetAttacker(IsValid(self:GetOwner()) and self:GetOwner() or self)
 	damage:SetInflictor(IsValid(self.Inflictor) and self.Inflictor or self)
 	damage:SetDamageForce(self:GetForward()*50000)
+	damage:SetDamagePosition(ent:WorldSpaceCenter())
 	damage:SetDamage(ent:Health() + 666)
 
 	if SERVER then

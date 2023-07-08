@@ -7,7 +7,9 @@ if SERVER then
 	util.AddNetworkString( "nzPowerUps.SyncPlayer" )
 	util.AddNetworkString( "nzPowerUps.SyncPlayerFull" )
 	util.AddNetworkString( "nzPowerUps.Nuke" ) -- See the nuke function in sv_powerups
-
+	util.AddNetworkString( "nzPowerUps.PickupHud" )
+	util.AddNetworkString( "RenderMaxAmmo" )
+	
 	function nzPowerUps:SendSync(receiver)
 		local data = table.Copy(self.ActivePowerUps)
 		

@@ -124,7 +124,7 @@ function SWEP:AdjustMouseSensitivity()
 		return 0.25
 	end
 	if self:GetStatus() ~= TFA.Enum.STATUS_SHOOTING and self:GetNextPrimaryFire() > CurTime() and self:GetStabbed() then
-		return math.Clamp(CurTime()/self:GetNextPrimaryFire(), 0.2, 1)
+		return math.Clamp(CurTime()/self:GetNextPrimaryFire(), 0, 1)
 	end
 end
 
@@ -197,17 +197,5 @@ function SWEP:Think2()
 		self:SetStabbed(false)
 	end
 
-	if IsValid(ply) and self:Clip1() <= 0 and self:Ammo1() > 0 and self:GetNextPrimaryFire() <= CurTime() and self.Primary.ClipSize > 0 then
-		self:Reload(true)
-	end
-
 	return BaseClass.Think2(self)
-end
-
-function SWEP:Hoslter(...)
-	if self:GetLunging() then
-		return false
-	end
-
-	return BaseClass.Hoslter(self, ...)
 end

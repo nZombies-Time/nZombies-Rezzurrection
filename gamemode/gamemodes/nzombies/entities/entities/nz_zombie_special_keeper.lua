@@ -6,9 +6,9 @@ ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-function ENT:Draw() //Runs every frame
+--[[function ENT:Draw() //Runs every frame
 	self:DrawModel()
-end
+end]]
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -16,6 +16,9 @@ ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = false
 ENT.IsMooSpecial = true
+
+ENT.AttackRange = 65
+ENT.DamageRange = 65
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/genesis/moo_codz_t7_genesis_keeper.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -26,20 +29,20 @@ ENT.BarricadeTearSequences = {
 
 local AttackSequences = {
 	{seq = "nz_keeper_stand_attack_v1", dmgtimes = {0.75, 1.25}},
-	{seq = "nz_keeper_stand_attack_v2", dmgtimes = {0.75, 1.25}},
-	{seq = "nz_keeper_stand_attack_v3", dmgtimes = {0.95, 1.35}},
-	{seq = "nz_keeper_stand_attack_v4", dmgtimes = {0.85, 1.30}},
+	{seq = "nz_keeper_stand_attack_v2", dmgtimes = {0.75, 2.35}},
+	{seq = "nz_keeper_stand_attack_v3", dmgtimes = {0.65}},
+	{seq = "nz_keeper_stand_attack_v4", dmgtimes = {0.15, 0.60, 1.10}},
 }
 
 local RunAttackSequences = {
-	{seq = "nz_keeper_moving_attack_v1", dmgtimes = {0.45}},
-	{seq = "nz_keeper_moving_attack_v2", dmgtimes = {0.45}},
+	{seq = "nz_keeper_moving_attack_v1", dmgtimes = {0.4}},
+	{seq = "nz_keeper_moving_attack_v2", dmgtimes = {0.6}},
 	{seq = "nz_keeper_moving_attack_v3", dmgtimes = {0.25}},
-	{seq = "nz_keeper_moving_attack_v4", dmgtimes = {0.25}},
+	{seq = "nz_keeper_moving_attack_v4", dmgtimes = {0.25, 0.55}},
 }
 
 local JumpSequences = {
-	{seq = "nz_keeper_barricade_trav", speed = 25, time = 3},
+	{seq = "nz_keeper_barricade_trav", speed = 50, time = 3},
 }
 local walksounds = {
 	Sound("nz_moo/zombies/vox/_keeper/vox_amb/amb_00.mp3"),
@@ -49,40 +52,6 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_keeper/vox_amb/amb_04.mp3"),
 	Sound("nz_moo/zombies/vox/_keeper/vox_amb/amb_05.mp3"),
 	Sound("nz_moo/zombies/vox/_keeper/vox_amb/amb_06.mp3"),
-}
-
-
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[2] = {
-		act = ACT_WALK_ANGRY,
-		minspeed = 25,
-		attackanims = RunAttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 60,
-		attackanims = RunAttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[4] = {
-		act = ACT_SPRINT,
-		minspeed = 145,
-		attackanims = RunAttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[5] = {
-		act = ACT_SUPERSPRINT,
-		minspeed = 220,
-		attackanims = RunAttackSequences,
-		barricadejumps = JumpSequences,
-	},
 }
 
 ENT.IdleSequence = "nz_keeper_idle"
@@ -96,6 +65,8 @@ ENT.SequenceTables = {
 				"nz_keeper_walk_v3",
 				"nz_keeper_walk_v4",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		}
 	}},
@@ -107,6 +78,8 @@ ENT.SequenceTables = {
 				"nz_keeper_run_v3",
 				"nz_keeper_run_v4",
 			},
+			AttackSequences = {RunAttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		}
 	}},
@@ -118,6 +91,8 @@ ENT.SequenceTables = {
 				"nz_keeper_sprint_v3",
 				"nz_keeper_sprint_v4",
 			},
+			AttackSequences = {RunAttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		}
 	}}
@@ -185,9 +160,8 @@ function ENT:StatsInitialize()
 			self:SetHealth( nzRound:GetZombieHealth() or 75 )
 		end
 
-		--Preselect the emerge sequnces for clientside use
-		self:SetBodygroup( 1 ,math.random(0,2))
-		self:SetBodygroup( 2 , math.random(0,4))
+		self:SetCollisionBounds(Vector(-12,-12, 0), Vector(12, 12, 77))
+
 	end
 end
 
@@ -216,74 +190,6 @@ function ENT:PerformDeath(dmgInfo)
 	self:StopSound("nz_moo/zombies/vox/_keeper/keeper_lp.wav")
 	ParticleEffect("doom_dissolve_flameburst",self:WorldSpaceCenter(),Angle(0,0,0),nil)
 	self:Remove(dmgInfo)
-end
-
--- A standard attack you can use it or create something fancy yourself
-function ENT:Attack( data )
-
-	self:SetLastAttack(CurTime())
-
-	data = data or {}
-	
-	data.attackseq = data.attackseq
-	if !data.attackseq then
-		local curstage = self:GetActStage()
-		local actstage = self.ActStages[curstage]
-		if !self:GetCrawler() and !actstage and curstage <= 0 then actstage = self.ActStages[1] end
-		--if self:GetCrawler() then self.CrawlAttackSequences end
-		
-		local attacktbl = actstage and actstage.attackanims or self.AttackSequences
-		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-		
-		if type(target) == "table" then
-			local id, dur = self:LookupSequenceAct(target.seq)
-			if !target.dmgtimes then
-			data.attackseq = {seq = id, dmgtimes =  {0.5} }
-			else
-			data.attackseq = {seq = id, dmgtimes = target.dmgtimes }
-			end
-			data.attackdur = dur
-		elseif target then -- It is a string or ACT
-			local id, dur = self:LookupSequenceAct(attacktbl)
-			data.attackseq = {seq = id, dmgtimes = {dur/2}}
-			data.attackdur = dur
-		else
-			local id, dur = self:LookupSequence("swing")
-			data.attackseq = {seq = id, dmgtimes = {1}}
-			data.attackdur = dur
-		end
-	end
-	
-	self:SetAttacking( true )
-	if IsValid(self:GetTarget()) and self:GetTarget():Health() and self:GetTarget():Health() > 0 then -- Doesn't matter if its a player... If the zombie is targetting it, they probably wanna attack it.
-		for k,v in pairs(data.attackseq.dmgtimes) do
-			self:TimedEvent( v, function()
-				if self.AttackSounds then self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) end
-				self:EmitSound( "npc/vort/claw_swing1.wav", 90, math.random(95, 105))
-				if !self:GetStop() and self:IsValidTarget( self:GetTarget() ) and self:TargetInRange( self:GetAttackRange() + 10 ) then
-					local dmgInfo = DamageInfo()
-					dmgInfo:SetAttacker( self )
-					dmgInfo:SetDamage( 50 )
-					dmgInfo:SetDamageType( DMG_SLASH )
-					dmgInfo:SetDamageForce( (self:GetTarget():GetPos() - self:GetPos()) * 7 + Vector( 0, 0, 16 ) )
-					self:GetTarget():TakeDamageInfo(dmgInfo)
-					if !IsValid(self:GetTarget()) then return end
-					self:GetTarget():EmitSound( "nz_moo/zombies/plr_impact/_zhd/evt_zombie_hit_player_0"..math.random(0,5)..".mp3", SNDLVL_TALKING, math.random(95,105))
-					
-					if self:GetTarget():IsPlayer() then
-						self:GetTarget():ViewPunch( VectorRand():Angle() * 0.01 )
-					end
-				end
-			end)
-		end
-	end
-
-	self:TimedEvent(data.attackdur, function()
-		self:SetAttacking(false)
-		self:SetLastAttack(CurTime())
-	end)
-
-	self:PlayAttackAndWait(data.attackseq.seq, 1)
 end
 
 function ENT:OnRemove()

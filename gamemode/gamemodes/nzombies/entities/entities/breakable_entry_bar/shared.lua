@@ -11,6 +11,7 @@ ENT.Instructions	= ""
 function ENT:Initialize()
 	self:SetModel("models/moo/_moo_custom_props/barricade_rebar/moo_codz_gm_barricade_rebar.mdl")
 	self.AutomaticFrameAdvance = true
+	self.Torn = true
 	self:SetMoveType( MOVETYPE_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
 	--self:SetModelScale(1)

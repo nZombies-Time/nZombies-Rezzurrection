@@ -165,7 +165,7 @@ function ENT:PerformDeath(dmgInfo)
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 		if IsValid(self) then
 			if self.IgnitedFoxy then
-				ParticleEffect("fx_hellhound_explosion",self:GetPos(),self:GetAngles(),self)
+				ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
 				self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
 				self:Remove()
 			else
@@ -188,7 +188,7 @@ function ENT:DoDeathAnimation(seq)
 		self:PlaySequenceAndWait(seq)
 		if IsValid(self) then
 			if self.IgnitedFoxy then
-				ParticleEffect("fx_hellhound_explosion",self:GetPos(),self:GetAngles(),self)
+				ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
 				self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
 				self:Remove()
 			else
@@ -208,7 +208,7 @@ function ENT:OnPathTimeOut()
 			self:SetRunSpeed( 71 )
 			self.loco:SetDesiredSpeed( 71 )
 			self:SpeedChanged()
-			ParticleEffectAttach("fx_hellhound_aura_fire",PATTACH_ABSORIGIN_FOLLOW,self,0)
+			ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 		end
 	end
 end

@@ -15,6 +15,7 @@ if SERVER then
 		if self:HasPerk("tombstone") then
 			nzRevive.Players[id].tombstone = true
 		end
+
 		if #player.GetAllPlaying() <= 1 and self:HasPerk("revive") and (!self.SoloRevive or self.SoloRevive < 3) then
 			self.SoloRevive = self.SoloRevive and self.SoloRevive + 1 or 1
 			self.DownedWithSoloRevive = true
@@ -26,13 +27,19 @@ if SERVER then
 			end)
 		end
 
+		if #player.GetAllPlaying() <= 1 and !nzRound:InState(ROUND_CREATE) or nzRound:InState(ROUND_GO) then
+			for k,v in pairs(ents.FindByClass("player_spawns")) do
+				v:SetTargetPriority(TARGET_PRIORITY_SPECIAL) -- This allows zombies to retreat to player spawns in solo games.
+			end
+		end
+
+		self.OldUpgrades = self:GetUpgrades()
 		self.OldPerks = self:GetPerks()
 		self.OldWeapons = {}
 
 		for k, v in pairs(self:GetWeapons()) do
 			if v.IsTFAWeapon then
 				if v.NZSpecialCategory == "display" then continue end
-
 				table.insert(self.OldWeapons, {class = v:GetClass(), pap = v:HasNZModifier("pap")})
 			end
 		end
@@ -51,11 +58,11 @@ if SERVER then
 
 		-- Equip the first pistol found in inventory - unless a pistol is already equipped
 		local wep = self:GetActiveWeapon()
-		if IsValid(wep) and wep.GetHoldType and wep:GetHoldType() == "pistol" or wep:GetHoldType() == "duel" or wep.HoldType == "pistol" or wep.HoldType == "duel" then
+		if IsValid(wep) and wep.GetHoldType and wep:GetHoldType() == "pistol" or wep.HoldType == "pistol" then
 			return
 		end
 		for k,v in pairs(self:GetWeapons()) do
-			if v.GetHoldType and v:GetHoldType() == "pistol" or v:GetHoldType() == "duel" or v.HoldType == "pistol" or v.HoldType == "duel" then
+			if v.GetHoldType and v:GetHoldType() == "pistol" or v.HoldType == "pistol" then
 				self:SelectWeapon(v:GetClass())
 				return
 			end
@@ -64,6 +71,7 @@ if SERVER then
 
 	function playerMeta:RevivePlayer(revivor, nosync)
 		local id = self:EntIndex()
+		local tbl = {}
 		if !nzRevive.Players[id] then return end
 		nzRevive.Players[id] = nil
 		if !nosync then
@@ -71,8 +79,12 @@ if SERVER then
 		end
 		self:SetTargetPriority(TARGET_PRIORITY_NONE)
         timer.Simple(2, function()
-			if (IsValid(self)) and self:IsPlaying() then
+			if (IsValid(self)) and (self:IsPlaying()) then
 				self:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+
+				for k,v in pairs(ents.FindByClass("player_spawns")) do
+					v:SetTargetPriority(TARGET_PRIORITY_NONE) -- Get rid of the spawn's target priority.
+				end
 			end
 		end)
 
@@ -85,6 +97,17 @@ if SERVER then
 		self.DownPoints = nil
 		self.DownedWithSoloRevive = nil
 
+		for k, v in pairs(ents.GetAll()) do
+			if v:IsValidZombie() then
+				table.insert(tbl, v)
+			end
+		end
+		if !table.IsEmpty(tbl) then
+			if #tbl >= 16 then
+				local SND = "RevivalStinger"
+				nzSounds:Play(SND)
+			end
+		end
 		self:ResetHull()
 	end
 

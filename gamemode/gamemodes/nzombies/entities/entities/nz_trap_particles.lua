@@ -330,11 +330,12 @@ function ENT:HurtEntsByRadius(radius)
 				if (!self:TargetIsZombie(ent)) then return end
 	
 				local dmg = DamageInfo()
+				dmg:SetDamageType(DMG_BURN)
 				dmg:SetAttacker(Entity(0))
 				dmg:SetInflictor(Entity(0))
 				dmg:SetDamage(ent:Health() * 2)
 				dmg:SetDamageForce(Vector(0,0,0))
-				ent:Kill(dmg)
+				ent:TakeDamageInfo(dmg)
 			end)
 		end
 	end

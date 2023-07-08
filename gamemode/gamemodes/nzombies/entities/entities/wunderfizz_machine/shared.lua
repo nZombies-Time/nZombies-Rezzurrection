@@ -76,12 +76,14 @@ function ENT:TurnOn()
 	self:SetCycle(0)
 	self:ResetSequence(turnon)
 	self.GoIdle = CurTime() + dur -- Delay when to go idle (after turn on animation)
+	self:EmitSound("nz_moo/perks/wonderfizz/ball_drop.mp3", 100)
 end
 
 function ENT:TurnOff(spawn)
 	self:SetActive(false)
 	local turnoff, dur = self:LookupSequence("turn_off")
 	self:ResetSequence(turnoff)
+	self:EmitSound("nz_moo/perks/wonderfizz/rand_perk_mach_leave.mp3", 100)
 	if spawn then self:SetCycle(1) else self:SetCycle(0) end
 	--self:SetCycle(0)
 	--self:SetPlaybackRate(10)
@@ -108,6 +110,8 @@ function ENT:Think()
 			e:SetOrigin(self:GetPos() + Vector(0,0,100))
 			e:SetMagnitude(0.5)
 			util.Effect("lightning_strike_wunderfizz", e)
+			ParticleEffect("ins_skybox_lightning",self:GetPos(),self:GetAngles(),nil)
+			--self:EmitSound("amb/weather/lightning/lightning_flash_0"..math.random(0,3)..".wav",511)
 			self.NextLightning = CurTime() + math.random(30)
 		end
 		self:NextThink(CurTime())

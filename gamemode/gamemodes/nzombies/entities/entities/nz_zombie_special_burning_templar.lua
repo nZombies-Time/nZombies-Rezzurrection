@@ -3,12 +3,11 @@ AddCSLuaFile()
 ENT.Base = "nz_zombie_walker_origins_templar"
 ENT.PrintName = "Burning Walker (Templar)"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle"
+ENT.Author = "GhostlyMoo"
 
 function ENT:StatsInitialize()
     if SERVER then
         dying = false
-		self:SetNoDraw(true) --This hides the brief "Default Pose" the zombie does before doing the spawn anim
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 260) )
 			self:SetHealth( math.random(75, 1000) )
@@ -24,18 +23,54 @@ function ENT:StatsInitialize()
 end
 
 function ENT:OnSpawn()
-	
-	--self:SetMaterial(table.Random({"burn"}))
-	ParticleEffect("doom_hellunit_spawn_small",self:GetPos(),self:GetAngles(),self)
-	self:EmitSound("nz_moo/zombies/spawn/zm_spawn_t9_0"..math.random(3)..".mp3", 90)
-	self:EmitSound("ambient/fire/mtov_flame2.wav")
+	local nav = navmesh.GetNavArea(self:GetPos(), 50)
+	if IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP) then
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+		self:CollideWhenPossible()
+	else
+		local SpawnMatSound = {
+			[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+			[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+			[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+			[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+		}
+		SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+		SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
 
-	self:SetSpecialAnimation(true)
-	local seq = self:SelectSpawnSequence()
-	if seq then
-		self:SetNoDraw(false)
-		self:PlaySequenceAndWait(seq)
-		self:SetSpecialAnimation(false)
+		local norm = (self:GetPos()):GetNormalized()
+		local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+
+		--ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		--self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+	
+		self:SetSpecialAnimation(true)
+		self:SetIsBusy(true)
+		local seq = self:SelectSpawnSequence()
+
+		if IsValid(nav) and nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) then
+			seq = self.UndercroftSequences[math.random(#self.UndercroftSequences)]
+		elseif IsValid(nav) and nav:HasAttributes(NAV_MESH_DONT_HIDE) then
+			seq = "nz_moo_wall_emerge_quick"
+		else
+			if tr.Hit then
+				local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+				self:EmitSound(finalsound)
+			end
+			ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+			self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+		end
+		if seq then
+			if IsValid(nav) and (nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) or nav:HasAttributes(NAV_MESH_DONT_HIDE)) then
+				self:PlaySequenceAndMove(seq, {gravity = false})
+			else
+				self:PlaySequenceAndMove(seq, {gravity = true})
+			end
+			self:SetSpecialAnimation(false)
+			self:SetIsBusy(false)
+			self:CollideWhenPossible()
+		end
 	end
 end
 

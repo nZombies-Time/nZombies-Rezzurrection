@@ -46,26 +46,6 @@ DEFINE_BASECLASS( ENT.Base )
 
 function ENT:Draw()
 	self:DrawModel()
-
-	local ply = LocalPlayer()
-	local angle = LocalPlayer():EyeAngles()
-	local pos = self:WorldSpaceCenter() + Vector(0,0,15)
-	local totaldist = 400^2
-	local distfade = 400^2
-	local playerpos = LocalPlayer():GetPos():DistToSqr(self:GetPos())
-	local fadefac = 1 - math.Clamp((playerpos - totaldist + distfade) / distfade, 0, 1)
-
-	angle = Angle(angle.x, angle.y, 0)
-	angle:RotateAroundAxis(angle:Up(), -90)
-	angle:RotateAroundAxis(angle:Forward(), 90)
-
-	if IsValid(ply) and ply == self:GetOwner() and (self.spawntime + 1) < CurTime() then
-		cam.Start3D2D(pos, angle, 1)
-			surface.SetMaterial(Material("vgui/hud/hud_grenadeicon.png", "smooth unlitgeneric"))
-			surface.SetDrawColor(255,255,255,255*fadefac)
-			surface.DrawTexturedRect(-8, -8, 16, 16)
-		cam.End3D2D()
-	end
 end
 
 function ENT:PhysicsCollide(data, phys)
@@ -98,12 +78,16 @@ end
 function ENT:Initialize()
 	BaseClass.Initialize(self)
 
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 	self.Damage = self.mydamage or self.Damage
 	self.killtime = CurTime() + self.Delay
 	self.spawntime = CurTime()
+	self.RangeSqr = self.Range*self.Range
 
 	if CLIENT then return end
+	//self:SetTrigger(true)
 	util.SpriteTrail(self, 0, Color(120, 120, 120), true, 6, 0, 0.5, 0.005, "cable/smoke.vmt")
 end
 
@@ -165,30 +149,31 @@ function ENT:Explode()
 	}
 
 	local damage = DamageInfo()
-	damage:SetDamage(self.Damage)
 	damage:SetAttacker(IsValid(ply) and ply or self)
 	damage:SetInflictor(IsValid(self.Inflictor) and self.Inflictor or self)
-	damage:SetDamageType(bit.bor(DMG_BLAST, DMG_AIRBOAT))
+	damage:SetDamageType(DMG_BLAST)
 
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Range)) do
-		if not v:IsWorld() and v:IsSolid() then
-			if v:IsPlayer() and v ~= ply then continue end
-			tr.endpos = v:WorldSpaceCenter()
-			local tr1 = util.TraceLine(tr)
-			if tr1.HitWorld then continue end
+		if v:IsWorld() then continue end
+		if v:IsPlayer() and v ~= ply then continue end
+		tr.endpos = v:WorldSpaceCenter()
+		local tr1 = util.TraceLine(tr)
+		if tr1.HitWorld then continue end
 
-			if v == ply then
-				local distfac = self:GetPos():Distance(v:GetPos())
-				distfac = 1 - math.Clamp(distfac/self.Range, 0, 1)
-				damage:SetDamage(100 * distfac)
-			end
+		local dist = self:GetPos():DistToSqr(v:GetPos())
+		dist = 1 - math.Clamp(dist/self.RangeSqr, 0, 0.5)
 
-			damage:SetDamageForce(v:GetUp()*10000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
+		damage:SetDamage(self.Damage * dist)
 
-			v:TakeDamageInfo(damage)
-
-			damage:SetDamage(self.Damage)
+		if v == ply then
+			damage:SetDamage(100 * dist)
 		end
+
+		damage:SetDamageForce(v:GetUp()*10000 + (v:GetPos() - self:GetPos()):GetNormalized()*10000)
+
+		v:TakeDamageInfo(damage)
+
+		damage:SetDamage(self.Damage)
 	end
 
 	util.ScreenShake(self:GetPos(), 10, 255, 1, self.Range*2)

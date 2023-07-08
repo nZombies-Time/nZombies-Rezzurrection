@@ -59,7 +59,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 			end
 		end
 
-		if dmginfo:IsDamageType( 131072 ) then
+		--[[if dmginfo:IsDamageType( 131072 ) then
 			if math.random(5) == 3 then
 				enemy:EmitSound("bo1_overhaul/n6/xplo"..math.random(2)..".mp3")
 				ParticleEffect("novagas_xplo",enemy:GetPos(),enemy:GetAngles(),nil)
@@ -75,9 +75,9 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 				vaporizer:Fire("TurnOn","",0)
 				vaporizer:Fire("kill","",15)
 			end
-		end
+		end]]
 
-		if dmginfo:IsDamageType( 1048576 ) then
+		--[[if dmginfo:IsDamageType( 1048576 ) then
 			if math.random(7) == 6 then
 				enemy:EmitSound("pop_acid.mp3",511)
 				local vaporizer = ents.Create("point_hurt")
@@ -99,9 +99,9 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 					gfx:Remove()
 				end)
 			end
-		end
+		end]]
 
-		if dmginfo:IsDamageType( 4096 ) then
+		--[[if dmginfo:IsDamageType( 4096 ) then
 			if math.random(10) == 6 then
 				enemy:EmitSound("pop_antimatter.wav", 94, math.random(90,100))
 				local ent = ents.Create("env_explosion")
@@ -120,23 +120,22 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 					gfx:Remove()
 				end)
 			end
-		end
+		end]]
 	end
 
 	if enemy:IsValidZombie() then
 		if attacker:IsPlayer() and attacker:GetNotDowned() then
 			if meleetypes[dmginfo:GetDamageType()] then
 				attacker:GivePoints(130)
-			elseif hitgroup == HITGROUP_HEAD then
-				enemy:EmitSound("nz_moo/effects/headshot_notif/headshot_notif_0"..math.random(2)..".mp3", 511)
+			elseif hitgroup == HITGROUP_HEAD and not dmginfo:IsDamageType(DMG_MISSILEDEFENSE) then
+				attacker:EmitSound("nz_moo/effects/headshot_notif/headshot_notif_0"..math.random(2)..".mp3", SNDLVL_TALKING)
 				attacker:GivePoints(100)
 				if dmginfo:IsBulletDamage() and attacker:HasUpgrade("vigor") then
 					attacker:GivePoints(50)
 				end
 
 				if attacker:HasPerk("deadshot") then
-					if not attacker.DeadshotChance then attacker.DeadshotChance = 0 end
-					if math.random(15) < attacker.DeadshotChance then
+					if math.random(15) < attacker:GetNW2Int("nz.DeadshotChance", 0) then
 						enemy:EmitSound("nzr/2022/effects/zombie/evt_kow_headshot.wav", 150)
 						enemy:EmitSound("nzr/2022/effects/zombie/head_0"..math.random(3)..".wav", 511)
 						ParticleEffect("divider_slash3", enemy:EyePos(), Angle(0,0,0))
@@ -145,12 +144,12 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 
 						local round = nzRound:GetNumber() > 0 and nzRound:GetNumber() or 1
 						local health = tonumber(nzCurves.GenerateHealthCurve(round))
-						local scale = math.random(1,5) * 0.1
+						local scale = math.random(3) * 0.1
 						if attacker:HasUpgrade("deadshot") then
-							scale = math.random(1,10) * 0.1
+							scale = math.random(9) * 0.1
 						end
 
-						for k, v in pairs(ents.FindInSphere(enemy:EyePos(), 150)) do
+						for k, v in pairs(ents.FindInSphere(enemy:EyePos(), 160)) do
 							if IsValid(v) and v:IsValidZombie() then
 								if v:Health() <= 0 then continue end
 								if v == enemy then continue end
@@ -170,9 +169,9 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 							end
 						end
 
-						attacker.DeadshotChance = 0
+						attacker:SetNW2Int("nz.DeadshotChance", 0)
 					else
-						attacker.DeadshotChance = attacker.DeadshotChance + (attacker:HasUpgrade("deadshot") and 2 or 1)
+						attacker:SetNW2Int("nz.DeadshotChance", attacker:GetNW2Int("nz.DeadshotChance", 0) + (attacker:HasUpgrade("deadshot") and 2 or 1))
 					end
 				end
 			elseif dmginfo:IsDamageType(DMG_MISSILEDEFENSE) then
@@ -180,7 +179,7 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 			else
 				attacker:GivePoints(50)
 				if dmginfo:IsBulletDamage() and attacker:HasUpgrade("vigor") then
-					attacker:GivePoints(math.random(1,5) * 10)
+					attacker:GivePoints(math.random(5) * 10)
 				end
 			end
 		end
@@ -199,19 +198,6 @@ function nzEnemies:OnEnemyKilled(enemy, attacker, dmginfo, hitgroup)
 
 		//print("Killed Enemy: " .. nzRound:GetZombiesKilled() .. "/" .. nzRound:GetZombiesMax() )
 
-		if nzRound:GetNumber() <= 23 and nzRound:GetNumber() >= 4 and !nzRound:IsSpecial() and nzRound:GetZombiesKilled() >= nzRound:GetZombiesMax() - 2 then -- In BO4 and CW, its the last "3" but I like "2" more.
-			for k, v in pairs(ents.GetAll()) do
-				if v:IsValidZombie() and !v.NZBossType and !v.IsMooSpecial and v.IsMooZombie then
-					timer.Simple(0, function() -- Next engine tick timers are cool... Unlike a certain other set of timers.
-						if IsValid(v) and v:GetAlive() then
-							//print("Fuck you bitch I'm coming to beat your ass!")
-							v.LastZombieMomento = true
-						end
-					end)
-				end
-			end
-		end
-
 		if nzRound:IsSpecial() and nzRound:GetZombiesKilled() >= nzRound:GetZombiesMax() then
 			nzPowerUps:SpawnPowerUp(enemy:GetPos(), "maxammo")
 		end
@@ -223,15 +209,29 @@ end
 function GM:EntityTakeDamage(zombie, dmginfo)
 	if zombie:IsPlayer() and dmginfo:IsDamageType(DMG_SLOWBURN) then return true end
 	if zombie:GetClass() == "whoswho_downed_clone" then return true end
-	if zombie.Alive and zombie:Health() <= 0 then zombie:Kill(dmginfo) end
+	if zombie.Alive and zombie:Health() <= 0 and zombie:Alive() and meleetypes[dmginfo:GetDamageType()] then zombie:Remove() end //failsafe for 0 health enemies (THAT DOESNT FUCKING WORK :DDDDDDDD)
+	--if zombie.Alive and zombie:Health() <= 0 /*and zombie:Alive()*/ then zombie:Kill(dmginfo) end
+	 -- Trying out stuff that doesn't use this dusty ass kill function.
 
 	local attacker = dmginfo:GetAttacker()
 	if !attacker:IsValid() then return end
 
 	if !attacker:IsPlayer() then
 		if IsValid(zombie) and zombie:IsValidZombie() and zombie:Health() > 0 then
+			if attacker.IsAATTurned and attacker:IsAATTurned() then
+				local turnedowner = attacker:GetNW2Entity("PERK.TurnedLogic"):GetAttacker()
+				if IsValid(turnedowner) and turnedowner:IsPlayer() then
+					dmginfo:SetDamageType(DMG_MISSILEDEFENSE)
+					dmginfo:SetAttacker(turnedowner)
+				end
+				dmginfo:SetDamage(zombie:Health() + 666)
+				nzEnemies:OnEnemyKilled(zombie, turnedowner, dmginfo, hitgroup)
+				return
+			end
+
 			if (attacker:GetClass() == "nz_trap_projectiles" or attacker:GetClass() == "nz_trap_turret") then 
-				zombie:Kill(dmginfo)
+				--zombie:Kill(dmginfo) -- Trying out stuff that doesn't use this dusty ass kill function.
+				zombie:TakeDamage(zombie:Health(), nil, nil)
 			end
 		end
 		return
@@ -241,21 +241,23 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 		local round = nzRound:GetNumber() > 0 and nzRound:GetNumber() or 1
 		local health = tonumber(nzCurves.GenerateHealthCurve(round))
 		local hitgroup = util.QuickTrace(dmginfo:GetDamagePosition(), dmginfo:GetDamagePosition()).HitGroup
+		local isplayer = attacker:IsPlayer()
 
 		if zombie.NZBossType then
+			if zombie.BossMeleeOnly and isplayer and not meleetypes[dmginfo:GetDamageType()] then return true end
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end
 
-			if blasttypes[dmginfo:GetDamageType()] then
-				dmginfo:SetDamage(dmginfo:GetDamage() * 1.5)
+			if isplayer and dmginfo:IsExplosionDamage() then
+				dmginfo:SetDamage(dmginfo:GetDamage() * (attacker:HasPerk("danger") and 2 or 1.2))
 			end
 
-			if attacker:HasUpgrade("death") then
-				dmginfo:ScaleDamage(10)
+			if isplayer and attacker:HasUpgrade("death") then
+				dmginfo:ScaleDamage(3)
 			end
 
-			if attacker:IsPlayer() and attacker:HasPerk("sake") and meleetypes[dmginfo:GetDamageType()] then
+			if isplayer and attacker:HasPerk("sake") and meleetypes[dmginfo:GetDamageType()] then
 				dmginfo:SetDamageType(DMG_SHOCK)
-				dmginfo:ScaleDamage(10)
+				dmginfo:ScaleDamage(2)
 			end
 
 			local data = nzRound:GetBossData(zombie.NZBossType)
@@ -271,13 +273,18 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 		elseif zombie:IsValidZombie() then
 			if zombie.IsAATTurned and zombie:IsAATTurned() then return true end
 			if zombie.IsInvulnerable and zombie:IsInvulnerable() then return true end
+			if zombie.BossMeleeOnly and isplayer and not meleetypes[dmginfo:GetDamageType()] then return true end
 
 			local wep = dmginfo:GetInflictor()
-			if not IsValid(wep) then
+			if not IsValid(wep) and isplayer then
 				wep = attacker:GetActiveWeapon()
 			end
 
-			if attacker:IsPlayer() and IsValid(wep) and hitgroup == HITGROUP_HEAD and (zombie.GetDecapitated and !zombie:GetDecapitated()) then 
+			if zombie:IsZombSlowed() then
+				dmginfo:ScaleDamage(2)
+			end
+
+			if isplayer and IsValid(wep) and hitgroup == HITGROUP_HEAD and (zombie.GetDecapitated and !zombie:GetDecapitated()) then 
 				if attacker:HasPerk("death") then
 					dmginfo:SetDamage(dmginfo:GetDamage() * (attacker:HasUpgrade("death") and 1.5 or 1.25))
 				end
@@ -296,34 +303,65 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				return
 			end
 
-			if !zombie.NZBossType and attacker:IsPlayer() and attacker:HasPerk("sake") and meleetypes[dmginfo:GetDamageType()] then
-				ParticleEffectAttach("bo3_waffe_electrocute", PATTACH_POINT_FOLLOW, zombie, 2)
-				if zombie:OnGround() then
-					ParticleEffectAttach("bo3_waffe_ground", PATTACH_ABSORIGIN_FOLLOW, zombie, 0)
+			if !zombie.NZBossType and isplayer and attacker:HasPerk("sake") and meleetypes[dmginfo:GetDamageType()] then
+				dmginfo:SetDamageType(DMG_MISSILEDEFENSE)
+				if attacker:HasUpgrade("sake") then
+					ParticleEffectAttach("bo3_waffe_electrocute", PATTACH_POINT_FOLLOW, zombie, 2)
+					if zombie:OnGround() then
+						ParticleEffectAttach("bo3_waffe_ground", PATTACH_ABSORIGIN_FOLLOW, zombie, 0)
+					end
+					dmginfo:SetDamageType(DMG_SHOCK)
 				end
-				/*if zombie:IsValidZombie() and not zombie.IsMooSpecial then
-					ParticleEffectAttach("bo3_waffe_eyes", PATTACH_POINT_FOLLOW, zombie, 3)
-					ParticleEffectAttach("bo3_waffe_eyes", PATTACH_POINT_FOLLOW, zombie, 4)
-				end*/
-				dmginfo:SetDamageType(DMG_SHOCK)
 				dmginfo:SetDamage(zombie:Health() + 666) 
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
+
+				if attacker:HasUpgrade("sake") and math.random(100) <= 45 and attacker:GetNW2Float("nz.SakeDelay", 0) < CurTime() and IsValid(wep) then
+					local waff = ents.Create("bo3_ww_wunderwaffe")
+					waff:SetModel("models/dav0r/hoverball.mdl")
+					waff:SetPos(zombie:WorldSpaceCenter())
+					waff:SetAngles(Vector(0,0,-1):Angle())
+					waff:SetOwner(attacker)
+					waff:SetNoDraw(true)
+					waff.Inflictor = wep
+
+					waff.Damage = 115
+					waff.mydamage = 115
+					waff.MaxChain = math.random(1, 3)
+					waff.ZapRange = 300
+					waff.ArcDelay = 0.4
+
+					waff:Spawn()
+
+					waff:SetOwner(attacker)
+					waff.Inflictor = wep
+
+					waff:SetVelocity(Vector(0,0,-4000))
+					local phys = waff:GetPhysicsObject()
+					if IsValid(phys) then
+						phys:SetVelocity(Vector(0,0,-4000))
+					end
+
+					attacker:SetNW2Float("nz.SakeDelay", CurTime() + 7)
+				end
+
 				return
 			end
 
-			if zombie:IsZombSlowed() then
-				dmginfo:ScaleDamage(2)
+			if isplayer and attacker:HasPerk("danger") and dmginfo:IsExplosionDamage() then
+				if IsValid(wep) then
+					if wep.Primary and (wep.Primary.Projectile or wep.Projectile) then
+						dmginfo:ScaleDamage(2)
+					end
+				else
+					dmginfo:ScaleDamage(2)
+				end
 			end
 
-			if attacker:IsPlayer() and attacker:HasPerk("danger") and blasttypes[dmginfo:GetDamageType()] and not dmginfo:IsBulletDamage() then
-				dmginfo:ScaleDamage(2)
+			if isplayer and dmginfo:IsDamageType(DMG_RADIATION) then
+				dmginfo:SetDamage(dmginfo:GetDamage() + health*0.01) //1% of MAX zombie health
 			end
 
-			if attacker:IsPlayer() and dmginfo:IsDamageType(DMG_RADIATION) then
-				dmginfo:SetDamage(dmginfo:GetDamage() + zombie:Health()*0.1) 
-			end
-
-			if attacker:IsPlayer() and attacker:HasPerk("fire") then
+			if isplayer and attacker:HasPerk("fire") then
 				if burntypes[dmginfo:GetDamageType()] then
 					dmginfo:ScaleDamage(attacker:HasUpgrade("fire") and 4 or 2)
 				end
@@ -333,17 +371,17 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				end
 			end
 
-			if attacker:IsPlayer() and dmginfo:IsDamageType(DMG_DIRECT) then
+			if isplayer and dmginfo:IsDamageType(DMG_DIRECT) then
 				dmginfo:SetDamage(zombie:Health() + 666) 
 				nzEnemies:OnEnemyKilled(zombie, attacker, dmginfo, hitgroup)
 				return
 			end
 
-			if attacker:IsPlayer() and burntypes[dmginfo:GetDamageType()] then
-				zombie:Ignite(dmginfo:GetDamage()/12)
+			if isplayer and burntypes[dmginfo:GetDamageType()] then
+				zombie:Ignite(math.Round(dmginfo:GetDamage()/15))
 			end
 
-			if attacker:IsPlayer() and dmginfo:IsDamageType(DMG_DROWN) then
+			if isplayer and dmginfo:IsDamageType(DMG_DROWN) then
 				if math.random(12) == 1 then
 					zombie:SetPlaybackRate(0)
 					zombie:SetMaterial("effects/freeze_overlayeffect01")
@@ -363,18 +401,11 @@ function GM:EntityTakeDamage(zombie, dmginfo)
 				end
 			end
 
-			if attacker:IsAATTurned() then
-				if IsValid(attacker:GetOwner()) then
-					dmginfo:SetAttacker(attacker:GetOwner())
-				end
-				dmginfo:SetDamage(zombie:Health() + 666)
-			end
-
 			if zombie:Health() > dmginfo:GetDamage() then
 				if zombie.HasTakenDamageThisTick then return end
 
-				if attacker:IsPlayer() and attacker:GetNotDowned() and !hook.Call("OnZombieShot", nil, zombie, attacker, dmginfo, hitgroup) then
-					if attacker:HasPerk("widowswine") and meleetypes[dmginfo:GetDamageType()] then
+				if isplayer and attacker:GetNotDowned() and !hook.Call("OnZombieShot", nil, zombie, attacker, dmginfo, hitgroup) then
+					if attacker:HasPerk("widowswine") and meleetypes[dmginfo:GetDamageType()] and zombie.BO3SpiderWeb then
 						zombie:BO3SpiderWeb(10)
 					end
 					attacker:GivePoints(10)
@@ -430,6 +461,29 @@ hook.Add("OnRoundPreparation", "NZIncreaseSpawnedZombies", function()
 	end
 end)
 
+-- Resseting player stats on round start
+hook.Add("OnRoundStart", "nz.ResetKillStats", function()
+	for _, ply in ipairs(player.GetAll()) do
+		if ply:HasPerk("everclear") then
+			ply:SetNW2Int("nz.ZombShellDelay", 1)
+			ply:SetNW2Int("nz.ZombShellCount", 0)
+		end
+		if ply:HasPerk("fire") then
+			ply:SetNW2Float("nz.BurnDelay", 1)
+			ply:SetNW2Int("nz.BurnCount", 0)
+		end
+		if ply:HasPerk("winters") then
+			ply:SetNW2Float("nz.WailDelay", 1)
+			ply:SetNW2Int("nz.WailCount", ply:HasUpgrade("winters") and 4 or 3)
+		end
+		if ply:HasUpgrade("jugg") then
+			local armor = ply:Armor()
+			local bonus = math.max(200, armor)
+			ply:SetArmor(bonus)
+		end
+	end
+end)
+
 -- Custom kill drops and effects
 hook.Add("OnZombieKilled", "nzZombieKill", function(ent, dmginfo)
 	local ply = dmginfo:GetAttacker()
@@ -437,12 +491,12 @@ hook.Add("OnZombieKilled", "nzZombieKill", function(ent, dmginfo)
 		local wep = dmginfo:GetInflictor()
 
 		if ply:HasPerk("pop") and IsValid(wep) and wep.IsTFAWeapon and not wep.NZSpecialCategory then
-			if ply.ElementalPOPDelay < CurTime() then
-				if math.random(10) < ply.ElementalPOPChance then
-					ply.ElementalPOPDelay = CurTime() + (ply:HasUpgrade("pop") and 10 or 30)
-					ply.ElementalPOPChance = 0
+			if ply:GetNW2Float("nz.EPopDelay", 0) < CurTime() then
+				if math.random(15) < ply:GetNW2Int("nz.EPopChance", 0) then
+					ply:SetNW2Float("nz.EPopDelay", CurTime() + (ply:HasUpgrade("pop") and 10 or 30))
+					ply:SetNW2Int("nz.EPopChance", 0)
 
-					local eff = wep:SharedRandom(1, (ply:HasUpgrade("pop") and 8 or 7), "Elemental")
+					local eff = wep:SharedRandom(1, (ply:HasUpgrade("pop") and 8 or 7), "Chaos")
 					ply:SetNW2Int("nz.EPopEffect", eff)
 					ply:SetNW2Float("nz.EPopDecay", CurTime() + 2)
 
@@ -456,7 +510,7 @@ hook.Add("OnZombieKilled", "nzZombieKill", function(ent, dmginfo)
 
 					aat:Spawn()
 				else
-					ply.ElementalPOPChance = ply.ElementalPOPChance + (ply:HasUpgrade("pop") and 2 or 1)
+					ply:SetNW2Int("nz.EPopChance", ply:GetNW2Int("nz.EPopChance", 0) + (ply:HasUpgrade("pop") and 2 or 1))
 				end
 			end
 		end
@@ -470,7 +524,7 @@ hook.Add("OnZombieKilled", "nzZombieKill", function(ent, dmginfo)
 				duration = math.random(10, 20)
 			end
 
-			if math.random(chance) == 1 and ply.ZombShellDelay < CurTime() then
+			if math.random(chance) == 1 and ply:GetNW2Float("nz.ZombShellDelay",0) < CurTime() then
 				local zomb = ents.Create("zombshell_effect")
 				zomb:SetPos(ent:WorldSpaceCenter())
 				zomb:SetOwner(ply)
@@ -479,8 +533,8 @@ hook.Add("OnZombieKilled", "nzZombieKill", function(ent, dmginfo)
 
 				zomb:Spawn()
 
-				ply.ZombShellDelay = CurTime() + (10 * ply.ZombShellCount)
-				ply.ZombShellCount = ply.ZombShellCount + 1
+				ply:SetNW2Float("nz.ZombShellDelay", CurTime() + (10 * ply:GetNW2Int("nz.ZombShellCount",0)))
+				ply:SetNW2Int("nz.ZombShellCount", ply:GetNW2Int("nz.ZombShellCount",0) + 1)
 			end
 		end
 

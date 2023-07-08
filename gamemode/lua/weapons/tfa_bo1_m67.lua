@@ -18,7 +18,7 @@ SWEP.ViewModelFOV = 65
 SWEP.WorldModel			= "models/nzr/2022/weapons/w_m67.mdl"
 SWEP.HoldType = "grenade"
 SWEP.CameraAttachmentOffsets = {}
-SWEP.CameraAttachmentScale = 2
+SWEP.CameraAttachmentScale = 1
 SWEP.VMPos = Vector(0, 0, 0)
 SWEP.VMAng = Vector(0, 0, 0)
 SWEP.VMPos_Additive = true
@@ -40,13 +40,13 @@ SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
 
 --[Gun Related]--
 SWEP.Primary.Sound = "nil"
-SWEP.Primary.Ammo = "grenade"
+SWEP.Primary.Ammo = "Grenade"
 SWEP.Primary.Automatic = false
 SWEP.Primary.RPM = 800
-SWEP.Primary.Damage = 100
+SWEP.Primary.Damage = 150
 SWEP.Primary.AmmoConsumption = 0
-SWEP.Primary.ClipSize = -1
-SWEP.Primary.DefaultClip = 10
+SWEP.Primary.ClipSize = 999
+SWEP.Primary.DefaultClip = 999
 SWEP.Primary.Delay = 0.15
 SWEP.DisableChambering = true
 SWEP.SelectiveFire = false
@@ -117,6 +117,15 @@ SWEP.EventTable = {
 },
 [ACT_VM_THROW] = {
 { ["time"] = 5 / 45, ["type"] = "sound", ["value"] = Sound("TFA.BO1.M67.Throw") },
+{ ["time"] = 0, ["type"] = "lua", value = function(self)
+	local ply = self:GetOwner()
+	if IsValid(ply) and ply.TFAVOX_Sounds then
+	local sndtbl = ply.TFAVOX_Sounds['main']
+		if sndtbl then
+			TFAVOX_PlayVoicePriority(ply, sndtbl['jump'], 1)
+		end
+	end
+end, client = false, server = true},
 },
 }
 

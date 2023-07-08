@@ -27,6 +27,9 @@ ENT.PrintName = "Turned"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
+ENT.Delay = 25
+ENT.Dance = false
+
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
 	self:NetworkVar("Entity", 1, "Inflictor")
@@ -41,11 +44,22 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_NONE)
 
 	if CLIENT then return end
+
+	if math.random(100) >= 70 then
+		self.Dance = true
+		self.Delay = 12
+	end
+
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
 		if v:IsValidZombie() and v:Health() > 0 then
 			if v:IsAATTurned() then continue end
+			if v:GetClass() == "nz_zombie_boss_astro" then
+				v:AATTurned(10, self:GetAttacker(), true)
+				break
+			end
+			if v.IsMooSpecial and not v.MooSpecialZombie then continue end
 
-			v:AATTurned(10)
+			v:AATTurned(self.Delay, self:GetAttacker(), self.Dance)
 			v:SetOwner(self:GetAttacker())
 			break
 		end

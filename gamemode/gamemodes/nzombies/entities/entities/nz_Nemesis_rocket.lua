@@ -7,7 +7,7 @@ ENT.Spawnable		= false
 ENT.AdminSpawnable	= false
 
 
-ENT.MyModel = "models/missiles/rpg_rocket_cod4rm.mdl"
+ENT.MyModel = "models/weapons/w_type97.mdl"
 ENT.MyModelScale = 1
 ENT.Damage = 75
 ENT.Radius = 350
@@ -17,16 +17,16 @@ if SERVER then
 
 	function ENT:Initialize()
 
-		local model = self.MyModel and self.MyModel or  "models/missiles/rpg_rocket_cod4rm.mdl"
+		local model = self.MyModel and self.MyModel or  "models/weapons/w_type97.mdl"
 		self.Class = self:GetClass()
 		
 		self:SetModel(model)
-		ParticleEffectAttach("rocket_smoke",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		ParticleEffectAttach("bo3_panzer_engine",PATTACH_ABSORIGIN_FOLLOW,self,0)
 			--self:SetSequence( "fly_suicide" )
 		self:PhysicsInit(SOLID_OBB)
 		self:SetSolid(SOLID_NONE)
 		self:SetTrigger(true)
-		self:SetAngles( Angle( 180,180,180 ))
+		self:SetAngles( Angle( 0,0,0 ))
 		self:UseTriggerBounds(true, 0)
 		self:SetMoveType(MOVETYPE_FLY)
 		--self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)

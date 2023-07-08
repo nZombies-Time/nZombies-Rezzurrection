@@ -9,12 +9,6 @@ ENT.Contact = "dont"
 
 game.AddParticles("particles/moo_powerup_fx.pcf")
 
---[[PrecacheParticleSystem("nz_powerup_purple") -- Not added yet
-PrecacheParticleSystem("nz_powerup_global")
-PrecacheParticleSystem("nz_powerup_local")
-PrecacheParticleSystem("nz_powerup_anti")
-PrecacheParticleSystem("nz_powerup_mini")]]
-
 ENT.NextDraw = 0
 
 function ENT:SetupDataTables()
@@ -44,12 +38,12 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_NONE)
 	self:SetSolid(SOLID_NONE)
 	self:UseTriggerBounds(true, 1)
+	self:DrawShadow(false)
 
-	if nzPowerUps:Get(self:GetPowerUp()).global then
-		timer.Simple(0, function() if IsValid(self) then ParticleEffectAttach("bo3_qed_powerup", 1, self, 0) end end)
-	else -- This uses the new Powerup FX that were done not too long ago... But now Non-Global Powerups have a Blue Aura rather than the normal green one.
-		timer.Simple(0, function() if IsValid(self) then ParticleEffectAttach("bo3_qed_powerup_local", 1, self, 0) end end)
-	end
+	timer.Simple(0, function()
+		if not IsValid(self) then return end
+		ParticleEffectAttach(nzPowerUps:Get(self:GetPowerUp()).global and "nz_powerup_global_intro" or "nz_powerup_local_intro", 1, self, 0)
+	end)
 
 	self:EmitSound("nz_moo/powerups/powerup_intro_start.mp3")
 	self:EmitSound("nz_moo/powerups/powerup_intro_lp.wav",100, 100, 1, 2)
@@ -60,11 +54,11 @@ function ENT:Initialize()
 	local distfac = 0.1
 	local nearest = self:FindNearestPlayer(self:GetPos())
 	if IsValid(nearest) then
-		local dist = math.Clamp(self:GetPos():Distance(nearest:GetPos()), 0, 256)
-		distfac = 1 - math.Clamp(dist / 256, 0, 1)
+		local dist = self:GetPos():DistToSqr(nearest:GetPos())
+		distfac = 1 - math.Clamp(dist / 40000, 0, 1) //200^2
 	end
 
-	self:SetActivateTime(CurTime() + (4.5 * distfac))
+	self:SetActivateTime(CurTime() + (3 * distfac))
 	self:SetBlinkTime(CurTime() + 25)
 	self:SetKillTime(CurTime() + 30)
 
@@ -72,65 +66,107 @@ function ENT:Initialize()
 	self:SetBlinking(false)
 
 	if CLIENT then return end
-
+	self:SetTrigger(true)
+	self:SetUseType(SIMPLE_USE)
 	if IsValid(nearest) then
-		local size = Vector(2, 2, 2)
-		local entpos = nearest:WorldSpaceCenter()
-		local pos = self:WorldSpaceCenter()
+		self:OOBTest(nearest)
+	end
+end
 
-		local tr = util.TraceLine({
-			start = pos,
-			endpos = entpos,
-			filter = {self, nearest},
-			mask = MASK_SOLID_BRUSHONLY
-		})
+function ENT:OOBTest(ply)
+	if CLIENT then return end
+	if not IsValid(ply) then return end
 
-		if tr.HitWorld then //Check 1, trace to player, if hits wall, check in sphere for barricads to place infront of
-			local barricade = self:FindNearestBarricade(self:GetPos())
-			if IsValid(barricade) then
-				local normal = (nearest:GetPos() - barricade:GetPos()):GetNormalized()
-				local fwd = barricade:GetForward()
-				local dot = fwd:Dot(normal)
-				if 0 < dot then
-					self:SetPos(barricade:WorldSpaceCenter() + fwd*50)
-				else
-					self:SetPos(barricade:WorldSpaceCenter() + fwd*-50)
-				end
+	local size = Vector(2, 2, 2)
+	local entpos = ply:WorldSpaceCenter()
+	local pos = self:WorldSpaceCenter()
+
+	local tr = util.TraceLine({
+		start = pos,
+		endpos = entpos,
+		filter = {self, ply},
+		mask = MASK_SOLID_BRUSHONLY
+	})
+
+	//Check 1, trace to player, if interrupted by world, teleport infront of a barricade closest to player
+	if tr.HitWorld then
+		local barricade = self:FindNearestBarricade(entpos)
+		if barricade and IsValid(barricade) then
+			//print('Powerup1, Trace to player blocked by world')
+			local normal = (ply:GetPos() - barricade:GetPos()):GetNormalized()
+			local fwd = barricade:GetForward()
+			local dot = fwd:Dot(normal)
+			if 0 < dot then
+				self:SetPos(barricade:WorldSpaceCenter() + fwd*50)
+			else
+				self:SetPos(barricade:WorldSpaceCenter() + fwd*-50)
 			end
-		end
-
-		for k, v in pairs(ents.FindAlongRay(pos, entpos, -size, size)) do
-			if v:GetClass() == "breakable_entry" then //Check 2, raycast to player, if hit barricade, place infront of
-				local normal = (nearest:GetPos() - v:GetPos()):GetNormalized()
-				local fwd = v:GetForward()
-				local dot = fwd:Dot(normal)
-
-				if 0 < dot then
-					self:SetPos(v:WorldSpaceCenter() + fwd*50)
-				else
-					self:SetPos(v:WorldSpaceCenter() + fwd*-50)
-				end
-			end
+			return
 		end
 	end
 
-	self:SetTrigger(true)
-	self:SetUseType(SIMPLE_USE)
+	//Check 2, raycast to player, if interrupted by a barricade, teleport infront of that barricade
+	for k, v in pairs(ents.FindAlongRay(pos, entpos, -size, size)) do
+		if v:GetClass() == "breakable_entry" then
+			//print('Powerup2, Barricade blocking raycast to player')
+			local normal = (ply:GetPos() - v:GetPos()):GetNormalized()
+			local fwd = v:GetForward()
+			local dot = fwd:Dot(normal)
+
+			if 0 < dot then
+				self:SetPos(v:WorldSpaceCenter() + fwd*50)
+			else
+				self:SetPos(v:WorldSpaceCenter() + fwd*-50)
+			end
+			return
+		end
+	end
+
+	//Check 3, if theres a barricade next to us at all, place on side with player
+	for k, v in pairs(ents.FindInSphere(pos, 60)) do
+		if v:GetClass() == "breakable_entry" then
+			//print('Powerup3, Barricade too close')
+			local ply2 = self:FindNearestPlayer(v:GetPos())
+			local normal = (self:GetPos() - v:GetPos()):GetNormalized()
+			local normal2 = (ply2:GetPos() - v:GetPos()):GetNormalized()
+			local fwd = v:GetForward()
+			local dot = fwd:Dot(normal)
+			local dot2 = fwd:Dot(normal2)
+
+			if 0 < dot2 and dot > 0 then
+				self:SetPos(v:WorldSpaceCenter() + fwd*50)
+			elseif 0 > dot2 and dot < 0 then
+				self:SetPos(v:WorldSpaceCenter() + fwd*-50)
+			end
+			return
+		end
+	end
 end
 
 function ENT:FindNearestPlayer(pos)
+	if not pos then
+		pos = self:GetPos()
+	end
+
 	local nearbyents = {}
-	for k, v in pairs(ents.FindInSphere(pos, 2048)) do
-		if v:IsPlayer() then
+	for k, v in pairs(player.GetAll()) do
+		if v:Alive() then
 			table.insert(nearbyents, v)
 		end
 	end
 
-	table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	if table.IsEmpty(nearbyents) then return end
+	if #nearbyents > 1 then
+		table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	end
 	return nearbyents[1]
 end
 
 function ENT:FindNearestBarricade(pos)
+	if not pos then
+		pos = self:GetPos()
+	end
+
 	local nearbyents = {}
 	for k, v in pairs(ents.FindInSphere(pos, 2048)) do
 		if v:GetClass() == "breakable_entry" then
@@ -138,7 +174,10 @@ function ENT:FindNearestBarricade(pos)
 		end
 	end
 
-	table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	if table.IsEmpty(nearbyents) then return end
+	if #nearbyents > 1 then
+		table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	end
 	return nearbyents[1]
 end
 
@@ -177,9 +216,22 @@ function ENT:Think()
 
 		self:SetNoDraw(not self:GetNoDraw())
 		self.NextDraw = CurTime() + math.Clamp(1 * final, 0.1, 1)
+
+		if not self:GetNoDraw() then
+			local global = nzPowerUps:Get(self:GetPowerUp()).global
+			ParticleEffectAttach(global and "nz_powerup_global" or "nz_powerup_local", 1, self, 0)
+		end
 	end
 
 	if not self:GetActivated() and self:GetActivateTime() < CurTime() then
+		self:StopParticles()
+		self:DrawShadow(true)
+
+		local global = nzPowerUps:Get(self:GetPowerUp()).global
+		local att = self:GetAttachment(1)
+		ParticleEffect(global and "nz_powerup_global_poof" or "nz_powerup_local_poof", att and att.Pos or self:WorldSpaceCenter(), angle_zero)
+		ParticleEffectAttach(global and "nz_powerup_global" or "nz_powerup_local", 1, self, 0)
+
 		self:SetMaterial("")
 		self:EmitSound("nz_moo/powerups/powerup_spawn_zhd_"..math.random(1,3)..".mp3",100)
 		self:StopSound("nz_moo/powerups/powerup_intro_lp.wav")
@@ -193,7 +245,7 @@ function ENT:Think()
 	if SERVER then
 		local pdata = nzPowerUps:Get(self:GetPowerUp())
 		if not pdata.nopush then
-			for k, v in pairs(ents.FindInSphere(self:GetPos(), pdata.pusharea or 10)) do --powerups are too close to each other!
+			for k, v in pairs(ents.FindInSphere(self:GetPos(), pdata.pusharea or 12)) do --powerups are too close to each other!
 				if v:GetClass() == "drop_powerup" and v ~= self then
 					if not nzPowerUps:Get(v:GetPowerUp()).nopush then
 						if v:EntIndex() < self:EntIndex() then
@@ -213,6 +265,12 @@ end
 
 function ENT:OnRemove()
 	if IsValid(self) then
+		self:StopParticles()
+
+		local global = nzPowerUps:Get(self:GetPowerUp()).global
+		local att = self:GetAttachment(1)
+		ParticleEffect(global and "nz_powerup_global_poof" or "nz_powerup_local_poof", att and att.Pos or self:WorldSpaceCenter(), angle_zero)
+
 		self:StopSound("nz_moo/powerups/powerup_intro_lp.wav")
 		self:StopSound("nz_moo/powerups/powerup_lp_zhd.wav")
 	end

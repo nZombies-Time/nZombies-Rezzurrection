@@ -1,9 +1,8 @@
 -- 
 
 if SERVER then
-
 	local plyMeta = FindMetaTable("Player")
-	
+
 	function plyMeta:GivePowerUp(id, duration)
 		if duration > 0 then
 			if not nzPowerUps.ActivePlayerPowerUps[self] then nzPowerUps.ActivePlayerPowerUps[self] = {} end
@@ -12,7 +11,7 @@ if SERVER then
 			nzPowerUps:SendPlayerSync(self) -- Sync this player's powerups
 		end
 	end
-	
+
 	function plyMeta:RemovePowerUp(id, nosync)
 		local PowerupData = nzPowerUps:Get(id)
 		if PowerupData and PowerupData.expirefunc then
@@ -23,7 +22,7 @@ if SERVER then
 		nzPowerUps.ActivePlayerPowerUps[self][id] = nil
 		if not nosync then nzPowerUps:SendPlayerSync(self) end -- Sync this player's powerups
 	end
-	
+
 	function plyMeta:RemoveAllPowerUps()
 		if not nzPowerUps.ActivePlayerPowerUps[self] then nzPowerUps.ActivePlayerPowerUps[self] = {} return end
 		
@@ -32,7 +31,7 @@ if SERVER then
 		end
 		nzPowerUps:SendPlayerSync(self)
 	end
-	
+
 	function nzPowerUps:Activate(id, ply, ent)
 		if hook.Call("OnPlayerPickupPowerUp", nil, ply, id, ent) then return end
 		
@@ -43,7 +42,7 @@ if SERVER then
 				if not nzPowerUps.ActivePlayerPowerUps[ply] or not nzPowerUps.ActivePlayerPowerUps[ply][id] then -- If you don't have the powerup
 					PowerupData.func(id, ply)
 				end
-				ply:GivePowerUp(id, PowerupData.duration)
+				ply:GivePowerUp(id, PowerupData.duration * (ply:HasUpgrade("time") and 2 or 1))
 			end
 		else
 			if PowerupData.duration ~= 0 then
@@ -51,7 +50,7 @@ if SERVER then
 				if not self.ActivePowerUps[id] then
 					PowerupData.func(id, ply)
 				end
-				self.ActivePowerUps[id] = (self.ActivePowerUps[id] or CurTime()) + PowerupData.duration
+				self.ActivePowerUps[id] = (self.ActivePowerUps[id] or CurTime()) + PowerupData.duration * ((IsValid(ply) and ply:HasUpgrade("time")) and 2 or 1)
 			else
 				-- Activate Once
 				PowerupData.func(id, ply)
@@ -76,12 +75,35 @@ if SERVER then
 	end
 
 	function nzPowerUps:SpawnPowerUp(pos, specific)
+		local barricades = ents.FindByClass("breakable_entry")
 		local choices = {}
 		local total = 0
 
 		-- Chance it
 		if not specific then
-			for k,v in pairs(self.Data) do
+			for k, v in pairs(self.Data) do
+				if k == "zombieblood" and #player.GetAllPlaying() <= 1 then continue end
+				if k == "bonfiresale" and not nzPowerUps:GetHasPaped() then continue end
+				if k == "deathmachine" and player.GetCount() <= 1 and (not Entity(1):HasPerk('revive')) then continue end
+				if k == "firesale" and not nzPowerUps:GetBoxMoved() then continue end
+				if k == "bottle" then continue end -- Me when a chance of zero doesn't matter and will still drop anyways.
+				if k == "carpenter" then
+					if #barricades >= 4 then
+						local barricades_broken = 0
+						for _,barricade in pairs(barricades) do 
+							if barricade:GetHasPlanks() and (barricade:GetNumPlanks() <= 0) then
+								barricades_broken = barricades_broken + 1
+							end
+						end
+
+						if (barricades_broken < 5) then
+							continue
+						end
+					else
+						continue
+					end
+				end
+
 				if k ~= "ActivePowerUps" then
 					choices[k] = v.chance
 					total = total + v.chance
@@ -90,16 +112,7 @@ if SERVER then
 		end
 
 		local id = specific and specific or nzMisc.WeightedRandom(choices)
-		local barricades = ents.FindByClass("breakable_entry")
-
 		if not id or id == "null" then return end --  Back out
-		if #player.GetAllPlaying() <= 1 and id == "zombieblood" then return end
-		--if id == "bottle" then return end
-		if id == "bonfiresale" and not nzPowerUps:GetHasPaped() then return end
-		if id == "deathmachine" and #player.GetAll() <= 1 and (not Entity(1):HasPerk('revive')) then return end
-		if id == "firesale" and not nzPowerUps:GetBoxMoved() then return end
-		if id == "carpenter" and (#barricades < 5) then return end
-
 
 		local ent = ents.Create("drop_powerup")
 		id = hook.Call("OnPowerUpSpawned", nil, id, ent) or id
@@ -109,7 +122,7 @@ if SERVER then
 		local PowerupData = self:Get(id)
 
 		local pos = pos+Vector(0,0,50)
-		
+
 		ent:SetPowerUp(id)
 		pos.z = pos.z - ent:OBBMaxs().z
 		ent:SetModel(PowerupData.model)
@@ -117,7 +130,6 @@ if SERVER then
 		ent:SetAngles(PowerupData.angle)
 		ent:Spawn()
 	end
-
 end
 
 function nzPowerUps:IsPowerupActive(id)
@@ -188,12 +200,6 @@ nzPowerUps:NewPowerUp("dp", {
 	loopsound = "nz_moo/powerups/doublepoints_loop_zhd.wav",
 	stopsound = "nz_moo/powerups/doublepoints_end.mp3",
 	func = function(self, ply)
-		--if nzMapping.Settings.negative then
-			--if math.random(0,3) == 3 then
-			--	ply:TakePoints(1150)
-			--	ply:ChatPrint( "115 Tax" )
-		--	end
-		--end
 	end,
 })
 
@@ -208,24 +214,15 @@ nzPowerUps:NewPowerUp("maxammo", {
 	duration = 0,
 	func = (function(self, ply)
 		nzSounds:Play("MaxAmmo")
+		net.Start("nzPowerUps.PickupHud")
+			net.WriteString("Max Ammo!")
+			net.WriteBool(true)
+		net.Broadcast()
 
 		-- Give everyone ammo
-		--if nzMapping.Settings.negative then
-			--if math.random(3) == 3 then
-			--	for k,v in pairs(player.GetAll()) do
-				--	v:ChatPrint( "Thank Joe Biden for this" )
-				--	v:RemoveAllAmmo()
-				--end
-			--else
-				for k,v in pairs(player.GetAll()) do
-					v:GiveMaxAmmo()
-				end	
-			--end
-		--else
-			--for k,v in pairs(player.GetAll()) do
-			--	v:GiveMaxAmmo()
-			--end
-		--end
+		for k,v in pairs(player.GetAll()) do
+			v:GiveMaxAmmo()
+		end
 	end),
 })
 
@@ -242,12 +239,6 @@ nzPowerUps:NewPowerUp("insta", {
 	loopsound = "nz_moo/powerups/instakill_loop_zhd.wav",
 	stopsound = "nz_moo/powerups/instakill_end.mp3",
 	func = function(self, ply)
-		--if nzMapping.Settings.negative then
-			--if math.random(1) == 1 then
-				--ply:SetHealth(1)
-				--ply:ChatPrint( "FIGHT FOR YOUR LIFE" )
-			--end
-		--end
 	end,
 })
 
@@ -262,18 +253,12 @@ nzPowerUps:NewPowerUp("nuke", {
 	duration = 0,
 	announcement = "nz/powerups/nuke.wav",
 	func = (function(self, ply)
-		--if nzMapping.Settings.negative then
-		--	if math.random(1) == 1 then
-			--	nzPowerUps:Nuke(ply:GetPos())
-			--else
-			--	for k,v in pairs(player.GetAll()) do
-				--	v:ChatPrint( "Who didn't pay electric bill?!" )
-				--end
-			--	nzElec:Reset()
-			--end
-		--else
-			nzPowerUps:Nuke(ply:GetPos())
-		--end
+		net.Start("nzPowerUps.PickupHud")
+			net.WriteString("Ka-Boom!")
+			net.WriteBool(false)
+		net.Broadcast()
+
+		nzPowerUps:Nuke(ply:GetPos())
 	end),
 })
 
@@ -290,24 +275,7 @@ nzPowerUps:NewPowerUp("firesale", {
 	--loopsound = "nz_moo/powerups/firesale_jingle.mp3", -- This makes the Firesale Jingle 2d. Its also a good way to prank Youtubers by giving them a Copyright Claim! Now thats what I call goofy.
 	stopsound = "nz_moo/powerups/doublepoints_end.mp3",
 	func = (function(self, ply)
-		--if nzMapping.Settings.negative then
-			--if math.random(0,3) == 3 then
-			--	nzPowerUps:FireSale()
-			--else
-			--	for k,v in pairs(player.GetAll()) do
-				--	v:ChatPrint( "Stop Gambling Addictions Today" )
-					--local tbl = ents.FindByClass("random_box_spawns")
-					--for k,v in pairs(tbl) do
-					--	if IsValid(v) then
-						--	v:StopSound("nz_firesale_jingle")
-						--	v:Remove()
-						--end
-					--end
-				--end
-			--end
-		--else
-			nzPowerUps:FireSale()
-		--end
+		nzPowerUps:FireSale()
 	end),
 	expirefunc = function()
 		local tbl = ents.FindByClass("random_box_spawns")
@@ -334,10 +302,10 @@ nzPowerUps:NewPowerUp("carpenter", {
 	angle = Angle(45,0,0),
 	scale = 1,
 	chance = 5,
-	duration = 0,
+	duration = 7,
+	loopsound = "nz_moo/powerups/carpenter_loop_classic.wav",
+	stopsound = "nz_moo/powerups/carpenter_end_classic.mp3",
 	func = (function(self, ply)
-		--nzNotifications:PlaySound("nz/powerups/carpenter.wav", 0)
-		--nzNotifications:PlaySound("nz/powerups/carp_loop.wav", 1)
 		nzSounds:Play("Carpenter")
 		nzPowerUps:Carpenter()
 	end),
@@ -356,46 +324,41 @@ nzPowerUps:NewPowerUp("zombieblood", {
 	loopsound = "nz_moo/powerups/zombieblood_loop.wav",
 	stopsound = "nz_moo/powerups/zombieblood_stop.mp3",
 	func = (function(self, ply)
-		--if nzMapping.Settings.negative then
-			--if math.random(1) == 1 then
-				--ply:SetTargetPriority(TARGET_PRIORITY_SPECIAL)
-				--local zombls = ents.FindInSphere(ply:GetPos(), 5000)
-				--for k,v in pairs(zombls) do
-					--if IsValid(v) and v:IsValidZombie() then
-						--v:SetTarget(ply)
-					--end
-				--end
-			--else
-				--ply:SetTargetPriority(TARGET_PRIORITY_NONE)
-			--end
-		--else
-			ply:SetTargetPriority(TARGET_PRIORITY_NONE)
-		--end
+		ply:SetTargetPriority(TARGET_PRIORITY_NONE)
 	end),
 	expirefunc = function(self, ply) -- ply is only passed if the powerup is non-global
-		ply:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+		if IsValid(ply) then
+			ply:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+		end
 	end,
 })
 
--- Death Machine
+//Lightning is power
 nzPowerUps:NewPowerUp("deathmachine", {
 	name = "Death Machine",
 	model = "models/powerups/w_deathmachine.mdl",
-	global = false, -- Only applies to the player picking it up and time is handled individually per player
+	global = false,
 	angle = Angle(0,0,0),
 	scale = 1,
-	chance = 0,
+	chance = 5,
 	duration = 30,
 	announcement = "nz/powerups/deathmachine.mp3",
 	func = (function(self, ply)
-		ply:SetUsingSpecialWeapon(true)
-		ply:Give("nz_death_machine")
-		ply:SelectWeapon("nz_death_machine")
+		if IsValid(ply) then
+			ply:SetUsingSpecialWeapon(true)
+			ply:Give("tfa_nz_bo3_minigun")
+			ply:SelectWeapon("tfa_nz_bo3_minigun")
+		end
 	end),
-	expirefunc = function(self, ply) -- ply is only passed if the powerup is non-global
-		ply:SetUsingSpecialWeapon(false)
-		ply:StripWeapon("nz_death_machine")
-		ply:EquipPreviousWeapon()
+	expirefunc = function(self, ply)
+		if IsValid(ply) then
+			ply:SetUsingSpecialWeapon(false)
+			ply:EquipPreviousWeapon()
+			timer.Simple(0, function()
+				if not IsValid(ply) then return end
+				ply:StripWeapon("tfa_nz_bo3_minigun")
+			end)
+		end
 	end,
 })
 
@@ -410,14 +373,30 @@ nzPowerUps:NewPowerUp("bonuspoints", {
     duration = 0,
     announcement = "nz/powerups/blood_money.wav",
     func = (function(self, ply)
-        local BONUS = (math.random(25,150) * 10) -- Everyone should get the same amount.
-        for k,v in pairs(player.GetAllPlaying()) do
-            v:GivePoints(BONUS)
-        end
+		local BONUS = (math.random(25,150) * 10) -- Everyone should get the same amount.
+		for k, v in pairs(player.GetAllPlaying()) do
+			v:GivePoints(BONUS)
+		end
     end),
 })
 
 --Perk Bottle
+--[[nzPowerUps:NewPowerUp("bottle", {
+    name = "Perk Bottle",
+    model = "models/powerups/w_perkbottle.mdl",
+    global = true,
+    angle = Angle(0,0,0),
+    scale = 1,
+    chance = 3,
+    duration = 0,
+    announcement = "",
+    func = (function(self, ply)
+    	local P = GetConVar("nz_difficulty_perks_max"):GetInt()
+        GetConVar("nz_difficulty_perks_max"):SetInt(P+1)
+    end),
+})]]
+
+-- Perk Bottle(The one that actually gives you a perk)
 nzPowerUps:NewPowerUp("bottle", {
     name = "Perk Bottle",
     model = "models/powerups/w_perkbottle.mdl",
@@ -428,31 +407,30 @@ nzPowerUps:NewPowerUp("bottle", {
     duration = 0,
     announcement = "",
     func = (function(self, ply)
-    	local blockedperks = {
-			["wunderfizz"] = true, -- lol, this would happen
-			["pap"] = true,
-		}
-		local wunderfizzlist = {}
-		for k,v in pairs(nzPerks:GetList()) do
-			if k != "wunderfizz" and k != "pap" then
-				wunderfizzlist[k] = {true, v}
-			end
-		end
+		net.Start("nzPowerUps.PickupHud")
+			net.WriteString("Free Perk!")
+			net.WriteBool(true)
+		net.Send(ply)
 
-		local available = nzMapping.Settings.wunderfizzperklist or wunderfizzlist
+		local available = nzMapping.Settings.wunderfizzperks or nzPerks:GetList()
+		local blockedperks = {
+			["wunderfizz"] = true,
+			["pap"] = true,
+			["gum"] = true,
+		}
+
 		local tbl = {}
-		for k,v in pairs(available) do
-			if !ply:HasPerk(k) and !blockedperks[k] then
-				if (v[1] == nil || v[1] == true) then
-					table.insert(tbl, k)
-				end
+		for k, v in pairs(available) do
+			if not ply:HasPerk(k) and not blockedperks[k] then
+				table.insert(tbl, k)
 			end
 		end
-		if #tbl <= 0 then print("too many perks idiot") end
-		local outcome = tbl[math.random(#tbl)]
-		ply:GivePerk(outcome)
+		if table.IsEmpty(tbl) then nzSounds:PlayEnt("Laugh", ply) end
+
+		ply:GivePerk(tbl[math.random(#tbl)])
     end),
 })
+
 --Bonfire Sale
 nzPowerUps:NewPowerUp("bonfiresale", {
     name = "BonFire Sale",
@@ -466,6 +444,5 @@ nzPowerUps:NewPowerUp("bonfiresale", {
 	loopsound = "nz_moo/powerups/omnov001l_1_l.wav",
 	stopsound = "nz_moo/powerups/doublepoints_end.mp3",
     func = (function(self, ply)
-    	--print("WOW, LOOKY LOOKY A FUNNY!!!")
     end),
 })

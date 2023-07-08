@@ -26,15 +26,33 @@ ENT.Spawnable = false
 ENT.AdminSpawnable = false
 ENT.Author = "DBot, FlamingFox"
 ENT.RenderGroup = RENDERGROUP_TRANSLUCENT
+ENT.TurnedName = "Turned"
+ENT.TurnedNames = {
+	"Odious Individual", "Laby after Taco Bell", "Fucker.lua",
+	"Turned", "Shitass", "Miscellaneous Intent", "The Imposter",
+	"Zobie", "Creeper, aww man", "Herbin", "Category Five",
+	"TheRelaxingEnd", "Zet0r", "Dead By Daylight", "Cave Johnson",
+	"Vinny Vincesauce", "Who's Who?", "MR ELECTRIC, KILL HIM!",
+	"Jerma985", "Steve Jobs", "BRAAAINS...", "timer.Simple",
+	"Timer Failed!", "r_flushlod", "Bruhnelious Cornelious The 3rd",
+	"Left 4 Dead 2", "Clown", "Mental Sickness", "Five Nights at FNAF",
+	"Minecraft Steve", "Its me! Goku!", "Gorgeous Freeman",
+	"Exotic Butters", "Brain Rot", "Team Fortress 2", "Roblox"
+}
+
 local entMeta = FindMetaTable("Entity")
+local nzombies = engine.ActiveGamemode() == "nzombies"
 
 if SERVER then
-	entMeta.AATTurned = function(self, duration, attacker)
+	entMeta.AATTurned = function(self, duration, attacker, dance)
 		if duration == nil then
 			duration = 0
 		end
 		if attacker == nil then
 			attacker = self
+		end
+		if dance == nil then
+			dance = false
 		end
 
 		if IsValid(self.perk_turned_logic) then
@@ -43,10 +61,12 @@ if SERVER then
 		end
 
 		self.perk_turned_logic = ents.Create("status_effect_pop_turned")
-		self.perk_turned_logic:SetPos(self:EyePos())
+		self.perk_turned_logic:SetPos(self:WorldSpaceCenter())
 		self.perk_turned_logic:SetParent(self)
 		self.perk_turned_logic:SetOwner(self)
 		self.perk_turned_logic:SetAttacker(attacker)
+		self.perk_turned_logic:SetDance(dance)
+		self.perk_turned_logic:SetNameIndex(math.random(36))
 
 		self.perk_turned_logic:Spawn()
 		self.perk_turned_logic:Activate()
@@ -74,27 +94,27 @@ end
 
 ENT.SetupDataTables = function(self)
 	self:NetworkVar("Entity", 0, "Attacker")
-	self:NetworkVar("String", 0, "Name")
+	self:NetworkVar("Bool", 0, "Dance")
+	self:NetworkVar("Int", 0, "NameIndex")
 end
 
+local turned_color = Color(40, 255, 0, 255)
 local function Draw3DText( pos, ang, scale, text, flipView )
 	if ( flipView ) then
-		-- Flip the angle 180 degrees around the UP axis
-		ang:RotateAroundAxis( Vector( 0, 0, 1 ), 180 )
+		ang:RotateAroundAxis( vector_up, 180 )
 	end
 
-	cam.Start3D2D( pos, ang, scale )
-		-- Actually draw the text. Customize this to your liking.
-		draw.DrawText( text, "ChatFont", 0, 0, Color( 40, 255, 0, 255 ), TEXT_ALIGN_CENTER )
+	cam.Start3D2D(pos, ang, scale)
+		cam.IgnoreZ(true)
+		draw.DrawText(tostring(text), nzombies and "nz.small."..GetFontType(nzMapping.Settings.smallfont) or "ChatFont", 0, 0, turned_color, TEXT_ALIGN_CENTER)
+		cam.IgnoreZ(false)
 	cam.End3D2D()
 end
 
 ENT.Draw = function(self)
-	local text = self:GetName()
+	local text = self.TurnedName
 
-	local mins, maxs = self:GetModelBounds()
-	local pos = self:WorldSpaceCenter() + self:GetUp()
-
+	local pos = self:GetPos() + self:GetUp()*42
 	local ang = LocalPlayer():EyeAngles()
 	ang = Angle(ang.x, ang.y, 0)
 	ang:RotateAroundAxis(ang:Up(), -90)
@@ -109,35 +129,43 @@ ENT.Initialize = function(self)
 	self:DrawShadow(false)
 	self:SetNotSolid(true)
 	self:SetMoveType(MOVETYPE_NONE)
-	
-	local p = self:GetParent()
 
+	local num = #self.TurnedNames
+	self.TurnedName = self.TurnedNames[self:GetNameIndex()]
+
+	local p = self:GetParent()
 	if IsValid(p) then
-		if p:IsValidZombie() then
-			p:SetInvulnerable(true)
+		if p.TurnedName then
+			self.TurnedName = p.TurnedName
+		end
+		if p:GetClass() == "nz_zombie_boss_astro" then
+			self.TurnedName = "The Imposter"
 		end
 
 		ParticleEffectAttach("bo3_aat_turned", PATTACH_ABSORIGIN_FOLLOW, p, 0)
+		p:EmitSound("NZ.POP.Turned.Impact")
 
-		local names = {
-			"Odious Individual", "Laby after Taco Bell", "Fucker.lua",
-			"Turned", "Shitass", "Miscellaneous Intent", "The Imposter",
-			"Zobie", "Creeper, aww man", "Herbin", "Category Five",
-			"TheRelaxingEnd", "Zet0r"
-		}
-		self:SetName(names[math.random(#names)])
-
-		if SERVER then
-			p:SetTargetPriority(TARGET_PRIORITY_PLAYER)
+		if self:GetDance() then
+			if SERVER and p.SetTargetPriority then
+				p:SetTargetPriority(TARGET_PRIORITY_SPECIAL)
+			end
+		else
+			p.IsTurned = true
+			p:EmitSound("NZ.POP.Turned.Loop")
 		end
 	end
 
 	if CLIENT then return end
-
-	if IsValid(p) and p:GetTarget():IsPlayer() then
-		p:SetTarget(p)
-		p.loco:SetDesiredSpeed(0)
-		p.loco:SetAcceleration(0)
+	if IsValid(p) and p:IsNextBot() then
+		if self:GetDance() or (p.IsMooSpecial and not p.MooSpecialZombie) then
+			p.loco:SetVelocity(vector_origin)
+			p.loco:SetAcceleration(0)
+			p.loco:SetDesiredSpeed(0)
+			if nzombies and p:IsValidZombie() then
+				p:SetBlockAttack(true)
+			end
+		end
+		p:SetTarget(nil)
 	end
 
 	self.statusStart = CurTime()
@@ -151,27 +179,37 @@ ENT.UpdateDuration = function(self, newtime)
 	end
 
 	if self.statusEnd - CurTime() > newtime then return end
+	local p = self:GetParent()
+	if (p.IsMooSpecial and not p.MooSpecialZombie) and p.Freeze then
+		p:Freeze(newtime)
+	end
 
     self.duration = newtime
     self.statusEnd = CurTime() + newtime
 end
 
 ENT.Think = function(self)
-	if CLIENT and DynamicLight then
-		local dlight = DynamicLight(self:EntIndex(), false)
-		if (dlight) then
-			dlight.pos = self:GetPos()
-			dlight.r = 50
-			dlight.g = 255
-			dlight.b = 10
-			dlight.brightness = 2
-			dlight.Decay = 1000
-			dlight.Size = 64
-			dlight.dietime = CurTime() + 1
+	if CLIENT then return false end
+	local p = self:GetParent()
+	for k, v in pairs(ents.FindInSphere(self:GetPos(), 60)) do
+		if nzombies and v:GetClass() == "drop_powerup" then
+			local ply = self:GetAttacker()
+			if IsValid(ply) and v:GetPowerUp() ~= "nuke" then
+				nzPowerUps:Activate(v:GetPowerUp(), ply, v)
+				ply:EmitSound(nzPowerUps:Get(v:GetPowerUp()).collect or "nz_moo/powerups/powerup_pickup_zhd.mp3")
+				v:Remove()
+			end
+		end
+
+		if self:GetDance() then
+			if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 and v ~= p then
+				if v.NZBossType then continue end
+				if v:IsAATTurned() then continue end
+
+				v:BO3Mystify(0.35)
+			end
 		end
 	end
-
-	if CLIENT then return false end
 
 	if self.statusEnd < CurTime() then
 		self:Remove()
@@ -182,46 +220,48 @@ ENT.Think = function(self)
 	return true
 end
 
-ENT.InflictDamage = function(self, ent)
+ENT.Explode = function(self)
+	if CLIENT then return end
+
+	local ent = self:GetParent()
 	local damage = DamageInfo()
 	damage:SetDamage(54000)
 	damage:SetAttacker(IsValid(self:GetAttacker()) and self:GetAttacker() or self)
 	damage:SetInflictor(IsValid(ent) and ent or self)
-	damage:SetDamageType(DMG_BLAST_SURFACE)
+	damage:SetDamageType(DMG_MISSILEDEFENSE)
 
-	for k, v in pairs(ents.FindInSphere(self:GetPos(), 512)) do
-		if v:IsValidZombie() then
-			damage:SetDamageForce(v:GetUp()*8000 + (v:GetPos() - self:GetPos()):GetNormalized()*10000)
-			if SERVER then
-				v:TakeDamageInfo(damage)
-			end
+	for k, v in pairs(ents.FindInSphere(self:GetPos(), 180)) do
+		if (v:IsNPC() or v:IsNextBot()) then
+			damage:SetDamageForce(v:GetUp()*8000 + (v:EyePos() - self:GetPos()):GetNormalized()*14000)
+			v:TakeDamageInfo(damage)
 		end
 	end
 
-	util.ScreenShake(self:GetPos(), 10, 255, 1.5, 600)
+	util.ScreenShake(self:GetPos(), 12, 255, 1.5, 600)
 
-	ParticleEffect("grenade_explosion_01", self:WorldSpaceCenter(), Angle(0,0,0))
+	ParticleEffect("grenade_explosion_01", self:GetPos(), Angle(0,0,0))
+	ParticleEffect("bo3_annihilator_blood", self:GetPos(), Angle(0,0,0))
 
-	self:EmitSound("Perk.Tortoise.Exp")
-	self:EmitSound("Perk.Tortoise.Exp_Firey")
-	self:EmitSound("Perk.Tortoise.Exp_Decay")
-
-	local dmg = DamageInfo()
-	dmg:SetDamageType(DMG_DIRECT)
-	dmg:SetAttacker(ent)
-	dmg:SetInflictor(ent)
-	dmg:SetDamage(ent:Health() + 666)
-	dmg:SetDamagePosition(ent:EyePos())
-	dmg:SetDamageForce(self:GetUp()*-10000)
-
-	if ent:IsNPC() then ent:SetSchedule(SCHED_ALERT_STAND) end
-	ent:TakeDamageInfo(dmg)
-	ent:Remove()
+	self:EmitSound("TFA_BO3_GRENADE.Dist")
+	self:EmitSound("TFA_BO3_GRENADE.Exp")
+	self:EmitSound("TFA_BO3_GENERIC.Gib")
+	self:EmitSound("TFA_BO3_ANNIHILATOR.Exp")
 end
 
+
 ENT.OnRemove = function(self)
-	if IsValid(self:GetParent()) then
-		self:GetParent():StopParticles()
-		self:InflictDamage(self:GetParent())
+	local p = self:GetParent()
+	if IsValid(p) then
+		p.IsTurned = false
+		p:StopParticles()
+		p:StopSound("NZ.POP.Turned.Loop")
+
+		self:Explode()
+		if p:IsNextBot() or p:IsNPC() then
+			p:Remove()
+			if nzombies then
+				nzRound:SetZombiesKilled(nzRound:GetZombiesKilled() + 1)
+			end
+		end
 	end
 end

@@ -1,7 +1,7 @@
 local _PLAYER = FindMetaTable("Player")
 
 function _PLAYER:GetPoints()
-	return self:GetNWInt("points") or 0
+	return self:GetNW2Int("points") or 0
 end
 
 function _PLAYER:HasPoints(amount)
@@ -12,28 +12,47 @@ function _PLAYER:CanAfford(amount)
 	return (self:GetPoints() - amount) >= 0
 end
 
-
 if (SERVER) then
+	local hudnetstring = {
+		["Shadows of Evil"] = "nz_points_notification_bo3_zod",
+		["Black Ops 3"] = "nz_points_notification_bo3",
+		["Black Ops 1"] = "nz_points_notification_bo1",
+		["Tranzit (Black Ops 2)"] = "nz_points_notification_bo2",
+		["Mob of the Dead"] = "nz_points_notification_bo2_dlc",
+		["Buried"] = "nz_points_notification_bo2_dlc",
+		["Origins (Black Ops 2)"] = "nz_points_notification_bo2_dlc",
+	}
+
 	util.AddNetworkString("nz_points_notification")
+	util.AddNetworkString("nz_points_notification_bo1")
+	util.AddNetworkString("nz_points_notification_bo2")
+	util.AddNetworkString("nz_points_notification_bo2_dlc")
+	util.AddNetworkString("nz_points_notification_bo2_dlc")
+	util.AddNetworkString("nz_points_notification_bo2_dlc")
+	util.AddNetworkString("nz_points_notification_bo3")
+	util.AddNetworkString("nz_points_notification_bo3_zod")
+
 	-- Sets the character's amount of currency to a specific value.
 	function _PLAYER:SetPoints(amount)
 		amount = math.Round(amount, 2)
-		if !GetConVar("nz_point_notification_clientside"):GetBool() then
+		if not GetConVar("nz_point_notification_clientside"):GetBool() then
 			local num = amount - self:GetPoints()
-			if num != 0 then -- 0 points doesn't get sent
-				net.Start("nz_points_notification")
+			if num ~= 0 then -- 0 points doesn't get sent
+				local netstring = hudnetstring[nzMapping.Settings.hudtype] or "nz_points_notification"
+
+				net.Start(netstring)
 					net.WriteInt(num, 20)
 					net.WriteEntity(self)
 				net.Broadcast()
 			end
 		end
-		self:SetNWInt("points", amount)
+		self:SetNW2Int("points", amount)
 	end
 
 	-- Quick function to set the money to the current amount plus an amount specified.
 	function _PLAYER:GivePoints(amount, ignoredp)
 		-- If double points is on.
-		if nzPowerUps:IsPowerupActive("dp") and !ignoredp then
+		if nzPowerUps:IsPowerupActive("dp") and not ignoredp then
 			amount = amount * 2
 		end
 		amount = hook.Call("OnPlayerGetPoints", nil, self, amount) or amount
@@ -46,7 +65,7 @@ if (SERVER) then
 		amount = hook.Call("OnPlayerLosePoints", nil, self, amount) or amount
 		self:SetPoints(self:GetPoints() - amount)
 		
-		if !nosound then
+		if not nosound then
 			self:EmitSound("nz/effects/buy.wav")
 		end
 
@@ -65,6 +84,7 @@ if (SERVER) then
 					return true -- If the buy was successfull, this function also returns true
 				end
 			else
+				self:EmitSound("nz_moo/effects/purchases/deny.wav")
 				return false -- Return false if we can't afford
 			end
 		else

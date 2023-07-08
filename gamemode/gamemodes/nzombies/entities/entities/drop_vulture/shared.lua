@@ -25,7 +25,7 @@ local vulturedrops = {
 		effect = function(ply)
 			ply:EmitSound("nz_moo/powerups/vulture/vulture_pickup.mp3") 
 			ply:EmitSound("nz_moo/powerups/vulture/vulture_money.mp3") 
-			ply:GivePoints(math.random(5, 20) * 5)
+			ply:GivePoints(math.random(5, 20) * (ply:HasUpgrade("vulture") and 10 or 5))
 			return true
 		end,
 		timer = 30,
@@ -43,7 +43,7 @@ local vulturedrops = {
 		effect = function(ply)
 			local wep = ply:GetActiveWeapon()
 			if IsValid(wep) then
-				local max = nzWeps:CalculateMaxAmmo(wep:GetClass(), wep:HasNZModifier("pap"))
+				local max = wep.Primary.MaxAmmo or nzWeps:CalculateMaxAmmo(wep:GetClass(), wep:HasNZModifier("pap"))
 				local give = math.Round(max/math.random(10, 20))
 				local ammo = wep:GetPrimaryAmmoType()
 				local cur = ply:GetAmmoCount(ammo)
@@ -112,63 +112,106 @@ function ENT:Initialize()
 	if CLIENT then return end
 	local nearest = self:FindNearestPlayer(self:GetPos())
 	if IsValid(nearest) then
-		local size = Vector(2, 2, 2)
-		local entpos = nearest:WorldSpaceCenter()
-		local pos = self:WorldSpaceCenter()
-
-		local tr = util.TraceLine({
-			start = pos,
-			endpos = entpos,
-			filter = {self, nearest},
-			mask = MASK_SOLID_BRUSHONLY
-		})
-
-		if tr.HitWorld then //Check 1, trace to player, if hits wall, check in sphere for barricads to place infront of
-			local barricade = self:FindNearestBarricade(self:GetPos())
-			if IsValid(barricade) then
-				local normal = (nearest:GetPos() - barricade:GetPos()):GetNormalized()
-				local fwd = barricade:GetForward()
-				local dot = fwd:Dot(normal)
-				if 0 < dot then
-					self:SetPos(barricade:WorldSpaceCenter() + fwd*50)
-				else
-					self:SetPos(barricade:WorldSpaceCenter() + fwd*-50)
-				end
-			end
-		end
-
-		for k, v in pairs(ents.FindAlongRay(pos, entpos, -size, size)) do
-			if v:GetClass() == "breakable_entry" then //Check 2, raycast to player, if hit barricade, place infront of
-				local normal = (nearest:GetPos() - v:GetPos()):GetNormalized()
-				local fwd = v:GetForward()
-				local dot = fwd:Dot(normal)
-
-				if 0 < dot then
-					self:SetPos(v:WorldSpaceCenter() + fwd*50)
-				else
-					self:SetPos(v:WorldSpaceCenter() + fwd*-50)
-				end
-			end
-		end
+		self:OOBTest(nearest)
 	end
-
 	self:SetTrigger(true)
 	self:SetUseType(SIMPLE_USE)
 end
 
+function ENT:OOBTest(ply)
+	if CLIENT then return end
+	if not IsValid(ply) then return end
+
+	local size = Vector(2, 2, 2)
+	local entpos = ply:WorldSpaceCenter()
+	local pos = self:WorldSpaceCenter()
+
+	local tr = util.TraceLine({
+		start = pos,
+		endpos = entpos,
+		filter = {self, ply},
+		mask = MASK_SOLID_BRUSHONLY
+	})
+
+	//Check 1, trace to player, if interrupted by world, teleport infront of a barricade closest to player
+	if tr.HitWorld then
+		local barricade = self:FindNearestBarricade(entpos)
+		if IsValid(barricade) then
+			//print('Powerup1, Trace to player blocked by world')
+			local normal = (ply:GetPos() - barricade:GetPos()):GetNormalized()
+			local fwd = barricade:GetForward()
+			local dot = fwd:Dot(normal)
+			if 0 < dot then
+				self:SetPos(barricade:WorldSpaceCenter() + fwd*50)
+			else
+				self:SetPos(barricade:WorldSpaceCenter() + fwd*-50)
+			end
+			return
+		end
+	end
+
+	//Check 2, raycast to player, if interrupted by a barricade, teleport infront of that barricade
+	for k, v in pairs(ents.FindAlongRay(pos, entpos, -size, size)) do
+		if v:GetClass() == "breakable_entry" then
+			//print('Powerup2, Barricade blocking raycast to player')
+			local normal = (ply:GetPos() - v:GetPos()):GetNormalized()
+			local fwd = v:GetForward()
+			local dot = fwd:Dot(normal)
+
+			if 0 < dot then
+				self:SetPos(v:WorldSpaceCenter() + fwd*50)
+			else
+				self:SetPos(v:WorldSpaceCenter() + fwd*-50)
+			end
+			return
+		end
+	end
+
+	//Check 3, if theres a barricade next to us at all, place on side with player
+	for k, v in pairs(ents.FindInSphere(pos, 60)) do
+		if v:GetClass() == "breakable_entry" then
+			//print('Powerup3, Barricade too close')
+			local ply2 = self:FindNearestPlayer(v:GetPos())
+			local normal = (self:GetPos() - v:GetPos()):GetNormalized()
+			local normal2 = (ply2:GetPos() - v:GetPos()):GetNormalized()
+			local fwd = v:GetForward()
+			local dot = fwd:Dot(normal)
+			local dot2 = fwd:Dot(normal2)
+
+			if 0 < dot2 and dot > 0 then
+				self:SetPos(v:WorldSpaceCenter() + fwd*50)
+			elseif 0 > dot2 and dot < 0 then
+				self:SetPos(v:WorldSpaceCenter() + fwd*-50)
+			end
+			return
+		end
+	end
+end
+
 function ENT:FindNearestPlayer(pos)
+	if not pos then
+		pos = self:GetPos()
+	end
+
 	local nearbyents = {}
-	for k, v in pairs(ents.FindInSphere(pos, 2048)) do
-		if v:IsPlayer() then
+	for k, v in pairs(player.GetAll()) do
+		if v:Alive() then
 			table.insert(nearbyents, v)
 		end
 	end
 
-	table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	if table.IsEmpty(nearbyents) then return end
+	if #nearbyents > 1 then
+		table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	end
 	return nearbyents[1]
 end
 
 function ENT:FindNearestBarricade(pos)
+	if not pos then
+		pos = self:GetPos()
+	end
+
 	local nearbyents = {}
 	for k, v in pairs(ents.FindInSphere(pos, 2048)) do
 		if v:GetClass() == "breakable_entry" then
@@ -176,7 +219,10 @@ function ENT:FindNearestBarricade(pos)
 		end
 	end
 
-	table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	if table.IsEmpty(nearbyents) then return end
+	if #nearbyents > 1 then
+		table.sort(nearbyents, function(a, b) return a:GetPos():DistToSqr(self:GetPos()) < b:GetPos():DistToSqr(pos) end)
+	end
 	return nearbyents[1]
 end
 
@@ -226,6 +272,9 @@ function ENT:Think()
 
 		self:SetNoDraw(not self:GetNoDraw())
 		self.NextDraw = CurTime() + math.Clamp(1 * final, 0.1, 1)
+		if not self:GetNoDraw() then
+			ParticleEffectAttach("nz_powerup_mini", PATTACH_ABSORIGIN_FOLLOW, self, 0)
+		end
 	end
 
 	if SERVER then
@@ -243,5 +292,7 @@ end
 function ENT:OnRemove()
 	if IsValid(self) then
 		self:StopParticles()
+		local att = self:GetAttachment(1)
+		ParticleEffect("nz_powerup_mini_poof", att and att.Pos or self:WorldSpaceCenter(), angle_zero)
 	end
 end

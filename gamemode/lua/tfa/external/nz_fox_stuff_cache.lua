@@ -4,6 +4,7 @@ game.AddParticles("particles/perks_phd.pcf")
 game.AddParticles("particles/perks_zombshell.pcf")
 game.AddParticles("particles/perks_razor.pcf")
 game.AddParticles("particles/perks_vulture.pcf")
+game.AddParticles("particles/perks_winterswail.pcf")
 
 game.AddParticles("particles/perks_aat_blastfurnace.pcf")
 game.AddParticles("particles/perks_aat_thunderwall.pcf")
@@ -15,10 +16,15 @@ game.AddParticles("particles/perks_aat_turned.pcf")
 game.AddParticles("particles/magicbox.pcf")
 
 PrecacheParticleSystem("nz_powerup_purple")
-PrecacheParticleSystem("nz_powerup_global")
-PrecacheParticleSystem("nz_powerup_local")
 PrecacheParticleSystem("nz_powerup_anti")
+PrecacheParticleSystem("nz_powerup_global")
+PrecacheParticleSystem("nz_powerup_global_intro")
+PrecacheParticleSystem("nz_powerup_global_poof")
+PrecacheParticleSystem("nz_powerup_local")
+PrecacheParticleSystem("nz_powerup_local_intro")
+PrecacheParticleSystem("nz_powerup_local_poof")
 PrecacheParticleSystem("nz_powerup_mini")
+PrecacheParticleSystem("nz_powerup_mini_poof")
 
 PrecacheParticleSystem("nz_perks_cherry")
 PrecacheParticleSystem("nz_perks_cherry_player")
@@ -27,6 +33,8 @@ PrecacheParticleSystem("nz_perks_zombshell")
 PrecacheParticleSystem("nz_perks_razor_vm")
 PrecacheParticleSystem("nz_perks_razor_trail")
 PrecacheParticleSystem("nz_perks_vulture_stink")
+PrecacheParticleSystem("nz_perks_winters")
+PrecacheParticleSystem("nz_perks_winters_zomb")
 
 PrecacheParticleSystem("bo3_aat_blastfurnace")
 PrecacheParticleSystem("bo3_aat_thunderwall")
@@ -58,10 +66,13 @@ TFA.AlternateAmmoTypes = {
 }
 
 TFA.AddSound("NZ.Cherry.Shock", CHAN_STATIC, 1, SNDLVL_NORM, 100, {"nzr/2022/perks/cherry/zm_common.all.sabl.1796.wav", "nzr/2022/perks/cherry/zm_common.all.sabl.1797.wav", "nzr/2022/perks/cherry/zm_common.all.sabl.1798.wav", "nzr/2022/perks/cherry/zm_common.all.sabl.1799.wav", "nzr/2022/perks/cherry/zm_common.all.sabl.1800.wav", "nzr/2022/perks/cherry/zm_common.all.sabl.1801.wav"},")")
+TFA.AddSound("NZ.Cherry.Sweet", CHAN_VOICE_BASE, 1, SNDLVL_NORM, 100, "nzr/2022/perks/cherry/zm_common.all.sabl.1789.wav",")")
 
 TFA.AddSound("NZ.PHD.Wubz", CHAN_USER_BASE, 1, SNDLVL_GUNFIRE, 100, "nzr/2022/perks/phd/mori2_perk_phd_explode.wav",")")
 TFA.AddSound("NZ.PHD.Explode", CHAN_AUTO, 1, SNDLVL_TALKING, 100, "nzr/2022/perks/phd/c4_det.wav",")")
 TFA.AddSound("NZ.PHD.Impact", CHAN_VOICE_BASE, 1, SNDLVL_NORM, 100, {"nzr/2022/perks/phd/impact_00.wav", "nzr/2022/perks/phd/impact_01.wav"},")")
+TFA.AddSound("NZ.PHD.Jump", CHAN_AUTO, 1, SNDLVL_IDLE, 100, "nzr/2022/perks/phd/evt_jump_pad_land.wav",")")
+TFA.AddSound("NZ.PHD.Funny", CHAN_AUTO, 1, SNDLVL_IDLE, 100, "nzr/2022/perks/phd/jumppad_fun.wav",")")
 
 TFA.AddSound("NZ.ZombShell.Start", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, "nzr/2022/perks/zombshell/zm_common.all.p.sabl.105.wav",")")
 TFA.AddSound("NZ.ZombShell.Loop", CHAN_WEAPON, 1, SNDLVL_NORM, 100, "nzr/2022/perks/zombshell/zm_common.all.p.sabl.104.wav",")")
@@ -77,6 +88,9 @@ TFA.AddSound("NZ.POP.Deadwire.Shock", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, {"nzr
 TFA.AddSound("NZ.POP.Fireworks.Whistle", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, {"nzr/2022/perks/pop/fireworks/whistle_00.wav", "nzr/2022/perks/pop/fireworks/whistle_01.wav", "nzr/2022/perks/pop/fireworks/whistle_02.wav", "nzr/2022/perks/pop/fireworks/whistle_03.wav", "nzr/2022/perks/pop/fireworks/whistle_04.wav"},")")
 TFA.AddSound("NZ.POP.Fireworks.Expl", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, {"nzr/2022/perks/pop/fireworks/explo_small_00.wav", "nzr/2022/perks/pop/fireworks/explo_small_01.wav", "nzr/2022/perks/pop/fireworks/explo_small_02.wav", "nzr/2022/perks/pop/perks/fireworks/explo_small_03.wav", "nzr/2022/perks/pop/fireworks/explo_small_04.wav"},")")
 TFA.AddSound("NZ.POP.Fireworks.Shoot", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/perks/pop/fireworks/wpn_pap_first.wav",")")
+
+TFA.AddSound("NZ.POP.Turned.Impact", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, {"nzr/2022/perks/pop/turned/turned_impact_00.wav", "nzr/2022/perks/pop/turned/turned_impact_01.wav", "nzr/2022/perks/pop/turned/turned_impact_02.wav"},")")
+TFA.AddSound("NZ.POP.Turned.Loop", CHAN_WEAPON, 0.3, SNDLVL_IDLE, 100, "nzr/2022/perks/pop/turned/turned_loop.wav",")")
 
 TFA.AddSound("NZ.POP.Thunderwall.Shoot", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 90, "nzr/2022/perks/pop/thunderwall/wpn_pap_launcher.wav",")")
 
@@ -103,18 +117,6 @@ TFA.AddSound("NZ.BO2.Box.Woosh", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/
 TFA.AddSound("NZ.BO2.Box.Spin", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/magicbox/bo2/zmb_box_spin.wav",")")
 TFA.AddSound("NZ.BO2.Box.Music", CHAN_ITEM, 1, SNDLVL_TALKING, 100, "nzr/2022/magicbox/bo2/music_box_00.wav",")")
 
-TFA.AddSound("NZ.BOTD.Box.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/BotD_box_open.wav",")")
-TFA.AddSound("NZ.BOTD.Box.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/BotD_box_close.wav",")")
-
-TFA.AddSound("NZ.Chaos.Box.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/chaos_box_open.wav",")")
-TFA.AddSound("NZ.Chaos.Box.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/chaos_box_close.wav",")")
-
-TFA.AddSound("NZ.SOE.Box.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/SoE_Box_Open.wav",")")
-TFA.AddSound("NZ.SOE.Box.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nz/mysterybox/SoE_Box_Close.wav",")")
-
-TFA.AddSound("NZ.DS.Box.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "enemies/bosses/raz/melee_start.ogg",")")
-TFA.AddSound("NZ.DS.Box.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "enemies/bosses/raz/raz_gun_charge.ogg",")")
-
 TFA.AddSound("NZ.BO2.TombBox.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nzr/2022/magicbox/bo2/tomb/magic_box_open.wav",")")
 TFA.AddSound("NZ.BO2.TombBox.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nzr/2022/magicbox/bo2/tomb/magic_box_close.wav",")")
 TFA.AddSound("NZ.BO2.TombBox.Arrive", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/magicbox/bo2/tomb/magicbox_arrive.wav",")")
@@ -132,10 +134,17 @@ TFA.AddWeaponSound("NZ.Bottle.Drink", "nzr/2022/perks/bottle/swallow.wav")
 TFA.AddWeaponSound("NZ.Hands.Knuckle0", "nzr/2022/pap/knuckle_00.wav")
 TFA.AddWeaponSound("NZ.Hands.Knuckle1", "nzr/2022/pap/knuckle_01.wav")
 
-if not ConVarExists("nz_perkmodifiers") then CreateConVar("nz_perkmodifiers", 1, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_REPLICATED}) end
+if not ConVarExists("nz_difficulty_bo4_perkmodifier") then
+	CreateConVar("nz_difficulty_bo4_perkmodifier", 1, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Enable or disable the Black Ops 4 styled perk modifier system where your 4th perk is automatically given its modifier/upgrade. (0 false, 1 true), Default is 1.",0,1)
+end
+
+if not ConVarExists("nz_difficulty_bo4_perkbleedout") then
+	CreateConVar("nz_difficulty_bo4_perkbleedout", 1, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Enable or disable the Black ops 4 styled perk bleedout system, where you lose half your perks after being revive. What perks you lose is random. (0 false, 1 true), Default is 1",0,1)
+end
 
 local sp = game.SinglePlayer()
-local cvar_modifiers = GetConVar("nz_perkmodifiers")
+local cvar_reviveperks = GetConVar("nz_difficulty_bo4_perkbleedout")
+local cvar_modifiers = GetConVar("nz_difficulty_bo4_perkmodifier")
 local cvar_downtime = GetConVar("nz_downtime")
 
 if nzombies then
@@ -146,6 +155,7 @@ if nzombies then
 	if SERVER then
 		hook.Add("PlayerRevived", "nzcanigetaREVIVE", function(ply, revivor)
 			local count = 0
+			local bo4w = cvar_reviveperks:GetBool()
 			for k, v in RandomPairs(ply.OldPerks) do
 				if IsValid(revivor) and revivor:HasUpgrade("revive") then
 					if revivor == ply and v == "revive" then continue end
@@ -157,9 +167,9 @@ if nzombies then
 					ply:GivePerk(v)
 
 					continue
-				else
+				elseif bo4w then
 					if count >= math.floor(#ply.OldPerks/2) then break end
-					if #player.GetAll() <= 1 and v == "revive" then continue end
+					if player.GetCount() <= 1 and v == "revive" then continue end
 
 					ply:GivePerk(v)
 					count = count + 1
@@ -173,10 +183,6 @@ if nzombies then
 
 		hook.Add("OnRoundStart", "nzbegaydodrugshailsatan", function(num)
 			for _, ply in pairs(player.GetAll()) do
-				if ply:Alive() and ply:HasPerk("everclear") then
-					ply.ZombShellCount = 1
-				end
-
 				if ply:Alive() and ply:HasUpgrade("mulekick") then
 					for _, wep in pairs(ply:GetWeapons()) do
 						if wep.NZSpecialCategory == "specialgrenade" then
@@ -192,6 +198,7 @@ if nzombies then
 					for k, v in pairs(ply:GetWeapons()) do
 						if v.NZSpecialCategory == "shield" then
 							fuck = true
+							break
 						end
 					end
 
@@ -222,44 +229,82 @@ if nzombies then
 			end
 		end)
 
-		hook.Add("OnPlayerBuyPerk", "nztombstoneunstinkifier2", function(ply, perk, machine)
-			local fuck = false
-			for k, v in pairs(player.GetAll()) do
-				if v:HasPerk("tombstone") then
-					fuck = true	
-				break end
-			end
+		local boobookeys = {
+			[IN_RELOAD] = true,
+			[IN_ATTACK] = true,
+		}
 
-			if perk == "tombstone" and not fuck then
-				cvar_downtime:SetFloat(cvar_downtime:GetFloat() * 2)
-			end
-		end)
+		hook.Add("KeyPress", "nzRandoPolitan", function(ply, key)
+			if not IsValid(ply) then return end
+			if not ply:HasPerk("politan") then return end
+			local wep = ply:GetActiveWeapon()
+			if not IsValid(wep) or wep.NZSpecialCategory or not wep.IsTFAWeapon then return end
 
-		hook.Add("OnPlayerLostPerk", "nztombstonebleeding", function(ply, perk, forced)
-			local fuck = false
-			for k, v in pairs(player.GetAll()) do
-				if v:HasPerk("tombstone") then
-					fuck = true	
-				break end
-			end
+			if boobookeys[key] and (wep.Primary.ClipSize > 0 and wep:Clip1() == 0 or ply:GetAmmoCount(wep:GetPrimaryAmmoType()) == 0) then
+				if ply:HasPerk("cherry") then
+					ply:SetNW2Bool("nz.CherryBool", false)
+				end
 
-			if perk == "tombstone" and not fuck then
-				cvar_downtime:SetFloat(cvar_downtime:GetFloat() * 0.5)
-			end
-		end)
+				for k, v in RandomPairs(nzMapping.Settings.rboxweps) do
+					local gun = weapons.Get(k)
+					if gun and not gun.NZSpecialCategory then
+						ply:StripWeapon(wep:GetClass())
 
-		hook.Add("OnPlayerPickupPowerUp", "nztemporalgift", function(ply, id, ent)
-			local fuck = false
-			for k, v in pairs(player.GetAll()) do
-				if v:HasUpgrade("speed") then
-					fuck = true	
-				break end
-			end
+						if not ply:HasUpgrade("politan") then
+							ply:Give(k)
+						else
+							if gun.NZPaPReplacement then
+								local wep2 = ply:Give(gun.NZPaPReplacement)
+								timer.Simple(0, function()
+									if not IsValid(ply) or not IsValid(wep2) then return end
 
-			local PowerupData = nzPowerUps:Get(id)
-			if fuck and PowerupData.duration ~= 0 then
-				nzPowerUps.ActivePowerUps[id] = (nzPowerUps.ActivePowerUps[id] or CurTime()) + (PowerupData.duration * 2)
-				nzPowerUps:SendSync()
+									wep2:ApplyNZModifier("pap")
+									if ply:HasPerk("staminup") then
+										wep2:ApplyNZModifier("staminup")
+									end
+									if ply:HasPerk("deadshot") then
+										wep2:ApplyNZModifier("deadshot")
+									end
+									if ply:HasPerk("dtap2") then
+										wep2:ApplyNZModifier("dtap2")
+									end
+									if ply:HasPerk("dtap") then
+										wep2:ApplyNZModifier("dtap")
+									end
+									if ply:HasPerk("vigor") then
+										wep2:ApplyNZModifier("vigor")
+									end
+									wep2:GiveMaxAmmo()
+								end)
+							elseif gun.OnPaP then
+								local wep2 = ply:Give(k)
+								timer.Simple(0, function()
+									if not IsValid(ply) or not IsValid(wep2) then return end
+
+									wep2:ApplyNZModifier("pap")
+									if ply:HasPerk("staminup") then
+										wep2:ApplyNZModifier("staminup")
+									end
+									if ply:HasPerk("deadshot") then
+										wep2:ApplyNZModifier("deadshot")
+									end
+									if ply:HasPerk("dtap2") then
+										wep2:ApplyNZModifier("dtap2")
+									end
+									if ply:HasPerk("dtap") then
+										wep2:ApplyNZModifier("dtap")
+									end
+									if ply:HasPerk("vigor") then
+										wep2:ApplyNZModifier("vigor")
+									end
+									wep2:GiveMaxAmmo()
+								end)
+							end
+						end
+
+						break
+					end
+				end
 			end
 		end)
 	end
@@ -354,6 +399,90 @@ if nzombies then
 	////////////////////////////////////////////////////////////////////
 	////						SHARED HOOKS						////
 	////////////////////////////////////////////////////////////////////
+
+	local meta = FindMetaTable("Player")
+	function meta:GetPHDJumped()
+		return self:GetNW2Bool("nz.PHDJumpd", false)
+	end
+	function meta:SetPHDJumped(bool)
+		return self:SetNW2Bool("nz.PHDJumpd", bool)
+	end
+	function meta:GetPHDDelay()
+		return self:GetNW2Float("nz.PHDDelay", 0)
+	end
+	function meta:SetPHDDelay(float)
+		return self:SetNW2Float("nz.PHDDelay", float)
+	end
+
+	local function GetMoveVector(mv) //copied from willox's double jump addon which is more than likely a copy of tf2 scouts double jump
+		local ang = mv:GetAngles()
+
+		local max_speed = mv:GetMaxSpeed()
+
+		local forward = math.Clamp(mv:GetForwardSpeed(), -max_speed, max_speed)
+		local side = math.Clamp(mv:GetSideSpeed(), -max_speed, max_speed)
+
+		local abs_xy_move = math.abs(forward) + math.abs(side)
+
+		if abs_xy_move == 0 then
+			return vector_origin
+		end
+
+		local mul = max_speed / abs_xy_move
+
+		local vec = Vector()
+
+		vec:Add(ang:Forward() * forward)
+		vec:Add(ang:Right() * side)
+
+		vec:Mul(mul)
+
+		return vec
+	end
+
+	hook.Add("SetupMove", "nzspacejam", function(ply, mv, cmd)
+		if ply:HasUpgrade("phd") and (not ply:InVehicle()) and ply:GetMoveType() ~= MOVETYPE_NOCLIP then
+			if (nzMapping.Settings.ac and nzMapping.Settings.acpreventcjump and !ply:IsInCreative()) then return end
+
+			local onground = ply:IsOnGround()
+			if onground and ply:GetPHDJumped() then
+				ply:SetPHDJumped(false)
+			end
+
+			if not onground and mv:KeyPressed(IN_JUMP) and not ply:GetPHDJumped() then
+				ply:SetPHDJumped(true)
+
+				local vel = GetMoveVector(mv)
+				vel.z = ply:GetJumpPower()
+
+				local max = mv:GetMaxSpeed()
+				local fwd = math.Clamp(mv:GetForwardSpeed(), -max, max)
+				local side = math.Clamp(mv:GetSideSpeed(), -max, max)
+
+				mv:SetVelocity(vel)
+
+				ply:DoCustomAnimEvent(PLAYERANIMEVENT_JUMP , -1)
+
+				local sidesway = side / max
+				local fwdsway = fwd / max
+
+				ply:ViewPunch(Angle(fwdsway*2, 0, sidesway*3))
+				if IsFirstTimePredicted() then
+					local fx = EffectData()
+					fx:SetOrigin(ply:GetPos())
+					fx:SetEntity(ply)
+					fx:SetScale(120)
+					util.Effect("ThumperDust", fx)
+					ply:EmitSound("NZ.PHD.Jump")
+				end
+			end
+
+			if not onground and ply:GetPHDJumped() and mv:KeyReleased(IN_DUCK) and ply:GetPHDDelay() < CurTime() then
+				ply:SetPHDDelay(CurTime() + 7)
+				mv:SetVelocity(mv:GetVelocity() - (vector_up*1000))
+			end
+		end
+	end)
 
 	hook.Add("TFA_PostPrimaryAttack", "nzimafirinmahlaza", function(wep)
 		local ply = wep:GetOwner()
@@ -472,7 +601,8 @@ if nzombies then
 
 			local scale = 1 - math.Clamp(ply:GetNW2Int("nz.CherryCount", 0) / 10, 0, 0.9)
 			local proc = 1 - math.Clamp(wep:Clip1() / wep.Primary.ClipSize, 0, 1)
-			local dmg = (200 * math.pow(1.1, math.floor(round/2) - 1)) * proc
+			local dmg = (250 * math.pow(1.1, math.floor(round/2) - 1)) * proc
+			local count = 0
 
 			local damage = DamageInfo()
 			damage:SetDamage(dmg * scale)
@@ -481,6 +611,9 @@ if nzombies then
 			damage:SetInflictor(wep)
 
 			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 150 * proc)) do
+				if v:GetClass() == "bo2_trap_turbine" then
+					v:SetHealth(math.min(v:Health() + math.Round(25*scale), v:GetMaxHealth()))
+				end
 				if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 then
 					damage:SetDamagePosition(v.EyePos and v:EyePos() or v:WorldSpaceCenter())
 					damage:SetDamageForce(v:GetUp())
@@ -502,9 +635,10 @@ if nzombies then
 
 					if SERVER then
 						v:TakeDamageInfo(damage)
+						if damage:GetDamage() > v:Health() then
+							count = count + 1
+						end
 					end
-
-					damage:SetDamage(dmg * scale)
 				end
 			end
 
@@ -514,33 +648,22 @@ if nzombies then
 			if IsFirstTimePredicted() then
 				ParticleEffectAttach("nz_perks_cherry", PATTACH_ABSORIGIN_FOLLOW, ply, 0)
 				ply:EmitSound("NZ.Cherry.Shock")
+				if ply:HasUpgrade("cherry") or proc >= 1 then
+					ply:EmitSound("NZ.Cherry.Sweet")
+				end
 			end
 
 			timer.Simple(scale, function()
 				if not IsValid(ply) then return end
 				ply:StopParticles()
-			end)
-		end
-	end)
 
-	hook.Add("TFA_PostReload", "nzRandoPolitan", function(wep)
-		if not IsValid(wep) then return end
-		local ply = wep:GetOwner()
-		if not IsValid(ply) or not ply:IsPlayer() then return end
-
-		if SERVER and ply:HasPerk("politan") then
-			if ply:HasPerk("cherry") then
-				ply:SetNW2Bool("nz.CherryBool", false)
-			end
-
-			for k, v in RandomPairs(nzMapping.Settings.rboxweps) do
-				local gun = weapons.Get(k)
-				if gun and not gun.NZSpecialCategory then
-					ply:StripWeapon(wep:GetClass())
-					ply:Give(k)
-					break
+				if count and count >= 12 then
+					if not ply.bo3cherryachv then
+						TFA.BO3GiveAchievement("A Burst of Flavor", "vgui/overlay/achievment/cherry.png", ply)
+						ply.bo3cherryachv = true
+					end
 				end
-			end
+			end)
 		end
 	end)
 end

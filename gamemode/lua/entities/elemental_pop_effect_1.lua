@@ -27,7 +27,10 @@ ENT.PrintName = "Blast Furnace"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
-ENT.Delay = 2
+ENT.Delay = 1.5
+ENT.Kills = 0
+ENT.MaxKills = 12
+ENT.Range = 200
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
@@ -35,8 +38,13 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
-	if IsValid(self:GetParent()) and not self:GetParent():IsPlayer() then
-		self:SetParent(nil)
+	local p = self:GetParent()
+	if IsValid(p) then
+		if p:IsPlayer() then
+			self.MaxKills = 20
+		else
+			self:SetParent(nil)
+		end
 	end
 
 	self:SetModel("models/dav0r/hoverball.mdl")
@@ -61,13 +69,15 @@ end
 local time
 function ENT:Think()
 	if SERVER then
-		for k, v in pairs(ents.FindInSphere(self:GetPos(), 200)) do
+		for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Range)) do
+			if self.Kills >= self.MaxKills then break end
 			if v == self:GetOwner() then continue end
 			if v:AATIsBlastFurnace() then continue end
 			if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 then
-				time = math.Rand(1, 2)
+				time = math.random(2,5)*0.5
 
 				v:AATBlastFurnace(time, self:GetAttacker(), self:GetInflictor())
+				self.Kills = self.Kills + 1
 			end
 		end
 

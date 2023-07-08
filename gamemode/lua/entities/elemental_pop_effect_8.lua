@@ -139,7 +139,7 @@ function ENT:MirgEffect()
 
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
 		if (v:IsNPC() or v:IsNextBot()) and not v:BO3IsSpored() then
-			v:BO3Spore(math.Rand(1.5,2.5), self:GetAttacker(), self:GetInflictor(), false)
+			v:BO3Spore(math.random(2,5)*0.5, self:GetAttacker(), self:GetInflictor(), false)
 		end
 	end
 end

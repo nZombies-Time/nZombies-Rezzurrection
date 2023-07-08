@@ -585,6 +585,14 @@ nzRound:AddZombieType("Die Maschine", "nz_zombie_walker_diemachine", {
 }) 
 nzRound:AddZombieType("Tag der Toten", "nz_zombie_walker_orange", {
 })
+nzRound:AddZombieType("Dead of the Night", "nz_zombie_walker_mansion", {
+})
+nzRound:AddZombieType("Voyage of Despair", "nz_zombie_walker_titanic", {
+})
+nzRound:AddZombieType("WW2", "nz_zombie_walker_ww2", {
+})
+nzRound:AddZombieType("Kentucky Fried Zom-bitch", "nz_zombie_walker_sentinel", {
+})
 nzRound:AddZombieType("Skeleton", "nz_zombie_walker_skeleton", {
 }) 
 nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
@@ -594,6 +602,18 @@ nzRound:AddZombieType("Necromorph", "nz_zombie_walker_necromorph", {
 
 
 function nzRound:GetZombieType(id)
+	if id == "Dead of the Night" then
+	return "nz_zombie_walker_mansion"
+	end
+	if id == "WW2" then
+	return "nz_zombie_walker_ww2"
+	end
+	if id == "Kentucky Fried Zom-bitch" then
+	return "nz_zombie_walker_sentinel"
+	end
+	if id == "Voyage of Despair" then
+	return "nz_zombie_walker_titanic"
+	end
 	if id == "Skeleton" then
 	return "nz_zombie_walker_skeleton"
 	end
@@ -739,6 +759,26 @@ nzRound:AddSpecialRoundType("Hellhounds", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Pests", {
+	specialTypes = {
+		["nz_zombie_special_sprinter"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 55
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.13
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+
 nzRound:AddSpecialRoundType("Helldonkeys", {
 	specialTypes = {
 		["nz_zombie_special_donkey"] = {chance = 100}
@@ -872,6 +912,25 @@ nzRound:AddSpecialRoundType("Lickers", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Hunter Beta", {
+	specialTypes = {
+		["nz_zombie_special_hunterbeta"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 54
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.4
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
 nzRound:AddSpecialRoundType("Raptors", {
 	specialTypes = {
 		["nz_zombie_special_raptor"] = {chance = 100}
@@ -961,7 +1020,7 @@ nzRound:AddSpecialRoundType("Bomber Zombies", {
 	else
 	local hp = 75
 	for i=1,nzRound:GetNumber() do 
-	hp = hp* 1.1
+	hp = hp* 1.3
 								end 
 		dog:SetHealth(hp)
 	end
@@ -981,6 +1040,25 @@ nzRound:AddSpecialRoundType("Spiders", {
 	local hp = 48
 	for i=1,nzRound:GetNumber() do 
 	hp = hp* 1.1
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Frogs", {
+	specialTypes = {
+		["nz_zombie_special_frog"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 80
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.3
 								end 
 		dog:SetHealth(hp)
 	end
@@ -1159,6 +1237,24 @@ function nzRound:AddAdditionalZombieType(id, class)
 end
 
 
+nzRound:AddAdditionalZombieType("Hunter Beta", "nz_zombie_special_hunterbeta", {
+}) 
+nzRound:AddAdditionalZombieType("Pests", "nz_zombie_special_sprinter", {
+}) 
+nzRound:AddAdditionalZombieType("Frogs", "nz_zombie_special_frog", {
+}) 
+nzRound:AddAdditionalZombieType("Dead of the Night Zombies", "nz_zombie_walker_mansion", {
+}) 
+nzRound:AddAdditionalZombieType("Titanic Zombies", "nz_zombie_walker_titanic", {
+}) 
+nzRound:AddAdditionalZombieType("Kentucky Fried Zom-bitch", "nz_zombie_walker_sentinel", {
+}) 
+nzRound:AddAdditionalZombieType("WW2 Zombies", "nz_zombie_walker_ww2", {
+}) 
+nzRound:AddAdditionalZombieType("Brenner", "nz_zombie_boss_fireman", {
+}) 
+nzRound:AddAdditionalZombieType("Meuchler", "nz_zombie_boss_assassin", {
+}) 
 nzRound:AddAdditionalZombieType("Radroaches", "nz_zombie_special_roach", {
 }) 
 nzRound:AddAdditionalZombieType("Hitler", "nz_zombie_boss_hillturr", {
@@ -1331,10 +1427,36 @@ nzRound:AddAdditionalZombieType("Larry the Lobster", "nz_zombie_boss_larry", {
 })   
 nzRound:AddAdditionalZombieType("Avogadro", "nz_zombie_boss_avogadro", {
 })  
-
 function nzRound:GetSpecialType(id)
 	if id == "Panzer (Der Eisendrache)" then
 	return "nz_zombie_boss_panzer_bo3"
+	end
+	if id == "Hunter Beta" then
+	return "nz_zombie_special_hunterbeta"
+	end
+	if id == "Pests" then
+	return "nz_zombie_special_sprinter"
+	end
+	if id == "Meuchler" then
+	return "nz_zombie_boss_assassin"
+	end
+	if id == "Frog" then
+	return "nz_zombie_special_frog"
+	end
+	if id == "Kentuck Fried Zom-bitch" then
+	return "nz_zombie_walker_sentinel"
+	end
+	if id == "Dead of the Night Zombies" then
+	return "nz_zombie_walker_mansion"
+	end
+	if id == "Titanic Zombies" then
+	return "nz_zombie_walker_titanic"
+	end
+		if id == "WW2 Zombies" then
+	return "nz_zombie_walker_ww2"
+	end
+	if id == "Brenner" then
+	return "nz_zombie_boss_fireman"
 	end
 	if id == "Radroaches" then
 	return "nz_zombie_special_roach"

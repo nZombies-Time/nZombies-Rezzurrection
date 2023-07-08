@@ -56,10 +56,10 @@ function ENT:Initialize()
 			self:EmitSound("nz_moo/perks/wonderfizz/elec/hit/random_perk_imp_0"..math.random(0, 2)..".mp3", 90, math.random(97, 103))
 
 			if (self.SoundPlayer) then
-        		self.SoundPlayer:FadeOut(0.5)
+        		self.SoundPlayer:FadeOut(0.8)
     		end
 			if self.Perk == "teddy" then
-				self:SetSkin(31)
+				self:SetSkin(30)
 				machine:SetIsTeddy(true)
 				machine:GetUser():GivePoints(machine:GetPrice())
 				timer.Simple(5, function() 

@@ -1,473 +1,428 @@
 AddCSLuaFile()
 
-ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Napalm_Zombie"
+ENT.Base = "nz_zombiebase_moo"
+ENT.PrintName = "The Napalm Zombie aka The NayNayPalm"
 ENT.Category = "Brainz"
-ENT.Author = "Laby"
+ENT.Author = "GhostlyMoo"
 
-ENT.Models = { "models/bosses/temple_zom.mdl" }
+function ENT:Draw() //Runs every frame
+		self:DrawModel()
+		if self.RedEyes and self:Alive() and !self:GetDecapitated() and !self:GetMooSpecial() and !self.IsMooSpecial then
+			self:DrawEyeGlow() 
+		end
 
-ENT.AttackRange = 115
-ENT.DamageLow = 1
-ENT.DamageHigh = 1
+		local elight = DynamicLight( self:EntIndex(), true )
+		if ( elight ) then
+			local bone = self:LookupBone("j_spineupper")
+			local pos = self:GetBonePosition(bone)
+			pos = pos 
+			elight.pos = pos
+			elight.r = 255
+			elight.g = 50
+			elight.b = 0
+			elight.brightness = 8
+			elight.Decay = 1000
+			elight.Size = 40
+			elight.DieTime = CurTime() + 1
+			elight.style = 0
+			elight.noworld = true
+		end
 
+	if GetConVar( "nz_zombie_debug" ):GetBool() then
+		render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+	end
+end
 
-ENT.AttackSequences = {
-	{seq = "suicide1"},
-	{seq = "suicide2"},
-	{seq = "suicide3"}
+function ENT:DrawEyeGlow()
+	local eyeglow =  Material("nz_moo/sprites/moo_glow1")
+	local eyeColor = Color(255,50,0)
+	local latt = self:LookupAttachment("lefteye")
+	local ratt = self:LookupAttachment("righteye")
+
+	if latt == nil then return end
+	if ratt == nil then return end
+
+	local leye = self:GetAttachment(latt)
+	local reye = self:GetAttachment(ratt)
+
+	local righteyepos = leye.Pos + leye.Ang:Forward()*0.5
+	local lefteyepos = reye.Pos + reye.Ang:Forward()*0.5
+
+	if lefteyepos and righteyepos then
+		render.SetMaterial(eyeglow)
+		render.DrawSprite(lefteyepos, 4, 4, eyeColor)
+		render.DrawSprite(righteyepos, 4, 4, eyeColor)
+	end
+end
+
+if CLIENT then return end -- Client doesn't really need anything beyond the basics
+
+ENT.SpeedBasedSequences = true
+ENT.IsMooZombie = true
+ENT.RedEyes = false
+ENT.MooSpecialZombie = true -- They're a Special Zombie, but is still close enough to a normal zombie to be able to do normal zombie things.
+ENT.IsMooSpecial = true
+
+ENT.AttackRange = 72
+
+ENT.TraversalCheckRange = 40
+
+ENT.Models = {
+	{Model = "models/moo/_codz_ports/t7/temple/moo_codz_t7_sonic_napalm.mdl", Skin = 1, Bodygroups = {0,0}},
 }
 
 ENT.DeathSequences = {
-	"death2",
-	"suicide1",
-	"suicide2",
-	"suicide3"
+	"nz_napalm_death_01",
+	"nz_napalm_death_02",
+	"nz_napalm_death_03",
 }
 
+ENT.BarricadeTearSequences = {
+	"nz_legacy_door_tear_high",
+	"nz_legacy_door_tear_low",
+	"nz_legacy_door_tear_left",
+	"nz_legacy_door_tear_right",
+}
+
+local spawnfast = {"nz_spawn_ground_climbout_fast"}
+
+local JumpSequences = {
+	{seq = "nz_barricade_trav_walk_1"},
+	{seq = "nz_barricade_trav_walk_2"},
+	{seq = "nz_barricade_trav_walk_3"},
+}
+
+local SprintJumpSequences = {
+	{seq = "nz_barricade_sprint_1"},
+	{seq = "nz_barricade_sprint_2"},
+}
+
+local SlowClimbUp36 = {
+	"nz_traverse_climbup36"
+}
+local SlowClimbUp48 = {
+	"nz_traverse_climbup48"
+}
+local SlowClimbUp72 = {
+	"nz_traverse_climbup72"
+}
+local SlowClimbUp96 = {
+	"nz_traverse_climbup96"
+}
+local SlowClimbUp128 = {
+	"nz_traverse_climbup128"
+}
+local SlowClimbUp160 = {
+	"nz_traverse_climbup160"
+}
+local FastClimbUp36 = {
+	"nz_traverse_fast_climbup36"
+}
+local FastClimbUp48 = {
+	"nz_traverse_fast_climbup48"
+}
+local FastClimbUp72 = {
+	"nz_traverse_fast_climbup72"
+}
+local FastClimbUp96 = {
+	"nz_traverse_fast_climbup96"
+}
+local ClimbUp200 = {
+	"nz_traverse_climbup200"
+}
+
+local AttackSequences = {
+	{seq = "nz_attack_stand_ad_1"},
+	{seq = "nz_attack_stand_au_1"},
+	{seq = "nz_legacy_attack_v3"},
+	{seq = "nz_legacy_attack_v4"},
+	{seq = "nz_legacy_attack_v11"},
+	{seq = "nz_fwd_ad_attack_v1"},
+	{seq = "nz_fwd_ad_attack_v2"},
+	{seq = "nz_legacy_attack_superwindmill"},
+	{seq = "nz_t8_attack_stand_larm_1"},
+	{seq = "nz_t8_attack_stand_larm_2"},
+	{seq = "nz_t8_attack_stand_larm_3"},
+	{seq = "nz_t8_attack_stand_rarm_1"},
+	{seq = "nz_t8_attack_stand_rarm_2"},
+	{seq = "nz_t8_attack_stand_rarm_3"},
+}
+
+local WalkAttackSequences = {
+	{seq = "nz_walk_ad_attack_v1"}, -- Quick single swipe
+	{seq = "nz_walk_ad_attack_v2"}, -- Slowish double swipe
+	{seq = "nz_walk_ad_attack_v3"}, -- Slowish single swipe
+	{seq = "nz_walk_ad_attack_v4"}, -- Quickish double swipe
+	{seq = "nz_t8_attack_walk_larm_1"},
+	{seq = "nz_t8_attack_walk_rarm_3"},
+	{seq = "nz_t8_attack_walk_larm_2"},
+	{seq = "nz_t8_attack_walk_rarm_6"},
+}
+
+local SuperSprintAttackSequences = {
+	{seq = "nz_t8_attack_supersprint_larm_1"},
+	{seq = "nz_t8_attack_supersprint_larm_2"},
+	{seq = "nz_t8_attack_supersprint_rarm_1"},
+	{seq = "nz_t8_attack_supersprint_rarm_2"},
+}
+
+local walksounds = {
+	Sound("nz_moo/zombies/vox/_napalm/amb/zmb_napalm_ambient_00.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/amb/zmb_napalm_ambient_01.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/amb/zmb_napalm_ambient_02.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/amb/zmb_napalm_ambient_03.mp3"),
+}
+
+ENT.SequenceTables = {
+	{Threshold = 0, Sequences = {
+		{
+			SpawnSequence = {spawnfast},
+			MovementSequence = {
+				"nz_napalm_walk_01",
+				"nz_napalm_walk_02",
+				"nz_napalm_walk_03",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
+
+			Climb36 = {SlowClimbUp36},
+			Climb48 = {SlowClimbUp48},
+			Climb72 = {SlowClimbUp72},
+			Climb96 = {SlowClimbUp96},
+			Climb120 = {SlowClimbUp128},
+			Climb160 = {SlowClimbUp160},
+			Climb200 = {ClimbUp200},
+
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 70, Sequences = {
+		{
+			SpawnSequence = {spawnfast},
+			MovementSequence = {
+				"nz_supersprint_au12"
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			AttackSequences = {SuperSprintAttackSequences},
+			JumpSequences = {SprintJumpSequences},
+
+			Climb36 = {FastClimbUp36},
+			Climb48 = {FastClimbUp48},
+			Climb72 = {FastClimbUp72},
+			Climb96 = {FastClimbUp96},
+			Climb120 = {SlowClimbUp128},
+			Climb160 = {SlowClimbUp160},
+			Climb200 = {ClimbUp200},
+
+			PassiveSounds = {walksounds},
+		},
+	}}
+}
+
+ENT.ExplodeAttackSequences = {
+	"nz_napalm_attack_01",
+	"nz_napalm_attack_02",
+	"nz_napalm_attack_03"
+}
+
+ENT.DeathSounds = {
+	"nz_moo/zombies/vox/_napalm/pain/zmb_napalm_zombies_vocals_pain_00.mp3",
+	"nz_moo/zombies/vox/_napalm/pain/zmb_napalm_zombies_vocals_pain_01.mp3",
+	"nz_moo/zombies/vox/_napalm/pain/zmb_napalm_zombies_vocals_pain_02.mp3"
+}
 ENT.AttackSounds = {
-	"enemies/bosses/nap/spawn.ogg",
+	"nz_moo/zombies/vox/_napalm/attack/zmb_napalm_attack_00.mp3",
+	"nz_moo/zombies/vox/_napalm/attack/zmb_napalm_attack_01.mp3",
+	"nz_moo/zombies/vox/_napalm/attack/zmb_napalm_attack_02.mp3",
+}
+ENT.SpawnSounds = {
+	"nz_moo/zombies/vox/_napalm/spawn/evt/evt_napalm_zombie_spawn_00.mp3",
+	"nz_moo/zombies/vox/_napalm/spawn/evt/evt_napalm_zombie_spawn_01.mp3",
+	"nz_moo/zombies/vox/_napalm/spawn/evt/evt_napalm_zombie_spawn_02.mp3",
+	"nz_moo/zombies/vox/_napalm/spawn/evt/evt_napalm_zombie_spawn_03.mp3",
+}
+ENT.SpawnVoxSounds = {
+	"nz_moo/zombies/vox/_napalm/spawn/evt_napalm_zombie_spawn_vocals_00.mp3",
+	"nz_moo/zombies/vox/_napalm/spawn/evt_napalm_zombie_spawn_vocals_01.mp3",
+	"nz_moo/zombies/vox/_napalm/spawn/evt_napalm_zombie_spawn_vocals_02.mp3",
 }
 
-ENT.AttackHitSounds = {
-	"enemies/bosses/nap/step3.ogg"
+ENT.BehindSoundDistance = 200 -- When the zombie is within 200 units of a player, play these sounds instead
+ENT.BehindSounds = {
+	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_00.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_01.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_02.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_03.mp3"),
+	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_04.mp3"),
 }
-
-ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
-}
-
-ENT.WalkSounds = {
-	"enemies/bosses/nap/amb1.ogg",
-	"enemies/bosses/nap/amb2.ogg",
-	"enemies/bosses/nap/amb3.ogg"
-}
-
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 1,
-	}
-}
-
--- We overwrite the Init function because we do not change bodygroups randomly!
-function ENT:Initialize()
-
-	self:Precache()
-
-	self:SetModel( self.Models[math.random( #self.Models )] )
-
-	self:SetJumping( false )
-	self:SetLastLand( CurTime() + 1 ) --prevent jumping after spawn
-	self:SetLastTargetCheck( CurTime() )
-	self:SetLastTargetChange( CurTime() )
-
-	--sounds
-	self:SetNextMoanSound( CurTime() + 1 )
-
-	--stuck prevetion
-	self:SetLastPush( CurTime() )
-	self:SetLastPostionSave( CurTime() )
-	self:SetStuckAt( self:GetPos() )
-	self:SetStuckCounter( 0 )
-	
-	self:SetAttacking( false )
-	self:SetLastAttack( CurTime() )
-	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
-
-	--target ignore
-	self:ResetIgnores()
-
-	self:SetHealth( 75 ) --fallback
-
-	self:SetRunSpeed( self.RunSpeed ) --fallback
-	self:SetWalkSpeed( self.WalkSpeed ) --fallback
-
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
-
-	self:SetActStage(0)
-	self:SetSpecialAnimation(false)
-
-	self:StatsInitialize()
-	self:SpecialInit()
-	
-	-- Fallback for buggy tool
-	if !self:GetRunSpeed() then self:SetRunSpeed(150) end
-
-	if SERVER then
-		self.loco:SetDeathDropHeight( self.DeathDropHeight )
-		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		self.loco:SetAcceleration( self.Acceleration )
-		self.loco:SetJumpHeight( self.JumpHeight )
-		if GetConVar("nz_zombie_lagcompensated"):GetBool() then
-			self:SetLagCompensated(true)
-		end
-		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
-		self:SetUsingClaw(false)
-		
-		self.NextAction = 0
-		self.NextClawTime = 0
-		self.NextFlameTime = 0
-	end
-	
-	self.ZombieAlive = true
-
-end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		hasExploded = false
-		self:SetRunSpeed(41)
-		self:SetHealth(1000)
-		self:SetMaxHealth(3000)
-		dying = false
-		counting = true
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		if nzRound:InState( ROUND_CREATE ) then
+			self:SetHealth(500)
+			self:SetMaxHealth(500)
+		else
+			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		end
+		self:SetRunSpeed(1)
+
+		self:SetBodygroup(0,0)
+
+		self.Cooldown = CurTime() + 7 -- Won't be allowed to explode right after spawning, so they'll attack normally until then.
+		self.CanExplode = false
+		self.Suicide = false
 	end
-
-	--PrintTable(self:GetSequenceList())
-end
-
-function ENT:SpecialInit()
-
-	if CLIENT then
-		--make them invisible for a really short duration to blend the emerge sequences
-		self:SetNoDraw(true)
-		self:TimedEvent( 0.5, function()
-			self:SetNoDraw(false)
-		end)
-
-		self:SetRenderClipPlaneEnabled( true )
-		self:SetRenderClipPlane(self:GetUp(), self:GetUp():Dot(self:GetPos()))
-
-		self:TimedEvent( 2, function()
-			self:SetRenderClipPlaneEnabled(false)
-		end)
-
-	end
-end
-
-function ENT:InitDataTables()
-	self:NetworkVar("Entity", 0, "ClawHook")
-	self:NetworkVar("Bool", 1, "UsingClaw")
-	self:NetworkVar("Bool", 2, "Flamethrowing")
 end
 
 function ENT:OnSpawn()
+	--self:PlaySound(self.SpawnSounds[math.random(#self.SpawnSounds)], 511, math.random(85, 105))
+	self:PlaySound(self.SpawnVoxSounds[math.random(#self.SpawnVoxSounds)], 100, math.random(85, 105), 1, 2)
+	self:EmitSound("nz_moo/zombies/vox/_napalm/evt_napalm_zombie_loop.wav", 75, math.random(95, 105), 1, 3)
 
-	local seq = "drg_jump"
-	local tr = util.TraceLine({
-		start = self:GetPos() + Vector(0,0,500),
-		endpos = self:GetPos(),
-		filter = self,
-		mask = MASK_SOLID_BRUSHONLY,
-	})
-    if tr.Hit then 
-        seq = "drg_jump"
-    end
-    local _, dur = self:LookupSequence(seq)
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
 
-    self.spawning = true
-    timer.Simple(dur, function()
-        self:ResetSequence( math.random(5, 7) )
-        self.spawning = false
-    end)
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
 
-	-- play emerge animation on spawn
-	-- if we have a coroutine else just spawn the zombie without emerging for now.
-	if coroutine.running() then
-	    local pos = self:GetPos() + (seq == "drg_jump" and Vector(0,0,100) or Vector(0,0,450))
-		
-		local effectData = EffectData()
-		effectData:SetStart( pos )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude(1)
-		self:EmitSound("enemies/bosses/nap/spawn.ogg",511)
-		local entParticle = ents.Create("info_particle_system")
-		entParticle:SetKeyValue("start_active", "1")
-		entParticle:SetKeyValue("effect_name", "napalm_emerge")
-		entParticle:SetPos(self:GetPos())
-		entParticle:SetAngles(self:GetAngles())
-		entParticle:Spawn()
-		entParticle:Activate()
-		entParticle:Fire("kill","",2)
-			self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(2)..".wav")
-		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
-        self:SetInvulnerable(true)
-		
-		--[[effectData = EffectData()
-		effectData:SetStart( pos + Vector(0, 0, 1000) )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude( 0.75 )
-		util.Effect("lightning_strike", effectData)]]
-		
-		self:TimedEvent(dur, function()
-			--dust cloud
-			self:SetInvulnerable(false)
-			local effectData = EffectData()
-			effectData:SetStart( self:GetPos() )
-			effectData:SetOrigin( self:GetPos() )
-			effectData:SetMagnitude(1)
+	if tr.Hit then
+		local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+		self:EmitSound(finalsound)
+	end
+
+	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+	ParticleEffect("doom_hellunit_spawn_medium",self:GetPos(),self:GetAngles(),self)
+	ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+
+	self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
 	
-			self.loco:SetDesiredSpeed(41)
-			counting = false
-		end)
-		self:PlaySequenceAndWait(seq)
+	self:SetSpecialAnimation(true)
+	local seq = self:SelectSpawnSequence()
+	if seq then
+		self:PlaySequenceAndMove(seq)
+		self:SetSpecialAnimation(false)
+		self:CollideWhenPossible()
 	end
 end
 
-function ENT:OnZombieDeath(dmgInfo)
-	dying = true
-	--self:ReleasePlayer()
-	--self:StopFlames()
-	self:SetRunSpeed(0)
-	self.loco:SetVelocity(Vector(0,0,0))
-	--self:Stop()
-	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-
-		if IsValid(self) then
-			
-			util.ScreenShake(self:GetPos(),12,400,3,1000)
-			self:EmitSound("enemies/bosses/nap/explode.ogg",511)
-            local ent = ents.Create("env_explosion")
-        ent:SetPos(self:GetPos())
-        ent:SetAngles(self:GetAngles())
-        ent:Spawn()
-        ent:SetKeyValue("imagnitude", "200")
-        ent:Fire("explode")
-            local entParticle = ents.Create("info_particle_system")
-            entParticle:SetKeyValue("start_active", "1")
-            entParticle:SetKeyValue("effect_name", "napalm_postdeath_napalm")
-            entParticle:SetPos(self:GetPos())
-            entParticle:SetAngles(self:GetAngles())
-            entParticle:Spawn()
-            entParticle:Activate()
-            entParticle:Fire("kill","",20)
-            local vaporizer = ents.Create("point_hurt")
-            if !vaporizer:IsValid() then return end
-            vaporizer:SetKeyValue("Damage", 22)
-            vaporizer:SetKeyValue("DamageRadius", 150)
-            vaporizer:SetKeyValue("DamageType",DMG_BURN)
-            vaporizer:SetPos(self:GetPos())
-            vaporizer:SetOwner(self)
-            vaporizer:Spawn()
-            vaporizer:Fire("TurnOn","",0)
-            vaporizer:Fire("kill","",20)
-			--util.Effect("Explosion", effectData)
-			self:Remove()
-		end
-	
-
+function ENT:PerformDeath(dmginfo)
+	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+	self:StopSound("nz_moo/zombies/vox/_napalm/evt_napalm_zombie_loop.wav")
+	self:DoDeathAnimation(self.RagdollDeathSequences[math.random(#self.RagdollDeathSequences)])
+	if !self.Suicide then
+		self:NapalmDeathExplosion()
+	end
 end
 
-function ENT:BodyUpdate()
-    
-	self.CalcIdeal = ACT_WALK
-
-	local velocity = self:GetVelocity()
-
-	local len2d = velocity:Length2D()
-
-    if ( len2d > 60 ) then 
-        self.CalcIdeal = ACT_WALK 
-    elseif ( len2d > 5 ) then 
-        self.CalcIdeal = ACT_WALK 
-    end
-
-	if self:IsJumping() and self:WaterLevel() <= 0 then
-		self.CalcIdeal = ACT_JUMP
-	end
-
-	if !self:GetSpecialAnimation() and !self:IsAttacking() then
-        if self:GetActivity() != self.CalcIdeal and !self:GetStop() then 
-            self:ResetSequence(5) 
-            self:StartActivity(self.CalcIdeal) 
-        end
-
-        local curseq = self:GetSequence()
-        if !self.spawning and (curseq != 5 and curseq != 6 and curseq != 7) then
-            self:ResetSequence( math.random(5, 7) )
-        end
-
-        if self.ActStages[self:GetActStage()] then
-			self:BodyMoveXY()
-		end
-    end
-    
-	self:FrameAdvance()
-
+function ENT:OnRemove()
+	self:StopSound("nz_moo/zombies/vox/_napalm/evt_napalm_zombie_loop.wav")
 end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
+
+	-- Turned Zombie Targetting
+	if self.IsTurned then return IsValid(ent) and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooSpecial and ent:Alive() end
+	
 	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 
--- This function is run every time a path times out, once every 1 seconds of pathing
-
-if CLIENT then
-	local eyeGlow =  Material( "sprites/redglow1" )
-	local white = Color( 255, 255, 255, 255 )
-	local lightglow = Material( "sprites/physg_glow1_noz" )
-	local lightyellow = Color( 255, 255, 200, 200 )
-	local clawglow = Material( "sprites/orangecore1" )
-	local clawred = Color( 255, 100, 100, 255 )
-	function ENT:Draw()
-		self:DrawModel()
-
+function ENT:PostAdditionalZombieStuff()
+	if CurTime() > self.Cooldown and !self.CanExplode then
+		self.CanExplode = true
 	end
-end
-
-function ENT:StartFlames(time)
-	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
-end
-
-function ENT:StopFlames()
-	self:SetStop(false)
-end
-
-function ENT:KILLAQUEEN()
-      --local effectdata = EffectData()
-      --effectdata:SetOrigin( self:GetPos() )
-      --util.Effect("hound_explosion", effectdata)
-	  ParticleEffect("hound_explosion",self:GetPos() + Vector(0,0,40),self:GetAngles(),self)
-	util.ScreenShake(self:GetPos(),12,400,3,1000)
-			self:EmitSound("enemies/bosses/nap/explode.ogg",511)
-            local ent = ents.Create("env_explosion")
-        ent:SetPos(self:GetPos())
-        ent:SetAngles(self:GetAngles())
-        ent:Spawn()
-		 ent:SetKeyValue("ignoredEntity", "self")
-        ent:SetKeyValue("iRadiusOverride", "400")
-		ent:SetKeyValue("imagnitude", "75")
-        ent:Fire("explode")
-		for k, v in pairs(ents.FindInSphere(self:GetPos(), 400)) do
-					if v:IsPlayer() then
-						v:Ignite(5)
-					end
-		end
-		 self:TimedEvent(5, function()
-self:SetBlockAttack(false)
- end)
+	if self:TargetInRange(100) and !self:IsAttackBlocked() and self.CanExplode and !self.IsTurned then
+		self.Suicide = true
+		self:DoSpecialAnimation(self.ExplodeAttackSequences[math.random(#self.ExplodeAttackSequences)])
+	end
 end
 
 function ENT:OnTargetInAttackRange()
-dying = true
-self:TimedEvent(1.9, function()
- self:KILLAQUEEN() 
- self:SetBlockAttack(true)
- end)
-
- local atkData = {}
-    atkData.dmglow = 5
-    atkData.dmghigh = 5
-	atkData.dmgforce = Vector( -2, -2, 0 )
-	atkData.dmgtype = DMG_BURN
-    self:Attack( atkData )
-end
-
-function ENT:PlayAttackAndWait( name, speed )
-
-	local len = self:SetSequence( name )
-	speed = speed or 1
-
-	self:ResetSequenceInfo()
-	self:SetCycle( 0 )
-	self:SetPlaybackRate( speed )
-
-	local endtime = CurTime() + len / speed
-
-	while ( true ) do
-
-		if ( endtime < CurTime() ) then
-			if !self:GetStop() then
-				self:StartActivity( ACT_WALK )
-				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-			end
-			return
-		end
-
-		coroutine.yield()
-
+	if !self:GetBlockAttack() and !self.CanExplode or self.IsTurned then
+		self:Attack()
+	else
+		self:TimeOut(2)
 	end
-
 end
 
-function ENT:OnThink()
-if !counting and !dying and self:Health() > 0 then
-counting = true
-timer.Simple(0.8,function()
-self:EmitSound("enemies/bosses/nap/step"..math.random(1,3)..".ogg")
-counting = false
-end)
+function ENT:NapalmDeathExplosion()
+	if IsValid(self) then	
+		util.ScreenShake(self:GetPos(),12,400,3,1000)
+
+		self:EmitSound("nz_moo/zombies/vox/_napalm/explosion/evt_napalm_zombie_explo.mp3",511)
+		self:EmitSound("nz_moo/zombies/vox/_napalm/explosion/zmb_napalm_explode.mp3",511)
+		self:EmitSound("nz_moo/zombies/vox/_napalm/explosion/evt_zombie_flare_0"..math.random(0,1)..".mp3",511)
+
+        local entParticle = ents.Create("info_particle_system")
+        entParticle:SetKeyValue("start_active", "1")
+        entParticle:SetKeyValue("effect_name", "napalm_postdeath_napalm")
+        entParticle:SetPos(self:GetPos())
+        entParticle:SetAngles(self:GetAngles())
+        entParticle:Spawn()
+        entParticle:Activate()
+        entParticle:Fire("kill","",20)
+        local vaporizer = ents.Create("point_hurt") -- Point Hurt is Laby's favorite breakfast, lunch, and dinner... HE LOVES!!! POINT_HURT!!!
+        if !vaporizer:IsValid() then return end
+        vaporizer:SetKeyValue("Damage", 22)
+        vaporizer:SetKeyValue("DamageRadius", 150)
+        vaporizer:SetKeyValue("DamageType",DMG_BURN)
+        vaporizer:SetPos(self:GetPos())
+        vaporizer:SetOwner(self)
+        vaporizer:Spawn()
+        vaporizer:Fire("TurnOn","",0)
+        vaporizer:Fire("kill","",20)
+
+		self:Explode(200, false)
+		--self:Remove() -- Goodbye
+	end
 end
-	
+
+function ENT:HandleAnimEvent(a,b,c,d,e)
+	if e == "melee" then
+		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+		self:DoAttackDamage()
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+	if e == "napalm_charge" then
+		self:EmitSound("nz_moo/zombies/vox/_napalm/explosion/evt_napalm_charge.mp3", 100)
+	end
+	if e == "napalm_explode" then
+		self:NapalmDeathExplosion()
+	end
 end
 
-function ENT:OnBarricadeBlocking( barricade )
-	if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-		if barricade:GetNumPlanks() > 0 then
-			timer.Simple(0.3, function()
-
-				for i = 1, barricade:GetNumPlanks() do
-					barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".wav", 100, math.random(90, 130))
-					barricade:RemovePlank()
-				end
-
-			end)
-
-			self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-			
-			local seq, dur
-
-			local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
-			local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-			
-			if type(target) == "table" then
-				seq, dur = self:LookupSequenceAct(target.seq)
-			elseif target then -- It is a string or ACT
-				seq, dur = self:LookupSequenceAct(target)
-			else
-				seq, dur = self:LookupSequence("swing")
-			end
-			
-			self:SetAttacking(true)
-			self:PlaySequenceAndWait(seq, 1)
-			self:SetLastAttack(CurTime())
-			self:SetAttacking(false)
-			self:UpdateSequence()
-			if coroutine.running() then
-				coroutine.wait(2 - dur)
-			end
-
-			-- this will cause zombies to attack the barricade until it's destroyed
-			local stillBlocked = self:CheckForBarricade()
-			if stillBlocked then
-				self:OnBarricadeBlocking(stillBlocked)
-				return
-			end
-
-			-- Attacking a new barricade resets the counter
-			self.BarricadeJumpTries = 0
-		elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-			local dist = barricade:GetPos():DistToSqr(self:GetPos())
-			if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
-				self:TriggerBarricadeJump()
-				self.BarricadeJumpTries = 0
-			else
-				-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
-				self.BarricadeJumpTries = self.BarricadeJumpTries + 1
-				-- Otherwise they'd get continuously stuck on slightly bigger props :(
-			end
-		else
-			self:SetAttacking(false)
-		end
+function ENT:PostTookDamage(dmginfo)
+	if self:Health() < 100 then
+		self.LastZombieMomento = true
 	end
 end

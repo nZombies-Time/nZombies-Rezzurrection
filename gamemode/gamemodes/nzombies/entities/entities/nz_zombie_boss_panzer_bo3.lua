@@ -5,6 +5,17 @@ ENT.PrintName = "Panzer Soldat(BO3)"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
+function ENT:SetupDataTables()
+	self:NetworkVar("Bool", 0, "Decapitated")
+	self:NetworkVar("Bool", 1, "Alive")
+	self:NetworkVar("Bool", 2, "MooSpecial")
+	self:NetworkVar("Bool", 3, "WaterBuff")
+	self:NetworkVar("Bool", 4, "Helmet")
+	self:NetworkVar("Bool", 5, "BomberBuff")
+
+	if self.InitDataTables then self:InitDataTables() end
+end
+
 AccessorFunc( ENT, "fLastToast", "LastToast", FORCE_NUMBER)
 
 function ENT:Draw()
@@ -13,7 +24,7 @@ function ENT:Draw()
 	if self.RedEyes and self:Alive() and !self:GetDecapitated() and !self:GetMooSpecial() and !self.IsMooSpecial then
 		self:DrawEyeGlow() 
 	end
-	if !self.HelmetLost then
+	if self:GetHelmet() then
 		self:FacePlateLamp()
 	end
 		
@@ -58,7 +69,7 @@ ENT.IsMooSpecial = true
 
 ENT.AttackRange = 115
 
-ENT.TraversalCheckRange = 80
+ENT.TraversalCheckRange = 100
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/castle/moo_codz_t7_mechz.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -69,10 +80,6 @@ local spawn = {"nz_soldat_arrive"}
 ENT.DeathSequences = {
 	"nz_soldat_death_1",
 	"nz_soldat_death_2"
-}
-
-ENT.BarricadeTearSequences = {
-	--Leave this empty if you don't intend on having a special enemy use tear anims.
 }
 
 local WalkAttackSequences = {
@@ -126,6 +133,9 @@ ENT.SequenceTables = {
 			MovementSequence = {
 				"nz_soldat_walk_basic",
 			},
+			FlameMovementSequence = {
+				"nz_soldat_ft_run",
+			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
@@ -168,6 +178,9 @@ ENT.SequenceTables = {
 			MovementSequence = {
 				"nz_soldat_launch_pad_move_loop",
 			},
+			FlameMovementSequence = {
+				"nz_soldat_ft_run",
+			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
@@ -191,23 +204,26 @@ function ENT:StatsInitialize()
 
 		self.HelmetDamage = 0
 
-		helmet = true
 		enraged = false
 		angering = false
 		leftthetoasteron = false
 		zoomingaround = false
 		youraisemeup = false
 
+
+		-- It is a 100% known fact that bools control at least 90% of the world... This comment is now false.
 		self.UsingFlamethrower = false
 		self.UsingGlowstick = false
 		self.Jetpacking = false
 		self.StartFlying = false
 		self.StopFlying = false
+		self.DisallowFlamethrower = false
 		self:SetLastToast(CurTime())
 		self.NextShootTime = math.random(5, 25) -- The initial chances of shooting glowsticks can vary. We love math random.
 		self:SetMooSpecial(true)
-		self:SetRunSpeed( 36 )
+		self:SetHelmet(true)
 		self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 85))
+		self:SetRunSpeed( 36 )
 	end
 end
 
@@ -220,8 +236,6 @@ function ENT:OnSpawn()
 	self:SetSpecialAnimation(true)
 
 		self:EmitSound("enemies/bosses/newpanzer/incoming_alarm_new.ogg",511)
-		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,4)
-		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,3)
 		self:EmitSound("enemies/bosses/newpanzer/mechz_entrance.ogg",100,100)
 		self:TimedEvent(dur - 0.75, function()
 			self:StopParticles()
@@ -236,17 +250,13 @@ function ENT:OnSpawn()
 end
 
 function ENT:PerformDeath(dmgInfo)
-	
-	self.UsingFlamethrower = false
-	self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
 	self:StopToasting()
-
 	self:EmitSound("enemies/bosses/newpanzer/rise.ogg",100, math.random(85, 105))
 
 	if self:GetSpecialAnimation() or self.PanzerDGLifted and self:PanzerDGLifted() then
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 		self:EmitSound("enemies/bosses/newpanzer/explode.ogg", 511)
-   		self:Explode( math.random( 45, 60 ))
+   		self:Explode(50, false)
 		self:Remove(dmgInfo)
 	else
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
@@ -254,11 +264,399 @@ function ENT:PerformDeath(dmgInfo)
 	end
 end
 
+function ENT:OnTargetInAttackRange()
+	if self.Jetpacking then
+		self.Jetpacking = false
+		self.StopFlying = true
+		--print("It is time commence the ass beating.")
+	else
+		if self.UsingFlamethrower then
+			self:StopToasting()
+		end
+		if !self:GetBlockAttack() then
+			self:Attack()
+		else
+			self:TimeOut(2)
+		end
+	end
+end
+
+function ENT:AI()
+	
+	if self.Jetpacking and self.StartFlying then
+		self.StartFlying = false
+		self.DisallowFlamethrower = true
+
+		self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/start.mp3",85)
+
+		self:PlaySequenceAndWait("nz_soldat_launch_pad_takeoff")
+		self:SetRunSpeed( 155 )
+		self.loco:SetDesiredSpeed( 155 )
+		self:SpeedChanged()
+		self:ResetMovementSequence()
+		local comedyday = os.date("%d-%m") == "01-04"
+		if math.random(10) == 10 or comedyday then
+			self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav",95, 100) -- Don't worry about it.
+		else
+			self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav",85, 100, 1, 3)
+		end
+	elseif not self.Jetpacking and self.StopFlying then
+		self.DisallowFlamethrower = false
+		self.StopFlying = false
+		self:StopParticles()
+		self:StopSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav")
+		self:StopSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav")
+		self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/stop.mp3",85)
+
+		self:PlaySequenceAndWait("nz_soldat_launch_pad_land")
+		if enraged then
+			self:SetRunSpeed( 71 )
+			self.loco:SetDesiredSpeed( 71 )
+		else
+			self:SetRunSpeed( 36 )
+			self.loco:SetDesiredSpeed( 36 )
+		end
+		self:TimeOut(0.05)
+		self:SpeedChanged()
+		self:ResetMovementSequence()
+	end
+	if angering then
+		angering = false
+		enraged = true
+
+		self:PlaySequenceAndWait("nz_soldat_berserk_1")
+
+		self:SetRunSpeed( 71 )
+		self.loco:SetDesiredSpeed( 71 )
+		self:TimeOut(0.05)
+		self:SpeedChanged()
+		self:ResetMovementSequence()
+	end
+	if self.UsingGlowstick then
+		local shootpos = self:GetAttachment(self:LookupAttachment("tag_gun_spin")).Pos
+		if self:IsValidTarget( self:GetTarget() ) then
+			self.loco:FaceTowards( self:GetTarget():GetPos() )
+		end
+		self:PlaySequenceAndWait("nz_soldat_chaingun_intro_sprint_to_aim")
+		for i=1, 3 do
+			-- He won't use this ability for the time being.
+			self:EmitSound("enemies/bosses/newpanzer/wpn_grenade_fire_mechz.ogg", 100, math.random(85, 105))
+			ParticleEffectAttach("bo3_panzer_elec_blast",PATTACH_POINT,self,8)
+			self:PlaySequenceAndWait("nz_soldat_chaingun_fire")
+		end
+		self.UsingGlowstick = false
+	end
+
+	if IsValid(self:GetTarget()) then
+		if !self.Jetpacking and !self.UsingGlowstick and !self:TargetInRange(750) then -- You're gonna fly over to the sorry bastard you're chasing and beat them to a pulp.
+			self.Jetpacking = true -- Personally... I prefer the air!
+			self.StartFlying = true
+		end
+		if self.Jetpacking and self:TargetInRange(300) then
+			self.Jetpacking = false
+			self.StopFlying = true
+		end
+		if !self:GetSpecialAnimation() and !angering and !self:GetAttacking() and !self.DisallowFlamethrower and !self.UsingGlowstick and self:TargetInRange(320) then	
+			self:StartToasting()
+		else
+			self:StopToasting()
+		end
+		--[[if CurTime() > self.NextShootTime and !self:GetSpecialAnimation() and !angering and !self.Jetpacking and !self:GetAttacking() and !self.UsingFlamethrower and self:TargetInRange(500) then
+			--print("I shall assault you with glow sticks.")
+			if self:TargetInRange(250) then return end
+			if self:IsAttackBlocked() then return end
+			self.UsingGlowstick = true
+			self.NextShootTime = CurTime() + math.random(7, 18)
+		end]]
+	end
+end
+
+function ENT:OnInjured( dmgInfo )
+	local hitpos = dmgInfo:GetDamagePosition()
+	
+	if self:GetHelmet() then
+		local bone = self:LookupBone("j_faceplate")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
+		
+		if hitpos:DistToSqr(finalpos) < 50 then
+			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
+			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
+				self:SetHelmet(false)
+				self:DeflateBones({
+					"j_faceplate",
+				})
+				self:EmitSound("enemies/bosses/newpanzer/mechz_faceplate.ogg",511, 100)
+				self:DoSpecialAnimation("nz_soldat_pain_faceplate")
+				angering = true
+			end
+		end
+		
+		dmgInfo:ScaleDamage(0.15) -- When the helmet isn't lost, all damage only deals 10%
+	else
+		local bone = self:LookupBone("j_head")
+		local pos, ang = self:GetBonePosition(bone)
+		local finalpos = pos + ang:Up()*4
+		
+		if hitpos:DistToSqr(finalpos) < 150 then
+			-- No damage scaling on headshot, we keep it at 1x
+		else
+			dmgInfo:ScaleDamage(0.2) -- When the helmet is lost, a non-headshot still only deals 10%
+		end
+	end
+end
+
+function ENT:PostTookDamage(dmginfo) 
+	if self:CrawlerForceTest(hitforce) and not self:GetSpecialAnimation() and not self.Jetpacking then -- Don't mind the use of the crawler force here.
+		self:StopToasting()
+		self:EmitSound("enemies/bosses/newpanzer/vox/angry_nh_0"..math.random(1,3)..".ogg", 100, math.random(85, 105))
+		self:EmitSound("enemies/bosses/newpanzer/destruction_0"..math.random(2)..".ogg", 100, math.random(85, 105))
+		self:DoSpecialAnimation(self.FatalSequences[math.random(#self.FatalSequences)])
+	end
+end
+
+function ENT:ResetMovementSequence()
+	if self.UsingFlamethrower then
+		self:ResetSequence(self.FlameMovementSequence)
+		self.CurrentSeq = self.FlameMovementSequence
+	else
+		self:ResetSequence(self.MovementSequence)
+		self.CurrentSeq = self.MovementSequence
+	end
+	if self.UpdateSeq ~= self.CurrentSeq then
+		self.UpdateSeq = self.CurrentSeq
+		self:UpdateMovementSpeed()
+	end
+end
+
+-- Called when the zombie wants to idle. Play an animation here
+function ENT:PerformIdle()
+	if self.UsingFlamethrower then
+		self:StopToasting()
+	end
+	if self.Jetpacking then
+		self:ResetSequence(self.JetPackIdleSequence)
+	elseif self.PanzerDGLifted and self:PanzerDGLifted() then
+		self:ResetSequence(self.TeslaSequence)
+	else
+		self:ResetSequence(self.IdleSequence)
+	end
+end
+
+function ENT:DoDeathAnimation(seq)
+	self.BehaveThread = coroutine.create(function()
+		self:PlaySequenceAndWait(seq)
+		self:EmitSound("enemies/bosses/newpanzer/explode.ogg", 511)
+   		self:Explode(50, false)
+		self:BecomeRagdoll(DamageInfo())
+	end)
+end
+
+function ENT:StartToasting()
+	self.UsingFlamethrower = true
+	if self.UsingFlamethrower then
+		--print("I'm Nintoasting!!!")
+
+		if not leftthetoasteron then
+			ParticleEffectAttach("asw_mnb_flamethrower",PATTACH_POINT_FOLLOW,self,5)
+			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/start.mp3",95, math.random(85, 105))
+			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/loop.wav",100, 100)
+			leftthetoasteron = true
+		end
+
+		self:SetLastToast(CurTime())
+		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
+			local bone = self:GetAttachment(self:LookupAttachment("tag_flamethrower_fx"))
+			pos = bone.Pos
+			local mins = Vector(0, -8, -15)
+			local maxs = Vector(325, 20, 15)
+			local tr = util.TraceHull({
+				start = pos,
+				endpos = pos + bone.Ang:Forward()*500,
+				filter = self,
+				mask = MASK_PLAYERSOLID,
+				collisiongroup = COLLISION_GROUP_INTERACTIVE_DEBRIS,
+				ignoreworld = true,
+				mins = mins,
+				maxs = maxs,
+			})
+		
+			debugoverlay.BoxAngles(pos, mins, maxs, bone.Ang, 1, Color( 255, 255, 255, 10))
+					
+			if self:IsValidTarget(tr.Entity) then
+				local dmg = DamageInfo()
+				dmg:SetAttacker(self)
+				dmg:SetInflictor(self)
+				dmg:SetDamage(2)
+				dmg:SetDamageType(DMG_BURN)
+						
+				tr.Entity:TakeDamageInfo(dmg)
+				tr.Entity:Ignite(2, 0)
+			end
+		end
+		self.NextFireParticle = CurTime() + 0.05
+	end
+end
+
+function ENT:StopToasting()
+	if self.UsingFlamethrower then
+		--print("I'm no longer Nintoasting.")
+		if leftthetoasteron then
+			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/end.mp3",100, math.random(85, 105))
+			self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+			leftthetoasteron = false
+		end
+		self.UsingFlamethrower = false
+		self:StopParticles()
+	end
+end
+
+function ENT:OnThink()
+	if not IsValid(self) then return end
+	if self.UsingFlamethrower and self:GetLastToast() + 0.1 < CurTime() then -- This controls how offten the trace for the flamethrower updates it's position. This shit is very costly so I wanted to try limit how much it does it.
+		self:StartToasting()
+	end
+end
+
+function ENT:OnRemove()
+	self:StopSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav")
+	self:StopSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav")
+	self:StopToasting()
+end
+
+function ENT:HandleAnimEvent(a,b,c,d,e)
+	if e == "melee" then
+		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+		self:DoAttackDamage()
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+
+	if e == "mech_melee_whoosh" then
+		self:EmitSound("enemies/bosses/newpanzer/melee_a.ogg",80)
+	end
+	if e == "mech_stomp_le" then
+		self:EmitSound("enemies/bosses/newpanzer/anim_decepticon_lg_run_0"..math.random(1,4)..".ogg",80,math.random(95,100))
+		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
+		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,13)
+	end
+	if e == "mech_stomp_ri" then
+		self:EmitSound("enemies/bosses/newpanzer/anim_decepticon_lg_run_0"..math.random(1,4)..".ogg",80,math.random(95,100))
+		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
+		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,14)
+	end
+	if e == "mech_land" then
+		self:EmitSound("enemies/bosses/newpanzer/land_0"..math.random(0,2)..".ogg",80,math.random(95,100))
+		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
+	end
+	if e == "mech_jetflames_start" then
+		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,4)
+		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,3)
+	end
+	if e == "mech_jetflames_stop" then
+		self:StopParticles()
+	end
+	if e == "mech_yell" then
+		self:EmitSound("enemies/bosses/newpanzer/vox/angry_nh_0"..math.random(3)..".ogg", 95, math.random(95,105))
+	end
+end
+
+function ENT:IsValidTarget( ent )
+	if not ent then return false end
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+end
+
+function ENT:HasHelmet() return self:GetHelmet() end
+
+if SERVER then
+	-- Collide When Possible
+	local collidedelay = 0.25
+	local bloat = Vector(5,5,0)
+
+	function ENT:Think()
+		if self.DoCollideWhenPossible then
+			if not self.NextCollideCheck or self.NextCollideCheck < CurTime() then
+				local mins,maxs = self:GetCollisionBounds()
+				local tr = util.TraceHull({
+					start = self:GetPos(),
+					endpos = self:GetPos(),
+					filter = self,
+					mask = MASK_SOLID,
+					mins = mins - bloat,
+					maxs = maxs + bloat,
+					ignoreworld = false
+				})
+
+				local b = IsValid(tr.Entity)
+				if not b then
+					self:SetSolidMask(MASK_NPCSOLID)
+					self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
+					self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 85))
+					self.DoCollideWhenPossible = nil
+					self.NextCollideCheck = nil
+				else
+					self.NextCollideCheck = CurTime() + collidedelay
+				end
+			end
+		end
+
+		-- We don't want to say we're stuck if it's because we're attacking or timed out and !self:GetTimedOut() 
+		if not self:GetSpecialAnimation() and not self:GetAttacking() and self:GetLastPostionSave() + 4 < CurTime() then
+			if self:GetPos():DistToSqr( self:GetStuckAt() ) < 10 then
+				self:SetStuckCounter( self:GetStuckCounter() + 1)
+				--print(self:GetStuckCounter())
+			else
+				self:SetStuckCounter( 0 )
+			end
+
+			if self:GetStuckCounter() >= 1 then
+				local tr = util.TraceHull({
+					start = self:GetPos(),
+					endpos = self:GetPos(),
+					maxs = self:OBBMaxs(),
+					mins = self:OBBMins(),
+					filter = self
+				})
+				if !tr.HitNonWorld then
+					--print("Stuck")
+					self:ApplyRandomPush(750)
+					self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
+					self:CollideWhenPossible()
+				end
+				if self:GetStuckCounter() > 3 and !self.PanzerDGLifted and !self:PanzerDGLifted() then
+					local spawnpoints = {}
+					for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
+						if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
+							table.insert(spawnpoints, v)
+						end
+					end
+					local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
+					self:SetPos(selected:GetPos())
+					self:SetStuckCounter( 0 )
+				end
+			end
+			self:SetLastPostionSave( CurTime() )
+			self:SetStuckAt( self:GetPos() )
+		end
+		self:DebugThink()
+		self:OnThink()
+	end
+end
+
 -- A standard attack you can use it or create something fancy yourself
 function ENT:Attack( data )
 
-	self.UsingFlamethrower = false
-	self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
 	self:StopToasting()
 
 	self:SetLastAttack(CurTime())
@@ -336,410 +734,13 @@ function ENT:Attack( data )
 	self:PlayAttackAndWait(data.attackseq.seq, 1)
 end
 
-if SERVER then
-	function ENT:RunBehaviour()
-
-		self:Retarget()
-		self:SpawnZombie()
-
-		while (true) do
-
-			if self.EventMask and not self.DoCollideWhenPossible then
-				self:SetSolidMask(MASK_NPCSOLID)
-			end
-			if !self:GetStop() and self:GetFleeing() then -- Admittedly this was rushed, I took no time to understand how this can be achieved with nextbot pathing so I just made a short navmesh algorithm for fleeing. Sorry. Created by Ethorbit.
-				self:SetTimedOut(false)
-
-				local target = self:GetTarget()
-				if IsValid(target) then
-					self:SetLastFlee(CurTime())
-					self:ResetMovementSequence() -- They'll comically slide away if this isn't here.
-					self:MoveToPos(self:GetFleeDestination(target), {lookahead = 0, maxage = 3})
-					self:SetLastFlee(CurTime())
-				end
-			end
-			if !self:GetFleeing() and !self:GetStop() and CurTime() > self:GetLastFlee() + 2 then
-				self:SetTimedOut(false)
-				local ct = CurTime()
-				if ct >= self.NextRetarget then
-					local oldtarget = self.Target
-					self:Retarget() --The overall process of looking for targets is handled much like how it is in nZu. While it may not save much fps in solo... Turns out this can vastly help the performance of multiplayer games.
-				end
-				if not self:HasTarget() and not self:IsValidTarget(self:GetTarget()) then
-					self:OnNoTarget()
-				else
-					local path = self:ChaseTarget()
-					if path == "failed" then
-						self:SetTargetUnreachable(true)
-					end
-					if path == "ok" then
-						if self:TargetInAttackRange() then -- Stop flying when you're in attack range.
-							if self.Jetpacking then
-								self.Jetpacking = false
-								self.StopFlying = true
-								--print("It is time commence the ass beating.")
-							else
-								if self.UsingFlamethrower then
-									--print("I'm no longer Nintoasting.")
-									self.UsingFlamethrower = false
-									leftthetoasteron = false
-									self:StopParticles()
-								end
-								self:OnTargetInAttackRange()
-							end
-						else
-							self:TimeOut(0.1)
-						end
-					elseif path == "timeout" then --asume pathing timedout, maybe we are stuck maybe we are blocked by barricades
-						self:SetTargetUnreachable(true)
-						self:OnPathTimeOut()
-					else
-						self:TimeOut(0.5)
-					end
-				end
-			else
-				self:TimeOut(1)
-			end
-			if self.Jetpacking and self.StartFlying then
-				self.StartFlying = false
-
-				ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,4)
-				ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,3)
-				self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/start.mp3",85)
-
-				self:PlaySequenceAndWait("nz_soldat_launch_pad_takeoff")
-				self:SetRunSpeed( 155 )
-				self.loco:SetDesiredSpeed( 155 )
-				self:SpeedChanged()
-				self:ResetMovementSequence()
-			elseif not self.Jetpacking and self.StopFlying then
-				self.StopFlying = false
-				self:StopParticles()
-				self:StopSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav")
-				self:StopSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav")
-				self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/stop.mp3",85)
-
-				self:PlaySequenceAndWait("nz_soldat_launch_pad_land")
-				if enraged then
-					self:SetRunSpeed( 71 )
-					self.loco:SetDesiredSpeed( 71 )
-				else
-					self:SetRunSpeed( 36 )
-					self.loco:SetDesiredSpeed( 36 )
-				end
-				self:TimeOut(0.05)
-				self:SpeedChanged()
-				self:ResetMovementSequence()
-			end
-			if angering then
-				angering = false
-				enraged = true
-
-				self:EmitSound("enemies/bosses/newpanzer/mechz_faceplate.ogg",511, 100)
-				self:PlaySequenceAndWait("nz_soldat_pain_faceplate")
-				self:PlaySequenceAndWait("nz_soldat_berserk_1")
-
-				self:SetRunSpeed( 71 )
-				self.loco:SetDesiredSpeed( 71 )
-				self:TimeOut(0.05)
-				self:SpeedChanged()
-				self:ResetMovementSequence()
-			end
-			if self.FatalForceAnim and not self.Jetpacking then
-				self.FatalForceAnim = false
-				self:StopToasting()
-				self:SetTarget(nil)
-
-				self:EmitSound("enemies/bosses/newpanzer/vox/angry_nh_0"..math.random(1,3)..".ogg", 100, math.random(85, 105))
-				self:EmitSound("enemies/bosses/newpanzer/destruction_0"..math.random(2)..".ogg", 100, math.random(85, 105))
-				--print("Uh oh Luigi, I'm about to commit insurance fraud lol.")
-				self:DoSpecialAnimation(self.FatalSequences[math.random(#self.FatalSequences)])
-			end
-			if self.UsingGlowstick then
-
-				local shootpos = self:GetAttachment(self:LookupAttachment("tag_gun_spin")).Pos
-				if self:IsValidTarget( self:GetTarget() ) then
-					self.loco:FaceTowards( self:GetTarget():GetPos() )
-				end
-				self:PlaySequenceAndWait("nz_soldat_chaingun_intro_sprint_to_aim")
-				for i=1, 3 do
-					-- He won't use this ability for the time being.
-					self:EmitSound("enemies/bosses/newpanzer/wpn_grenade_fire_mechz.ogg", 100, math.random(85, 105))
-					ParticleEffectAttach("bo3_panzer_elec_blast",PATTACH_POINT,self,8)
-					self:PlaySequenceAndWait("nz_soldat_chaingun_fire")
-				end
-				self.UsingGlowstick = false
-			end
-			if not self.NextSound or self.NextSound < CurTime() and not self:GetAttacking() and self:Alive() then
-				self:Sound() -- Moo Mark 12/7/22: Moved this out of the THINK function since I thought it was a little stupid.
-			end
-		end
-	end
-end
-
-function ENT:OnPathTimeOut()
-	local distToTarget = self:GetPos():DistToSqr(self:GetTargetPosition())
-	if IsValid(self:GetTarget()) then
-		if !self.Jetpacking and !self.UsingGlowstick and distToTarget > 750^2 then -- You're gonna fly over to the sorry bastard you're chasing and beat them to a pulp.
-			self.Jetpacking = true -- Personally... I prefer the air!
-			self.StartFlying = true
-			local comedyday = os.date("%d-%m") == "01-04"
-			if math.random(10) == 10 or comedyday then
-				self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav",95, 100) -- Don't worry about it.
-			else
-				self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav",85, 100, 1, 3)
-			end
-			--print("Where do you think you're goin Mario? You can hide but you can't hide!")
-		end
-		if self.Jetpacking and distToTarget < 300^2 then
-			self.Jetpacking = false
-			self.StopFlying = true
-		end
-		if !self.Climbing and !youraisemeup and !self:GetSpecialAnimation() and !angering and !self:GetAttacking() and !self.Jetpacking and !self.UsingGlowstick and distToTarget < 320^2 then	
-			self.UsingFlamethrower = true
-			if not leftthetoasteron then
-				--ParticleEffectAttach("bo3_panzer_flame",PATTACH_POINT_FOLLOW,self,5)
-				ParticleEffectAttach("asw_mnb_flamethrower",PATTACH_POINT_FOLLOW,self,5) -- This one just looks cooler.
-
-				self:EmitSound("nz_moo/zombies/vox/_mechz/flame/start.mp3",95, math.random(85, 105))
-				self:EmitSound("nz_moo/zombies/vox/_mechz/flame/loop.wav",100, 100)
-				leftthetoasteron = true
-			end
-		elseif not self.Jetpacking then
-			self.UsingFlamethrower = false
-			if leftthetoasteron then
-				self:EmitSound("nz_moo/zombies/vox/_mechz/flame/stop.mp3",100, math.random(85, 105))
-				self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
-				leftthetoasteron = false
-			end
-			self:StopParticles()
-		end
-		--[[if CurTime() > self.NextShootTime and !self:GetSpecialAnimation() and !angering and !self.Jetpacking and !self:GetAttacking() and !self.UsingFlamethrower and distToTarget > 500^2 then
-			--print("I shall assault you with glow sticks.")
-			self.UsingGlowstick = true
-			self.NextShootTime = CurTime() + math.random(7, 18)
-		end]]
-	end
-end
-
-function ENT:OnInjured( dmgInfo )
-	local hitpos = dmgInfo:GetDamagePosition()
-	
-	if !self.HelmetLost then
-		local bone = self:LookupBone("j_faceplate")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
-		
-		if hitpos:DistToSqr(finalpos) < 50 then
-			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
-			if self.HelmetDamage > (self:GetMaxHealth() * 0.01) then
-				self.HelmetLost = true
-				angering = true
-				self:DeflateBones({
-					"j_faceplate",
-				})
-			end
-		end
-		
-		dmgInfo:ScaleDamage(0.15) -- When the helmet isn't lost, all damage only deals 10%
-	else
-		local bone = self:LookupBone("j_head")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Up()*4
-		
-		if hitpos:DistToSqr(finalpos) < 150 then
-			-- No damage scaling on headshot, we keep it at 1x
-		else
-			dmgInfo:ScaleDamage(0.2) -- When the helmet is lost, a non-headshot still only deals 10%
-		end
-	end
-	
-end
-
-function ENT:OnTakeDamage(dmginfo)
-	if SERVER then
-		local hitforce = dmginfo:GetDamageForce()
-
-		if (dmginfo:GetDamageType() == DMG_DISSOLVE and dmginfo:GetDamage() >= self:Health() and self:Health() > 0) then
-			self:DissolveEffect()
-		end
-
-		if self:CrawlerForceTest(hitforce) and not self:GetSpecialAnimation() and not self.Jetpacking then -- Don't mind the use of the crawler force here.
-			self.FatalForceAnim = true
-		end
-
-		self:SetLastHurt(CurTime())
-	end
-end
-
-function ENT:ResetMovementSequence()
-	if self.UsingFlamethrower then
-		self:ResetSequence(self.FlameMovementSequence)
-	else
-		self:ResetSequence(self.MovementSequence)
-	end
-end
-
--- Called when the zombie wants to idle. Play an animation here
-function ENT:PerformIdle()
-	if self.UsingFlamethrower then
-		self:StopToasting()
-	end
-	if self.Jetpacking then
-		self:ResetSequence(self.JetPackIdleSequence)
-	elseif self.PanzerDGLifted and self:PanzerDGLifted() then
-		self:ResetSequence(self.TeslaSequence)
-	else
-		self:ResetSequence(self.IdleSequence)
-	end
-end
-
-
-function ENT:OnBarricadeBlocking( barricade, dir )
-		if not self:GetSpecialAnimation() then
-			self.UsingFlamethrower = false
-
-			self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
-			self:StopToasting()
-			if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-				
-				if barricade:GetNumPlanks() > 0 then
-					local warppos = barricade:GetPos() + dir * 50
-					local currentpos
-					local currentb = barricade
-					if !self:GetIsBusy() then -- When the zombie initially comes in contact with the barricade.
-						self:MoveToPos(warppos, { lookahead = 20, tolerance = 20, draw = false, maxage = 3, repath = 3, })
-
-						self:TimeOut(0.5) -- An intentional and W@W authentic stall.
-						self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
-					end
-					
-					self:SetIsBusy(true)
-					currentpos = self:GetPos()
-					if currentpos ~= warppos then
-						self:SetPos(Vector(warppos.x,warppos.y,currentpos.z))
-					end
-					self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-
-					if IsValid(barricade.ZombieUsing) then -- Moo Mark 3/15/23: Trying out something where only one zombie can actively attack a barricade at a time.
-						--local no, fuckoff = self:CheckForBarricade()
-						self:TimeOut(1)
-						if barricade then
-							self:OnBarricadeBlocking(barricade, dir)
-							return
-						end
-					else
-						local seq, dur
-
-						local attacktbl = self.AttackSequences
-						if self:GetCrawler() then
-							attacktbl = self.CrawlAttackSequences
-						end
-
-						local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-						local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
-						local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
-					
-						if not self.IsMooSpecial and not self:GetCrawler() then -- Don't let special zombies use the tear anims.
-							if type(teartarget) == "table" then
-								seq, dur = self:LookupSequenceAct(teartarget.seq)
-							elseif teartarget then -- It is a string or ACT
-								seq, dur = self:LookupSequenceAct(teartarget)
-							else
-								seq, dur = self:LookupSequence("swing")
-							end
-						else
-							if type(target) == "table" then
-								seq, dur = self:LookupSequenceAct(target.seq)
-							elseif target then -- It is a string or ACT
-								seq, dur = self:LookupSequenceAct(target)
-							else
-								seq, dur = self:LookupSequence("swing")
-							end
-						end
-
-						local planktopull = barricade:BeginPlankPull(self)
-						local planknumber -- fucking piece of shit
-						if planktopull then
-							planknumber = planktopull:GetFlags()
-						end
-
-						if !IsValid(barricade.ZombieUsing) then
-							barricade:HasZombie(self) -- Blocks any other zombie from attacking the barricade.
-						end
-
-						if self.AttackSounds then self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) end
-						if !self.IsMooSpecial then
-							if planknumber ~= nil then
-								if !self:GetCrawler() then
-									self:PlaySequenceAndWait("nz_boardtear_aligned_m_"..planknumber.."_grab")
-									if IsValid(self) and self:Alive() then
-										if IsValid(planktopull) then
-											barricade:RemovePlank(planktopull)
-										end
-									end
-									self:PlaySequenceAndWait("nz_boardtear_aligned_m_"..planknumber.."_pull")
-								else
-									self:PlaySequenceAndWait("nz_crawl_boardtear_aligned_m_"..planknumber.."_grab")
-									if IsValid(self) and self:Alive() then
-										if IsValid(planktopull) then
-											barricade:RemovePlank(planktopull)
-										end
-									end
-									self:PlaySequenceAndWait("nz_crawl_boardtear_aligned_m_"..planknumber.."_pull")
-								end
-							end
-						else
-							timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
-								if IsValid(self) and self:Alive() and IsValid(planktopull) then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
-									barricade:RemovePlank(planktopull)
-								end
-							end)
-
-							self:PlaySequenceAndWait(seq)
-						end
-
-						self:SetLastAttack(CurTime())
-						if math.random(100) <= 25 and !self:GetCrawler() and !self.IsMooSpecial then -- The higher the number, the more likely a zombie will taunt.
-							self:SetStuckCounter( 0 ) --This is just to make sure a zombie won't despawn at a barricade.
-							local seq,s = self:SelectTauntSequence()
-							if seq then
-								self:PlaySequenceAndWait(seq)
-							end
-						end
-
-						-- this will cause zombies to attack the barricade until it's destroyed
-						--local fuckyou, asshole = self:CheckForBarricade()
-						if barricade then
-							self:OnBarricadeBlocking(barricade, dir)
-							return
-						end
-					end
-				elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-					self:TimeOut(0.5)
-					self:TriggerBarricadeJump(barricade, dir)
-				else
-					self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
-					self:CollideWhenPossible()
-					self:SetIsBusy(false)
-				end
-			end
-		end
-	end
-
 function ENT:TriggerBarricadeJump( barricade, dir )
 	if not self:GetSpecialAnimation() and (not self.NextBarricade or CurTime() > self.NextBarricade) then
 
-		self.UsingFlamethrower = false
-
-		self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
 		self:StopToasting()
 
 		self:SetSpecialAnimation(true)
 		self:SetBlockAttack(true) -- Moo Mark BarricadeJump
-
-		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,4)
-		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,3)
 
 		local id, dur, speed
 		local animtbl = self.JumpSequences
@@ -800,170 +801,110 @@ function ENT:TriggerBarricadeJump( barricade, dir )
 	end
 end
 
-function ENT:DoDeathAnimation(seq)
-	self.BehaveThread = coroutine.create(function()
-		self:PlaySequenceAndWait(seq)
-		self:EmitSound("enemies/bosses/newpanzer/explode.ogg", 511)
-   		self:Explode( math.random( 45, 60 ))
-		self:BecomeRagdoll(DamageInfo())
-	end)
-end
+function ENT:OnBarricadeBlocking( barricade, dir )
+	if not self:GetSpecialAnimation() then
 
-function ENT:StartToasting()
-	if self.UsingFlamethrower then
-		--print("I'm Nintoasting!!!")
-		self:SetLastToast(CurTime())
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:GetAttachment(self:LookupAttachment("tag_flamethrower_fx"))
-			pos = bone.Pos
-			local mins = Vector(0, -8, -15)
-			local maxs = Vector(325, 20, 15)
-			local tr = util.TraceHull({
-				start = pos,
-				endpos = pos + bone.Ang:Forward()*500,
-				filter = self,
-				mins = mins,
-				maxs = maxs,
-			})
-		
-			debugoverlay.BoxAngles(pos, mins, maxs, bone.Ang, 1, Color( 255, 255, 255, 10))
-					
-			if self:IsValidTarget(tr.Entity) then
-				local dmg = DamageInfo()
-				dmg:SetAttacker(self)
-				dmg:SetInflictor(self)
-				dmg:SetDamage(2)
-				dmg:SetDamageType(DMG_BURN)
-						
-				tr.Entity:TakeDamageInfo(dmg)
-				tr.Entity:Ignite(2, 0)
-			end
-		end
-		self.NextFireParticle = CurTime() + 0.05
-	end
-end
+		self:StopToasting()
+		if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
+				
+			if barricade:GetNumPlanks() > 0 then
+				local warppos = barricade:GetPos() + dir * 50
+				local currentpos
+				local currentb = barricade
+				if !self:GetIsBusy() then -- When the zombie initially comes in contact with the barricade.
+					self:MoveToPos(warppos, { lookahead = 20, tolerance = 20, draw = false, maxage = 3, repath = 3, })
 
-function ENT:StopToasting()
-	if self.UsingFlamethrower then
-		--print("I'm no longer Nintoasting.")
-		self.UsingFlamethrower = false
-		if leftthetoasteron then
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/stop.mp3",100, math.random(85, 105))
-			self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
-			leftthetoasteron = false
-		end
-	end
-	self:StopParticles()
-end
-
-function ENT:OnThink()
-	if not IsValid(self) then return end
-	if self.UsingFlamethrower and self:GetLastToast() + 0.1 < CurTime() then -- This controls how offten the trace for the flamethrower updates it's position. This shit is very costly so I wanted to try limit how much it does it.
-		self:StartToasting()
-	end
-end
-
-function ENT:OnRemove()
-	self.UsingFlamethrower = false
-	self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
-	self:StopSound("nz_moo/zombies/vox/_mechz/rocket/loop.wav")
-	self:StopSound("nz_moo/zombies/vox/_mechz/rocket/joyride.wav")
-	self:StopToasting()
-end
-
-function ENT:IsValidTarget( ent )
-	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
-end
-
--- Panzer is getting more intense anti stuck measures since he can get stuck more easily.
-
-if SERVER then
-	-- Collide When Possible
-	local collidedelay = 0.25
-	local bloat = Vector(5,5,0)
-
-	function ENT:Think()
-		--[[if (self:IsAllowedToMove() and !self:GetAttacking() and !self:GetCrawler() and self.SameSquare) then -- Moo Mark
-        	self.loco:SetVelocity(self:GetForward() * self:GetRunSpeed())
-        end]]
-		if self.DoCollideWhenPossible then
-			if not self.NextCollideCheck or self.NextCollideCheck < CurTime() then
-				local mins,maxs = self:GetCollisionBounds()
-				local tr = util.TraceHull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					filter = self,
-					mask = MASK_SOLID,
-					mins = mins - bloat,
-					maxs = maxs + bloat,
-					ignoreworld = false
-				})
-
-				local b = IsValid(tr.Entity)
-				if not b then
-					self:SetSolidMask(MASK_NPCSOLID)
-					self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
-					self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 85))
-					self.DoCollideWhenPossible = nil
-					self.NextCollideCheck = nil
-				else
-					self.NextCollideCheck = CurTime() + collidedelay
-				end
-			end
-		end
-
-		-- We don't want to say we're stuck if it's because we're attacking or timed out and !self:GetTimedOut() 
-		if not self:GetSpecialAnimation() and not self:GetAttacking() and self:GetLastPostionSave() + 4 < CurTime() then
-			if self:GetPos():DistToSqr( self:GetStuckAt() ) < 10 then
-				self:SetStuckCounter( self:GetStuckCounter() + 1)
-				--print(self:GetStuckCounter())
-			else
-				self:SetStuckCounter( 0 )
-			end
-
-			if self:GetStuckCounter() >= 1 then
-				local tr = util.TraceHull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = self:OBBMaxs(),
-					mins = self:OBBMins(),
-					filter = self
-				})
-				if !tr.HitNonWorld then
-					--print("Stuck")
-					self:ApplyRandomPush(750)
+					self:TimeOut(0.5) -- An intentional and W@W authentic stall.
 					self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
-					self:CollideWhenPossible()
 				end
-				if self:GetStuckCounter() > 3 and not self.PanzerDGLifted and not self:PanzerDGLifted() then
-					local spawnpoints = {}
-					for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
-						if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
-							table.insert(spawnpoints, v)
+					
+				self:SetIsBusy(true)
+				currentpos = self:GetPos()
+				if currentpos ~= warppos then
+					self:SetPos(Vector(warppos.x,warppos.y,currentpos.z))
+				end
+				self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
+
+				if IsValid(barricade.ZombieUsing) then -- Moo Mark 3/15/23: Trying out something where only one zombie can actively attack a barricade at a time.
+					--local no, fuckoff = self:CheckForBarricade()
+					self:TimeOut(1)
+					if barricade then
+						self:OnBarricadeBlocking(barricade, dir)
+						return
+					end
+				else
+					local seq, dur
+
+					local attacktbl = self.AttackSequences
+					if self:GetCrawler() then
+						attacktbl = self.CrawlAttackSequences
+					end
+
+					local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
+					local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
+					local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
+					
+					if not self.IsMooSpecial and not self:GetCrawler() then -- Don't let special zombies use the tear anims.
+						if type(teartarget) == "table" then
+							seq, dur = self:LookupSequenceAct(teartarget.seq)
+						elseif teartarget then -- It is a string or ACT
+							seq, dur = self:LookupSequenceAct(teartarget)
+						else
+							seq, dur = self:LookupSequence("swing")
+						end
+					else
+						if type(target) == "table" then
+							seq, dur = self:LookupSequenceAct(target.seq)
+						elseif target then -- It is a string or ACT
+							seq, dur = self:LookupSequenceAct(target)
+						else
+							seq, dur = self:LookupSequence("swing")
 						end
 					end
-					local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
-					self:SetPos(selected:GetPos())
-					self:SetStuckCounter( 0 )
-				end
-			end
-			self:SetLastPostionSave( CurTime() )
-			self:SetStuckAt( self:GetPos() )
-		end
-		self:DebugThink()
-		self:OnThink()
-	end
 
-	function ENT:SolidMaskDuringEvent(mask)  -- Changes the zombie's mask until the end of the event. If nil is passed, it immediately removes the mask
-		if mask then
-			self:SetSolidMask(mask)
-			self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-			--self:SetCollisionBounds(Vector(-15,-15, 0), Vector(15, 15, 85))
-			self.EventMask = true
-		else
-			self:SetSolidMask(MASK_NPCSOLID)
-			self.EventMask = nil
+					local planktopull = barricade:BeginPlankPull(self)
+					local planknumber -- fucking piece of shit
+					if planktopull then
+						planknumber = planktopull:GetFlags()
+					end
+
+					if !IsValid(barricade.ZombieUsing) then
+						barricade:HasZombie(self) -- Blocks any other zombie from attacking the barricade.
+					end
+
+					if self.AttackSounds then self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) end
+					timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
+						if IsValid(self) and self:Alive() and IsValid(planktopull) then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
+							barricade:RemovePlank(planktopull)
+						end
+					end)
+
+					self:PlaySequenceAndWait(seq)
+
+					self:SetLastAttack(CurTime())
+					if math.random(100) <= 25 and !self:GetCrawler() and !self.IsMooSpecial then -- The higher the number, the more likely a zombie will taunt.
+						self:SetStuckCounter( 0 ) --This is just to make sure a zombie won't despawn at a barricade.
+						local seq,s = self:SelectTauntSequence()
+						if seq then
+							self:PlaySequenceAndWait(seq)
+						end
+					end
+
+					-- this will cause zombies to attack the barricade until it's destroyed
+					--local fuckyou, asshole = self:CheckForBarricade()
+					if barricade then
+						self:OnBarricadeBlocking(barricade, dir)
+						return
+					end
+				end
+			elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
+				self:TimeOut(0.5)
+				self:TriggerBarricadeJump(barricade, dir)
+			else
+				self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
+				self:CollideWhenPossible()
+				self:SetIsBusy(false)
+			end
 		end
 	end
 end

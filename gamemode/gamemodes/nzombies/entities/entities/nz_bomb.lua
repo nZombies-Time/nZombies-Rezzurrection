@@ -1,87 +1,99 @@
 ENT.Type = "anim"
 ENT.Base = "base_entity"
 ENT.PrintName = "WW2 Bomber zombie bomb"
-ENT.Author = "Zet0r"
+ENT.Author = "Your mom"
 ENT.Health = 100
 ENT.Spawnable = false
 ENT.AdminSpawnable = false
 ENT.markedExplode = false
-
-ENT.ExplosionSounds = {
-	"nz/monkey/voice_explosion/explo_vox_00.wav",
-	"nz/monkey/voice_explosion/explo_vox_01.wav",
-	"nz/monkey/voice_explosion/explo_vox_02.wav",
-	"nz/monkey/voice_explosion/explo_vox_03.wav",
-	"nz/monkey/voice_explosion/explo_vox_04.wav",
-	"nz/monkey/voice_explosion/explo_vox_05.wav",
-	"nz/monkey/voice_explosion/explo_vox_06.wav",
-	"nz/monkey/voice_explosion/explo_vox_07.wav",
-	"nz/monkey/voice_explosion/explo_vox_08.wav",
-	"nz/monkey/voice_explosion/explo_vox_09.wav",
-	"nz/monkey/voice_explosion/explo_vox_10.wav",
-	"nz/monkey/voice_explosion/explo_vox_11.wav",
-}
-
 
 if SERVER then
 	AddCSLuaFile()
 end
 
 function ENT:Initialize()
-	if SERVER then
-		self:SetModel( "models/roach/codz_megapack/ww2/bmb_bomb.mdl" )
-		self:PhysicsInitSphere(1, "metal_bouncy")
-		--self:SetCollisionBounds(Vector(20,20, 0), Vector(20, 20, 30))
-		self:SetAngles( Angle(0, 0, 90))
-		self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-	end
+	self:SetModel( "models/moo/_codz_ports/s2/zombie/moo_codz_s2_bmb_bomb.mdl" )
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
+    self:GetPhysicsObject():SetMaterial("metal")
+
+    self:EmitSound("physics/metal/metal_box_impact_bullet"..math.random(1,3)..".wav",100,math.random(95, 105))
 end
 
 function ENT:OnTakeDamage( dmginfo )
-print("bro")
-if self.markedExplode == false then
-self.markedExplode = true
-self:EXUPLOSION()
-end
-end
+	if self.markedExplode == false then
+		self.markedExplode = true
 
-function ENT:PhysicsCollide(data, physobj)
-	if SERVER then
-			self:SetMoveType(MOVETYPE_NONE)
-			self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-			--self:SetExplosionTimer(4)
-			physobj:SetVelocity(Vector(0,0,0) )
+        suicide = suicide or true
+        local dmg = 50
+
+        local attacker = dmginfo:GetAttacker()
+        local inflictor = dmginfo:GetInflictor()
+
+        if SERVER then
+            local pos = self:WorldSpaceCenter()
+
+            local tr = {
+                start = pos,
+                filter = self,
+                mask = MASK_NPCSOLID_BRUSHONLY
+            }
+
+            for k, v in pairs(ents.FindInSphere(pos, 200)) do
+                if v:IsNPC() or v:IsNextBot() then
+                    if v:GetClass() == self:GetClass() then continue end
+                    if v == self then continue end
+                    if v:Health() <= 0 then continue end
+                    if v.NZBossType then continue end
+                    tr.endpos = v:WorldSpaceCenter()
+                    local tr1 = util.TraceLine(tr)
+                    if tr1.HitWorld then continue end
+
+                    local zexpdamage = DamageInfo()
+                    zexpdamage:SetAttacker(attacker)
+                    zexpdamage:SetInflictor(inflictor)
+                    zexpdamage:SetDamageType(DMG_BLAST)
+                    zexpdamage:SetDamage(v:Health() + 666)
+                    zexpdamage:SetDamageForce(v:GetUp()*5000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
+
+                    if v:IsNPC() or v:IsNextBot() then
+                        v:TakeDamageInfo(zexpdamage)
+                    end
+                else
+                    local expdamage = DamageInfo()
+                    expdamage:SetAttacker(attacker)
+                    expdamage:SetInflictor(inflictor)
+                    expdamage:SetDamageType(DMG_BLAST)
+
+                    local distfac = pos:Distance(v:WorldSpaceCenter())
+                    distfac = 1 - math.Clamp((distfac/200), 0, 1)
+                    expdamage:SetDamage(dmg * distfac)
+
+                    expdamage:SetDamageForce(v:GetUp()*5000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
+
+                    if v:IsPlayer() then
+                        v:TakeDamageInfo(expdamage)
+                    end
+                end
+            end
+
+            local effectdata = EffectData()
+            effectdata:SetOrigin(self:GetPos())
+
+            util.Effect("HelicopterMegaBomb", effectdata)
+            util.Effect("Explosion", effectdata)
+
+            util.ScreenShake(self:GetPos(), 20, 255, 1.5, 400)
+
+            self:Remove()
+        end
 	end
 end
 
+function ENT:PhysicsCollide(data, physobj) end
 
-function ENT:EXUPLOSION()
-		local ent = ents.Create("env_explosion")
-	ent:SetPos(self:GetPos())
-	ent:SetAngles(self:GetAngles())
-	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "88")
-	ent:Fire("explode")
-		
-			self.ExplosionLight1 = ents.Create("light_dynamic")
-		self.ExplosionLight1:SetKeyValue("brightness", "4")
-		self.ExplosionLight1:SetKeyValue("distance", "300")
-		self.ExplosionLight1:SetLocalPos(self:GetPos())
-		self.ExplosionLight1:SetLocalAngles(self:GetAngles())
-		self.ExplosionLight1:Fire("Color", "255 150 0")
-		self.ExplosionLight1:SetParent(self)
-		self.ExplosionLight1:Spawn()
-		self.ExplosionLight1:Activate()
-		self.ExplosionLight1:Fire("TurnOn", "", 0)
-		self:DeleteOnRemove(self.ExplosionLight1)
-		
-		SafeRemoveEntityDelayed(self,0.1)
-end
+function ENT:Think() end
 
 function ENT:Draw()
 	self:DrawModel()
-end
-
-function ENT:Think()
-	
 end

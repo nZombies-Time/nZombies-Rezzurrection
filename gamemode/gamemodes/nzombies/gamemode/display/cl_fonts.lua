@@ -1,17 +1,97 @@
 //Main Text
 
-surface.CreateFont( "nz.pointsmall", {
-	font = "Agency FB",
+surface.CreateFont( "nz.grenade", {
+	font = "Trebuchet MS Regular",
+	extended = true,
+	size =  22,
+	weight =   300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.powerup", {
+	font = "DK Umbilical Noose2",
 	extended = true,
 	size =  20,
-	weight =  5000,
+	weight =   300,
 	antialias = true,
-} )	
+} )
+
+surface.CreateFont( "nz.ammo.bo3zod.big", {
+	font = "Agency FB" ,
+	size =  80,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo3zod.main", {
+	font = "Agency FB" ,
+	size =  60,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo3.big", {
+	font = "Agency FB" ,
+	size =  80,
+	weight =  50,
+	scanlines = 2,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo3.main", {
+	font = "Agency FB" ,
+	size =  60,
+	weight =  50,
+	scanlines = 2,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo3.wepname", {
+	font = "Agency FB" ,
+	size =  35,
+	weight =  50,
+	antialias = true,
+} )
+
+surface.CreateFont( "nz.small.wallbuy", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size = 42,
+	weight =  300,
+	antialias = true,
+} )
 surface.CreateFont( "nz.smaller", {
-	font = "Agency FB",
+	font = "FTY SKORZHEN NCV",
 	extended = true,
 	size =  36,
 	weight =   300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.playerhp", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size =  25,
+	weight =   300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.wepname", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size = 20,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.mag", {
+	font = "FTY SKORZHEN NCV" ,
+	size =  75,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.reserve", {
+	font = "FTY SKORZHEN NCV" ,
+	size =  35,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo2.alter", {
+	font = "FTY SKORZHEN NCV",
+	size = 25,
+	weight =  50,
 	antialias = true,
 } )
 --Classic Fonts
@@ -31,8 +111,15 @@ surface.CreateFont( "nz.small.classic", {
 surface.CreateFont( "nz.points.classic", {
 	font = "DK Umbilical Noose2",
 	extended = true,
-	size =  48,
-	weight =300,
+	size = 32,
+	weight = 300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.classic", {
+	font = "DK Umbilical Noose2",
+	extended = true,
+	size = 42,
+	weight = 300,
 	antialias = true,
 } )
 surface.CreateFont( "nz.ammo.classic", {
@@ -50,7 +137,7 @@ surface.CreateFont( "nz.ammo2.classic", {
 surface.CreateFont( "nz.rounds.classic", {
 	font = "DK Umbilical Noose2", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -71,7 +158,14 @@ surface.CreateFont( "nz.small.blackops2", {
 surface.CreateFont( "nz.points.blackops2", {
 	font ="Agency FB",
 	extended = true,
-	size =  48,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.blackops2", {
+	font ="Agency FB",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -90,7 +184,7 @@ surface.CreateFont( "nz.ammo2.blackops2", {
 surface.CreateFont( "nz.rounds.blackops2", {
 	font = "Agency FB", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -112,7 +206,14 @@ surface.CreateFont( "nz.small.blackops4", {
 surface.CreateFont( "nz.points.blackops4", {
 	font = "FTY SKORZHEN NCV",
 	extended = true,
-	size =  48,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.blackops4", {
+	font = "FTY SKORZHEN NCV",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -131,7 +232,7 @@ surface.CreateFont( "nz.ammo2.blackops4", {
 surface.CreateFont( "nz.rounds.blackops4", {
 	font = "FTY SKORZHEN NCV",
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -152,7 +253,14 @@ surface.CreateFont( "nz.small.waw", {
 surface.CreateFont( "nz.points.waw", {
 	font = "OPTIMA",
 	extended = true,
-	size =  40,
+	size = 32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.waw", {
+	font = "OPTIMA",
+	extended = true,
+	size = 42,
 	weight =300,
 	antialias = true,
 } )
@@ -171,7 +279,7 @@ surface.CreateFont( "nz.ammo2.waw", {
 surface.CreateFont( "nz.rounds.waw", {
 	font = "OPTIMA", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -192,7 +300,14 @@ surface.CreateFont( "nz.small.xd", {
 surface.CreateFont( "nz.points.xd", {
 	font = "Comic Sans MS",
 	extended = true,
-	size =  54,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.xd", {
+	font = "Comic Sans MS",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -211,7 +326,7 @@ surface.CreateFont( "nz.ammo2.xd", {
 surface.CreateFont( "nz.rounds.xd", {
 	font = "Comic Sans MS", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -236,6 +351,13 @@ surface.CreateFont( "nz.points.grit", {
 	weight =300,
 	antialias = true,
 } )
+surface.CreateFont( "nz.pointsmain.grit", {
+	font = "None Shall Pass",
+	extended = true,
+	size =  40,
+	weight =300,
+	antialias = true,
+} )
 surface.CreateFont( "nz.ammo.grit", {
 	font = "None Shall Pass" ,
 	size = 30,
@@ -251,7 +373,7 @@ surface.CreateFont( "nz.ammo2.grit", {
 surface.CreateFont( "nz.rounds.grit", {
 	font = "DK Umbilical Noose2", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -272,7 +394,14 @@ surface.CreateFont( "nz.small.rage", {
 surface.CreateFont( "nz.points.rage", {
 	font = "Road Rage",
 	extended = true,
-	size =  38,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.rage", {
+	font = "Road Rage",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -282,56 +411,16 @@ surface.CreateFont( "nz.ammo.rage", {
 	weight =  50,
 	antialias = true,
 } )
-surface.CreateFont( "nz.rounds.rage", {
-	font = "Road Rage", //Avenir Next
-	extended = true,
-	size = 400,
-	weight = 30,
-	antialias = true,
-} )
 surface.CreateFont( "nz.ammo2.rage", {
 	font ="Road Rage",
 	size = 20,
 	weight =  50,
 	antialias = true,
 } )
---Black Ops 1
-surface.CreateFont( "nz.main.bo1", {
-	font = "HelveticaNeue Condensed",
-	size =  60,
-	weight =  300,
-	antialias = true,
-} )
-surface.CreateFont( "nz.small.bo1", {
-	font = "HelveticaNeue Condensed",
+surface.CreateFont( "nz.rounds.rage", {
+	font = "Road Rage", //Avenir Next
 	extended = true,
-	size = 45,
-	weight =  300,
-	antialias = true,
-} )
-surface.CreateFont( "nz.points.bo1", {
-	font ="HelveticaNeue Condensed",
-	extended = true,
-	size =  38,
-	weight =300,
-	antialias = true,
-} )
-surface.CreateFont( "nz.ammo.bo1", {
-	font = "HelveticaNeue Condensed",
-	size = 35,
-	weight =  50,
-	antialias = true,
-} )
-surface.CreateFont( "nz.ammo2.bo1", {
-	font = "HelveticaNeue Condensed",
-	size = 20,
-	weight =  50,
-	antialias = true,
-} )
-surface.CreateFont( "nz.rounds.bo1", {
-	font = "Black Rose", //Avenir Next
-	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -352,7 +441,14 @@ surface.CreateFont( "nz.small.rose", {
 surface.CreateFont( "nz.points.rose", {
 	font = "Black Rose",
 	extended = true,
-	size =  44,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.rose", {
+	font = "Black Rose",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -371,7 +467,7 @@ surface.CreateFont( "nz.ammo2.rose", {
 surface.CreateFont( "nz.rounds.rose", {
 	font = "Black Rose", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -392,7 +488,14 @@ surface.CreateFont( "nz.small.reborn", {
 surface.CreateFont( "nz.points.reborn", {
 	font = "Zombies Reborn",
 	extended = true,
-	size =  64,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.reborn", {
+	font = "Zombies Reborn",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -411,7 +514,7 @@ surface.CreateFont( "nz.ammo2.reborn", {
 surface.CreateFont( "nz.rounds.reborn", {
 	font = "DK Umbilical Noose2", //Avenir Next
 	extended = true,
-	size = 500,
+	size = 250,
 	weight = 30,
 	antialias = true,
 } )
@@ -432,7 +535,14 @@ surface.CreateFont( "nz.small.rio", {
 surface.CreateFont( "nz.points.rio", {
 	font = "Rio Grande",
 	extended = true,
-	size =  40,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.rio", {
+	font = "Rio Grande",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -451,7 +561,7 @@ surface.CreateFont( "nz.ammo2.rio", {
 surface.CreateFont( "nz.rounds.rio", {
 	font = "DK Umbilical Noose2", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -472,7 +582,14 @@ surface.CreateFont( "nz.small.signal", {
 surface.CreateFont( "nz.points.signal", {
 	font = "Bad Signal",
 	extended = true,
-	size =  40,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.signal", {
+	font = "Bad Signal",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -491,7 +608,7 @@ surface.CreateFont( "nz.ammo2.signal", {
 surface.CreateFont( "nz.rounds.signal", {
 	font = "Bad Signal", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -512,7 +629,7 @@ surface.CreateFont( "nz.small.infected", {
 surface.CreateFont( "nz.points.infected", {
 	font = "INFECTED",
 	extended = true,
-	size =  60,
+	size =  32,
 	weight =300,
 	antialias = true,
 } )
@@ -531,7 +648,7 @@ surface.CreateFont( "nz.ammo2.infected", {
 surface.CreateFont( "nz.rounds.infected", {
 	font = "INFECTED", //Avenir Next
 	extended = true,
-	size = 500,
+	size = 250,
 	weight = 30,
 	antialias = true,
 } )
@@ -552,7 +669,21 @@ surface.CreateFont( "nz.small.brutal", {
 surface.CreateFont( "nz.points.brutal", {
 	font = "Brutalworld",
 	extended = true,
-	size =  48,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.infected", {
+	font = "INFECTED",
+	extended = true,
+	size =  42,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.brutal", {
+	font = "Brutalworld",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -571,7 +702,7 @@ surface.CreateFont( "nz.ammo2.brutal", {
 surface.CreateFont( "nz.rounds.brutal", {
 	font = "Brutalworld", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -596,6 +727,13 @@ surface.CreateFont( "nz.points.ugly", {
 	weight =300,
 	antialias = true,
 } )
+surface.CreateFont( "nz.pointsmain.ugly", {
+	font = "Space Age",
+	extended = true,
+	size =  35,
+	weight =300,
+	antialias = true,
+} )
 surface.CreateFont( "nz.ammo.ugly", {
 	font ="Space Age" ,
 	size = 30,
@@ -611,7 +749,7 @@ surface.CreateFont( "nz.ammo2.ugly", {
 surface.CreateFont( "nz.rounds.ugly", {
 	font = "Space Age", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -636,6 +774,13 @@ surface.CreateFont( "nz.points.tech", {
 	weight =300,
 	antialias = true,
 } )
+surface.CreateFont( "nz.pointsmain.tech", {
+	font = "Origin Tech Demo",
+	extended = true,
+	size =  45,
+	weight =300,
+	antialias = true,
+} )
 surface.CreateFont( "nz.ammo.tech", {
 	font ="Origin Tech Demo" ,
 	size = 27,
@@ -651,7 +796,7 @@ surface.CreateFont( "nz.ammo2.tech", {
 surface.CreateFont( "nz.rounds.tech", {
 	font = "Origin Tech Demo", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -672,7 +817,14 @@ surface.CreateFont( "nz.small.krabs", {
 surface.CreateFont( "nz.points.krabs", {
 	font = "Krabby Patty",
 	extended = true,
-	size =  35,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.krabs", {
+	font = "Krabby Patty",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -691,7 +843,7 @@ surface.CreateFont( "nz.ammo2.krabs", {
 surface.CreateFont( "nz.rounds.krabs", {
 	font = "Krabby Patty", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
 	weight = 30,
 	antialias = true,
 } )
@@ -712,7 +864,14 @@ surface.CreateFont( "nz.small.default", {
 surface.CreateFont( "nz.points.default", {
 	font = "Reckoner2",
 	extended = true,
-	size =  40,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.default", {
+	font = "Reckoner2",
+	extended = true,
+	size =  42,
 	weight =300,
 	antialias = true,
 } )
@@ -731,7 +890,55 @@ surface.CreateFont( "nz.ammo2.default", {
 surface.CreateFont( "nz.rounds.default", {
 	font = "Reckoner2", //Avenir Next
 	extended = true,
-	size = 400,
+	size = 150,
+	weight = 30,
+	antialias = true,
+} )
+
+--Black Ops 1
+surface.CreateFont( "nz.main.bo1", {
+	font = "HelveticaNeue Condensed",
+	size =  60,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.small.bo1", {
+	font = "HelveticaNeue Condensed",
+	extended = true,
+	size = 45,
+	weight =  300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.points.bo1", {
+	font ="HelveticaNeue Condensed",
+	extended = true,
+	size =  32,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.pointsmain.bo1", {
+	font ="HelveticaNeue Condensed",
+	extended = true,
+	size =  42,
+	weight =300,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo.bo1", {
+	font = "HelveticaNeue Condensed",
+	size = 35,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.ammo2.bo1", {
+	font = "HelveticaNeue Condensed",
+	size = 20,
+	weight =  50,
+	antialias = true,
+} )
+surface.CreateFont( "nz.rounds.bo1", {
+	font = "HelveticaNeue Condensed", //Avenir Next
+	extended = true,
+	size = 180,
 	weight = 30,
 	antialias = true,
 } )

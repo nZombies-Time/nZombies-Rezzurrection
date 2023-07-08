@@ -385,7 +385,7 @@ function ENT:Attack( data )
 					dmgInfo:SetDamageForce( (self:GetTarget():GetPos() - self:GetPos()) * 7 + Vector( 0, 0, 16 ) )
 					self:GetTarget():TakeDamageInfo(dmgInfo)
 					if !IsValid(self:GetTarget()) then return end
-					self:GetTarget():EmitSound( "nz/zombies/attack/player_hit_"..math.random(0,5)..".wav", SNDLVL_TALKING, math.random(95,105))
+					self:GetTarget():EmitSound( "effects/hit/evt_zombie_hit_player_0"..math.random(1,5)..".wav", SNDLVL_TALKING, math.random(95,105))
 					self:GetTarget():ViewPunch( VectorRand():Angle() * 0.01 )
 				end
 			end)

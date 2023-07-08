@@ -27,7 +27,7 @@ ENT.PrintName = "Cryofreeze"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
-ENT.MaxKills = 24
+ENT.MaxKills = 12
 ENT.Kills = 0
 
 function ENT:SetupDataTables()
@@ -53,9 +53,7 @@ function ENT:Initialize()
 			if v == self:GetOwner() then continue end
 			if v:IsATTCryoFreeze() then continue end
 
-			local time = math.Rand(2,3)
-
-			v:ATTCryoFreeze(time, self:GetAttacker(), self:GetInflictor())
+			v:ATTCryoFreeze(1.2, self:GetAttacker(), self:GetInflictor())
 		end
 	end
 	self:Remove()

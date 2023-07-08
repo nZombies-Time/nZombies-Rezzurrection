@@ -240,18 +240,14 @@ function ENT:ZapTarget(ent, delay)
 				dmg:SetDamageType(DMG_SHOCK)
 				dmg:SetAttacker(Entity(0))
 				ent:TakeDamageInfo(dmg)
-				ent:SetStamina(0) -- Make the player start walking (Just like in COD)
 			end
 	
 			if (self:TargetIsZombie(ent)) then
 				local dmg = DamageInfo()
-				dmg:SetDamage(ent:Health() +80)
-				dmg:SetDamageType(DMG_BURN) -- Let them play their electricuting animations
 				dmg:SetAttacker(Entity(0))
+				dmg:SetDamageType(DMG_SHOCK)
+				dmg:SetDamage(ent:Health() + 666)
 				ent:TakeDamageInfo(dmg)
-				if nzRound:InProgress() then
-	nzRound:SetZombiesKilled( nzRound:GetZombiesKilled() + 1 )
-	end
 			end
 		end)
 	end

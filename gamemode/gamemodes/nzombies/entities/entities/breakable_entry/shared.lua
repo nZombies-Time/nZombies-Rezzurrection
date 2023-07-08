@@ -17,6 +17,20 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 2, "Prop" )
 end
 
+-- What positions the barricade can possibly use
+ENT.BarricadeTearPositions = {
+	Front = {
+		Vector(-55,0,0),
+		--Vector(-55,35,0),
+		--Vector(-55,-35,0),
+	},
+	Back = {
+		Vector(55,0,0),
+		--Vector(55,35,0),
+		--Vector(55,-35,0),
+	}
+}
+
 function ENT:Initialize()
 
 	self:SetModel("models/moo/barricade/barricade.mdl")
@@ -36,12 +50,44 @@ function ENT:Initialize()
 	self.ClassicNumsPlanks = {}
 
 	self:SetBoardType(self:GetBoardType())
+	self:UpdateBarricadePos()
 
 	if SERVER then
 		self:ResetPlanks(true)
 	end
 end
 
+function ENT:ReserveAvailableTearPosition(z)
+	local tbl = (z:GetPos() - self:GetPos()):Dot(self:GetAngles():Forward()) < 0 and self.m_tReservedSpots.Front or self.m_tReservedSpots.Back
+	for k,v in pairs(tbl) do
+		--if not IsValid(v) or v == z then -- Commented out until further notice.
+			tbl[k] = z
+			return k
+		--end
+	end
+end
+
+function ENT:InitPlankSetup()
+	if !self:GetHasPlanks() then return end
+	self.NextPlank = CurTime() + 4
+	for i=1, 6 do
+		timer.Simple(i * 0.1, function()
+			if IsValid(self) then
+				if self:GetNumPlanks() < 6 then
+					self:CreatePlank() 
+				end
+			end
+		end)
+	end
+end
+
+function ENT:CreatePlank(nosound)
+	if !self:GetHasPlanks() then return end
+	if self:GetNumPlanks() < 6 then
+		--self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
+		self:SpawnPlank()
+	end
+end
 
 function ENT:FullRepair()
 	if !self:GetHasPlanks() then return end
@@ -50,25 +96,38 @@ function ENT:FullRepair()
 		timer.Simple(i * 0.1, function()
 			if IsValid(self) then
 				if self:GetNumPlanks() < 6 then
-					self:AddPlank() 
+					local plank = self:GetTornPlank()
+					if IsValid(plank) then
+						self:AddPlank(plank) 
+					end
 				end
 			end
 		end)
 	end
 end
 
-function ENT:AddPlank(nosound)
+function ENT:AddPlank(plank)
 	if !self:GetHasPlanks() then return end
 	if self:GetNumPlanks() < 6 then
-		self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
-		self:SpawnPlank()
+		--self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
+		self:PlankCheck(plank)
 	end
 end
 
 function ENT:GetCurrentPlank()
 	local tbl = {}
 	for k,v in pairs(self.Planks) do
-		if !IsValid(self.ZombieUsing) then
+		if !IsValid(self.ZombieUsing) and !v.Torn then
+			table.insert(tbl, v)
+		end
+	end
+	return tbl[math.random(#tbl)]
+end
+
+function ENT:GetTornPlank()
+	local tbl = {}
+	for k,v in pairs(self.Planks) do
+		if !IsValid(self.ZombieUsing) and v.Torn then
 			table.insert(tbl, v)
 		end
 	end
@@ -85,28 +144,31 @@ end
 function ENT:RemovePlank(plank)
 	if plank == nil then return end
 
-	local validnum = {1,2,3,4,5,6}
+	--[[local validnum = {1,2,3,4,5,6}
 	if validnum[plank:GetFlags()] then
 		table.insert(self.ClassicNumsPlanks, plank:GetFlags())
-	end
+	end]]
 	
-	local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
+	--local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
 
-	if !IsValid(plank) and plank != nil then -- Not valid but not nil (NULL)
+	--[[if !IsValid(plank) and plank != nil then -- Not valid but not nil (NULL)
 		table.RemoveByValue(self.Planks, plank) -- Remove it from the table
 		self:RemovePlank() -- and try again
-	end
+	end]]
 	
-	if IsValid(plank) then
+	--[[if IsValid(plank) then
 		plank:ResetSequence(sequence)
 		timer.Simple(2, function() 
 			if IsValid(plank) then 
 				plank:Remove() 
 			end 
 		end)
-	end
+	end]]
 
-	table.RemoveByValue(self.Planks, plank)
+	local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
+	plank:ResetSequence(sequence)
+	--table.RemoveByValue(self.Planks, plank)
+	plank.Torn = true
 	self:SetNumPlanks( self:GetNumPlanks() - 1 )
 	
 	self.ZombieUsing = nil
@@ -133,7 +195,7 @@ function ENT:ResetPlanks(nosoundoverride)
 	self.Planks = {}
 	self:SetNumPlanks(0)
 	if self:GetHasPlanks() then
-		self:FullRepair()
+		self:InitPlankSetup()
 	end
 end
 
@@ -147,9 +209,20 @@ function ENT:GetPlankPositionAvailable(plank)
 	return rplank
 end
 
+function ENT:PlankCheck(plank)
+	if !IsValid(plank) then plank = self:GetTornPlank() end
+	--print(plank.Torn)
+	if plank.Torn then
+		self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
+		--table.insert(self.Planks, plank)
+		local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
+		plank:ResetSequence(sequence)
+		plank.Torn = false
+	end
+end
+
 function ENT:SpawnPlank()
 	local plank = self:GetBoardType() == 1 and ents.Create("breakable_entry_plank") or self:GetBoardType() == 2 and ents.Create("breakable_entry_bar") or self:GetBoardType() == 3 and ents.Create("breakable_entry_ventslat")
-	local nums = self:GetPlankPositionAvailable(plank)
 	plank:SetParent(self)
 	if self:GetBoardType() == 1 then
 		plank:SetLocalPos( Vector(35,0,30))
@@ -160,12 +233,16 @@ function ENT:SpawnPlank()
 	end
 	plank:Spawn()
 	plank:SetCollisionGroup( COLLISION_GROUP_DEBRIS )
+
+	local nums = self:GetPlankPositionAvailable(plank)
 	plank:AddFlags(nums)
-
-	local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
-	plank:ResetSequence(sequence)
-
 	table.insert(self.Planks, plank)
+
+	self:PlankCheck(plank)
+
+	--[[local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
+	plank:ResetSequence(sequence)]]
+
 	return plank
 end
 
@@ -176,6 +253,31 @@ end
 function ENT:HasZombie(ent)
 	self.ZombieUsing = ent
 	self.CurrentlyInUse = true
+end
+
+function ENT:UpdateBarricadePos()
+	-- Determine what positions are available
+	local t = {}
+
+	local ms,mx = Vector(-15,-15,10), Vector(15,15,70)
+	for k,v in pairs(self.BarricadeTearPositions) do
+		local t2 = {}
+		for k2,v2 in pairs(v) do
+			local pos = self:LocalToWorld(v2)
+			local tr = util.TraceHull({
+				start = pos,
+				endpos = pos,
+				mins = ms,
+				maxs = mx,
+				filter = self
+			})
+			if not tr.Hit then
+				t2[pos] = NULL
+			end
+		end
+		t[k] = t2
+	end
+	self.m_tReservedSpots = t
 end
 
 function ENT:Touch(ent) end
@@ -260,6 +362,7 @@ if CLIENT then
 			self:SetBodygroup(0,0)
 		else
 			self:SetBodygroup(0,1)
+			self:SetSubMaterial(0, "invisible")
 		end
 	end
 else
@@ -295,38 +398,36 @@ else
 	end
 
 	function ENT:Think()
-		if self:GetHasPlanks() and self.NextPlank < CurTime() and self:GetNumPlanks() < 6 then
-			local plytab = {}
+		if self:GetHasPlanks() and self:GetNumPlanks() < 6 then
 			local pos = self:GetPos()
-			local time = 0.5
+			local p = nextPlayer()
+			if IsValid(p) then
+				local isamish = p:HasPerk("amish")
+				local fuck = p:KeyDown(IN_USE)
 
-			for i=1, #player.GetAll() do
-				local p = nextPlayer()
-				if (p:HasPerk("amish") or p:KeyDown(IN_USE)) and p:GetPos():Distance(pos) < (p:HasPerk("amish") and 200 or 90) then
-					table.insert(plytab, p)
-				end
-			end
-
-			if not table.IsEmpty(plytab) then
-				if #plytab > 1 then
-					table.sort(plytab, function(a, b) return a:GetPos():DistToSqr(pos) < b:GetPos():DistToSqr(pos) end)
+				local wep = p:GetActiveWeapon()
+				if IsValid(wep) and wep:IsSpecial() then
+					fuck = false
 				end
 
-				local ply = plytab[1]
-				if IsValid(ply) then
-					self:AddPlank(true)
+				if (isamish or fuck) and p:GetPos():DistToSqr(pos) < (isamish and 25600 or 2500) then
+					if self.NextPlank and self.NextPlank < CurTime() then
+						local plank = self:GetTornPlank()
+						if IsValid(plank) then
+							self:AddPlank(plank)
 
-					time = ply:HasPerk("speed") and 0.5 or 1
-					timer.Simple(time, function()
-						if IsValid(ply) then
-							ply:GivePoints(ply:HasPerk("amish") and (math.random(1, 5) * 10) or 10)
-							ply:EmitSound("nz/effects/buy.wav")
+							local time = p:HasPerk("speed") and 0.5 or 1
+							timer.Simple(time, function()
+								if not IsValid(p) then return end
+								p:GivePoints(p:HasPerk("amish") and (math.random(1,5) * 10) or 10)
+								p:EmitSound("nz/effects/buy.wav")
+							end)
+
+							self.NextPlank = CurTime() + time
 						end
-					end)
+					end
 				end
 			end
-
-			self.NextPlank = CurTime() + time
 		end
 
 		if self.CollisionResetTime and self.CollisionResetTime < CurTime() then
@@ -344,3 +445,11 @@ else
 		return true
 	end
 end
+
+hook.Add("PhysgunDrop", "UpdatePositions", function()
+	for k,v in pairs(ents.GetAll()) do
+		if v:GetClass() == "breakable_entry" then
+			v:UpdateBarricadePos()
+		end
+	end
+end)

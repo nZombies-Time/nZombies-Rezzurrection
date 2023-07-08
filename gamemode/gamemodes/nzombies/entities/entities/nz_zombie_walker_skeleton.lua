@@ -13,7 +13,7 @@ ENT.IsMooZombie = true
 ENT.RedEyes = true
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/t8/red_skeleton/moo_codz_t8_chaos_skelly.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t7/castle/moo_codz_t7_castle_skeleton.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}
@@ -64,8 +64,8 @@ local CrawlAttackSequences = {
 }
 
 local CrawlJumpSequences = {
-	{seq = "nz_barricade_crawl_1", speed = 10, time = 3},
-	{seq = "nz_barricade_crawl_2", speed = 10, time = 3},
+	{seq = "nz_barricade_crawl_1"},
+	{seq = "nz_barricade_crawl_2"},
 }
 
 local SlowClimbUp36 = {
@@ -103,60 +103,80 @@ local ClimbUp200 = {
 }
 
 local AttackSequences = {
-	{seq = "nz_attack_stand_ad_1", dmgtimes = {0.75, 1.25}},
-	{seq = "nz_attack_stand_au_1", dmgtimes = {0.75, 1.25}},
-	{seq = "nz_fwd_ad_attack_v1", dmgtimes = {0.95, 1.35}},
-	{seq = "nz_fwd_ad_attack_v2", dmgtimes = {0.85, 1.30}},
-	{seq = "nz_legacy_attack_v3", dmgtimes = {0.25}},
-	{seq = "nz_legacy_attack_v4", dmgtimes = {0.35}},
-	{seq = "nz_legacy_attack_v11", dmgtimes = {1.00}},
-	{seq = "nz_legacy_attack_superwindmill", dmgtimes = {0.50, 1.00, 1.50, 2.00}}, -- Just don't get Superwind Mill'd 5 head.
+	{seq = "nz_attack_stand_ad_1"},
+	{seq = "nz_attack_stand_au_1"},
+	{seq = "nz_legacy_attack_v3"},
+	{seq = "nz_legacy_attack_v4"},
+	{seq = "nz_legacy_attack_v11"},
+	{seq = "nz_fwd_ad_attack_v1"},
+	{seq = "nz_fwd_ad_attack_v2"},
+	{seq = "nz_legacy_attack_superwindmill"},
+	{seq = "nz_t8_attack_stand_larm_1"},
+	{seq = "nz_t8_attack_stand_larm_2"},
+	{seq = "nz_t8_attack_stand_larm_3"},
+	{seq = "nz_t8_attack_stand_rarm_1"},
+	{seq = "nz_t8_attack_stand_rarm_2"},
+	{seq = "nz_t8_attack_stand_rarm_3"},
 }
 
 local WalkAttackSequences = {
-	{seq = "nz_walking_attack_v1", dmgtimes = {1.45}},
-	{seq = "nz_walking_attack_v2", dmgtimes = {1.4}},
-	{seq = "nz_walking_attack_v3", dmgtimes = {0.75}},
-	{seq = "nz_walking_attack_v4", dmgtimes = {1.65}},
-	{seq = "nz_walking_attack_v5", dmgtimes = {1.85}},
+	{seq = "nz_walk_ad_attack_v1"}, -- Quick single swipe
+	{seq = "nz_walk_ad_attack_v2"}, -- Slowish double swipe
+	{seq = "nz_walk_ad_attack_v3"}, -- Slowish single swipe
+	{seq = "nz_walk_ad_attack_v4"}, -- Quickish double swipe
+	{seq = "nz_t8_attack_walk_larm_1"},
+	{seq = "nz_t8_attack_walk_rarm_3"},
+	{seq = "nz_t8_attack_walk_larm_2"},
+	{seq = "nz_t8_attack_walk_rarm_6"},
 }
 
 local RunAttackSequences = {
-	{seq = "nz_running_attack_v1", dmgtimes = {0.75}},
-	{seq = "nz_running_attack_v2", dmgtimes = {0.75}},
-	{seq = "nz_running_attack_v3", dmgtimes = {0.70}},
-	{seq = "nz_running_attack_v4", dmgtimes = {0.80}},
-	{seq = "nz_running_attack_v5", dmgtimes = {0.75}},
+	{seq = "nz_t8_attack_run_larm_1"},
+	{seq = "nz_t8_attack_run_larm_2"},
+	{seq = "nz_t8_attack_run_larm_3"},
+	{seq = "nz_t8_attack_run_larm_4"},
+	{seq = "nz_t8_attack_run_rarm_1"},
+	{seq = "nz_t8_attack_run_rarm_2"},
+	{seq = "nz_t8_attack_run_rarm_3"},
+	{seq = "nz_t8_attack_run_rarm_4"},
+}
+
+local StinkyRunAttackSequences = {
+	{seq = "nz_run_ad_attack_v1"},
+	{seq = "nz_run_ad_attack_v2"},
+	{seq = "nz_run_ad_attack_v3"},
+	{seq = "nz_run_ad_attack_v4"},
 }
 
 local SprintAttackSequences = {
-	{seq = "nz_sprinting_attack_v1", dmgtimes = {0.40}},
-	{seq = "nz_sprinting_attack_v2", dmgtimes = {0.85}},
-	{seq = "nz_sprinting_attack_v3", dmgtimes = {0.50}},
-	{seq = "nz_sprinting_attack_v4", dmgtimes = {0.40}},
-	{seq = "nz_sprinting_attack_v5", dmgtimes = {0.35}},
+	{seq = "nz_t8_attack_sprint_larm_1"},
+	{seq = "nz_t8_attack_sprint_larm_2"},
+	{seq = "nz_t8_attack_sprint_larm_3"},
+	{seq = "nz_t8_attack_sprint_larm_4"},
+	{seq = "nz_t8_attack_sprint_rarm_1"},
+	{seq = "nz_t8_attack_sprint_rarm_2"},
+	{seq = "nz_t8_attack_sprint_rarm_3"},
+	{seq = "nz_t8_attack_sprint_rarm_4"},
 }
 
 local SuperSprintAttackSequences = {
-	{seq = "nz_supersprinting_attack_v1", dmgtimes = {0.40}},
-	{seq = "nz_supersprinting_attack_v2", dmgtimes = {0.35}},
-	{seq = "nz_supersprinting_attack_v3", dmgtimes = {0.45}},
-	{seq = "nz_supersprinting_attack_v4", dmgtimes = {0.40}},
+	{seq = "nz_t8_attack_supersprint_larm_1"},
+	{seq = "nz_t8_attack_supersprint_larm_2"},
+	{seq = "nz_t8_attack_supersprint_rarm_1"},
+	{seq = "nz_t8_attack_supersprint_rarm_2"},
 }
 
 local JumpSequences = {
-	{seq = "nz_barricade_trav_walk_1", speed = 25, time = 3},
-	{seq = "nz_barricade_trav_walk_2", speed = 25, time = 3},
-	{seq = "nz_barricade_trav_walk_3", speed = 15, time = 2.5},
-	{seq = "nz_barricade_trav_walk_4", speed = 15, time = 2.5},
+	{seq = "nz_barricade_trav_walk_1"},
+	{seq = "nz_barricade_trav_walk_2"},
+	{seq = "nz_barricade_trav_walk_3"},
 }
 local RunJumpSequences = {
-	{seq = "nz_barricade_run_1", speed = 35, time = 1.5},
+	{seq = "nz_barricade_run_1"},
 }
 local SprintJumpSequences = {
-	{seq = "nz_barricade_sprint_1", speed = 50, time = 1.25},
-	{seq = "nz_barricade_sprint_2", speed = 30, time = 1.25},
-	{seq = "nz_mantle36_quick", speed = 75, time = 1.25},
+	{seq = "nz_barricade_sprint_1"},
+	{seq = "nz_barricade_sprint_2"},
 }
 local walksounds = {
 	Sound("nz_moo/zombies/vox/_skele/amb/amb_00.mp3"),
@@ -220,6 +240,11 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
@@ -282,6 +307,11 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -350,8 +380,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {RunJumpSequences},
@@ -414,8 +450,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {RunJumpSequences},
@@ -470,8 +512,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {SprintJumpSequences},
@@ -523,8 +571,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {SprintJumpSequences},
@@ -576,8 +630,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {SprintJumpSequences},
@@ -625,8 +685,14 @@ ENT.SequenceTables = {
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
 			},
+			FireMovementSequence = {
+				"nz_firestaff_walk_v1",
+				"nz_firestaff_walk_v2",
+				"nz_firestaff_walk_v3",
+			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
+			Bo3AttackSequences = {StinkyRunAttackSequences},
 			CrawlAttackSequences = {CrawlAttackSequences},
 
 			JumpSequences = {SprintJumpSequences},
@@ -729,35 +795,80 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-	local SpawnMatSound = {
-		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
-		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
-		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
-		[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
-	}
-	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
-	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
-
-	local norm = (self:GetPos()):GetNormalized()
-	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
-
-	if tr.Hit then
-		local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
-		self:EmitSound(finalsound)
-	end
-
-	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
-	ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-
-	self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
-
-	self:Sound()
-
-	self:SetSpecialAnimation(true)
-	local seq = self:SelectSpawnSequence()
-	if seq then
-		self:PlaySequenceAndWait(seq)
-		self:SetSpecialAnimation(false)
+	local nav = navmesh.GetNavArea(self:GetPos(), 50)
+	if IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP) then
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 		self:CollideWhenPossible()
+	else
+		local SpawnMatSound = {
+			[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+			[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+			[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+			[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+		}
+		SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+		SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
+
+		local norm = (self:GetPos()):GetNormalized()
+		local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+
+		--ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		--self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+	
+		self:SetSpecialAnimation(true)
+		self:SetIsBusy(true)
+		local seq = self:SelectSpawnSequence()
+
+
+		local navtypes = {
+			[NAV_MESH_OBSTACLE_TOP] = true,
+			[NAV_MESH_DONT_HIDE] = true,
+		}
+
+
+		if IsValid(nav) and nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) then
+			seq = self.UndercroftSequences[math.random(#self.UndercroftSequences)]
+		elseif IsValid(nav) and nav:HasAttributes(NAV_MESH_DONT_HIDE) then
+			seq = "nz_moo_wall_emerge_quick"
+		else
+			if tr.Hit then
+				local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+				self:EmitSound(finalsound)
+			end
+			ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+			self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+		end
+		if seq then
+			if IsValid(nav) and (nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) or nav:HasAttributes(NAV_MESH_DONT_HIDE)) then
+				self:PlaySequenceAndMove(seq, {gravity = false})
+			else
+				self:PlaySequenceAndMove(seq, {gravity = true})
+			end
+			self:SetSpecialAnimation(false)
+			self:SetIsBusy(false)
+			self:CollideWhenPossible()
+		end
 	end
 end
+
+ENT.PainSounds = {
+	"nz_moo/zombies/vox/_zhd/pain/pain_00.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_01.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_02.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_03.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_04.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_05.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_06.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_07.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_08.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_09.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_10.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_11.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_12.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_13.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_14.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_15.mp3",
+	"nz_moo/zombies/vox/_zhd/pain/pain_16.mp3",
+}

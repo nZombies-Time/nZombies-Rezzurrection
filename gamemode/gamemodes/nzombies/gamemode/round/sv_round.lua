@@ -467,9 +467,11 @@ function nzRound:ResetGame()
 	nzRandomBox.Remove()
 
 	--Reset all perk machines
-	for k,v in pairs(ents.FindByClass("perk_machine")) do
-		v:TurnOff()
-	end
+	 for k,v in pairs(ents.FindByClass("perk_machine")) do
+        v:TurnOff()
+        v:SetLooseChange(true)
+        v:SetBrutusLocked(false)
+    end
 	
 	for k,v in pairs(ents.FindByClass("ammo_box")) do
 		v:SetPrice(4500)

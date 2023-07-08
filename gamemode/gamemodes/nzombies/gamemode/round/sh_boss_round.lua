@@ -21,26 +21,31 @@ if SERVER then
 	end
 	
 	function nzRound:SetBossType(id)
-	local comedyday = os.date("%d-%m") == "01-04"
 		if id == "None" then
 			self.BossType = nil -- "None" makes a nil key
 		else
-			if comedyday then
-			self.BossType = "Larry the Lobster"
-			else
 			self.BossType = id or "Panzer" -- A nil id defaults to "Panzer", otherwise id
-			end
 		end
 	end
-	
+
+	function nzRound:InitializeBossSpawnChance()
+		if !self.BossSpawnChance then self.BossSpawnChance = 0 end
+	end
+
+	function nzRound:GetBossSpawnChance()
+		return self.BossSpawnChance
+	end
+
+	function nzRound:SetBossSpawnsSoFar()
+		if !self.BossSpawnsSoFar then self.BossSpawnsSoFar = 0 end
+	end
+
+	function nzRound:GetBossSpawnsSoFar()
+		return self.BossSpawnsSoFar
+	end
+
 	function nzRound:GetBossType(id)
-		local comedyday = os.date("%d-%m") == "01-04"
-		if comedyday then
-		self.BossType = "Larry the Lobster"
 		return self.BossType
-		else
-		return self.BossType
-		end
 	end
 	
 	function nzRound:GetBossData(id)
@@ -52,14 +57,14 @@ if SERVER then
 		local bosstype = id or self.BossType
 		if bosstype then
 			local data = nzRound:GetBossData(bosstype)
-			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_normal" or "nz_spawn_zombie_boss"  -- Check what spawnpoint type we're using
+			local spawnpoint = data.specialspawn and "nz_spawn_zombie_special" or "nz_spawn_zombie_boss" or "nz_spawn_zombie_normal"  -- Check what spawnpoint type we're using
 			local spawnpoints = {}
 			for k,v in pairs(ents.FindByClass(spawnpoint)) do -- Find and add all valid spawnpoints that are opened and not blocked
 				if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
 					table.insert(spawnpoints, v)
 				end
 			end
-			
+
 			local spawn = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
 			if IsValid(spawn) then -- If we this exists, spawn here
 				local boss = ents.Create(data.class)
@@ -74,6 +79,7 @@ if SERVER then
 	
 	-- This runs at the start of every round
 	hook.Add("OnRoundStart", "nzBossRoundHandler", function(round)
+		--print("next boss round "..nzRound:GetNextBossRound().."")
 		if !nzRound:GetNextBossRound() then return end
 		if round == -1 then -- Round infinity always spawn bosses
 			local diff = nzRound:GetNextBossRound() - round
@@ -84,36 +90,58 @@ if SERVER then
 			return
 		end
 		if nzRound:MarkedForBoss(round) then -- If this round is a boss round
+			local data = nzRound:GetBossData()
+			if !data then return end
 			if nzRound:IsSpecial() then nzRound:SetNextBossRound(round + 1) return end -- If special round, delay 1 more round and back out
 			
-			local spawntime = math.random(1, nzRound:GetZombiesMax() - 2) -- Set a random time to spawn
-			nzRound:PrepareBoss( spawntime )
+			--print("boss round")
+			local count = #player.GetAllPlaying()
+			local bossamount = math.floor(nzRound:GetNumber() * 0.065) + data.perplayer + count - 1
+
+			nzRound:SetNextBossRound(nzRound:GetNumber() + data.intermission)
+			nzRound:PrepareBoss(bossamount)
 		end
 	end)
-	
-	-- This function spawns a boss in after this many zombies has spawned
-	-- If called multiple times, the latter will overwrite the prior (because of hook names)
-	function nzRound:PrepareBoss( spawntime )
-		local spawncount = 0
+
+
+	--[[
+		Moo Mark 5/13/23:
+		Completely redid the boss spawning system so it can spawn 
+		multiple a round, spawn more per player, and have a cap 
+		of how many can be alive at once.
+	]]--
+	function nzRound:PrepareBoss( bossamount )
+		local spawnssofar = 0
+		local spawnchance = 0
+		--print("start boss spawning")
+		--print(bossamount)
 		hook.Add("OnZombieSpawned", "nzBossSpawnHandler", function() -- Add a hook for each zombie spawned
-			if !nzRound:MarkedForBoss(nzRound:GetNumber()) then
-				hook.Remove("OnZombieSpawned", "nzBossSpawnHandler") -- Cancel if we're no longer on a boss round!
-			return end
-			
-			spawncount = spawncount + 1 -- Add 1 more zombie spawned since we started tracking
-			
-			--print("BOSS: "..spawncount.."/"..spawntime)
-			
-			if spawncount >= spawntime then -- If we've spawned the amount of zombies that we randomly set
-				local data = nzRound:GetBossData() -- Check if we got boss data
-				if !data then hook.Remove("OnZombieSpawned", "nzBossSpawnHandler") return end -- If not, remove and cancel
-				
-				local boss = nzRound:SpawnBoss()
-				if IsValid(boss) then 
-					hook.Remove("OnZombieSpawned", "nzBossSpawnHandler") -- Only remove the hook when we spawned the boss
+			local round = nzRound:GetNumber()
+			local data = nzRound:GetBossData()
+			--print("zombie spawned")
+			if nzRound:GetNextBossRound() - data.intermission == round and spawnssofar < bossamount then
+				if math.random(30) < spawnchance then -- 30 being max number of attempts
+					--print("success")
+    				local bosses = ents.FindByClass(data.class)
+    				if #bosses >= data.amountatonce then
+    					--print("boss cap")
+    					spawnchance = spawnchance + 1 -- Further the chance of a boss spawning next possible chance.
+    				else
+    					local boss = nzRound:SpawnBoss()
+    					--print("boss spawned")
+
+    					spawnssofar = spawnssofar + 1
+    					spawnchance = 0 --success, reset counter
+    				end
+				else
+					--print("failed")
+    				--failed, increase attempt counter
+    				spawnchance = spawnchance + 1
 				end
-				-- If there is no valid spawnpoint to spawn at, it will try again next zombie that spawns
-				-- until we get out of the boss round, then it gives up
+			else
+				--print("Amount of Bosses reached or no longer boss round.")
+				hook.Remove("OnZombieSpawned", "nzBossSpawnHandler")
+				return
 			end
 		end)
 	end
@@ -123,6 +151,7 @@ if SERVER then
 		local data = nzRound:GetBossData()
 		if data then
 			data.initfunc()
+			nzRound:SetNextBossRound(data.initalrnd)
 		end
 	end)
 
@@ -143,10 +172,10 @@ if SERVER then
 		if round == -1 then return end
 
 		for _, ply in pairs(player.GetAll()) do
-			ply:GivePoints(1000)
+			ply:GivePoints(150)
 		end
 
-		local chance = math.random(10)
+		local chance = math.random(20)
 		if chance <= 1 then
 			nzPowerUps:SpawnPowerUp(ent:GetPos(), "bonfiresale")
 		elseif chance <= 5 then
@@ -163,20 +192,40 @@ function nzRound:AddBossType(id, class, funcs)
 			-- Which entity to spawn
 			data.class = class
 			-- Whether to spawn at special spawnpoints
+
 			data.specialspawn = funcs.specialspawn
 			-- Base health
+
 			data.health = funcs.health
 			-- Health scale multiplier (by round)
+
 			data.scale = funcs.scale
 			-- Damage received scale for enemies with a 'helmet'
+
 			data.dmgmul = funcs.dmgmul
 			-- Runs on game begin with this boss set, use to set first boss round
+
+			data.amountatonce = funcs.amountatonce
+			-- Amount of Bosses that can be alive at once during a Boss Round.
+
+			data.initalrnd = funcs.initalrnd
+			-- Initial round the Boss can start to appear on.
+
+			data.intermission = funcs.intermission
+			-- The amount of rounds until the next boss round.
+
+			data.perplayer = funcs.perplayer
+			-- Adds a boss per player in the game for the round(First player not counted).
+
 			data.initfunc = funcs.initfunc
 			-- Run when the boss spawns, arguments are (boss)
+
 			data.spawnfunc = funcs.spawnfunc
 			-- Run when the boss dies, arguments are (boss, attacker, dmginfo, hitgroup)
+
 			data.deathfunc = funcs.deathfunc
 			-- Whenever the boss is damaged, arguments are (boss, attacker, dmginfo, hitgroup) Called before damage applied (can scale dmginfo)
+			
 			data.onhit = funcs.onhit
 			-- All functions are optional, but death/spawn func is needed to set next boss round! (Unless you got another way)
 			nzRound.BossData[id] = data
@@ -189,13 +238,16 @@ function nzRound:AddBossType(id, class, funcs)
 	end
 end
 
-nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
+--[[nzRound:AddBossType("Margwa", "nz_zombie_boss_margwa", {
 	specialspawn = true,
-	health = 1000,
-	scale = 750,
-	dmgmul = 0.1,
+	health = 500,
+	scale = 1,
+	dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -205,20 +257,22 @@ nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})]]
 
-nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
+nzRound:AddBossType("Avogadro", "nz_zombie_boss_avogadro", {
 	specialspawn = true,
-	health = 850,
-	scale = 600,
-	dmgmul = 0.1,
+	health = 1250,
+	scale = 1,
+	dmgmul = 1,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 4, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -228,20 +282,47 @@ nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
 })
+nzRound:AddBossType("Brenner", "nz_zombie_boss_fireman", {
+    specialspawn = true,
+    health = 800,
+    scale = 500,
+    dmgmul = 1,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_fireman/zvox_fir_intro_roar.mp3')")
 
-nzRound:AddBossType("Hitler", "nz_zombie_boss_hillturr", {
+        local data = nzRound:GetBossData(self.NZBossType)
+        local count = #player.GetAllPlaying()
+
+        self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+        self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+nzRound:AddBossType("Meuchler", "nz_zombie_boss_assassin", {
 	specialspawn = true,
-	health = 1500,
-	scale = 800,
-	dmgmul = 0.1,
+	health = 2000,
+	scale = 2000,
+	dmgmul = 1,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 2,
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(8,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -251,20 +332,279 @@ nzRound:AddBossType("Hitler", "nz_zombie_boss_hillturr", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Adolf", "nz_zombie_boss_hillturr", {
+    specialspawn = true,
+    health = 25000,
+    scale = 1,
+    dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 2,
+	intermission = 1,
+	perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+        local data = nzRound:GetBossData(self.NZBossType)
+        local count = #player.GetAllPlaying()
+
+        self:SetHealth(data.scale + (data.health * count))
+        self:SetMaxHealth(data.scale + (data.health * count))
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
+    specialspawn = true,
+    health = 700,
+    scale = 400,
+    dmgmul = 0.75,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+		--BroadcastLua("surface.PlaySound('nz/panzer/mech_alarm.wav')")
+		
+        local data = nzRound:GetBossData(self.NZBossType)
+        local count = #player.GetAllPlaying()
+
+        self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+        self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+nzRound:AddBossType("Panzer (Der Eisendrache)", "nz_zombie_boss_panzer_bo3", {
+    specialspawn = true,
+    health = 700,
+    scale = 500,
+    dmgmul = 0.75,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('enemies/bosses/newpanzer/incoming_alarm_new.ogg')")
+		
+        local data = nzRound:GetBossData(self.NZBossType)
+        local count = #player.GetAllPlaying()
+
+        self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+        self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+nzRound:AddBossType("Cosmonaut(Round 7-8)", "nz_zombie_boss_astro", {
+	specialspawn = true,
+	health = 25000,
+	scale = 1,
+	dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 8,
+	intermission = 1,
+	perplayer = 1,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_astro/spawn_flux.mp3')")
+
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Cosmonaut (Round 2)", "nz_zombie_boss_astro", {
+	specialspawn = true,
+	health = 25000,
+	scale = 1,
+	dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 2,
+	intermission = 1,
+	perplayer = 1,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_astro/spawn_flux.mp3')")
+
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Brutus", "nz_zombie_boss_brutus", {
+	specialspawn = true,
+	health = 500,
+	scale = 250,
+	dmgmul = 0.75,
+	amountatonce = 4,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_cellbreaker/spawn_2d.mp3')")
+
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Napalm Zombie", "nz_zombie_boss_Napalm", {
+	specialspawn = true,
+	health = 250,
+	scale = 250,
+	dmgmul = 1,
+	amountatonce = 3,
+	initalrnd = 8,
+	intermission = 1,
+	perplayer = 2,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_napalm/spawn/evt/evt_napalm_zombie_spawn_00.mp3')")
+
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
+	specialspawn = true,
+	health = 250,
+	scale = 250,
+	dmgmul = 1,
+	amountatonce = 3,
+	initalrnd = 8,
+	intermission = 1,
+	perplayer = 2,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_sonic/spawn/evt_sonic_spawn_00.mp3')")
+		
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
+	specialspawn = true,
+	health = 3500,
+	scale = 900,
+	dmgmul = 1,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+	initfunc = function()
+		--nzRound:SetNextBossRound(8) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+nzRound:AddBossType("Larry the Lobster", "nz_zombie_boss_larry", {
+	specialspawn = true,
+	health = 3500,
+	scale = 900,
+	dmgmul = 1,
+	amountatonce = 2,
+	initalrnd = 8,
+	intermission = 4,
+	perplayer = 1,
+	initfunc = function()
+		--nzRound:SetNextBossRound(8) -- Randomly spawn in rounds 6-8
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
 })
 
 nzRound:AddBossType("Pickpocket Gecko", "nz_zombie_boss_gex", {
 	specialspawn = true,
-	health = 700,
+	health = 1000,
 	scale = 1000,
-	dmgmul = 0.1,
+	dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 11,
+	intermission = 5,
+	perplayer = 1,
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(14,16)) -- Randomly spawn in rounds 6-8
+		--nzRound:SetNextBossRound(8) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -274,66 +614,47 @@ nzRound:AddBossType("Pickpocket Gecko", "nz_zombie_boss_gex", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+
+nzRound:AddBossType("Ubermorph", "nz_zombie_boss_ubermorph", {
+	specialspawn = true,
+	health = 3000,
+	scale = 2000,
+	dmgmul = 0.8,
+	amountatonce = 2, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 7, 		-- The inital round this enemy can appear.
+	intermission = 2, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
 })
 
 nzRound:AddBossType("Panzermorder", "nz_zombie_boss_panzermorder", {
 	specialspawn = true,
-	health = 3500,
-	scale = 1500,
-	dmgmul = 1,
-	initfunc = function()
-		nzRound:SetNextBossRound(math.random(11,13)) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(self)
-		local data = nzRound:GetBossData(self.NZBossType)
-		local count = #player.GetAllPlaying()
-
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-	end,
-	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
-nzRound:AddBossType("Ubermorph", "nz_zombie_boss_ubermorph", {
-	specialspawn = true,
-	health = 3000,
-	scale = 2000,
-	dmgmul = 1,
-	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(self)
-		local data = nzRound:GetBossData(self.NZBossType)
-		local count = #player.GetAllPlaying()
-
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-	end,
-	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
-nzRound:AddBossType("Cosmonaut(Round 7-8)", "nz_zombie_boss_astro", {
-	specialspawn = true,
 	health = 4000,
-	scale = 2000,
+	scale = 2500,
 	dmgmul = 1,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 12, 		-- The inital round this enemy can appear.
+	intermission = 6, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -343,20 +664,22 @@ nzRound:AddBossType("Cosmonaut(Round 7-8)", "nz_zombie_boss_astro", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(1,2)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
 	specialspawn = true,
-	health = 1750,
-	scale = 1150,
+	health = 1500,
+	scale = 600,
 	dmgmul = 1,
+	amountatonce = 3, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 6, 		-- The inital round this enemy can appear.
+	intermission = 3, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -366,66 +689,22 @@ nzRound:AddBossType("Dilophosaurus", "nz_zombie_boss_dilophosaurus", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Brute (Dead Space)", "nz_zombie_boss_brute", {
 	specialspawn = true,
-	health = 1000,
-	scale = 1300,
-	dmgmul = 1,
-	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,7)) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(self)
-		local data = nzRound:GetBossData(self.NZBossType)
-		local count = #player.GetAllPlaying()
-
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-	end,
-	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(2,3)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
-nzRound:AddBossType("Brutus", "nz_zombie_boss_brutus", {
-	specialspawn = true,
-	health = 500,
-	scale = 850,
-	dmgmul = 0.5,
-	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(self)
-		local data = nzRound:GetBossData(self.NZBossType)
-		local count = #player.GetAllPlaying()
-
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-	end,
-	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
-nzRound:AddBossType("Avogadro", "nz_zombie_boss_avogadro", {
-	specialspawn = true,
-	health = 375,
+	health = 3000,
 	scale = 1000,
-	dmgmul = 0.75,
+	dmgmul = 0.5,
+	amountatonce = 2, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 5, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -435,20 +714,22 @@ nzRound:AddBossType("Avogadro", "nz_zombie_boss_avogadro", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Swamp Warden", "nz_zombie_boss_shrek", {
 	specialspawn = true,
 	health = 500,
-	scale = 850,
-	dmgmul = 0.5,
+	scale = 1000,
+	dmgmul = 0.75,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 9, 		-- The inital round this enemy can appear.
+	intermission = 3, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -458,20 +739,22 @@ nzRound:AddBossType("Swamp Warden", "nz_zombie_boss_shrek", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Divider (Dead Space)", "nz_zombie_boss_Divider", {
 	specialspawn = true,
 	health = 4000,
-	scale = 300,
+	scale = 250,
 	dmgmul = 1,
+	amountatonce = 3, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 11, 		-- The inital round this enemy can appear.
+	intermission = 3, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(4,6)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -481,20 +764,23 @@ nzRound:AddBossType("Divider (Dead Space)", "nz_zombie_boss_Divider", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
+
 
 nzRound:AddBossType("William Birkin", "nz_zombie_boss_G1", {
 	specialspawn = true,
-	health = 2200,
-	scale = 480,
+	health = 2000,
+	scale = 510,
 	dmgmul = 1,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 6, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(11,13)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -504,20 +790,74 @@ nzRound:AddBossType("William Birkin", "nz_zombie_boss_G1", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(7,8)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
+
+
+nzRound:AddBossType("William Birkin (2nd Form)", "nz_zombie_boss_G2", {
+	specialspawn = true,
+	health = 3500,
+	scale = 700,
+	dmgmul = 0.9,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 10, 		-- The inital round this enemy can appear.
+	intermission = 6, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+
+
+nzRound:AddBossType("William Birkin (Final Form)", "nz_zombie_boss_G3", {
+	specialspawn = true,
+	health = 4000,
+	scale = 1500,
+	dmgmul = 0.75,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 14, 		-- The inital round this enemy can appear.
+	intermission = 6, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
 
 nzRound:AddBossType("The Mangler", "nz_zombie_boss_mangler", {
 	specialspawn = true,
 	health = 800,
-	scale = 650,
-	dmgmul = 0.5,
+	scale = 600,
+	dmgmul = 0.8,
+	amountatonce = 3, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 7, 		-- The inital round this enemy can appear.
+	intermission = 3, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 2, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -527,20 +867,22 @@ nzRound:AddBossType("The Mangler", "nz_zombie_boss_mangler", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Fuel Junkie", "nz_zombie_boss_spicy", {
 	specialspawn = true,
-	health = 750,
-	scale = 600,
+	health = 700,
+	scale = 500,
 	dmgmul = 1,
+	amountatonce = 3, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 2, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 2, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(7,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -550,9 +892,8 @@ nzRound:AddBossType("Fuel Junkie", "nz_zombie_boss_spicy", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(2,4)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
 })
@@ -562,8 +903,11 @@ nzRound:AddBossType("The Margwa", "nz_zombie_boss_margwa", {
 	health = 2000,
 	scale = 1000,
 	dmgmul = 0.25,
+	amountatonce = 2, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 4, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(8,11)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -573,43 +917,22 @@ nzRound:AddBossType("The Margwa", "nz_zombie_boss_margwa", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,7)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
-
-nzRound:AddBossType("Napalm Zombie", "nz_zombie_boss_Napalm", {
-	specialspawn = true,
-	health = 1350,
-	scale = 410,
-	dmgmul = 1,
-	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
-	end,
-	spawnfunc = function(self)
-		local data = nzRound:GetBossData(self.NZBossType)
-		local count = #player.GetAllPlaying()
-
-		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-	end,
-	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,4)) -- Delay further boss spawning by 3-5 rounds after its death
-		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
-		end
-	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("Nemesis", "nz_zombie_boss_Nemesis", {
 	specialspawn = true,
-	health = 3200,
-	scale = 800,
-	dmgmul = 1,
+	health = 4000,
+	scale = 2000,
+	dmgmul = 0.75,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 12, 		-- The inital round this enemy can appear.
+	intermission = 6, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(8,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -619,20 +942,22 @@ nzRound:AddBossType("Nemesis", "nz_zombie_boss_Nemesis", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,7)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("George Romero", "nz_zombie_boss_romero", {
 	specialspawn = true,
 	health = 15625,
 	scale = 1,
 	dmgmul = 1,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 2, 		-- The inital round this enemy can appear.
+	intermission = 5, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(2,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -642,20 +967,22 @@ nzRound:AddBossType("George Romero", "nz_zombie_boss_romero", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(5,6)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
 nzRound:AddBossType("George Romero (Round 1)", "nz_zombie_boss_romero", {
 	specialspawn = true,
 	health = 15625,
 	scale = 1,
 	dmgmul = 1,
+	amountatonce = 1, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 1, 		-- The inital round this enemy can appear.
+	intermission = 5, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(1) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -665,20 +992,22 @@ nzRound:AddBossType("George Romero (Round 1)", "nz_zombie_boss_romero", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(6,8)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
-nzRound:AddBossType("Cosmonaut (Round 2)", "nz_zombie_boss_astro", {
+nzRound:AddBossType("Licker (Boss)", "nz_zombie_special_licker", {
 	specialspawn = true,
-	health = 15625,
-	scale = 1,
+	health = 600,
+	scale = 500,
 	dmgmul = 1,
+	amountatonce = 5, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 7, 		-- The inital round this enemy can appear.
+	intermission = 3, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 2, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(2) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -688,20 +1017,22 @@ nzRound:AddBossType("Cosmonaut (Round 2)", "nz_zombie_boss_astro", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(1,2)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
-nzRound:AddBossType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
+nzRound:AddBossType("Hunter (Boss)", "nz_zombie_special_hunterbeta", {
 	specialspawn = true,
-	health = 2000,
-	scale = 300,
-	dmgmul = 1,
+	health = 800,
+	scale = 550,
+	dmgmul = 0.85,
+	amountatonce = 4, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 8, 		-- The inital round this enemy can appear.
+	intermission = 4, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(6,8)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -711,20 +1042,22 @@ nzRound:AddBossType("Shrieker Zombie", "nz_zombie_boss_shrieker", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
-nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
+nzRound:AddBossType("Sentinel Bot (Boss)", "nz_zombie_special_bot", {
 	specialspawn = true,
-	health = 3500,
-	scale = 900,
-	dmgmul = 1,
+	health = 600,
+	scale = 700,
+	dmgmul = 0.6,
+	amountatonce = 5, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 7, 		-- The inital round this enemy can appear.
+	intermission = 4, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(7,11)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -734,20 +1067,22 @@ nzRound:AddBossType("Thrasher", "nz_zombie_boss_thrasher", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})
 
-nzRound:AddBossType("Larry the Lobster", "nz_zombie_boss_larry", {
+nzRound:AddBossType("Raptor (Boss)", "nz_zombie_special_raptor", {
 	specialspawn = true,
-	health = 3000,
-	scale = 1000,
+	health = 720,
+	scale = 720,
 	dmgmul = 1,
+	amountatonce = 8, 	-- Amount of this enemy that can be alive at once.
+	initalrnd = 6, 		-- The inital round this enemy can appear.
+	intermission = 2, 	-- The amount of rounds that need to pass in order for the enemy to spawn again.
+	perplayer = 1, 		-- The number of this enemy that can spawn depending on player count.
 	initfunc = function()
-		nzRound:SetNextBossRound(math.random(2,9)) -- Randomly spawn in rounds 6-8
 	end,
 	spawnfunc = function(self)
 		local data = nzRound:GetBossData(self.NZBossType)
@@ -757,9 +1092,8 @@ nzRound:AddBossType("Larry the Lobster", "nz_zombie_boss_larry", {
 		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
-		nzRound:SetNextBossRound(nzRound:GetNumber() + math.random(3,5)) -- Delay further boss spawning by 3-5 rounds after its death
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-			attacker:GivePoints(500) -- Give killer 500 points if not downed
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
-}) -- No onhit function, we don't give points on hit for this guy
+})

@@ -31,12 +31,14 @@ function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 1, "BeingUsed")
 	self:NetworkVar("Int", 0, "Price")
 	self:NetworkVar("Bool", 2, "LooseChange")
+	self:NetworkVar("Bool", 3, "BrutusLocked")
 end
 
 function ENT:Initialize()
 	if SERVER then
 		self:SetBeingUsed(false)
 		self:SetLooseChange(true)
+		self:SetBrutusLocked(false)
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetSolid( SOLID_VPHYSICS )
 		self:DrawShadow( false )
@@ -67,6 +69,7 @@ end
 
 function ENT:TurnOn()
 	self:SetActive(true)
+	self:EmitSound("effects/perk_turn_on.ogg",75,math.random(95,105))
 	self:Update()
 end
 
@@ -84,6 +87,7 @@ function ENT:Update()
 		local bocwmodel = PerkData.model_bocw
 		local nz_tomb = PerkData.model_origins
 		local ww2model = PerkData.model_ww2
+		local bo2model = PerkData.model_bo2
 
 		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
 			self:SetModel(bocwmodel)
@@ -93,6 +97,9 @@ function ENT:Update()
 		end
 		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
 			self:SetModel(ww2model)
+		end
+		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bo2" then
+			self:SetModel(bo2model)
 		end
 	end
 
@@ -129,6 +136,7 @@ function ENT:Update()
 		local bocwmodel = PerkData.model_bocw
 		local nz_tomb = PerkData.model_origins
 		local ww2model = PerkData.model_ww2
+		local bo2model = PerkData.model_bo2
 
 		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bocw" then
 			self:SetModel(bocwmodel)
@@ -138,6 +146,9 @@ function ENT:Update()
 		end
 		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "ww2" then
 			self:SetModel(ww2model)
+		end
+		if nzPerks:GetPAPType(nzMapping.Settings.PAPtype) == "bo2" then
+			self:SetModel(bo2model)
 		end
 	end
 end
@@ -153,7 +164,7 @@ local MachinesNoDrink = {
 function ENT:Use(activator, caller)
 	local PerkData = nzPerks:Get(self:GetPerkID())
 
-	if self:IsOn() then
+	if self:IsOn() and !self:BrutusLocked() then
 		local price = self:GetPrice()
 
 		local func = function()
@@ -185,7 +196,7 @@ function ENT:Use(activator, caller)
 					end
 
 					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
-						self:EmitSound("nz/machines/jingle/IW/"..id.."_get.wav", 75, math.random(97, 103))
+						self:EmitSound("nz_moo/perkacolas/iw/"..id.."_sting.mp3", 75, math.random(97, 103))
 					else
 						self:EmitSound("nz/machines/jingle/"..id.."_get.ogg", 75, math.random(97, 103))
 					end
@@ -247,11 +258,28 @@ function ENT:Use(activator, caller)
 		else
 			func()
 		end
+	elseif self:IsOn() and self:BrutusLocked() then
+		if activator:CanAfford(2000) then
+			activator:TakePoints(2000)
+ 			self:SetBrutusLocked(false)
+			self:SetRenderFX(0)
+		end
 	end
 end
 
 function ENT:LooseChange()
 	return self:GetLooseChange()
+end
+
+function ENT:BrutusLocked()
+	return self:GetBrutusLocked()
+end
+
+function ENT:OnBrutusLocked()
+	if !self:BrutusLocked() then
+		self:SetBrutusLocked(true)
+		self:SetRenderFX(16)
+	end
 end
 
 -- Funny Spare Change Code: By GhostlyMoo
@@ -260,7 +288,7 @@ function ENT:Touch(entity)
 		self:SetLooseChange(false)
 		self:EmitSound("nz/effects/buy.wav", SNDLVL_TALKING)
 		entity:GivePoints(100)
-		print("Found bubblegum under the table.")
+		--print("Found bubblegum under the table.")
 	end
 end
 

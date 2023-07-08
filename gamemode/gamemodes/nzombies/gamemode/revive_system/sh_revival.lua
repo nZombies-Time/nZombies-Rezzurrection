@@ -86,23 +86,29 @@ if SERVER then
 
 	net.Receive("nz_TombstoneSuicide", function(len, ply)
 		if ply:GetDownedWithTombstone() then
-		if ply:HasUpgrade("tombstone") then
-		ply:GivePoints(6000)
-		end
+			for _, mod in pairs(ply.OldUpgrades) do
+				if mod ~= "tombstone" then continue end
+				ply:GivePoints(6000)
+			end
+
 			local tombstone = ents.Create("drop_tombstone")
-			tombstone:SetPos(ply:GetPos() + Vector(0,0,50))
+			tombstone:SetOwner(ply)
+			tombstone:SetFunny(math.random(100) == 1)
+			tombstone:SetPos(ply:GetPos() + Vector(0,0,24))
 			tombstone:Spawn()
+
 			local weps = {}
-			for k,v in pairs(ply:GetWeapons()) do
+			for k, v in pairs(ply:GetWeapons()) do
 				table.insert(weps, {class = v:GetClass(), pap = v:HasNZModifier("pap")})
 			end
-			local perks = ply.OldPerks
 
+			if not tombstone.OwnerData then tombstone.OwnerData = {} end
 			tombstone.OwnerData.weps = weps
-			tombstone.OwnerData.perks = perks
+			tombstone.OwnerData.perks = ply.OldPerks
+			tombstone.OwnerData.upgrades = ply.OldUpgrades
 
 			ply:KillDownedPlayer()
-			tombstone:SetPerkOwner(ply)
+			tombstone:SetOwner(ply)
 		end
 	end)
 end

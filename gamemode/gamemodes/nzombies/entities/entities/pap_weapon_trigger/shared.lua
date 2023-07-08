@@ -38,32 +38,38 @@ function ENT:Use(ply, caller)
 		end
 
 		timer.Simple(0, function()
-			if IsValid(wep) and IsValid(ply) then
-				wep:ApplyNZModifier("pap")
+			if not IsValid(ply) or not IsValid(wep) then return end
 
-				if not self.RerollingAtts then
-					wep:SetClip1(wep.Primary.ClipSize)
-				end
-				if IsValid(self.wep) then
-					self.wep.machine:SetBeingUsed(false)
-					self.wep:Remove()
-				end
+			wep:ApplyNZModifier("pap")
+			if self.RerollingAtts then
+				wep:ApplyNZModifier("repap")
+			end
 
-				if not wep.NZSpecialCategory and ply:HasPerk("staminup") then
-					wep:ApplyNZModifier("staminup")
-				end
-				if not wep.NZSpecialCategory and ply:HasPerk("deadshot") then
-					wep:ApplyNZModifier("deadshot")
-				end
-				if not wep.NZSpecialCategory and ply:HasPerk("dtap2") then
-					wep:ApplyNZModifier("dtap2")
-				end
-				if not wep.NZSpecialCategory and ply:HasPerk("dtap") then
-					wep:ApplyNZModifier("dtap")
-				end
-				if not wep.NZSpecialCategory and ply:HasPerk("vigor") then
-					wep:ApplyNZModifier("vigor")
-				end
+			if wep.IsTFAWeapon then
+				wep:SetClip1(wep.Primary_TFA.ClipSize)
+			else
+				wep:SetClip1(wep.Primary.ClipSize)
+			end
+
+			if IsValid(self.wep) then
+				self.wep.machine:SetBeingUsed(false)
+				self.wep:Remove()
+			end
+
+			if not wep.NZSpecialCategory and ply:HasPerk("staminup") then
+				wep:ApplyNZModifier("staminup")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("deadshot") then
+				wep:ApplyNZModifier("deadshot")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("dtap2") then
+				wep:ApplyNZModifier("dtap2")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("dtap") then
+				wep:ApplyNZModifier("dtap")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("vigor") then
+				wep:ApplyNZModifier("vigor")
 			end
 
 			self:Remove()

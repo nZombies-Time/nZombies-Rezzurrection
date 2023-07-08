@@ -23,50 +23,39 @@ function ENT:Draw()
 end
 
 function ENT:Initialize()
-	
-		if (nzMapping.Settings.boxtype =="Original") then
-	 self:SetModel("models/nzr/2022/magicbox/bo2/magic_box.mdl")
-	end
-	if (nzMapping.Settings.boxtype =="Origins") then
-	 self:SetModel("models/nzr/2022/magicbox/bo2/tomb_box.mdl")
-	end
-	if (nzMapping.Settings.boxtype =="Mob of the Dead") then
-	self:SetModel( "models/nzr/2022/magicbox/motd.mdl" )
-	end
-	if (nzMapping.Settings.boxtype =="Dead Space") then
-	self:SetModel( "models/nzr/2022/magicbox/Deadspace_box.mdl" )
-	self:SetModelScale( self:GetModelScale() * 0.7, 0 )
-	end
-	if (nzMapping.Settings.boxtype =="Resident Evil") then
-	self:SetModel( "models/nzr/2022/magicbox/re_box.mdl" )
-	end
-	
-	if (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
-	self:SetModel( "models/nzr/2022/magicbox/ww2.mdl" )
-	end
-	if (nzMapping.Settings.boxtype == "DOOM") then
-	self:SetModel( "models/nzr/2022/magicbox/doom_on.mdl" )
-	end
-	if (nzMapping.Settings.boxtype == "Chaos") then
-	self:SetModel( "models/nzr/2022/magicbox/chaos.mdl" )
-	end
-	if (nzMapping.Settings.boxtype == "Shadows of Evil") then
-	self:SetModel( "models/nzr/2022/magicbox/soe.mdl" )
-	end
-	if (nzMapping.Settings.boxtype == nil) then
 	self:SetModel("models/nzr/2022/magicbox/bo2/magic_box.mdl")
+	if (nzMapping.Settings.boxtype == "Original") then
+		self:SetModel("models/nzr/2022/magicbox/bo2/magic_box.mdl")
+	elseif (nzMapping.Settings.boxtype == "Origins") then
+		self:SetModel("models/nzr/2022/magicbox/bo2/tomb_box.mdl")
+	elseif (nzMapping.Settings.boxtype == "Mob of the Dead") then
+		self:SetModel( "models/nzr/2022/magicbox/motd.mdl" )
+	elseif (nzMapping.Settings.boxtype == "Dead Space") then
+		self:SetModel( "models/nzr/2022/magicbox/Deadspace_box.mdl" )
+		self:SetModelScale( self:GetModelScale() * 0.7, 0 )
+	elseif (nzMapping.Settings.boxtype == "Resident Evil") then
+		self:SetModel( "models/nzr/2022/magicbox/re_box.mdl" )
+	elseif (nzMapping.Settings.boxtype == "Call of Duty: WW2") then
+		self:SetModel( "models/nzr/2022/magicbox/ww2.mdl" )
+	elseif (nzMapping.Settings.boxtype == "DOOM") then
+		self:SetModel( "models/nzr/2022/magicbox/doom_on.mdl" )
+	elseif (nzMapping.Settings.boxtype == "Chaos") then
+		self:SetModel( "models/nzr/2022/magicbox/chaos.mdl" )
+	elseif (nzMapping.Settings.boxtype == "Shadows of Evil") then
+		self:SetModel( "models/nzr/2022/magicbox/soe.mdl" )
 	end
-	
+
 	self.AutomaticFrameAdvance = true
 	self:PhysicsInit(SOLID_NONE)
 	self:SetMoveType(MOVETYPE_NONE)
-	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
-	self:SetSolid(SOLID_OBB)
+	self:SetCollisionGroup(COLLISION_GROUP_WORLD)
+	self:SetSolid(SOLID_VPHYSICS)
 
 	local sequence = self:LookupSequence("arrive")
 	if sequence then
-	self:ResetSequence(sequence)
+		self:ResetSequence(sequence)
 	end
+
 	self:SetPos(self:GetPos() - self:GetRight()*7.5)
 	self:DrawShadow(false)
 	self:SetOpen(false)
@@ -157,7 +146,7 @@ function ENT:SpawnWeapon(activator, class)
 
 	wep.Box = self
 
-	if activator:HasUpgrade("speed") then
+	if activator:HasPerk("time") then
 		self:EmitSound("nz_moo/effects/box_jingle_timeslip.mp3")
 	else
 		nzSounds:PlayEnt("Jingle", self)
@@ -199,9 +188,7 @@ function ENT:MoveAway()
 	self.Moving = true
 
 	local sequence = self:LookupSequence("leave")
-	if sequence then
 	self:ResetSequence(sequence)
-	end
 	self:SetActivated(false)
 
 	timer.Simple(0.25, function()
@@ -237,7 +224,6 @@ function ENT:OnRemove()
 	else
 		if IsValid(self.SpawnPoint) then
 			self.SpawnPoint:SetBodygroup(1,0)
-			self.SpawnPoint:SetModelScale(1, 0 )
 		end
 	end
 end

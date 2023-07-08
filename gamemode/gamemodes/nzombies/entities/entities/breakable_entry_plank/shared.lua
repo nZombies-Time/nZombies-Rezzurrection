@@ -11,6 +11,7 @@ ENT.Instructions	= ""
 function ENT:Initialize()
 	self:SetModel("models/moo/_codz_ports_props/t6/p6_zm_wood_plank/moo_codz_p6_barricade_board.mdl")
 	self.AutomaticFrameAdvance = true
+	self.Torn = true
 	self:SetMoveType( MOVETYPE_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
 	--self:SetModelScale(1)

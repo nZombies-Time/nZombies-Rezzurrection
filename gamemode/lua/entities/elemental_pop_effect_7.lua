@@ -27,9 +27,6 @@ ENT.PrintName = "Black Hole"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
-ENT.MaxKills = 24
-ENT.Kills = 0
-
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
 	self:NetworkVar("Entity", 1, "Inflictor")
@@ -60,6 +57,12 @@ function ENT:Initialize()
 	bhole:SetSolid(SOLID_NONE)
 	bhole:SetMoveType(MOVETYPE_NONE)
 	bhole:SetCollisionGroup(COLLISION_GROUP_NONE)
+
+	local phys = bhole:GetPhysicsObject()
+	if IsValid(phys) then
+		phys:EnableMotion(false)
+		phys:EnableGravity(false)
+	end
 
 	bhole:SetNoDraw(true)
 	bhole:DrawShadow(false)

@@ -70,9 +70,9 @@ function ENT:Think()
 				damage:SetDamageType(DMG_BURN)
 				damage:SetAttacker(IsValid(self:GetAttacker()) and self:GetAttacker() or self)
 				damage:SetInflictor(self)
-				damage:SetDamagePosition(v:EyePos())
-				damage:SetDamageForce(Vector(0, 0, -15000))
-				damage:SetDamage(health / 9)
+				damage:SetDamagePosition(v:WorldSpaceCenter())
+				damage:SetDamageForce(vector_origin)
+				damage:SetDamage(health / 10)
 
 				v:TakeDamageInfo(damage)
 			end

@@ -27,6 +27,9 @@ ENT.PrintName = "Thunderwall"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
+ENT.Kills = 0
+ENT.MaxKills = 20
+
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
 	self:NetworkVar("Entity", 1, "Inflictor")
@@ -81,6 +84,7 @@ function ENT:Initialize()
 		if ent:IsValidZombie() then
 			if ent == ply then continue end
 			if ent:Health() <= 0 then continue end
+			if self.Kills >= self.MaxKills then break end
 
 			if SERVER then
 				self:ThundergunDamage(ent)
@@ -103,9 +107,10 @@ function ENT:ThundergunDamage(ent)
 	damage:SetDamageForce(ent:GetUp()*20000 + wep:GetAimVector()*50000)
 
 	if nzombies and ent.NZBossType then
-		damage:SetDamage(ent:GetMaxHealth() / math.Clamp(nzRound:GetNumber()/5, 2, 8))
-		damage:ScaleDamage((10 - nzRound:GetBossData(ent.NZBossType).dmgmul*10) + 1)
+		damage:SetDamage(math.max(2000, ent:GetMaxHealth() / 4))
+		damage:ScaleDamage(math.Round(nzRound:GetNumber()/6))
 	end
 
 	ent:TakeDamageInfo(damage)
+	self.Kills = self.Kills + 1
 end
