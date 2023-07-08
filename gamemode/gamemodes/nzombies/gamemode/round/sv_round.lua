@@ -435,6 +435,12 @@ function nzRound:ResetGame()
 	self:SetZombiesKilled( 0 )
 	self:SetZombiesMax( 0 )
 
+	--Reset zombie ai so no stench happens if you ready up again
+	
+	  for k,v in pairs(ents.FindByClass("player_spawns")) do
+        v:SetTargetPriority(TARGET_PRIORITY_NONE) -- Get rid of the spawn's target priority.
+    end
+	
 	--Reset all player ready states
 	for _, ply in pairs( player.GetAllReady() ) do
 		ply:UnReady()
