@@ -491,6 +491,28 @@ nzMapping:AddSaveModule("BlockSpawns", {
 	cleanents = {"wall_block"},
 })
 
+nzMapping:AddSaveModule("Jumptraversals", {
+	savefunc = function()
+		local trav_spawns = {}
+		for _, v in pairs(ents.FindByClass("jumptrav_block")) do
+			
+
+			table.insert(trav_spawns, {
+			pos = v:GetPos(),
+			angle = v:GetAngles(),
+			model = v:GetModel(),
+			})
+		end
+		return trav_spawns
+	end,
+	loadfunc = function(data)
+		for k,v in pairs(data) do
+			nzMapping:JumpBlockSpawn(v.pos, v.angle, v.model)
+		end
+	end,
+	cleanents = {"jumptrav_block"},
+})
+
 nzMapping:AddSaveModule("RandomBoxSpawns", {
 	savefunc = function()
 		local randombox_spawn = {}
