@@ -29,11 +29,13 @@ end
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
+ENT.RedEyes = true
 ENT.SpeedBasedSequences = true
+
 ENT.IsMooZombie = true
-ENT.RedEyes = false
-ENT.MooSpecialZombie = true -- They're a Special Zombie, but is still close enough to a normal zombie to be able to do normal zombie things.
 ENT.IsMooSpecial = true
+ENT.MooSpecialZombie = true -- They're a Special Zombie, but is still close enough to a normal zombie to be able to do normal zombie things.
+ENT.IsMooBossZombie = true
 
 ENT.AttackRange = 72
 
@@ -201,16 +203,21 @@ ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, 
 
 function ENT:StatsInitialize()
 	if SERVER then
-		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
 		if nzRound:InState( ROUND_CREATE ) then
-			self:SetHealth(500)
-			self:SetMaxHealth(500)
+			self:SetHealth(2250)
+			self:SetMaxHealth(2250)
 		else
-			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			if nzRound:InState( ROUND_PROG ) then
+				self:SetHealth(math.Clamp(nzRound:GetNumber() * 250 + (250 * count), 2250, 5250 * count))
+				self:SetMaxHealth(math.Clamp(nzRound:GetNumber() * 250 + (250 * count), 2250, 5250 * count))
+			else
+				self:SetHealth(2250)
+				self:SetMaxHealth(2250)	
+			end
 		end
+
 		self:SetRunSpeed(71)
 
 		self:SetBodygroup(0,1)
@@ -292,7 +299,7 @@ function ENT:IsValidTarget( ent )
 	-- Turned Zombie Targetting
 	if self.IsTurned then return IsValid(ent) and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooSpecial and ent:Alive() end
 	
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 

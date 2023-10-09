@@ -41,35 +41,44 @@ local function DrawDownedPlayers_t5()
 	local scale = (w/1920 + 1)/2
 	local bleedtime = nz_bleedouttime:GetFloat()
 	local pply = LocalPlayer()
+	if IsValid(pply:GetObserverTarget()) then
+		pply = pply:GetObserverTarget()
+	end
 
-	for k, v in pairs(nzRevive.Players) do
-		local ply = Entity(k)
-		if IsValid(ply) then
-			local id = ply:EntIndex()
-			if ply == pply then continue end
-			if not nzRevive.Players[id].DownTime then continue end
-			local revivor = nzRevive.Players[id].RevivePlayer
+	for id, data in pairs(nzRevive.Players) do
+		local ply = Entity(id)
+		if not IsValid(ply) then continue end
+		
+		if ply == pply then continue end
+		if not data.DownTime then continue end
 
-			local ppos = ply:GetPos()
-			local posxy = (ppos + vector_up_35):ToScreen()
-			local dir = ((ppos + vector_up_35) - EyeVector()*2):GetNormal():ToScreen()
+		local revivor = data.RevivePlayer
+		if IsValid(revivor) and revivor == pply then continue end
 
-			if posxy.x - 35 < 60 or posxy.x - 35 > w-130 or posxy.y - 50 < 60 or posxy.y - 50 > h-110 then
-				posxy.x, posxy.y = XYCompassToScreen((ppos + vector_up_35), 60)
-			end
+		local ppos = ply:GetPos()
+		local posxy = (ppos + vector_up_35):ToScreen()
 
-			local revivescale = 1 - math.Clamp((CurTime() - nzRevive.Players[id].DownTime) / bleedtime, 0, 1)
+		if posxy.x - 35 < 60 or posxy.x - 35 > w-130 or posxy.y - 50 < 60 or posxy.y - 50 > h-110 then
+			posxy.x, posxy.y = XYCompassToScreen((ppos + vector_up_35), 60)
+		end
 
-			surface.SetDrawColor(255, 180*revivescale, 0)
-			if nzRevive.Players[id].ReviveTime then
-				surface.SetDrawColor(color_white)
-			end
-			if IsValid(revivor) and revivor:HasPerk('revive') then
+		local downscale = 1 - math.Clamp((CurTime() - data.DownTime) / bleedtime, 0, 1)
+		surface.SetDrawColor(255, 180*downscale, 0)
+		surface.SetMaterial(t5_hud_revive)
+		surface.DrawTexturedRect(posxy.x - 32*scale, posxy.y - 32*scale, 64*scale, 64*scale)
+
+		if IsValid(revivor) and data.ReviveTime then
+			local hasrevive = revivor:HasPerk("revive")
+			local revtime = hasrevive and 2 or 4
+			local revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
+
+			surface.SetDrawColor(color_white)
+			if hasrevive then
 				surface.SetDrawColor(color_revive)
 			end
 			surface.SetMaterial(t5_hud_revive)
-			surface.DrawTexturedRect(posxy.x - 32*scale, posxy.y - 32*scale, 64*scale, 64*scale)
-		end	
+			surface.DrawTexturedRectUV(posxy.x - 32*scale, posxy.y - 32*scale, 64*scale, 64*revivescale*scale, 0, 0, 1, 1*revivescale)
+		end
 	end
 end
 
@@ -77,28 +86,46 @@ local function DrawRevivalProgress_t5()
 	if not cl_drawhud:GetBool() then return end
 
 	local ply = LocalPlayer()
-	local tr = util.QuickTrace(ply:EyePos(), ply:GetAimVector()*100, ply)
-	local dply = tr.Entity
-	if IsValid(dply) then
-		local id = dply:EntIndex()
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
-		local hasrevive = ply:HasPerk("revive")
-		local revtime = hasrevive and 2 or 4
-		local w, h = ScrW(), ScrH()
-		local scale = (w/1920 + 1)/2
+	local reviving = ply:GetPlayerReviving()
+	if not IsValid(reviving) then return end
+	local id = reviving:EntIndex()
 
-		if nzRevive.Players[id] and nzRevive.Players[id].RevivePlayer == ply then
-			local revivescale = math.Clamp((CurTime() - nzRevive.Players[id].ReviveTime) / revtime, 0, 1)
+	local hasrevive = ply:HasPerk("revive")
+	local revtime = hasrevive and 2 or 4
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1)/2
+	local bleedtime = nz_bleedouttime:GetFloat()
 
-			surface.SetDrawColor(color_black_180)
-			surface.DrawRect(w/2 - 150*scale, h - 400*scale, 300*scale, 20*scale)
+	local data = nzRevive.Players[id]
+	if data and data.RevivePlayer == ply then
+		local revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
 
-			surface.SetDrawColor(color_white)
-			if hasrevive then
-				surface.SetDrawColor(color_revive)
-			end
-			surface.DrawRect(w/2 - 145*scale, h - 395*scale, 290*revivescale*scale, 10*scale)
+		if data.DownTime then
+			local downscale = 1 - math.Clamp((CurTime() - data.DownTime) / bleedtime, 0, 1)
+			surface.SetDrawColor(255, 180*downscale, 0)
+			surface.SetMaterial(t5_hud_revive)
+			surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
 		end
+
+		surface.SetDrawColor(color_white)
+		if hasrevive then
+			surface.SetDrawColor(color_revive)
+		end
+		surface.SetMaterial(t5_hud_revive)
+		surface.DrawTexturedRectUV(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*revivescale*scale, 0, 0, 1, 1*revivescale)
+
+		surface.SetDrawColor(color_black_180)
+		surface.DrawRect(w/2 - 150*scale, h - 400*scale, 300*scale, 20*scale)
+
+		surface.SetDrawColor(color_white)
+		if hasrevive then
+			surface.SetDrawColor(color_revive)
+		end
+		surface.DrawRect(w/2 - 145*scale, h - 395*scale, 290*revivescale*scale, 10*scale)
 	end
 end
 

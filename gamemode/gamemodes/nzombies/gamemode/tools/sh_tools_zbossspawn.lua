@@ -11,7 +11,7 @@ nzTools:CreateTool("zbossspawn", {
 		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_boss" then
 			ent = tr.Entity -- No need to recreate if we shot an already existing one
 		else
-			ent = nzMapping:ZedBossSpawn(tr.HitPos, nil, ply)
+			ent = nzMapping:ZedBossSpawn(tr.HitPos,(Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2],0)), nil, ply)
 		end
 
 		ent.flag = data.flag

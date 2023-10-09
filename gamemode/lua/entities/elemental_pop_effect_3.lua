@@ -212,6 +212,7 @@ function ENT:FakePrimaryAttack()
 		if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 then
 			if self.Kills >= self.MaxKills then break end
 			if v.NZBossType then continue end
+			if string.find(v:GetClass(), "nz_zombie_boss") then continue end
 			if v.Alive and not v:Alive() then continue end
 			if table.HasValue(self.TargetsToIgnore, v) then continue end
 

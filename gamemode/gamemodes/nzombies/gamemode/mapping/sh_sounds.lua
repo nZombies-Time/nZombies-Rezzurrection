@@ -10,10 +10,10 @@ end
 
 nzSounds = {}
 nzSounds.struct = { -- For use with 'data' when creating config menu options
-    "roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "dogroundsnd", "gameendsnd", -- main event sounds
+    "roundstartsnd", "roundendsnd", "specialroundstartsnd", "specialroundendsnd", "dogroundsnd", "gameendsnd",  -- main event sounds
     "spawnsnd", "grabsnd", "instakillsnd", "firesalesnd", "deathmachinesnd", "carpentersnd", "nukesnd", "doublepointssnd", "maxammosnd", "zombiebloodsnd", -- power up sounds
     "boxshakesnd", "boxpoofsnd", "boxlaughsnd", "boxbyesnd", "boxjinglesnd", "boxopensnd", "boxclosesnd",	-- mystery box sounds
-	"eesong","papshot", "bonuspointssnd", "bonfiresalesnd", "firstroundstartsnd", "whoswholoopersnd" --new sounds as of 115 day
+	"eesong","papshot", "bonuspointssnd", "bonfiresalesnd", "firstroundstartsnd", "whoswholoopersnd", "radio" --new sounds as of 115 day
 }
 
 nzSounds.Sounds = {}
@@ -49,7 +49,6 @@ nzSounds.Sounds.Default.BonusPoints = "nz_moo/announcer/sammantha/announce_bonus
 nzSounds.Sounds.Default.BonFireSale = "nz_moo/announcer/sammantha/announce_bonsale.mp3"
 nzSounds.Sounds.Default.FirstRoundStart = "nz_moo/round/classic_redone/splash.mp3"
 nzSounds.Sounds.Default.WhosWhoLooper = "nzr/2022/perks/chuggabud/ww_looper.wav"
-
 function nzSounds:RefreshSounds()
     
 	nzSounds.Sounds.Custom.RoundStart = nzMapping.Settings.roundstartsnd
@@ -92,11 +91,15 @@ function nzSounds:RefreshSounds()
 end 
 nzSounds:RefreshSounds()
 
-function nzSounds:GetSound(event)
+function nzSounds:GetSound(event, id)
     local snd = !nzSounds.Sounds.Custom[event] and nzSounds.Sounds.Default[event] or nzSounds.Sounds.Custom[event]
-
+	PrintTable(snd)
     if (istable(snd)) then
+		if id then
+		snd = snd[id]
+		else
         snd = table.Random(snd) -- ^ is a table of sounds, but we can only play 1
+		end
     end
 
     if (SERVER) then
@@ -152,14 +155,11 @@ function nzSounds:GetDefaultSound(event)
     return nzSounds.Sounds.Default[event]
 end
 
-function nzSounds:PlayEnt(event, ent, noOverlap) -- Plays on an entity (and must be close to actually hear it)
-    local snd = nzSounds:GetSound(event)
+function nzSounds:PlayEnt(event, ent, id) -- Plays on an entity (and must be close to actually hear it)
+    local snd = nzSounds:GetSound(event, id)
     if (snd == nil || !isstring(snd)) then return end
 
     if (IsValid(ent)) then
-        if (noOverlap) then
-            ent:StopSound(snd)
-        end
 
         ent:EmitSound(snd)
     end

@@ -27,8 +27,6 @@ if (SERVER) then
 	util.AddNetworkString("nz_points_notification_bo1")
 	util.AddNetworkString("nz_points_notification_bo2")
 	util.AddNetworkString("nz_points_notification_bo2_dlc")
-	util.AddNetworkString("nz_points_notification_bo2_dlc")
-	util.AddNetworkString("nz_points_notification_bo2_dlc")
 	util.AddNetworkString("nz_points_notification_bo3")
 	util.AddNetworkString("nz_points_notification_bo3_zod")
 

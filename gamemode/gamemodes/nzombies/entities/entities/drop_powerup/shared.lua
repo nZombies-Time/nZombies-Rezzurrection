@@ -27,10 +27,6 @@ function ENT:Draw()
 end
 
 function ENT:Initialize()
-	if SERVER then
-		SafeRemoveEntityDelayed(self, 30)
-	end
-
 	local pdata = nzPowerUps:Get(self:GetPowerUp())
 	self:SetModelScale(pdata.scale, 0)
 	self:PhysicsInitSphere(60, "default_silent")
@@ -40,6 +36,20 @@ function ENT:Initialize()
 	self:UseTriggerBounds(true, 1)
 	self:DrawShadow(false)
 
+	self.LoopSound =  "nz_moo/powerups/powerup_lp_zhd.wav"
+	self.GrabSound = "nz_moo/powerups/powerup_pickup_zhd.mp3"
+	self.SpawnSound = "nz_moo/powerups/powerup_spawn_zhd_"..math.random(1,3)..".mp3"
+
+	if nzSounds.Sounds.Custom.Loop and !table.IsEmpty(nzSounds.Sounds.Custom.Loop) then
+		self.LoopSound = tostring(nzSounds.Sounds.Custom.Loop[math.random(#nzSounds.Sounds.Custom.Loop)])
+	end
+	if nzSounds.Sounds.Custom.Grab and !table.IsEmpty(nzSounds.Sounds.Custom.Grab) then
+		self.GrabSound = tostring(nzSounds.Sounds.Custom.Grab[math.random(#nzSounds.Sounds.Custom.Grab)])
+	end
+	if nzSounds.Sounds.Custom.Spawn and !table.IsEmpty(nzSounds.Sounds.Custom.Spawn) then
+		self.SpawnSound = tostring(nzSounds.Sounds.Custom.Spawn[math.random(#nzSounds.Sounds.Custom.Spawn)])
+	end
+
 	timer.Simple(0, function()
 		if not IsValid(self) then return end
 		ParticleEffectAttach(nzPowerUps:Get(self:GetPowerUp()).global and "nz_powerup_global_intro" or "nz_powerup_local_intro", 1, self, 0)
@@ -47,30 +57,29 @@ function ENT:Initialize()
 
 	self:EmitSound("nz_moo/powerups/powerup_intro_start.mp3")
 	self:EmitSound("nz_moo/powerups/powerup_intro_lp.wav",100, 100, 1, 2)
-	self:EmitSound("nz_moo/powerups/powerup_lp_zhd.wav",75, 100, 1, 3)
 
 	self:SetMaterial("null")
 
+	self:SetActivated(false)
+	self:SetBlinking(false)
+
+	if CLIENT then return end
 	local distfac = 0.1
 	local nearest = self:FindNearestPlayer(self:GetPos())
 	if IsValid(nearest) then
 		local dist = self:GetPos():DistToSqr(nearest:GetPos())
 		distfac = 1 - math.Clamp(dist / 40000, 0, 1) //200^2
+
+		self:OOBTest(nearest)
 	end
 
 	self:SetActivateTime(CurTime() + (3 * distfac))
 	self:SetBlinkTime(CurTime() + 25)
 	self:SetKillTime(CurTime() + 30)
 
-	self:SetActivated(false)
-	self:SetBlinking(false)
-
-	if CLIENT then return end
 	self:SetTrigger(true)
 	self:SetUseType(SIMPLE_USE)
-	if IsValid(nearest) then
-		self:OOBTest(nearest)
-	end
+	SafeRemoveEntityDelayed(self, 30)
 end
 
 function ENT:OOBTest(ply)
@@ -127,6 +136,7 @@ function ENT:OOBTest(ply)
 		if v:GetClass() == "breakable_entry" then
 			//print('Powerup3, Barricade too close')
 			local ply2 = self:FindNearestPlayer(v:GetPos())
+			if not IsValid(ply2) then continue end
 			local normal = (self:GetPos() - v:GetPos()):GetNormalized()
 			local normal2 = (ply2:GetPos() - v:GetPos()):GetNormalized()
 			local fwd = v:GetForward()
@@ -149,7 +159,7 @@ function ENT:FindNearestPlayer(pos)
 	end
 
 	local nearbyents = {}
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:Alive() then
 			table.insert(nearbyents, v)
 		end
@@ -188,7 +198,7 @@ function ENT:StartTouch(ent)
 		nzPowerUps:Activate(self:GetPowerUp(), ent, self)
 
 		local GLOBAL = nzPowerUps:Get(self:GetPowerUp()).global
-		ent:EmitSound(nzPowerUps:Get(self:GetPowerUp()).collect or "nz_moo/powerups/powerup_pickup_zhd.mp3")
+		ent:EmitSound(nzPowerUps:Get(self:GetPowerUp()).collect or self.GrabSound)
 
 		self:Remove()
 	end
@@ -217,7 +227,7 @@ function ENT:Think()
 		self:SetNoDraw(not self:GetNoDraw())
 		self.NextDraw = CurTime() + math.Clamp(1 * final, 0.1, 1)
 
-		if not self:GetNoDraw() then
+		if not self:GetNoDraw() and final > 0.35 then
 			local global = nzPowerUps:Get(self:GetPowerUp()).global
 			ParticleEffectAttach(global and "nz_powerup_global" or "nz_powerup_local", 1, self, 0)
 		end
@@ -233,7 +243,9 @@ function ENT:Think()
 		ParticleEffectAttach(global and "nz_powerup_global" or "nz_powerup_local", 1, self, 0)
 
 		self:SetMaterial("")
-		self:EmitSound("nz_moo/powerups/powerup_spawn_zhd_"..math.random(1,3)..".mp3",100)
+
+		self:EmitSound(self.LoopSound,75, 100, 1, 3)
+		self:EmitSound(self.SpawnSound,100)
 		self:StopSound("nz_moo/powerups/powerup_intro_lp.wav")
 		self:SetActivated(true)
 	end
@@ -273,5 +285,6 @@ function ENT:OnRemove()
 
 		self:StopSound("nz_moo/powerups/powerup_intro_lp.wav")
 		self:StopSound("nz_moo/powerups/powerup_lp_zhd.wav")
+		self:StopSound(self.LoopSound)
 	end
 end

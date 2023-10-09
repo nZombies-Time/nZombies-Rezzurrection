@@ -106,11 +106,10 @@ function ENT:StartTouch(ply)
 	if IsValid(ply) and ply:IsPlayer() and ply == self:GetOwner() and ply:GetNotDowned() then
 		ply:StripWeapons()
 
-		local wep
 		for _, gun in pairs(self.OwnerData.weps) do
-			wep = ply:Give(gun.class)
+			local wep = ply:Give(gun.class)
 			timer.Simple(0, function()
-				if not IsValid(ply) or not IsValid(wep) then return end
+				if not (IsValid(ply) and IsValid(wep)) then return end
 
 				if gun.pap then
 					wep:ApplyNZModifier("pap")
@@ -176,6 +175,7 @@ function ENT:Think()
 	elseif self:GetActivated() then
 		if (not ply:GetNotDowned() or not ply:Alive()) and (self:GetKillTime() - CurTime()) >= self.BlinkDelay then
 			if not self.Fuckerdown then
+				ply:ChatPrint('Tombstone: Player downed or killed, pausing timer')
 				self.DownedAt = CurTime()
 				self.Fuckerdown = self:GetKillTime() - CurTime()
 			end

@@ -7,10 +7,13 @@ ENT.Author = "Laby and GhostlyMoo"
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
-ENT.SpeedBasedSequences = true
-ENT.IsMooZombie = true
 ENT.RedEyes = false
+ENT.SpeedBasedSequences = true
+
+ENT.IsMooZombie = true
 ENT.IsMooSpecial = true
+ENT.MooSpecialZombie = true -- They're a Special Zombie, but is still close enough to a normal zombie to be able to do normal zombie things.
+ENT.IsMooBossZombie = true
 
 ENT.AttackRange = 72
 
@@ -82,16 +85,21 @@ ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, 
 
 function ENT:StatsInitialize()
 	if SERVER then
-		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
 		if nzRound:InState( ROUND_CREATE ) then
-			self:SetHealth(500)
-			self:SetMaxHealth(500)
+			self:SetHealth(5000)
+			self:SetMaxHealth(5000)
 		else
-			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			if nzRound:InState( ROUND_PROG ) then
+				self:SetHealth(math.Clamp(nzRound:GetNumber() * 500 + (500 * count), 1000, 10500 * count))
+				self:SetMaxHealth(math.Clamp(nzRound:GetNumber() * 500 + (500 * count), 1000, 10500 * count))
+			else
+				self:SetHealth(5000)
+				self:SetMaxHealth(5000)	
+			end
 		end
+
 		self:SetRunSpeed(35)
 
 		grabbing = false
@@ -125,7 +133,7 @@ end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 
@@ -285,7 +293,7 @@ function ENT:ZombieStatusEffects()
 		if self.IsAATTurned and self:IsAATTurned() then
 			self:TimeOut(0)
 			self:SetSpecialShouldDie(true)
-			self:PlaySound(self.AstroDanceSounds[math.random(#self.AstroDanceSounds)], 511, math.random(95, 105), 1, 2)
+			self:PlaySound(self.AstroDanceSounds[math.random(#self.AstroDanceSounds)], 511)
 			self:DoSpecialAnimation(self.DanceSequences[math.random(#self.DanceSequences)])
 		end
 

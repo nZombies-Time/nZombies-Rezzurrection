@@ -2,13 +2,17 @@
 function nzRevive.DoPlayerDeath(ply, dmg)
 	if IsValid(ply) and ply:IsPlayer() then
 		if (math.floor(ply:Health() - dmg:GetDamage()) <= 0) then
-			local allow = hook.Call("PlayerShouldTakeDamage", nil, ply, dmg:GetAttacker(), dmg)
+			if IsValid(dmg:GetAttacker()) and dmg:GetAttacker():IsValidZombie() and ply:HasPerk("whoswho") and ply:GetNW2Float("nz.ChuggaDelay", 0) < CurTime() then
+				nzRevive:ChuggaBudTeleport(ply, true)
+				ply:SetNW2Float("nz.ChuggaDelay", CurTime() + 180)
+				return true
+			end
+
+			local allow = hook.Call("PlayerShouldTakeDamage", nil, ply, dmg:GetAttacker())
 
 			if allow != false then -- Only false should prevent it (not nil)
 				if ply:GetNotDowned() then
-					print(ply:Nick() .. " got downed!")
 					ply:DownPlayer()
-					--ply:SetMaxHealth(100) -- failsafe for Jugg not resetting
 					return true
 				else
 					ply:KillDownedPlayer() -- Kill them if they are already downed
@@ -28,7 +32,7 @@ function nzRevive.PostPlayerDeath(ply)
 end
 
 local function HandleKillCommand(ply)
-	if (ply:IsPlaying() and !ply:IsSpectating()) or ply:IsInCreative() then
+	if (ply:IsPlaying() and !ply:IsSpectating()) or (ply:IsInCreative() and ply:Alive()) then
 		if ply:GetNotDowned() then
 			ply:DownPlayer()
 		else

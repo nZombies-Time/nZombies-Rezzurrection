@@ -62,6 +62,10 @@ function ENT:Think()
 	if SERVER then
 		for k, v in pairs(ents.FindInSphere(self:GetPos(), 100)) do
 			if v:IsValidZombie() and v:Health() > 0 then
+				if v.NZBossType then continue end
+				if string.find(v:GetClass(), "nz_zombie_boss") then continue end
+				if v.IsAATTurned and v:IsAATTurned() then continue end
+
 				v:ZombSlow(0.15)
 			end
 		end

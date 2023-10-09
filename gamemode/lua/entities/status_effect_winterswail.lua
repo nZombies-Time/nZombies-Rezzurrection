@@ -32,6 +32,10 @@ local entMeta = FindMetaTable("Entity")
 
 if SERVER then
 	entMeta.WintersWailSlow = function(self, duration, ratio)
+		if self.IsAATTurned and self:IsAATTurned() then return end
+		if self.NZBossType then return end
+		if string.find(self:GetClass(), "nz_zombie_boss") then return end
+
 		if duration == nil then
 			duration = 0
 		end

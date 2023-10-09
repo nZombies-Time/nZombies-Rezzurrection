@@ -513,12 +513,6 @@ ENT.CrawlTeslaDeathSequences = {
 	"nz_crawl_tesla_death_v2",
 }
 
-ENT.PainSequences = {
-	"nz_s2_pain_head",
-	"nz_s2_pain_right",
-	"nz_s2_pain_left",
-}
-
 ENT.DeathSounds = {
 	"nz_moo/zombies/vox/_gen/gen2/zmb_vox_gen2_death_01.mp3",
 	"nz_moo/zombies/vox/_gen/gen2/zmb_vox_gen2_death_02.mp3",
@@ -823,53 +817,79 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-	local nav = navmesh.GetNavArea(self:GetPos(), 50)
-	if IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP) then
+	local spawn
+	local types = {
+		["nz_spawn_zombie_normal"] = true,
+		["nz_spawn_zombie_special"] = true,
+		["nz_spawn_zombie_extra1"] = true,
+		["nz_spawn_zombie_extra2"] = true,
+		["nz_spawn_zombie_extra3"] = true,
+		["nz_spawn_zombie_extra4"] = true,
+	}
+	for k,v in pairs(ents.FindInSphere(self:GetPos(), 10)) do
+		if types[v:GetClass()] then
+			if !v:GetMasterSpawn() then
+				spawn = v
+			end
+		end
+	end
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
+
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
+	if IsValid(spawn) and spawn:GetSpawnType() == 1 then
 		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 		self:CollideWhenPossible()
 	else
-		local SpawnMatSound = {
-			[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
-			[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
-			[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
-			[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
-		}
-		SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
-		SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
-
-		local norm = (self:GetPos()):GetNormalized()
-		local tr = util.QuickTrace(self:GetPos(), norm*10, self)
-
 		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 
-		--ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-		--self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
-	
 		self:SetSpecialAnimation(true)
 		self:SetIsBusy(true)
 		local seq = self:SelectSpawnSequence()
 
-
-		local navtypes = {
-			[NAV_MESH_OBSTACLE_TOP] = true,
-			[NAV_MESH_DONT_HIDE] = true,
-		}
-
-
-		if IsValid(nav) and nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) then
+		if IsValid(spawn) and spawn:GetSpawnType() == 3 then
 			seq = self.UndercroftSequences[math.random(#self.UndercroftSequences)]
-		elseif IsValid(nav) and nav:HasAttributes(NAV_MESH_DONT_HIDE) then
-			seq = "nz_moo_wall_emerge_quick"
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 4 then
+			seq = self.WallSpawnSequences[math.random(#self.WallSpawnSequences)]
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 5 then
+			if tr.Hit then
+				local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+				self:EmitSound(finalsound)
+			end
+			ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+			self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
+
+			seq = self.JumpSpawnSequences[math.random(#self.JumpSpawnSequences)]
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 6 then
+			seq = self.BarrelSpawnSequences[math.random(#self.BarrelSpawnSequences)]
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 7 then
+			seq = self.LowCeilingDropSpawnSequences[math.random(#self.LowCeilingDropSpawnSequences)]
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 8 then
+			seq = self.HighCeilingDropSpawnSequences[math.random(#self.HighCeilingDropSpawnSequences)]
+		elseif IsValid(spawn) and spawn:GetSpawnType() == 9 then
+			seq = self.GroundWallSpawnSequences[math.random(#self.GroundWallSpawnSequences)]
 		else
 			if tr.Hit then
 				local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
 				self:EmitSound(finalsound)
 			end
 			ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-			self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+			self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
 		end
 		if seq then
-			if IsValid(nav) and (nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) or nav:HasAttributes(NAV_MESH_DONT_HIDE)) then
+			if IsValid(spawn) and 
+				(spawn:GetSpawnType() == 3 
+				or spawn:GetSpawnType() == 4 
+				or spawn:GetSpawnType() == 6 
+				or spawn:GetSpawnType() == 9) then
 				self:PlaySequenceAndMove(seq, {gravity = false})
 			else
 				self:PlaySequenceAndMove(seq, {gravity = true})
@@ -921,30 +941,6 @@ function ENT:Sound()
 	end
 end
 
-function ENT:HandleAnimEvent(a,b,c,d,e)
-	if e == "melee" then
-		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
-		self:DoAttackDamage()
-	end
-	if e == "s2_gen_step" then
-		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 60, math.random(95, 105))
-	end
-	if e == "s2_taunt_vox" then
-		self:PlaySound(self.TauntSounds[math.random(#self.TauntSounds)],95, math.random(95, 105), 1, 2)
-	end
-	if e == "death_ragdoll" then
-		self:BecomeRagdoll(DamageInfo())
-	end
-	if e == "start_traverse" then
-		--print("starttraverse")
-		self.TraversalAnim = true
-	end
-	if e == "finish_traverse" then
-		--print("finishtraverse")
-		self.TraversalAnim = false
-	end
-end
-
 if SERVER then
 
 	function ENT:UpdateModel()
@@ -957,52 +953,6 @@ if SERVER then
 		self:SetBodygroup(0,math.random(0,self:GetBodygroupCount(0))) -- Randomize the possible hat
 		self:SetBodygroup(1,math.random(0,self:GetBodygroupCount(1) - 2)) -- Randomize the possible head minus the blank
 	end
-
-	--[[function ENT:PostTookDamage(dmginfo) 
-		if self.Dying then return end
-
-		local hitgroup = util.QuickTrace(dmginfo:GetDamagePosition(), dmginfo:GetDamagePosition()).HitGroup
-		local hitforce = dmginfo:GetDamageForce()
-
-		if CurTime() > self.LastStun then
-			if !dmginfo:IsDamageType(DMG_MISSILEDEFENSE) and !self:GetSpecialAnimation() and !self:GetCrawler() and !self:GetIsBusy() and !self.ShouldCrawl then
-				if hitgroup == HITGROUP_HEAD then
-					if self.PainSounds and !self:GetDecapitated() then
-						self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85, 105), 1, 2)
-						self.NextSound = CurTime() + self.SoundDelayMax
-					end
-					self:DoSpecialAnimation("nz_s2_pain_head", true, true)
-					self.LastStun = CurTime() + 8
-				end
-
-				if hitgroup == HITGROUP_LEFTARM then
-					if self.PainSounds and !self:GetDecapitated() then
-						self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85, 105), 1, 2)
-						self.NextSound = CurTime() + self.SoundDelayMax
-					end
-					self:DoSpecialAnimation("nz_s2_pain_left", true, true)
-					self.LastStun = CurTime() + 8
-				end
-
-				if hitgroup == HITGROUP_RIGHTARM then
-					if self.PainSounds and !self:GetDecapitated() then
-						self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85, 105), 1, 2)
-						self.NextSound = CurTime() + self.SoundDelayMax
-					end
-					self:DoSpecialAnimation("nz_s2_pain_right", true, true)
-					self.LastStun = CurTime() + 8
-				end
-				if self:CrawlerForceTest(hitforce) then
-					if self.PainSounds and !self:GetDecapitated() then
-						self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85, 105), 1, 2)
-						self.NextSound = CurTime() + self.SoundDelayMax
-					end
-					self:DoSpecialAnimation(self.PainSequences[math.random(#self.PainSequences)], true, true)
-					self.LastStun = CurTime() + 8
-				end
-			end
-		end
-	end]]
 
 	function ENT:GibHead()
 		if self:GetDecapitated() then return end

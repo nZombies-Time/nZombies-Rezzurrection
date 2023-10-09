@@ -30,30 +30,54 @@ end)
 function nzPowerUps:Nuke(pos, nopoints, noeffect)
 	-- Kill them all
 	local highesttime = 0
-	
-	for _,v in pairs(ents.GetAll()) do
-		if v:IsValidZombie() and !v.NZBossType then
-			if IsValid(v) then
-				v:SetBlockAttack(true)
+	local total = {}
 
-				local insta = DamageInfo()
-				insta:SetAttacker(Entity(0))
-				insta:SetDamageType(DMG_SHOCK)
-				insta:SetDamage(v:Health() + 666)
-				v:TakeDamageInfo(insta)
-				v:EmitSound("nz_moo/zombies/vox/nuke_death/soul_0"..math.random(0,10)..".mp3", 100, math.random(85,115))	
-			end
+	for _,v in nzLevel.GetZombieArray() do
+		if v:IsValidZombie() and !v.NZBossType and !v.IsMooBossZombie then
+			highesttime = highesttime + math.Rand(0.15, 0.45)
+
+			v:SetRunSpeed(1)
+			v:SpeedChanged()
+			v.MarkedForDeath = true
+			v:SetBlockAttack(true)
+
+			-- In Serverside related stuff, timers are fine.
+			timer.Simple(highesttime, function()
+				if IsValid(v) then
+					if math.random(5) <= 2 then
+						if v.IsMooZombie and !v.IsMooSpecial then
+							v:GibHead()
+						end
+					end
+
+					local insta = DamageInfo()
+					insta:SetAttacker(Entity(0))
+					insta:SetDamageType(DMG_BLAST)
+					insta:SetDamage(v:Health() + 666)
+					
+					v:TakeDamageInfo(insta)
+
+					v:Ignite(5)
+					v:EmitSound("nz_moo/powerups/nuke_ignite.mp3", 511)	
+					v:EmitSound("nz_moo/zombies/vox/nuke_death/soul_0"..math.random(0,10)..".mp3", 75, math.random(85,115))	
+					
+					table.insert(total, v)
+				end
+			end)
 		end
 	end
 	
-
 	-- Give the players a set amount of points
 	if not nopoints then
 		timer.Simple(highesttime, function()
-			if nzRound:InProgress() then -- Only if the game is still going!
-				for k,v in pairs(player.GetAll()) do
-					if v:IsPlayer() then
-						v:GivePoints(400)
+			for k,v in pairs(player.GetAllPlaying()) do
+				if v:IsPlayer() then
+					v:GivePoints(400)
+					if #total == 1 then
+						if !v.MOOS_FAV_THING_TO_SAY_ON_NUKES_TM and TFA.BO3GiveAchievement then
+      						TFA.BO3GiveAchievement("Weapon of Minor Destruction", "vgui/overlay/achievment/Weapon_of_Minor_Destruction_WaW.png", v)
+    						v.MOOS_FAV_THING_TO_SAY_ON_NUKES_TM = true
+						end
 					end
 				end
 			end
@@ -145,7 +169,7 @@ function nzPowerUps:Carpenter(nopoints)
 					repaired = repaired + 1
 					if repaired == #barricades then
 						self.ActivePowerUps["carpenter"] = (self.ActivePowerUps["carpenter"] or CurTime()) - PowerupData.duration
-						for k,v in pairs(player.GetAll()) do
+						for k,v in pairs(player.GetAllPlaying()) do
 							if v:IsPlayer() then
 								v:GivePoints(200)
 							end

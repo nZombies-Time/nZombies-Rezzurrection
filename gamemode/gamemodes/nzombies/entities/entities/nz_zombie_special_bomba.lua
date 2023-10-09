@@ -322,7 +322,7 @@ function ENT:StatsInitialize()
 
 		self.ChangeSpeed = false
 
-		self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 95))
+		self:SetCollisionBounds(Vector(-17,-17, 0), Vector(17, 17, 96))
 		self:SetBodygroup(0,0)
 
 		if self.Treasure then
@@ -398,11 +398,6 @@ function ENT:PerformDeath(dmginfo)
 	else
 		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
 	end
-end
-
-function ENT:IsValidTarget( ent )
-	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
 end
 
 function ENT:PostTookDamage(dmginfo)

@@ -39,15 +39,20 @@ nzMapping:AddSaveModule("ZedSpawns", {
 		local zed_spawns = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_normal")) do
 			table.insert(zed_spawns, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_spawns
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedSpawn(v.pos, v.link)
+			nzMapping:ZedSpawn(v.pos, v.angle, v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_normal"}, -- Simply clean entities of this type
@@ -58,15 +63,20 @@ nzMapping:AddSaveModule("ZedSpecialSpawns", {
 		local zed_special_spawns = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do
 			table.insert(zed_special_spawns, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_special_spawns
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedSpecialSpawn(v.pos, v.link)
+			nzMapping:ZedSpecialSpawn(v.pos,v.angle , v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_special"},
@@ -78,6 +88,7 @@ nzMapping:AddSaveModule("ZedBossSpawn", {
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_boss")) do
 			table.insert(zed_boss_spawns, {
 			pos = v:GetPos(),
+			angle = v:GetAngles(),
 			link = v.link
 			})
 		end
@@ -85,7 +96,7 @@ nzMapping:AddSaveModule("ZedBossSpawn", {
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedBossSpawn(v.pos, v.link)
+			nzMapping:ZedBossSpawn(v.pos,v.angle , v.link)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_boss"},
@@ -96,15 +107,20 @@ nzMapping:AddSaveModule("ZedExtraSpawn1", {
 		local zed_add_spawns1 = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra1")) do
 			table.insert(zed_add_spawns1, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_add_spawns1
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedExtraSpawn1(v.pos, v.link)
+			nzMapping:ZedExtraSpawn1(v.pos,v.angle , v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_extra1"},
@@ -115,15 +131,20 @@ nzMapping:AddSaveModule("ZedExtraSpawn2", {
 		local zed_add_spawns2 = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra2")) do
 			table.insert(zed_add_spawns2, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_add_spawns2
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedExtraSpawn2(v.pos, v.link)
+			nzMapping:ZedExtraSpawn2(v.pos,v.angle , v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_extra2"},
@@ -134,15 +155,20 @@ nzMapping:AddSaveModule("ZedExtraSpawn3", {
 		local zed_add_spawns3 = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra3")) do
 			table.insert(zed_add_spawns3, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_add_spawns3
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedExtraSpawn3(v.pos, v.link)
+			nzMapping:ZedExtraSpawn3(v.pos,v.angle , v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_extra3"},
@@ -153,32 +179,39 @@ nzMapping:AddSaveModule("ZedExtraSpawn4", {
 		local zed_add_spawns4 = {}
 		for _, v in pairs(ents.FindByClass("nz_spawn_zombie_extra4")) do
 			table.insert(zed_add_spawns4, {
-			pos = v:GetPos(),
-			link = v.link
+				pos = v:GetPos(),
+				angle = v:GetAngles(),
+				link = v.link,
+				master = v:GetMasterSpawn(),
+				spawntype = v:GetSpawnType() or 0,
+				zombietype = v:GetZombieType() or "none",
+				roundactive = v:GetActiveRound() or 0,
 			})
 		end
 		return zed_add_spawns4
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:ZedExtraSpawn4(v.pos, v.link)
+			nzMapping:ZedExtraSpawn4(v.pos,v.angle , v.link, v.master, v.spawntype, v.zombietype, v.roundactive)
 		end
 	end,
 	cleanents = {"nz_spawn_zombie_extra4"},
 })
+
 nzMapping:AddSaveModule("PlayerSpawns", {
 	savefunc = function()
 		local player_spawns = {}
 		for _, v in pairs(ents.FindByClass("player_spawns")) do
 			table.insert(player_spawns, {
 			pos = v:GetPos(),
+			angle = v:GetAngles(),
 			})
 		end
 		return player_spawns
 	end,
 	loadfunc = function(data)
 		for k,v in pairs(data) do
-			nzMapping:PlayerSpawn(v.pos)
+			nzMapping:PlayerSpawn(v.pos,v.angle)
 		end
 	end,
 	cleanents = {"player_spawns"},
@@ -623,9 +656,10 @@ nzMapping:AddSaveModule("BreakEntry", {
 				angle = v:GetAngles(),
 				planks = v:GetHasPlanks(),
 				jump = v:GetTriggerJumps(),
-				--classic = v:GetClassicPatern(),
 				boardtype = v:GetBoardType(),
 				prop = v:GetProp() or 0,
+				jumptype = v:GetJumpType() or 0,
+				plycollision = v:GetPlayerCollision() or 1,
 			})
 		end
 		return break_entry
@@ -633,7 +667,9 @@ nzMapping:AddSaveModule("BreakEntry", {
 	loadfunc = function(data)
 		for k,v in pairs(data) do
 			if not v.prop then v.prop = 0 end 
-			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.boardtype, v.prop)
+			if not v.jumptype then v.jumptype = 0 end
+			if not v.plycollision then v.plycollision = 1 end
+			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.boardtype, v.prop, v.jumptype, v.plycollision)
 		end
 	end,
 	cleanents = {"breakable_entry", "breakable_entry_plank", "breakable_entry_bar", "breakable_entry_ventslat"},

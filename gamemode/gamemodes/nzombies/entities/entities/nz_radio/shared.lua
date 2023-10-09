@@ -29,12 +29,12 @@ print(self:GetRadio())
 end
 
 function ENT:Use( activator, caller )
-	if nzRound:InProgress() then
+	--if nzRound:InProgress() then
 		--PrintMessage( HUD_PRINTTALK,"Assume all songs are copyrighted!")
-		local mySound = self:GetRound()
+		local mySound = self:GetRadio()
 		print(mySound)
-		self:EmitSound(mySound,511)
-	end
+		self:EmitSound(mySound)
+	--end
 end
 
 function ENT:Draw()

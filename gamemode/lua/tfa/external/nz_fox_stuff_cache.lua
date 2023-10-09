@@ -1,10 +1,12 @@
 game.AddParticles("particles/drops_powerups.pcf")
+
 game.AddParticles("particles/perks_cherry.pcf")
 game.AddParticles("particles/perks_phd.pcf")
 game.AddParticles("particles/perks_zombshell.pcf")
 game.AddParticles("particles/perks_razor.pcf")
 game.AddParticles("particles/perks_vulture.pcf")
 game.AddParticles("particles/perks_winterswail.pcf")
+game.AddParticles("particles/perks_chuggabud.pcf")
 
 game.AddParticles("particles/perks_aat_blastfurnace.pcf")
 game.AddParticles("particles/perks_aat_thunderwall.pcf")
@@ -35,6 +37,8 @@ PrecacheParticleSystem("nz_perks_razor_trail")
 PrecacheParticleSystem("nz_perks_vulture_stink")
 PrecacheParticleSystem("nz_perks_winters")
 PrecacheParticleSystem("nz_perks_winters_zomb")
+PrecacheParticleSystem("nz_perks_chuggabud_tp")
+PrecacheParticleSystem("nz_perks_chuggabud_ghost")
 
 PrecacheParticleSystem("bo3_aat_blastfurnace")
 PrecacheParticleSystem("bo3_aat_thunderwall")
@@ -107,6 +111,10 @@ TFA.AddSound("NZ.ChuggaBud.Stinger", CHAN_VOICE2, 1, SNDLVL_TALKING, 100, "nzr/2
 TFA.AddSound("NZ.ChuggaBud.Teleport", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/perks/chuggabud/mpl_flashback_reappear_plr.wav",")")
 TFA.AddSound("NZ.ChuggaBud.Sweet", CHAN_STATIC, 1, SNDLVL_GUNFIRE, 100, {"nzr/2022/perks/chuggabud/teleport_out_00.wav", "nzr/2022/perks/chuggabud/teleport_out_01.wav"},")")
 
+TFA.AddSound("NZ.Winters.Start", CHAN_STATIC, 1, SNDLVL_TALKING, 100, {"nzr/2022/perks/winters/zm_common.all.sabl.1816.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1817.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1818.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1819.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1820.wav"},")")
+TFA.AddSound("NZ.Winters.Loop", CHAN_WEAPON, 1, SNDLVL_TALKING, 100, {"nzr/2022/perks/winters/zm_common.all.sabl.1824.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1825.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1826.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1827.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1828.wav", "nzr/2022/perks/winters/zm_common.all.sabl.1829.wav"},")")
+TFA.AddSound("NZ.Winters.End", CHAN_WEAPON, 1, SNDLVL_TALKING, 100, "nzr/2022/perks/winters/zm_common.all.sabl.1048.wav",")")
+
 TFA.AddSound("NZ.BO2.Box.Open", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nzr/2022/magicbox/bo2/open_00.wav",")")
 TFA.AddSound("NZ.BO2.Box.Close", CHAN_STATIC, 1, SNDLVL_NORM, 100, "nzr/2022/magicbox/bo2/close_00.wav",")")
 TFA.AddSound("NZ.BO2.Box.Land", CHAN_STATIC, 1, SNDLVL_TALKING, 100, "nzr/2022/magicbox/bo2/land_00.wav",")")
@@ -133,6 +141,9 @@ TFA.AddWeaponSound("NZ.Bottle.Drink", "nzr/2022/perks/bottle/swallow.wav")
 
 TFA.AddWeaponSound("NZ.Hands.Knuckle0", "nzr/2022/pap/knuckle_00.wav")
 TFA.AddWeaponSound("NZ.Hands.Knuckle1", "nzr/2022/pap/knuckle_01.wav")
+
+TFA.AddWeaponSound("NZ.Syrette.Open", "nzr/2023/syrette/adrenaline_cap_off.wav")
+TFA.AddWeaponSound("NZ.Syrette.Stab", "nzr/2023/syrette/adrenaline_needle_in.wav")
 
 if not ConVarExists("nz_difficulty_bo4_perkmodifier") then
 	CreateConVar("nz_difficulty_bo4_perkmodifier", 1, {FCVAR_SERVER_CAN_EXECUTE, FCVAR_ARCHIVE, FCVAR_REPLICATED}, "Enable or disable the Black Ops 4 styled perk modifier system where your 4th perk is automatically given its modifier/upgrade. (0 false, 1 true), Default is 1.",0,1)
@@ -314,6 +325,87 @@ if nzombies then
 	////////////////////////////////////////////////////////////////////
 
 	if CLIENT then
+		//custom tfa swep function to make the crosshair respond to playercolor instead of always red
+		//green for turned zombies and rainbow for turnt zombies
+
+		/*
+		local GetNPCDisposition = TFA.GetNPCDisposition
+		local cv_red_r, cv_red_g, cv_red_b = GetConVar("cl_tfa_hud_crosshair_color_enemy_r"), GetConVar("cl_tfa_hud_crosshair_color_enemy_g"), GetConVar("cl_tfa_hud_crosshair_color_enemy_b")
+		local cv_grn_r, cv_grn_g, cv_grn_b = GetConVar("cl_tfa_hud_crosshair_color_friendly_r"), GetConVar("cl_tfa_hud_crosshair_color_friendly_g"), GetConVar("cl_tfa_hud_crosshair_color_friendly_b")
+		local cl_xhair_teamcolorcvar = GetConVar("cl_tfa_hud_crosshair_color_team")
+		local sv_xhair_showplayercvar = GetConVar("sv_tfa_crosshair_showplayer")
+
+		function SWEP:GetTeamColor(ent)
+			if not self.IsTFAWeapon then return old_GetTeamColor(self, ent) end
+
+			if not cl_xhair_teamcolorcvar:GetBool() then return color_white end
+			local ply = LocalPlayer()
+			if not IsValid(ply) then return color_white end
+
+			if ent:IsPlayer() then
+				if not sv_xhair_showplayercvar:GetBool() then return color_white end
+				local pvcol = ent:GetPlayerColor()
+				pcolor = Color(255*pvcol.x, 255*pvcol.y, 255*pvcol.z, 255)
+				return pcolor
+			end
+
+			if ent:IsNPC() then
+				local c_red = Color(cv_red_r:GetInt(), cv_red_g:GetInt(), cv_red_b:GetInt(), 255)
+				local c_grn = Color(cv_grn_r:GetInt(), cv_grn_g:GetInt(), cv_grn_b:GetInt(), 255)
+
+				local disp = GetNPCDisposition(ent) or ent:GetNW2Int("tfa_disposition", -1)
+
+				if disp > 0 then
+					if disp == (D_FR or 2) or disp == (D_HT or 1) then
+						return c_red
+					else
+						return c_grn
+					end
+				end
+
+				if IsFriendEntityName(ent:GetClass()) then
+					return c_grn
+				else
+					return c_red
+				end
+			end
+
+			if ent:IsNextBot() then
+				if ent.IsAATTurned and ent:IsAATTurned() then
+					local c_grn = Color(cv_grn_r:GetInt(), cv_grn_g:GetInt(), cv_grn_b:GetInt(), 255)
+					if not ent.IsTurned then
+						local time = CurTime()
+						local r = ( 0.5 * (math.sin(time - 2)	+ 1) )
+						local g = ( 0.5 * (math.sin(time + 2)	+ 1) )
+						local b = ( 0.5 * (math.sin(time)		+ 1) )
+						local c_rnbw = Color(255*r, 255*g, 255*b)
+
+						return c_rnbw
+					else
+						return c_grn
+					end
+				end
+			end
+
+			return color_white
+		end
+		*/
+
+		local zmhud_icon_headshot = Material("vgui/hud/hud_headshoticon.png", "smooth unlitgeneric")
+
+		local blur_mat = Material("pp/bokehblur")
+		local function MyDrawBokehDOF(fac)
+			render.UpdateScreenEffectTexture()
+			render.UpdateFullScreenDepthTexture()
+			blur_mat:SetTexture("$BASETEXTURE", render.GetScreenEffectTexture())
+			blur_mat:SetTexture("$DEPTHTEXTURE", render.GetResolvedFullFrameDepth())
+			blur_mat:SetFloat("$size", fac * 4)
+			blur_mat:SetFloat("$focus", 1)
+			blur_mat:SetFloat("$focusradius", 10*fac)
+			render.SetMaterial(blur_mat)
+			render.DrawScreenQuad()
+		end
+
 		local tab = {
 			["$pp_colour_addr"] = 0.05,
 			["$pp_colour_addg"] = 0.2,
@@ -334,7 +426,7 @@ if nzombies then
 				DrawColorModify(tab)
 			end
 			if ply:HasPerkBlur() then
-				DrawMotionBlur(0.4, ply:PerkBlurIntensity(), 0.015)
+				MyDrawBokehDOF(ply:PerkBlurIntensity())
 			end
 		end)
 
@@ -376,7 +468,7 @@ if nzombies then
 					fadefac = math.Clamp(fadefac / 1, 0, 1)
 				end
 
-				surface.SetMaterial(Material("vgui/hud/hud_headshoticon.png", "smooth unlitgeneric"))
+				surface.SetMaterial(zmhud_icon_headshot)
 				surface.SetDrawColor(255,255,255,255*fadefac)
 				surface.DrawTexturedRect(ScrW() / 2 - 32, ScrH() / 2 - 32, 64, 128)
 			end
@@ -399,7 +491,6 @@ if nzombies then
 	////////////////////////////////////////////////////////////////////
 	////						SHARED HOOKS						////
 	////////////////////////////////////////////////////////////////////
-
 	local meta = FindMetaTable("Player")
 	function meta:GetPHDJumped()
 		return self:GetNW2Bool("nz.PHDJumpd", false)
@@ -585,6 +676,59 @@ if nzombies then
 		end
 	end)
 
+	local CherryTrapFunc = {
+		["bo2_trap_drone"] = function(ent, scale)
+			ent:SetHealth(math.min(ent:Health() + math.Round(25*scale), ent:GetMaxHealth()))
+		end,
+		["bo2_trap_turbine"] = function(ent, scale)
+			ent:SetHealth(math.min(ent:Health() + math.Round(25*scale), ent:GetMaxHealth()))
+		end,
+		["bo2_trap_subwoofer"] = function(ent, scale)
+			local time = 1 - (1*scale) + engine.TickInterval()
+			ent:SetActivated(true)
+			ent:SetNextAttack(CurTime() + time)
+
+			local timername = "sub_cherryreset"..ent:EntIndex()
+			if timer.Exists(timername) then timer.Remove(timername) end
+
+			timer.Create(timername, time+engine.TickInterval(), 1, function()
+				if not IsValid(ent) or ent.Turbine then return end
+				ent:TurnOff()
+			end)
+		end,
+		["bo2_trap_etrap"] = function(ent, scale)
+			ent:TurnOn()
+
+			local timername = "etrap_cherryreset"..ent:EntIndex()
+			if timer.Exists(timername) then timer.Remove(timername) end
+
+			timer.Create(timername, 6*scale, 1, function()
+				if not IsValid(ent) or ent.Turbine then return end
+				ent:TurnOff()
+			end)
+		end,
+		["bo2_trap_turret"] = function(ent, scale)
+			ent:TurretOn()
+
+			if ent.SetRapidFire then
+				ent:SetRapidFire(true)
+			end
+
+			local timername = "turret_cherryreset"..ent:EntIndex()
+			if timer.Exists(timername) then timer.Remove(timername) end
+
+			timer.Create(timername, 4*scale, 1, function()
+				if not IsValid(ent) then return end
+				if ent.SetRapidFire then
+					ent:SetRapidFire(false)
+				end
+				if ent:GetActivated() and not ent.Turbine then
+					ent:TurretOff()
+				end
+			end)
+		end,
+	}
+
 	hook.Add("TFA_Reload", "nzCherry", function(wep)
 		local ply = wep:GetOwner()
 		if not IsValid(ply) or not ply:IsPlayer() then return end
@@ -601,7 +745,7 @@ if nzombies then
 
 			local scale = 1 - math.Clamp(ply:GetNW2Int("nz.CherryCount", 0) / 10, 0, 0.9)
 			local proc = 1 - math.Clamp(wep:Clip1() / wep.Primary.ClipSize, 0, 1)
-			local dmg = (250 * math.pow(1.1, math.floor(round/2) - 1)) * proc
+			local dmg = (300 * math.pow(1.1, math.floor(round/2) - 1)) * proc
 			local count = 0
 
 			local damage = DamageInfo()
@@ -609,20 +753,23 @@ if nzombies then
 			damage:SetDamageType(DMG_SHOCK)
 			damage:SetAttacker(ply)
 			damage:SetInflictor(wep)
+			damage:SetDamageForce(vector_up)
 
 			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 150 * proc)) do
-				if v:GetClass() == "bo2_trap_turbine" then
-					v:SetHealth(math.min(v:Health() + math.Round(25*scale), v:GetMaxHealth()))
+				local class = v:GetClass()
+				if SERVER and CherryTrapFunc[class] then
+					CherryTrapFunc[class](v, scale)
+					continue
 				end
+
 				if (v:IsNPC() or v:IsNextBot()) and v:Health() > 0 then
-					damage:SetDamagePosition(v.EyePos and v:EyePos() or v:WorldSpaceCenter())
-					damage:SetDamageForce(v:GetUp())
+					damage:SetDamagePosition(v:WorldSpaceCenter())	
 
 					if ply:HasUpgrade("cherry") then
 						damage:SetDamage(v:Health() + 666)
 					end
 
-					if damage:GetDamage() >= v:Health() then
+					if damage:GetDamage() > v:Health() and IsFirstTimePredicted() then
 						ParticleEffectAttach("bo3_waffe_electrocute", PATTACH_POINT_FOLLOW, v, 2)
 						if v:OnGround() then
 							ParticleEffectAttach("bo3_waffe_ground", PATTACH_ABSORIGIN_FOLLOW, v, 0)
@@ -653,17 +800,19 @@ if nzombies then
 				end
 			end
 
-			timer.Simple(scale, function()
-				if not IsValid(ply) then return end
-				ply:StopParticles()
+			if SERVER then
+				timer.Simple(scale, function()
+					if not IsValid(ply) then return end
+					ply:StopParticles()
 
-				if count and count >= 12 then
-					if not ply.bo3cherryachv then
-						TFA.BO3GiveAchievement("A Burst of Flavor", "vgui/overlay/achievment/cherry.png", ply)
-						ply.bo3cherryachv = true
+					if count and count >= 12 then
+						if not ply.bo3cherryachv and TFA.BO3GiveAchievement then
+							TFA.BO3GiveAchievement("A Burst of Flavor", "vgui/overlay/achievment/cherry.png", ply)
+							ply.bo3cherryachv = true
+						end
 					end
-				end
-			end)
+				end)
+			end
 		end
 	end)
 end

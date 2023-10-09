@@ -43,6 +43,7 @@ ENT.IdleSequence = "idle"
 
 ENT.DeathSequences = {
 	"death",
+	"death"
 }
 
 ENT.ElectrocutionSequences = {
@@ -138,31 +139,27 @@ function ENT:OnSpawn()
 	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
 end
 
-function ENT:PerformDeath(dmgInfo)
-	if self:GetSpecialAnimation() then
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		if IsValid(self) then
-				self:Remove()
-		end
-	else
-		if dmgInfo:GetDamageType() == DMG_SHOCK then
-			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-			self:DoDeathAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
-		else
-			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-			self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
-		end
+function ENT:PerformDeath(dmginfo)
+	local damagetype = dmginfo:GetDamageType()
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
 	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathSounds then
+	timer.Simple(5.5, function()
+	self:Remove(dmgInfo)
+	end)
+				self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+				self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+				--self:Remove(dmgInfo)
+	end
+	
+	
 end
 
-function ENT:DoDeathAnimation(seq)
-	self.BehaveThread = coroutine.create(function()
-		self:PlaySequenceAndWait(seq)
-		if IsValid(self) then
-				self:Remove()
-		end
-	end)
-end
+
 
 
 function ENT:OnPathTimeOut()
@@ -235,5 +232,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

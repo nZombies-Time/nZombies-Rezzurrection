@@ -273,6 +273,7 @@ function ENT:OnTargetInAttackRange()
 end
 
 function ENT:AI()
+	if !self:Alive() then return end
 	if IsValid(self:GetTarget()) then
 		if !self:GetSpecialAnimation() and !self:GetAttacking() and !self:IsAttackBlocked() and self:TargetInRange(320) and !self:TargetInRange(self.AttackRange + 30) then	
 			self:StartToasting()
@@ -307,6 +308,7 @@ function ENT:AI()
 end
 
 function ENT:PostTookDamage(dmginfo) 
+	if !self:Alive() then return end
 	if self:CrawlerForceTest(hitforce) and not self:GetSpecialAnimation() then -- Don't mind the use of the crawler force here.
 		if self.UsingFlamethrower then
 			self:StopToasting()
@@ -442,6 +444,9 @@ function ENT:OnThink()
 	if self.UsingFlamethrower and self:GetLastToast() + 0.1 < CurTime() then -- This controls how offten the trace for the flamethrower updates it's position. This shit is very costly so I wanted to try limit how much it does it.
 		self:StartToasting()
 	end
+	if !self.UsingFlamethrower then
+		self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+	end
 end
 
 function ENT:OnRemove()
@@ -451,96 +456,7 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
-end
-
-if SERVER then
-	-- Collide When Possible
-	local collidedelay = 0.25
-	local bloat = Vector(5,5,0)
-
-	function ENT:Think()
-		if (self:IsAllowedToMove() and !self:GetCrawler() and self.loco:GetVelocity():Length2D() >= 125 and self.SameSquare and !self:GetIsBusy() or self:IsAllowedToMove() and self:GetAttacking() ) then -- Moo Mark
-        	self.loco:SetVelocity(self:GetForward() * self:GetRunSpeed())
-        end
-		if self.DoCollideWhenPossible then
-			if not self.NextCollideCheck or self.NextCollideCheck < CurTime() then
-				local mins,maxs = self:GetCollisionBounds()
-				local tr = util.TraceHull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					filter = self,
-					mask = MASK_SOLID,
-					mins = mins - bloat,
-					maxs = maxs + bloat,
-					ignoreworld = false
-				})
-
-				local b = IsValid(tr.Entity)
-				if not b then
-					self:SetSolidMask(MASK_NPCSOLID)
-					self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
-					self.DoCollideWhenPossible = nil
-					self.NextCollideCheck = nil
-				else
-					self.NextCollideCheck = CurTime() + collidedelay
-				end
-			end
-		end
-
-		-- We don't want to say we're stuck if it's because we're attacking or timed out and !self:GetTimedOut() 
-		if not self:GetSpecialAnimation() and not self:GetAttacking() and self:GetLastPostionSave() + 4 < CurTime() then
-			if self:GetPos():DistToSqr( self:GetStuckAt() ) < 10 then
-				self:SetStuckCounter( self:GetStuckCounter() + 1)
-				--print(self:GetStuckCounter())
-			else
-				self:SetStuckCounter( 0 )
-			end
-
-			if self:GetStuckCounter() >= 1 then
-				local tr = util.TraceHull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = self:OBBMaxs(),
-					mins = self:OBBMins(),
-					filter = self
-				})
-				if !tr.HitNonWorld then
-					--print("Stuck")
-					self:ApplyRandomPush(750)
-					self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY)
-					self:CollideWhenPossible()
-				end
-				if self:GetStuckCounter() > 3 and not self.PanzerDGLifted and not self:PanzerDGLifted() then
-					local spawnpoints = {}
-					for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
-						if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
-							table.insert(spawnpoints, v)
-						end
-					end
-					local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
-					self:SetPos(selected:GetPos())
-					self:SetStuckCounter( 0 )
-				end
-			end
-			self:SetLastPostionSave( CurTime() )
-			self:SetStuckAt( self:GetPos() )
-		end
-		self:DebugThink()
-		self:OnThink()
-	end
-
-	function ENT:SolidMaskDuringEvent(mask)  -- Changes the zombie's mask until the end of the event. If nil is passed, it immediately removes the mask
-		if mask then
-			self:SetSolidMask(mask)
-			self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-			--self:SetCollisionBounds(Vector(-15,-15, 0), Vector(15, 15, 85))
-			self.EventMask = true
-		else
-			self:SetSolidMask(MASK_NPCSOLID)
-			self.EventMask = nil
-		end
-	end
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 
 function ENT:Attack( data )

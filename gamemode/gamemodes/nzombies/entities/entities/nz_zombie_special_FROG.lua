@@ -13,7 +13,7 @@ ENT.RedEyes = true
 ENT.IsMooSpecial = true
 ENT.AttackRange = 120
 ENT.DamageRange = 110
-ENT.AttackDamage = 30
+ENT.AttackDamage = 25
 
 ENT.Models = {
 	{Model = "models/specials/lurker.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -22,8 +22,7 @@ ENT.Models = {
 local spawn = {"flinch"}
 
 local AttackSequences = {
-	{seq = "att1", dmgtimes = {0.5, 0.9}},
-	{seq = "att2", dmgtimes = {1.0}}
+	{seq = "att1", dmgtimes = {0.5, 0.9}}
 }
 
 
@@ -103,10 +102,8 @@ function ENT:StatsInitialize()
 end
 
 function ENT:OnSpawn()
-self:ManipulateBoneScale(42,Vector(0,0,0))
-	self:ManipulateBoneScale(43,Vector(0,0,0))
-	self:ManipulateBoneScale(45,Vector(0,0,0))
-	self:ManipulateBoneScale(46,Vector(0.5,0.5,0.5))
+
+	
 	self:SetMaterial("invisible")
 	self:SetInvulnerable(true)
 	self:SetBlockAttack(true)
@@ -117,6 +114,10 @@ self:ManipulateBoneScale(42,Vector(0,0,0))
 	--ParticleEffect("fx_hellhound_summon",self:GetPos(),self:GetAngles(),nil)
 
 	self:TimeOut(0.85)
+	self:ManipulateBoneScale(42,Vector(0.1,0.1,0.1))
+	self:ManipulateBoneScale(43,Vector(0.1,0.1,0.1))
+	self:ManipulateBoneScale(45,Vector(0.1,0.1,0.1))
+	self:ManipulateBoneScale(46,Vector(0.5,0.5,0.5))
 	self:SetBodygroup(2,0)
 	self:EmitSound("nz/hellhound/spawn/strike.wav",511,100)
 	ParticleEffectAttach("ins_skybox_lightning",PATTACH_ABSORIGIN_FOLLOW,self,0)
@@ -167,7 +168,7 @@ end
 
 
 function ENT:PlayAttackAndWait( name, speed )
-
+	
 	local len = self:SetSequence( name )
 	speed = speed or 1
 
@@ -198,5 +199,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

@@ -150,9 +150,9 @@ SWEP.StatCache_Blacklist = {
 DEFINE_BASECLASS( SWEP.Base )
 
 function SWEP:Equip(ply, ...)
-	if nzombies then
+	/*if engine.ActiveGamemode() == "nzombies" then
 		ply:SetAmmo(4, GetNZAmmoID("grenade"))
-	end
+	end*/
 
 	return BaseClass.Equip(self, ply, ...)
 end

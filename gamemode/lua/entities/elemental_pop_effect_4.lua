@@ -106,7 +106,7 @@ function ENT:ThundergunDamage(ent)
 	damage:SetDamage(ent:Health() + 666)
 	damage:SetDamageForce(ent:GetUp()*20000 + wep:GetAimVector()*50000)
 
-	if nzombies and ent.NZBossType then
+	if nzombies and (ent.NZBossType or string.find(ent:GetClass(), "nz_zombie_boss")) then
 		damage:SetDamage(math.max(2000, ent:GetMaxHealth() / 4))
 		damage:ScaleDamage(math.Round(nzRound:GetNumber()/6))
 	end

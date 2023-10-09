@@ -28,6 +28,9 @@ ENT.PrintName = "Grenade"
 --[Parameters]--
 ENT.Delay = 2
 ENT.Range = 250
+ENT.NZNadeRethrow = true
+ENT.NZHudIcon = Material("vgui/hud/hud_grenadethrowback_glow.png", "smooth unlitgeneric")
+ENT.NZHudIcon_t7 = Material("vgui/hud/hud_grenadethrowback.png", "smooth unlitgeneric")
 
 local BounceSound = {
 	[MAT_WOOD] = "TFA.BO1.M67.Bounce.Wood",
@@ -87,7 +90,7 @@ function ENT:Initialize()
 	self.RangeSqr = self.Range*self.Range
 
 	if CLIENT then return end
-	//self:SetTrigger(true)
+	self:SetTrigger(true)
 	util.SpriteTrail(self, 0, Color(120, 120, 120), true, 6, 0, 0.5, 0.005, "cable/smoke.vmt")
 end
 
@@ -102,6 +105,11 @@ function ENT:Think()
 
 	self:NextThink(CurTime())
 	return true
+end
+
+function ENT:StartTouch(ent)
+	if not (ent:IsNextBot() or ent:IsNPC()) then return end
+	self:InflictDamage(ent, self:WorldSpaceCenter())
 end
 
 function ENT:InflictDamage(ent, hitpos)
@@ -120,7 +128,13 @@ function ENT:InflictDamage(ent, hitpos)
 		damage:SetDamagePosition(ent:GetBonePosition(headbone))
 	end
 
-	ParticleEffect("blood_impact_red_01", hitpos, Angle(0,0,0))
+	local ang = ent:GetForward():Angle()
+	local phys = self:GetPhysicsObject()
+	if IsValid(phys) then
+		ang = phys:GetVelocity():Angle()
+	end
+
+	ParticleEffect("blood_impact_red_01", hitpos, ang)
 	ent:TakeDamageInfo(damage)
 end
 

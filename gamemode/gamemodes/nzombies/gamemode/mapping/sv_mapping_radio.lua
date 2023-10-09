@@ -1,8 +1,8 @@
-function nzMapping:Radio(pos, ang, ply, sound)
+function nzMapping:Radio(pos, ang, sound,ply)
 	local ent = ents.Create("nz_radio")
 	ent:SetPos(pos)
 	ent:SetAngles(ang)
-
+	print(sound)
 	
 		if sound then
 			ent:SetRadio(tostring(sound))

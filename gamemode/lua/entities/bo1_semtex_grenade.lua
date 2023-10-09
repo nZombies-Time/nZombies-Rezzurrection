@@ -27,12 +27,13 @@ ENT.PrintName = "Grenade"
 
 --[Parameters]--
 ENT.Delay = 2
-ENT.Range = 250
+ENT.Range = 220
 ENT.BeepDelay = 0.35
 
 DEFINE_BASECLASS( ENT.Base )
 
 local nzombies = engine.ActiveGamemode() == "nzombies"
+local blueflare = Material("effects/blueflare1")
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Bool", 0, "Activated")
@@ -44,7 +45,7 @@ function ENT:Draw()
 	self:DrawModel()
 
 	local attpos = self:GetAttachment(1)
-	render.SetMaterial(Material("effects/blueflare1"))
+	render.SetMaterial(blueflare)
 	if self:GetBlinking() then
 		render.DrawSprite(attpos.Pos, 8, 8, Color(120,255,70,255))
 	end
@@ -58,7 +59,7 @@ function ENT:PhysicsCollide(data, phys)
 	local ang = self:GetAngles()
 
 	timer.Simple(0, function()
-		if not self:IsValid() then return end
+		if not IsValid(self) then return end
 		self:SetAngles(ang)
 		self:SetSolid(SOLID_NONE)
 		self:SetMoveType(MOVETYPE_NONE)
@@ -79,6 +80,8 @@ function ENT:Initialize()
 	BaseClass.Initialize(self)
 
 	self:SetBodygroup(0, 1)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
 	self:SetCollisionGroup(COLLISION_GROUP_PASSABLE_DOOR)
 	self:SetBeepTimer(CurTime() + self.BeepDelay)
 	self.killtime = CurTime() + 10
@@ -89,6 +92,7 @@ function ENT:Initialize()
 	end
 
 	if CLIENT then return end
+	self:SetTrigger(true)
 	util.SpriteTrail(self, 0, Color(120, 120, 120), true, 6, 0, 0.5, 0.005, "cable/smoke.vmt")
 end
 
@@ -114,6 +118,8 @@ function ENT:Think()
 end
 
 function ENT:InflictDamage(ent, hitpos)
+	if v.IsAATTurned and v:IsAATTurned() then return end
+
 	local damage = DamageInfo()
 	damage:SetDamage(5)
 	damage:SetAttacker(IsValid(self:GetOwner()) and self:GetOwner() or self)
@@ -122,7 +128,7 @@ function ENT:InflictDamage(ent, hitpos)
 	damage:SetDamageForce(ent:GetForward())
 	damage:SetDamageType(DMG_GENERIC)
 
-	ParticleEffect("blood_impact_red_01", hitpos, Angle(0,0,0))
+	ParticleEffect("blood_impact_red_01", hitpos, angle_zero)
 	ent:TakeDamageInfo(damage)
 end
 
@@ -130,12 +136,13 @@ function ENT:Explode()
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Range)) do
 		if (v:IsNPC() or v:IsNextBot()) then
 			if nzombies and v.NZBossType then continue end
+			if nzombies and v.IsAATTurned and v:IsAATTurned() then continue end
 
-			v:BO3SpiderWeb(10)
+			v:BO3SpiderWeb(10, self:GetOwner())
 		end
 	end
 
-	ParticleEffect("bo3_spider_impact", self:GetPos(), Angle(0,0,0))
+	ParticleEffect("bo3_spider_impact", self:GetPos(), angle_zero)
 	self:EmitSound("TFA_BO3_SPIDERNADE.Explode")
 
 	self:Remove()

@@ -3,7 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Don't tell him about Hillturr"
 ENT.Category = "Brainz"
-ENT.Author = "Moo and (Seth Norris Originally)"
+ENT.Author = "GhostlyMoo and (Seth Norris Originally)"
 
 AccessorFunc( ENT, "fMaldoTimer", "MaldoTimer", FORCE_NUMBER)
 
@@ -15,6 +15,8 @@ ENT.RedEyes = false
 ENT.IsMooSpecial = true
 
 ENT.AttackRange = 100
+
+ENT.TraversalCheckRange = 40
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/sethnorris/moo_sethnorris_adolphin_hilter.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -148,89 +150,8 @@ end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
-end
-
-function ENT:OnBarricadeBlocking( barricade, dir ) -- Moo Mark, I'd like to say that this function while it gets the job done is disgusting to look at and is overall odious.
-	if not self:GetSpecialAnimation() then
-		if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-			if barricade:GetNumPlanks() > 0 then
-
-				self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-				local seq, dur
-
-				local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
-				local crawlattacktbl = self.ActStages[6] and self.ActStages[6].attackanims or self.CrawlAttackSequences
-				local taunttbl = self.TauntSequences
-				local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-				local crawltarget = type(crawlattacktbl) == "table" and crawlattacktbl[math.random(#crawlattacktbl)] or crawlattacktbl
-
-				local teartbl = self.BarricadeTearSequences[math.random(#self.BarricadeTearSequences)]
-				local teartarget = type(teartbl) == "table" and teartbl[math.random(#teartbl)] or teartbl
-				local taunt = type(taunttbl) == "table" and taunttbl[math.random(#taunttbl)] or taunttbl
-		
-
-				if self:GetCrawler() then
-					if type(crawltarget) == "table" then
-						seq, dur = self:LookupSequenceAct(crawltarget.seq)
-					elseif crawltarget then -- It is a string or ACT
-						seq, dur = self:LookupSequenceAct(crawltarget)
-					else
-						seq, dur = self:LookupSequence("swing")
-					end
-				else
-					if type(teartarget) == "table" then
-						seq, dur = self:LookupSequenceAct(teartarget.seq)
-					elseif target then -- It is a string or ACT
-						seq, dur = self:LookupSequenceAct(teartarget)
-					else
-						seq, dur = self:LookupSequence("swing")
-					end
-				end
-
-				self:SetAttacking(true)
-
-				timer.Simple(dur/2, function() -- Moo Mark. This is very sinful but my dumbass can't think of anything else rn.
-					if IsValid(self) and self:Alive() then -- This is just so the plank being pulled looks nicer and will look like the zombie is actually pulling that bitch.
-						barricade:EmitSound("nz_moo/barricade/snap/board_snap_zhd_0" .. math.random(1, 6) .. ".mp3", 100, math.random(90, 130))
-						barricade:RemovePlank()
-					end
-				end)
-
-				self:PlaySequenceAndWait(seq, 1)
-
-				self:SetLastAttack(CurTime())
-				
-				self:SetAttacking(false)
-				if coroutine.running() then
-					coroutine.wait(2 - dur)
-				end
-
-				-- this will cause zombies to attack the barricade until it's destroyed
-				local stillBlocked, dir = self:CheckForBarricade()
-				if stillBlocked then
-					self:OnBarricadeBlocking(stillBlocked, dir)
-					return
-				end
-
-				-- Attacking a new barricade resets the counter
-				self.BarricadeJumpTries = 0
-			elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-				local dist = barricade:GetPos():DistToSqr(self:GetPos())
-				if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
-					self:TriggerBarricadeJump(barricade, dir)
-					self.BarricadeJumpTries = 0
-				else
-					-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
-					self.BarricadeJumpTries = self.BarricadeJumpTries + 1
-					-- Otherwise they'd get continuously stuck on slightly bigger props :( <--- Fuck your sad face, Love Moo.
-				end
-			else
-				self:SetAttacking(false)
-			end
-		end
-	end
 end
 
 function ENT:OnThink()

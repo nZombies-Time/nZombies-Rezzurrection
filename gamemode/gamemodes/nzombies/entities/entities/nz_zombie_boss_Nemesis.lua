@@ -105,7 +105,7 @@ function ENT:StatsInitialize()
 		self:SetMooSpecial(true)
 		self:SetRunSpeed( 20 )
 		self.loco:SetDesiredSpeed( 20 )
-		self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+		self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 90))
 	end
 end
 
@@ -155,7 +155,7 @@ function ENT:OnPathTimeOut()
 				self:PlaySequenceAndMove("rpg_raise", 1, self.FaceEnemy)
 				--print("TODAY IS FRIDAY IN CALIFORNIA")
 				self:PlaySequenceAndMove("rpg_fire", 1, self.FaceEnemy)
-				self.NextAction = CurTime() + math.random(1, 5)
+				self.NextAction = CurTime() + math.random(5, 12)
 			end
 	end
 end
@@ -205,5 +205,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

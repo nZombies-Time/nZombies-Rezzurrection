@@ -29,6 +29,7 @@ ENT.AdminOnly = false
 
 ENT.MaxKills = 12
 ENT.Kills = 0
+ENT.Range = 300
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
@@ -45,15 +46,17 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_NONE)
 
 	self:EmitSound("NZ.POP.Cryofreeze.Wind")
-	ParticleEffect("bo3_aat_freeze_explode", self:GetPos(), Angle(0,0,0))
+	ParticleEffect("bo3_aat_freeze_explode", self:GetPos(), angle_zero)
 
 	if CLIENT then return end
-	for k, v in pairs(ents.FindInSphere(self:GetPos(), 300)) do
+	for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Range)) do
 		if v:IsValidZombie() and v:Health() > 0 then
+			if v.NZBossType then continue end
+			if string.find(v:GetClass(), "nz_zombie_boss") then continue end
 			if v == self:GetOwner() then continue end
 			if v:IsATTCryoFreeze() then continue end
 
-			v:ATTCryoFreeze(1.2, self:GetAttacker(), self:GetInflictor())
+			v:ATTCryoFreeze(math.Rand(1.4,1.6), self:GetAttacker(), self:GetInflictor())
 		end
 	end
 	self:Remove()

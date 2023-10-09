@@ -5,7 +5,7 @@ nzTools:CreateTool("pspawn", {
 		return true
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
-		nzMapping:PlayerSpawn(tr.HitPos, ply)
+		nzMapping:PlayerSpawn(tr.HitPos,(Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2],0)), ply)
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
 		if IsValid(tr.Entity) and tr.Entity:GetClass() == "player_spawns" then

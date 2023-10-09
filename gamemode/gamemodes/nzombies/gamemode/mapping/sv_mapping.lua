@@ -1,19 +1,39 @@
 	--
 
-function nzMapping:ZedSpawn(pos, link,animskip,barricade, ply)
+function nzMapping:ZedSpawn(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_normal")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	
-	ent:SetSkip( animskip )
-	ent:SetBarricade(barricade)
 	ent:Spawn()
-	print(ent:GetSkip())
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -25,16 +45,39 @@ function nzMapping:ZedSpawn(pos, link,animskip,barricade, ply)
 	return ent
 end
 
-function nzMapping:ZedSpecialSpawn(pos, link, ply)
+function nzMapping:ZedSpecialSpawn(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_special")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -46,11 +89,16 @@ function nzMapping:ZedSpecialSpawn(pos, link, ply)
 	return ent
 end
 
-function nzMapping:ZedBossSpawn(pos, link, ply)
+function nzMapping:ZedBossSpawn(pos, angle, link, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_boss")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
@@ -67,16 +115,39 @@ function nzMapping:ZedBossSpawn(pos, link, ply)
 	return ent
 end
 
-function nzMapping:ZedExtraSpawn1(pos, link, ply)
+function nzMapping:ZedExtraSpawn1(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_extra1")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -88,16 +159,39 @@ function nzMapping:ZedExtraSpawn1(pos, link, ply)
 	return ent
 end
 
-function nzMapping:ZedExtraSpawn2(pos, link, ply)
+function nzMapping:ZedExtraSpawn2(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_extra2")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -109,16 +203,39 @@ function nzMapping:ZedExtraSpawn2(pos, link, ply)
 	return ent
 end
 
-function nzMapping:ZedExtraSpawn3(pos, link, ply)
+function nzMapping:ZedExtraSpawn3(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_extra3")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -130,16 +247,39 @@ function nzMapping:ZedExtraSpawn3(pos, link, ply)
 	return ent
 end
 
-function nzMapping:ZedExtraSpawn4(pos, link, ply)
+function nzMapping:ZedExtraSpawn4(pos, angle, link, master, spawntype, zombietype, roundactive, ply)
 
 	local ent = ents.Create("nz_spawn_zombie_extra4")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 	-- For the link displayer
 	if link != nil then
 		ent:SetLink(tostring(link))
 		ent.link = tostring(link)
+	end
+
+	ent:SetMasterSpawn(master)
+
+	if spawntype ~= nil then
+		ent:SetSpawnType(spawntype)
+	end
+
+	if zombietype ~= nil then
+		ent:SetZombieType(zombietype)
+	else
+		ent:SetZombieType("none")
+	end
+
+	if roundactive ~= nil then
+		ent:SetActiveRound(tonumber(roundactive))
+	else
+		ent:SetActiveRound(0)
 	end
 
 	if ply then
@@ -151,11 +291,16 @@ function nzMapping:ZedExtraSpawn4(pos, link, ply)
 	return ent
 end
 
-function nzMapping:PlayerSpawn(pos, ply)
+function nzMapping:PlayerSpawn(pos, angle, ply)
 
 	local ent = ents.Create("player_spawns")
 	pos.z = pos.z - ent:OBBMaxs().z
 	ent:SetPos( pos )
+	if angle ~= nil then -- Just incase something stupid happens.
+		ent:SetAngles( angle )
+	else
+		ent:SetAngles(Angle(0,0,0))
+	end
 	ent:Spawn()
 
 	if ply then
@@ -165,7 +310,6 @@ function nzMapping:PlayerSpawn(pos, ply)
 		undo.Finish( "Effect (" .. tostring( model ) .. ")" )
 	end
 	return ent
-
 end
 
 function nzMapping:EasterEgg(pos, ang, model, ply)
@@ -542,24 +686,27 @@ end
 	
 end
 
-function nzMapping:BreakEntry(pos, ang, planks, jump, boardtype, prop, ply)
+function nzMapping:BreakEntry(pos, ang, planks, jump, boardtype, prop, jumptype, plycollision, ply)
 	local planks = planks
 	if planks == nil then planks = true else planks = tobool(planks) end
 	local jump = jump
 	if jump == nil then jump = false else jump = tobool(jump) end
-	--[[local classic = classic
-	if classic == nil then classic = false else classic = tobool(classic) end]]
 	local boardtype = boardtype
 	if boardtype == nil then boardtype = 1 else boardtype = boardtype end
+	local plycollision = plycollision
+	if plycollision == nil then plycollision = false else plycollision = tobool(plycollision) end
 
 	local entry = ents.Create( "breakable_entry" )
 	entry:SetPos( pos )
 	entry:SetAngles( ang )
-	entry:SetHasPlanks(planks)
-	entry:SetTriggerJumps(jump)
-	--entry:SetClassicPatern(classic)
-	entry:SetBoardType(boardtype)
+
+	entry:SetHasPlanks( planks )
+	entry:SetTriggerJumps( jump )
+	entry:SetBoardType( boardtype )
 	entry:SetProp( prop )
+	entry:SetJumpType( jumptype )
+	entry:SetPlayerCollision( plycollision )
+
 	entry:Spawn()
 	entry:PhysicsInit( SOLID_VPHYSICS )
 

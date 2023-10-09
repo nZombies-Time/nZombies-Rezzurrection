@@ -69,7 +69,9 @@ if CLIENT then
 		local fade = 0
 		local rising = true
 		surface.PlaySound("nz_moo/powerups/nuke_flux.mp3") -- BOOM!
-		hook.Add("RenderScreenspaceEffects", "DrawNukeEffect", function()
+
+		-- Fuck the flashbang.
+		--[[hook.Add("RenderScreenspaceEffects", "DrawNukeEffect", function()
 			if rising then
 				if fade <= 135 then
 					fade = fade + 1000*FrameTime()
@@ -84,7 +86,7 @@ if CLIENT then
 			end
 			surface.SetDrawColor(255,255,255,fade)
 			surface.DrawRect(-ScrW(),-ScrH(),ScrW()*2,ScrH()*2)
-		end)
+		end)]]
 	end
 
 	-- Receivers 

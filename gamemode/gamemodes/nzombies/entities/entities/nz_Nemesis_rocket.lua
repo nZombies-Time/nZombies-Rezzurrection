@@ -49,7 +49,7 @@ function ENT:Launch(dir)
 	self.AutoReturnTime = CurTime() + 5
 end
 
-function ENT:OnContact(ent)
+function ENT:StartTouch(ent)
 local panzer = self:GetParent()
 if ent:IsPlayer() or ent:IsWorld() then
 		self:EmitSound("ambient/explosions/explode_1.wav")

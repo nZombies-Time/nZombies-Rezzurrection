@@ -1,44 +1,19 @@
 -------------------------
 -- Localize
-local pairs = pairs
-local IsValid = IsValid
-local LocalPlayer = LocalPlayer
-local CurTime = CurTime
-local Color = Color
-local ScreenScale = ScreenScale
+local pairs, IsValid, LocalPlayer, CurTime, Color, ScreenScale =
+	pairs, IsValid, LocalPlayer, CurTime, Color, ScreenScale
 
-local math = math
-local surface = surface
-local table = table
-local input = input
-local string = string
-local draw = draw
-local killicon = killicon
-local file = file
+local math, surface, table, input, string, draw, killicon, file =
+	math, surface, table, input, string, draw, killicon, file
 
-local ents_FindInSphere = ents.FindInSphere
-local file_exists = file.Exists
-local input_getkeyname = input.GetKeyName
-local input_isbuttondown = input.IsButtonDown
-local input_lookupbinding = input.LookupBinding
-local table_insert = table.insert
-local table_remove = table.remove
-local table_isempty = table.IsEmpty
-local table_count = table.Count
-local table_copy = table.Copy
+local file_exists, input_getkeyname, input_isbuttondown, input_lookupbinding, table_insert, table_remove, table_isempty, table_count, table_copy =
+	file.Exists, input.GetKeyName, input.IsButtonDown, input.LookupBinding, table.insert, table.remove, table.IsEmpty, table.Count, table.Copy
 
-local string_len = string.len
-local string_sub = string.sub
-local string_gsub = string.gsub
-local string_upper = string.upper
-local string_rep = string.rep
-local string_match = string.match
+local string_len, string_sub, string_gsub, string_upper, string_rep, string_match =
+	string.len, string.sub, string.gsub, string.upper, string.rep, string.match
 
-local TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
-local TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
-local TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
-local TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
-local TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
+local TEXT_ALIGN_CENTER, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, TEXT_ALIGN_BOTTOM =
+	TEXT_ALIGN_CENTER, TEXT_ALIGN_LEFT, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, TEXT_ALIGN_BOTTOM
 
 if GetConVar("nz_hud_laby_mode") == nil then
 	CreateClientConVar("nz_hud_laby_mode", 0, true, false, "Any HUD that would place the player info on the left, will now be on the right. (0 false, 1 true), Default is 0.", 0, 1)
@@ -69,7 +44,7 @@ if GetConVar("nz_hud_show_perkstats") == nil then
 end
 
 if GetConVar("nz_hud_show_wepicon") == nil then
-	CreateClientConVar("nz_hud_show_wepicon", 0, true, false, "Enable or disable displaying currently held weapons killicon next to its name. (0 false, 1 true), Default is 1.", 0, 1)
+	CreateClientConVar("nz_hud_show_wepicon", 0, true, false, "Enable or disable displaying currently held weapons killicon next to its name. (0 false, 1 true), Default is 0.", 0, 1)
 end
 
 if GetConVar("nz_hud_show_perk_frames") == nil then
@@ -81,11 +56,7 @@ if GetConVar("nz_hud_player_indicators") == nil then
 end
 
 if GetConVar("nz_hud_player_indicator_angle") == nil then
-	CreateClientConVar("nz_hud_player_indicator_angle", 0.45, true, false, "How 'behind' a player must be to draw the arrow indicator (0 will always draw indicators, 0.5 draws indicators within 180° behind you, and 0.9 would only draw indicators directly behind you), Default is 0.45", 0, 1)
-end
-
-if GetConVar("nz_hud_health_playercolor") == nil then
-	CreateClientConVar("nz_hud_health_playercolor", 1, true, false, "Enable or disable the Health Bar using player index color instead of black. (0 false, 1 true), Default is 1.", 0, 1)
+	CreateClientConVar("nz_hud_player_indicator_angle", 0.45, true, false, "How 'behind' a player must be to draw the arrow indicator. 0 will always draw indicators, 0.5 will draw indicators within 180° behind you. its a percentage ratio, think 1 being 100% and 0 being 0%. Default is 0.45", 0, 1)
 end
 
 if GetConVar("nz_hud_use_playercolor") == nil then
@@ -93,9 +64,10 @@ if GetConVar("nz_hud_use_playercolor") == nil then
 end
 
 if GetConVar("nz_hud_better_scaling") == nil then
-	CreateClientConVar("nz_hud_better_scaling", 1, true, false, "Enable or disable better HUD scaling for lower resolutions (recommended for 720p, does nothing at 1080p), has no affect on reworked HUDs as they are always scaled. (0 false, 1 true), Default is 0.", 0, 1)
+	CreateClientConVar("nz_hud_better_scaling", 1, true, false, "Enable or disable better HUD scaling for lower resolutions (recommended for 720p, does nothing at 1080p). (0 false, 1 true), Default is 1.", 0, 1)
 end
 
+local voiceloopback = GetConVar("voice_loopback")
 local cl_drawhud = GetConVar("cl_drawhud")
 local nz_clientpoints = GetConVar("nz_point_notification_clientside")
 local nz_perkmax = GetConVar("nz_difficulty_perks_max")
@@ -111,7 +83,6 @@ local nz_showperkframe = GetConVar("nz_hud_show_perk_frames")
 
 local nz_indicators = GetConVar("nz_hud_player_indicators")
 local nz_indicatorangle = GetConVar("nz_hud_player_indicator_angle")
-local nz_healthplayercolor = GetConVar("nz_hud_health_playercolor")
 local nz_betterscaling = GetConVar("nz_hud_better_scaling")
 local nz_useplayercolor = GetConVar("nz_hud_use_playercolor")
 
@@ -119,6 +90,7 @@ local color_white_50 = Color(255, 255, 255, 50)
 local color_white_100 = Color(255, 255, 255, 100)
 local color_white_150 = Color(255, 255, 255, 150)
 local color_white_200 = Color(255, 255, 255, 200)
+local color_black_100 = Color(0, 0, 0, 100)
 local color_black_180 = Color(0, 0, 0, 180)
 local color_red_200 = Color(200, 0, 0, 255)
 local color_red_255 = Color(255, 0, 0, 255)
@@ -129,12 +101,18 @@ local color_t7zod = Color(255, 250, 100, 255)
 local color_t7zod_outline = Color(255, 120, 10, 40)
 
 local color_grey = Color(200, 200, 200, 255)
+local color_used = Color(250, 200, 120, 255)
 local color_gold = Color(255, 255, 100, 255)
 local color_green = Color(100, 255, 10, 255)
 local color_armor = Color(135, 200, 255)
 local color_yellow = Color(255, 178, 0, 255)
-local color_blood = Color(80, 0, 0, 255)
-local color_tacnade = Color(255, 80, 80)
+
+local color_wonderweapon = Color(0, 255, 255, 255)
+local color_specialist = Color(180, 0, 0, 255)
+local color_trap = Color(255, 180, 20, 255)
+
+local color_blood = Color(60, 0, 0, 255)
+local color_blood_score = Color(120, 0, 0, 255)
 
 local color_points1 = Color(255, 200, 0, 255)
 local color_points2 = Color(100, 255, 70, 255)
@@ -155,7 +133,223 @@ local cthulhuammo = {
 	["Shadows of Evil"] = true,
 }
 
-//------------------------------------------------ GhostlyMoo and Fox's HUD ------------------------------------------------\\
+roundcounters = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "i", "ii", "iii", "iiii", "iiiii"}
+roundassets = {["burnt"] = {}, ["heat"] = {}, ["normal"] = {}}
+
+for k, v in pairs(roundcounters) do
+	for a, b in pairs(roundassets) do
+		roundassets[a][tonumber(v) or v] = Material("round/_bo4/" .. a .. "/" .. v .. ".png", "unlitgeneric")
+	end
+end
+
+roundassets["sparks"] = {}
+
+for i = 0, 19 do
+	roundassets["sparks"][i] = Material("round/sparks/" .. i .. ".png", "unlitgeneric")
+end
+
+/*local spark_center = {x = 33, y = -84}
+local spark_size = {x = 168, y = 252}
+
+local function DrawSpark(x, y, size)
+end*/
+
+local oldnum = 0
+local usingtally = true
+
+local tallysize = 150
+local digitsize = {x = 84, y = 120}
+
+local strokes = {
+	[0] = {
+		[1] = {
+			{42, 10},
+			{17, 28},
+			{11, 65},
+			{24, 96},
+			{44, 108}
+		},
+		[2] = {
+			{42, 10},
+			{66, 29},
+			{69, 64},
+			{62, 93},
+			{44, 108}
+		}
+	},
+	[1] = {
+		[1] = {
+			{36, 9},
+			{38, 51},
+			{49, 107}
+		}
+	},
+	[2] = {
+		[1] = {
+			{14, 45},
+			{26, 24},
+			{45, 11},
+			{55, 27},
+			{44, 57},
+			{32, 100},
+			{56, 89},
+			{73, 70}
+		}
+	},
+	[3] = {
+		[1] = {
+			{14, 36},
+			{29, 17},
+			{48, 10},
+			{63, 22},
+			{55, 44},
+			{33, 62},
+			{59, 67},
+			{67, 84},
+			{54, 99},
+			{32, 106}
+		}
+	},
+	[4] = {
+		[1] = {
+			{58, 18},
+			{53, 49},
+			{52, 113}
+		},
+		[2] = {
+			{40, 8},
+			{22, 63},
+			{67, 40}
+		}
+	},
+	[5] = {
+		[1] = {
+			{61, 7},
+			{28, 18},
+			{26, 55},
+			{58, 41},
+			{61, 76},
+			{58, 102},
+			{45, 112},
+			{30, 102}
+		}
+	},
+	[6] = {
+		[1] = {
+			{53, 9},
+			{31, 35},
+			{23, 65},
+			{25, 97},
+			{36, 109},
+			{53, 92},
+			{61, 51},
+			{42, 61},
+			{31, 74}
+		}
+	},
+	[7] = {
+		[1] = {
+			{15, 37},
+			{42, 24},
+			{64, 8},
+			{58, 56},
+			{48, 111}
+		}
+	},
+	[8] = {
+		[1] = {
+			{43, 7},
+			{24, 29},
+			{25, 55},
+			{44, 58},
+			{62, 70},
+			{57, 95},
+			{40, 114}
+		},
+		[2] = {
+			{43, 7},
+			{56, 23},
+			{53, 45},
+			{44, 58},
+			{33, 77},
+			{26, 102},
+			{40, 114}
+		}
+	},
+	[9] = {
+		[1] = {
+			{50, 44},
+			{28, 63},
+			{11, 56},
+			{19, 34},
+			{35, 18},
+			{57, 18},
+			{69, 18},
+			{54, 62},
+			{38, 114}
+		}
+	},
+	["i"] = {
+		[1] = {
+			{35, 44},
+			{59, 210}
+		}
+	},
+	["ii"] = {
+		[1] = {
+			{83, 56},
+			{104, 212}
+		}
+	},
+	["iii"] = {
+		[1] = {
+			{138, 62},
+			{148, 205}
+		}
+	},
+	["iiii"] = {
+		[1] = {
+			{188, 62},
+			{189, 195}
+		}
+	},
+	["iiiii"] = {
+		[1] = {
+			{24, 61},
+			{210, 201}
+		}
+	},
+	["e"] = {
+		[1] = {
+			{62, 26},
+			{43, 18},
+			{22, 25},
+			{17, 52},
+			{34, 62},
+			{48, 60},
+			{28, 78},
+			{30, 96},
+			{49, 99},
+			{64, 89}
+		}
+	},
+	["slash"] = {
+		[1] = {
+			{69, 25},
+			{19, 90}
+		}
+	}
+}
+
+local tallycoordmult = tallysize/256
+local rounddata = {}
+local sparkdata = {}
+local roundbusy = false
+local prev_round_special = false
+local spacing = 70
+
+-------------------------
+//------------------------------------------------GHOSTLYMOO'S HUD------------------------------------------------\\
 
 nzDisplay = nzDisplay or AddNZModule("Display")
 
@@ -170,14 +364,17 @@ nzDisplay.reworkedHUDs = {
 }
 
 //------Pre-Loading POWERUP Icons------\\
-local nz_powerup_minigun = Material("chron/perk_icons/death_machine.png", "unlitgeneric smooth")
-local nz_powerup_blood = Material("chron/perk_icons/zombie_blood.png", "unlitgeneric smooth")
-local nz_powerup_2x = Material("chron/perk_icons/doublepointsicon.png", "unlitgeneric smooth")
-local nz_powerup_killjoy = Material("chron/perk_icons/insta_kill.png", "unlitgeneric smooth")
-local nz_powerup_firesale = Material("chron/perk_icons/fire_sale.png", "unlitgeneric smooth")
-local nz_powerup_bonfiresale = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_campfire.png", "unlitgeneric")
+local t8_powerup_minigun = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_death_machine.png", "unlitgeneric")
+local t8_powerup_blood = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_blood.png", "unlitgeneric")
+local t8_powerup_2x = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_2x.png", "unlitgeneric")
+local t8_powerup_killjoy = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_instakill.png", "unlitgeneric")
+local t8_powerup_firesale = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_firesale.png", "unlitgeneric")
+local t8_powerup_bonfiresale = Material("nz_moo/icons/bo4/t8_hud_robit_powerup_campfire.png", "unlitgeneric")
 
 //------Pre-Loading Max Ammo Elements------\\
+local t8_powerup_kaboomtext = Material("nz_moo/huds/bo4/pow_notifs/t8_zmhud_nuke_text.png", "unlitgeneric smooth")
+local t8_powerup_perkslottext = Material("nz_moo/huds/bo4/pow_notifs/t8_zmhud_perkslot_text.png", "unlitgeneric smooth")
+local t8_powerup_maxammotext = Material("nz_moo/huds/bo4/pow_notifs/t8_zmhud_maxammo_text.png", "unlitgeneric smooth")
 local t8_powerup_maxammotray = Material("nz_moo/huds/bo4/t8_zmhud_maxammo_tray.png", "unlitgeneric smooth")
 local t8_powerup_maxammobg = Material("nz_moo/huds/bo4/t8_zmhud_maxammo_bg.png", "unlitgeneric smooth")
 local t8_powerup_maxammocircle = Material("nz_moo/huds/bo4/t8_zmhud_maxammo_circle.png", "unlitgeneric smooth")
@@ -195,12 +392,19 @@ local t7zod_powerup_maxammotext = Material("nz_moo/huds/t7_zod/uie_t7_zm_hud_not
 local t7zod_powerup_maxammoctnr = Material("nz_moo/huds/t7_zod/uie_t7_zm_hud_notif_txtcontainer.png", "unlitgeneric smooth")
 
 //------Pre-Loading MISC HUD Elements------\\
+local zmhud_vulture_glow = Material("nz_moo/huds/t6/specialty_vulture_zombies_glow.png", "unlitgeneric smooth")
 local zmhud_icon_holygrenade = Material("nz_moo/hud_holygrenade.png", "unlitgeneric smooth")
 local zmhud_icon_frame = Material("nz_moo/icons/perk_frame.png", "unlitgeneric smooth")
 local zmhud_icon_missing = Material("nz_moo/icons/statmon_warning_scripterrors.png", "unlitgeneric smooth")
-local zmhud_icon_player = Material("nz_moo/icons/fxt_ui_arrow.png", "unlitgeneric smooth")
+local zmhud_icon_player = Material("nz_moo/icons/offscreenobjectivepointer.png", "unlitgeneric smooth")
 local zmhud_icon_death = Material("vgui/hud/grenadepointer.png", "unlitgeneric smooth")
 local zmhud_icon_mule = Material("perk_icons/waw/mule.png", "unlitgeneric smooth")
+local zmhud_icon_talk = Material("nz_moo/icons/talkballoon.png", "unlitgeneric smooth")
+local zmhud_icon_voiceon = Material("nz_moo/icons/voice_on.png", "unlitgeneric smooth")
+local zmhud_icon_voicedim = Material("nz_moo/icons/voice_on_dim.png", "unlitgeneric smooth")
+local zmhud_icon_voiceoff = Material("nz_moo/icons/voice_off.png", "unlitgeneric smooth")
+local zmhud_icon_offscreen = Material("nz_moo/icons/offscreen_arrow.png", "unlitgeneric smooth")
+local zmhud_icon_camera = Material("nz_moo/icons/menu_mp_lobby_views.png", "unlitgeneric smooth")
 
 //------Pre-Loading SPECIAL HUD Icons------\\
 local zmhud_icon_shield = Material("nz_moo/huds/bo4/t8_rocket_shield.png", "unlitgeneric smooth")
@@ -208,17 +412,6 @@ local zmhud_icon_special = Material("nz_moo/huds/bo4/t8_specialweapon.png", "unl
 local zmhud_icon_grenade = Material("nz_moo/icons/hud_us_grenade.png", "unlitgeneric smooth")
 local zmhud_icon_sticky = Material("nz_moo/hud_sticky_grenade_32.png", "unlitgeneric smooth")
 local zmhud_icon_trap = Material("nz_moo/icons/zm_turbine_icon.png", "unlitgeneric smooth")
-
-//perk tray
-local zmhud_mmo_cherry = Material("nz_moo/icons/bo1/cherry.png", "smooth unlitgeneric")
-local zmhud_mmo_deadshot = Material("nz_moo/icons/bo1/deadshot.png", "smooth unlitgeneric")
-local zmhud_mmo_pop = Material("nz_moo/icons/bo1/epop.png", "smooth unlitgeneric")
-local zmhud_mmo_everclear = Material("nz_moo/icons/bo1/everclear.png", "smooth unlitgeneric")
-local zmhud_mmo_tort = Material("nz_moo/icons/bo1/victor.png", "smooth unlitgeneric")
-local zmhud_mmo_fire = Material("nz_moo/icons/bo1/fire.png", "smooth unlitgeneric")
-local zmhud_mmo_winter = Material("nz_moo/icons/bo1/winter.png", "unlitgeneric smooth")
-local zmhud_mmo_chugga = Material("nz_moo/icons/bo1/whoswho.png", "smooth unlitgeneric")
-local zmhud_mmo_sake = Material("nz_moo/icons/bo1/sake.png", "smooth unlitgeneric")
 
 local illegalspecials = {
 	["specialgrenade"] = true,
@@ -249,11 +442,37 @@ function GetFontType(id)
 	return "classic"
 end
 
+function GetPerkIconMaterial(perk)
+	if not perk then return zmhud_icon_missing end
+
+	local style = nzMapping.Settings.icontype
+	if style == "Rezzurrection" then return nzPerks:Get(perk).icon end
+	if style == "Infinite Warfare" then return nzPerks:Get(perk).icon_iw end
+	if style == "No Background" then return nzPerks:Get(perk).icon_glow end
+	if style == "World at War/ Black Ops 1" then return nzPerks:Get(perk).icon_waw end
+	if style == "Black Ops 2" then return nzPerks:Get(perk).icon_bo2 end
+	if style == "Black Ops 3" then return nzPerks:Get(perk).icon_bo3 end
+	if style == "Black Ops 4" then return nzPerks:Get(perk).icon_bo4 end
+	if style == "Modern Warfare" then return nzPerks:Get(perk).icon_mw end
+	if style == "Hololive" then return nzPerks:Get(perk).icon_holo end
+	if style == "Cold War" then return nzPerks:Get(perk).icon_cw end
+	if style == "April Fools" then return nzPerks:Get(perk).icon_dumb end
+	if style == "WW2" then return nzPerks:Get(perk).icon_ww2 end
+	if style == "Shadows of Evil" then return nzPerks:Get(perk).icon_soe end
+	if style == "Halloween" then return nzPerks:Get(perk).icon_halloween end
+	if style == "Christmas" then return nzPerks:Get(perk).icon_xmas end
+	if style == "Vanguard" then return nzPerks:Get(perk).icon_griddy end
+	if style == "Neon" then return nzPerks:Get(perk).icon_neon end
+	if style == "Overgrown" then return nzPerks:Get(perk).icon_grown end
+
+	return nzPerks:Get(perk).icon
+end
+
 local function StatesHud()
 	if cl_drawhud:GetBool() then
 		local text = ""
 		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
-		local w, h = ScrW() / 2, ScrH()
+		local w, h = ScrW(), ScrH()
 		local pscale = 1
 		if nz_betterscaling:GetBool() then
 			pscale = (w/1920 + 1) / 2
@@ -269,7 +488,7 @@ local function StatesHud()
 		end
 
 		local fontColor = !IsColor(nzMapping.Settings.textcolor) and color_red_200 or nzMapping.Settings.textcolor
-		draw.SimpleText(text, font, w, h/2 + 385*pscale, fontColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		draw.SimpleTextOutlined(text, font, w/2, 60*pscale, fontColor, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, color_black_100)
 	end
 end
 
@@ -295,12 +514,12 @@ local function InventoryHUD()
 	local ply = LocalPlayer()
 	if not IsValid(ply) then return end
 	if ply:IsNZMenuOpen() then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
+	local ammofont =  ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont))
 	local ammo2font =  ("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font))
-
-	local nz_keytrap = GetConVar("nz_key_trap")
-	local nz_keyshield = GetConVar("nz_key_shield")
-	local nz_keyspecialist = GetConVar("nz_key_specialist")
 
 	local w, h = ScrW(), ScrH()
 	local scale = ((w/1920)+1)/2
@@ -310,7 +529,6 @@ local function InventoryHUD()
 	for _, wep in pairs(plyweptab) do
 		// Traps
 		if wep.IsTFAWeapon and wep.NZSpecialCategory == "trap" then
-			local key = nz_keytrap:GetInt()
 			local icon = zmhud_icon_trap
 			if wep.NZHudIcon then
 				icon = wep.NZHudIcon
@@ -324,19 +542,22 @@ local function InventoryHUD()
 
 			surface.SetMaterial(icon)
 			surface.SetDrawColor(color_white)
-			surface.DrawTexturedRect((w - 622*scale) - 32, (h - 54*scale) - 32, 48, 48)
+			surface.DrawTexturedRect((w - 20*scale) - 32, (h - 280*scale) - 32, 48, 48)
 
 			surface.SetDrawColor(color_black_180)
-			surface.DrawRect((w - 622*scale) - 32, (h - 4*scale) - 32*scale, 48, 10)
+			surface.DrawRect((w - 22*scale) - 32, (h - 230*scale) - 32*scale, 48, 10)
 			surface.SetDrawColor(traphealthcolor)
-			surface.DrawRect((w - 620*scale) - 32, (h - 2*scale) - 32*scale, 44 * trapscale, 6)
+			surface.DrawRect((w - 20*scale) - 32, (h - 228*scale) - 32*scale, 44 * trapscale, 6)
 
-			draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammo2font, (w - 632*scale) - 32*scale, (h - 4*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+			local nz_key_trap = GetConVar("nz_key_trap")
+			if nz_key_trap then
+				local key = nz_key_trap:GetInt() > 0 and nz_key_trap:GetInt() or 1
+				draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammofont, (w - 40*scale) - 32*scale, (h - 240*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black)
+			end
 		end
 
 		// Specialists
 		if wep.IsTFAWeapon and wep.NZSpecialCategory == "specialist" then
-			local key = nz_keyspecialist:GetInt()
 			local icon = zmhud_icon_special
 			if wep.NZHudIcon then
 				icon = wep.NZHudIcon
@@ -350,19 +571,22 @@ local function InventoryHUD()
 
 			surface.SetMaterial(icon)
 			surface.SetDrawColor(color_white)
-			surface.DrawTexturedRect((w - 722*scale) - 32, (h - 54*scale) - 32, 48, 48)
+			surface.DrawTexturedRect((w - 20*scale) - 32, (h - 360*scale) - 32, 48, 48)
 
 			surface.SetDrawColor(color_black_180)
-			surface.DrawRect((w - 722*scale) - 32, (h - 4*scale) - 32*scale, 48, 10)
+			surface.DrawRect((w - 22*scale) - 32, (h - 310*scale) - 32*scale, 48, 10)
 			surface.SetDrawColor(specialchargecolor)
-			surface.DrawRect((w - 720*scale) - 32, (h - 2*scale) - 32*scale, 44 * specialscale, 6)
+			surface.DrawRect((w - 20*scale) - 32, (h - 308*scale) - 32*scale, 44 * specialscale, 6)
 
-			draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammo2font, (w - 732*scale) - 32*scale, (h - 4*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+			local nz_key_specialist = GetConVar("nz_key_specialist")
+			if nz_key_specialist then
+				local key = nz_key_specialist:GetInt() > 0 and nz_key_specialist:GetInt() or 1
+				draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammofont, (w - 40*scale) - 32*scale, (h - 320*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black)
+			end
 		end
 
 		// Shield Slot Occupier
 		if wep.IsTFAWeapon and wep.NZSpecialCategory == "shield" and wep.NZHudIcon and not wep.ShieldEnabled then
-			local key = nz_keyshield:GetInt()
 			local icon = zmhud_icon_shield
 			if wep.NZHudIcon then
 				icon = wep.NZHudIcon
@@ -377,16 +601,20 @@ local function InventoryHUD()
 				local shieldwepchargecolor = Color(255, 300*shieldwepscale, 300*shieldwepscale, 255)
 
 				surface.SetDrawColor(color_black_180)
-				surface.DrawRect((w - 822*scale) - 32, (h - 4*scale) - 32*scale, 48, 10)
+				surface.DrawRect((w - 22*scale) - 32, (h - 390*scale) - 32*scale, 48, 10)
 				surface.SetDrawColor(shieldwepchargecolor)
-				surface.DrawRect((w - 820*scale) - 32, (h - 2*scale) - 32*scale, 44 * shieldwepscale, 6)
+				surface.DrawRect((w - 20*scale) - 32, (h - 388*scale) - 32*scale, 44 * shieldwepscale, 6)
 			end
 
 			surface.SetMaterial(icon)
 			surface.SetDrawColor(color_white)
-			surface.DrawTexturedRect((w - 822*scale) - 32, (h - 54*scale) - 32, 48, 48)
+			surface.DrawTexturedRect((w - 20*scale) - 32, (h - 440*scale) - 32, 48, 48)
 
-			draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammo2font, (w - 832*scale) - 32*scale, (h - 4*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+			local nz_key_shield = GetConVar("nz_key_shield")
+			if nz_key_shield then
+				local key = nz_key_shield:GetInt() > 0 and nz_key_shield:GetInt() or 1
+				draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammofont, (w - 40*scale) - 32*scale, (h - 400*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black)
+			end
 		end
 	end
 
@@ -395,7 +623,6 @@ local function InventoryHUD()
 		local shield = ply:GetShield()
 		local wep = shield:GetWeapon()
 
-		local key = nz_keyshield:GetInt()
 		local icon = zmhud_icon_shield
 		if IsValid(wep) and wep.NZHudIcon then
 			icon = wep.NZHudIcon
@@ -409,104 +636,30 @@ local function InventoryHUD()
 
 		surface.SetMaterial(icon)
 		surface.SetDrawColor(color_white)
-		surface.DrawTexturedRect((w - 822*scale) - 32, (h - 54*scale) - 32, 48, 48)
+		surface.DrawTexturedRect((w - 20*scale) - 32, (h - 440*scale) - 32, 48, 48)
 
 		surface.SetDrawColor(color_black_180)
-		surface.DrawRect((w - 822*scale) - 32, (h - 4*scale) - 32*scale, 48, 10)
+		surface.DrawRect((w - 22*scale) - 32, (h - 390*scale) - 32*scale, 48, 10)
 		surface.SetDrawColor(shieldhealthcolor)
-		surface.DrawRect((w - 820*scale) - 32, (h - 2*scale) - 32*scale, 44 * shieldscale, 6)
+		surface.DrawRect((w - 20*scale) - 32, (h - 388*scale) - 32*scale, 44 * shieldscale, 6)
 
-		draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammo2font, (w - 832*scale) - 32*scale, (h - 4*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black_180)
-	end
-end
-
-local function PlayerStaminaHUD()
-	if not cl_drawhud:GetBool() then return end
-	if not nz_showstamina:GetBool() then return end
-
-	local ply = LocalPlayer()
-	if not IsValid(ply) then return end
-	if not ply.GetStamina then return end
-
-	if not (nzRound:InProgress() or nzRound:InState(ROUND_CREATE)) then return end
-
-	local w, h = ScrW(), ScrH()
-	local wr = ScrW()/1920
-	local scale = (w/1920 + 1) / 2
-	local pscale = 1
-	if nz_betterscaling:GetBool() then
-		pscale = scale
-	end
-	if nz_labymode:GetBool() then
-		wr = w - 219
+		local nz_key_shield = GetConVar("nz_key_shield")
+		if nz_key_shield then
+			local key = nz_key_shield:GetInt() > 0 and nz_key_shield:GetInt() or 1
+			draw.SimpleTextOutlined("["..string_upper(input_getkeyname(key)).."]", ammofont, (w - 40*scale) - 32*scale, (h - 400*scale) - 32*scale, GetButtonDown(key) and color_gold or color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black)
+		end
 	end
 
-	local stamina = ply:GetStamina()
-	local maxstamina = ply:GetMaxStamina()
-	local fade = maxstamina*0.15 //lower the number, faster the fade in
-	local offset = 56*pscale
+	// Shovel
+	if ply.GetShovel and IsValid(ply:GetShovel()) then
+		local shovel = ply:GetShovel()
+		local usecount = shovel:GetUseCount()
 
-	local staminascale = math.Clamp(stamina / maxstamina, 0, 1)
-	local stamalpha = 1 - math.Clamp((stamina - maxstamina + fade) / fade, 0, 1)
-	local staminacolor = ColorAlpha(color_white, 255*stamalpha)
+		surface.SetMaterial(shovel:IsGolden() and shovel.NZHudIcon2 or shovel.NZHudIcon)
+		surface.SetDrawColor(color_white)
+		surface.DrawTexturedRect((w - 20*scale) - 32, (h - 200*scale) - 32, 48, 48)
 
-	if stamina < maxstamina then
-		surface.SetDrawColor(staminacolor)
-		surface.DrawRect(wr + (75*pscale) + 4, h - (285*scale) + (offset), 110 * staminascale, 4)
-	end
-end
-
-local function PlayerHealthHUD()
-	if not cl_drawhud:GetBool() then return end
-	if not nz_showhealth:GetBool() then return end
-
-	local ply = LocalPlayer()
-	if not IsValid(ply) then return end
-
-	if not (nzRound:InProgress() or nzRound:InState(ROUND_CREATE)) then return end
-
-	local w, h = ScrW(), ScrH()
-	local wr = ScrW()/1920
-	local scale = (w/1920 + 1) / 2
-	local pscale = 1
-	if nz_betterscaling:GetBool() then
-		pscale = scale
-	end
-	if nz_labymode:GetBool() then
-		wr = w - 219
-	end
-
-	local health = ply:Health()
-	local maxhealth = ply:GetMaxHealth()
-	local offset = 48*pscale + 5 //player portrait dimensions + 5 for a bit of room
-
-	local healthscale = math.Clamp(health / maxhealth, 0, 1)
-	local healthcolor = Color(255, 300*healthscale, 300*healthscale, 255)
-
-	local color = player.GetColorByIndex(ply:EntIndex())
-	if nz_useplayercolor:GetBool() then
-		local pcol = ply:GetPlayerColor()
-		color = Color(255*pcol.x, 255*pcol.y, 255*pcol.z, 255)
-	end
-	if not nz_healthplayercolor:GetBool() then
-		color = color_black_180
-	end
-
-	surface.SetDrawColor(color)
-	surface.DrawRect(wr + 25*pscale, h - 275 * scale + offset, 164, 12)
-	surface.SetDrawColor(healthcolor)
-	surface.DrawRect(wr + (25*pscale) + 4, h - 275 * scale + (offset + 3), 156 * healthscale, 6)
-
-	local armor = ply:Armor()
-	if armor > 0 then //there is no 'max armor' value, the hardcoded limit is 255, certain armor chargers max out at 200, and the max thru armor pickups is 100
-		local maxarmor = (armor <= 100) and 100 or (armor <= 200) and 200 or 255
-		local armorscale = math.Clamp(armor / maxarmor, 0, 1)
-
-		surface.SetDrawColor(color_black_180)
-		surface.DrawRect(wr + 25*pscale, h - 260 * scale + offset, 164, 12)
-
-		surface.SetDrawColor(color_armor)
-		surface.DrawRect(wr + (25*pscale) + 4, h - 260 * scale + (offset + 3), 156 * armorscale, 6)
+		draw.SimpleTextOutlined("["..usecount.."]", ammofont, (w - 40*scale) - 32*scale, (h - 160*scale) - 32*scale, turbinehealthcolor, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 2, color_black)
 	end
 end
 
@@ -680,15 +833,9 @@ local function ScoreHud()
 
 			local phealthscale = math.Clamp(phealth / pmaxhealth, 0, 1)
 			local phealthcolor = Color(255, 300*phealthscale, 300*phealthscale, 255)
-			local pplayercolor = pcolor
-			if not nz_healthplayercolor:GetBool() then
-				pplayercolor = color_black_180
-			end
 
-			surface.SetDrawColor(pplayercolor)
-			surface.DrawRect((labymode and wr-144 or wr) + 25*pscale, h - 275 * scale - offset + poffset, 142, 8)
 			surface.SetDrawColor(phealthcolor)
-			surface.DrawRect((labymode and wr-144 or wr) + (25*pscale) + 2, h - 275 * scale - offset + (poffset + 2), 138 * phealthscale, 4)
+			surface.DrawRect((labymode and wr-144 or wr) + 25*pscale, h - 275 * scale - offset + poffset, 142, 8)
 		end
 	end
 
@@ -736,6 +883,9 @@ local function GunHud()
 	local ply = LocalPlayer()
 	if not IsValid(ply) then return end
 	if ply:IsNZMenuOpen() then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
 	local w, h = ScrW(), ScrH()
 	local scale = ((w/1920) + 1) / 2
@@ -745,7 +895,6 @@ local function GunHud()
 	local ammo2font = ("nz.ammo2."..GetFontType(nzMapping.Settings.ammo2font))
 	local smallfont = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
 	local fontColor = !IsColor(nzMapping.Settings.textcolor) and color_red_200 or nzMapping.Settings.textcolor
-	local tfa_key_silence = GetConVar("cl_tfa_keys_silencer")
 
 	//------MAIN HUD BG------\\
 	surface.SetMaterial(Material(nzRound:GetHUDType(nzMapping.Settings.hudtype), "unlitgeneric smooth"))
@@ -760,22 +909,37 @@ local function GunHud()
 		end
 
 		if class == "nz_multi_tool" then
-			draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
-			draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", ammofont, w - 230*scale, h - 110*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black_180)
+			draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].displayname or wep.ToolMode, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+			draw.SimpleTextOutlined(nzTools.ToolData[wep.ToolMode].desc or "", ammofont, w - 220*scale, h - 112*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_TOP, 2, color_black)
 		elseif illegalspecials[wep.NZSpecialCategory] then
 			local name = wep:GetPrintName()
-			draw.SimpleTextOutlined(name, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+			draw.SimpleTextOutlined(name, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 		elseif not illegalspecials[wep.NZSpecialCategory] then
+			local clipstring = ""
 			if wep.Primary then
 				local clip = wep.Primary.ClipSize
 				local resclip = wep.Primary.DefaultClip
+				local clip1 = wep:Clip1()
 
 				local ammoType = wep:GetPrimaryAmmoType()
 				local ammoTotal = ply:GetAmmoCount(ammoType)
 				local ammoCol = color_white
 				local reserveCol = color_white
 
-				if clip and clip > 0 and wep:Clip1() <= math.ceil(clip/3) then
+				if wep.CanBeSilenced and wep:GetSilenced() then
+					if wep.Clip3 then
+						clip = wep.Tertiary.ClipSize
+						resclip = wep.Tertiary.DefaultClip
+						clip1 = wep:Clip3()
+					else
+						clip = wep.Secondary.ClipSize
+						resclip = wep.Secondary.DefaultClip
+						clip1 = wep:Clip2()
+					end
+					ammoTotal = ply:GetAmmoCount(wep:GetSecondaryAmmoType())
+				end
+
+				if clip and clip > 0 and clip1 <= math.ceil(clip/3) then
 					ammoCol = color_red_255
 				end
 				if resclip and resclip > 0 and ammoTotal <= math.ceil(resclip/3) then
@@ -783,82 +947,74 @@ local function GunHud()
 				end
 
 				if clip and clip > 0 then
-					local diff = 8*scale
-					if ammoTotal > 0 then
-						diff = string_len(tostring(ammoTotal))*8*scale
-					end
-
 					if ammoType == -1 then
-						draw.SimpleTextOutlined(wep:Clip1(), ammofont, w - 270*scale, h - 80*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+						draw.SimpleTextOutlined(clip1, ammofont, w - 270*scale, h - 82*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+						clipstring = clip1
 					else
-						draw.SimpleTextOutlined(wep:Clip1(), ammofont, w - (290 + diff)*scale, h - 80*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+						draw.SimpleTextOutlined(clip1, ammofont, w - 270*scale, h - 82*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						if resclip and resclip > 0 then
-							draw.SimpleTextOutlined("/", ammofont, w - (260 + diff)*scale, h - 80*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
-							draw.SimpleTextOutlined(ammoTotal, ammofont, w - 230*scale, h - 80*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+							draw.SimpleTextOutlined("/", ammofont, w - 265*scale, h - 82*scale, color_white, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
+							draw.SimpleTextOutlined(ammoTotal, ammofont, w - 250*scale, h - 82*scale, reserveCol, TEXT_ALIGN_LEFT, TEXT_ALIGN_BOTTOM, 2, color_black)
 						end
+						clipstring = clip1
 					end
 				else
 					if ammoTotal and ammoTotal > 0 then
-						draw.SimpleTextOutlined(ammoTotal, ammofont, w - 270*scale, h - 80*scale, reserveCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+						draw.SimpleTextOutlined(ammoTotal, ammofont, w - 270*scale, h - 82*scale, reserveCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+						clipstring = ammoTotal
 					end
 				end
 			end
 
-			if wep.Secondary then
+			if wep.Secondary and (not wep.CanBeSilenced or (wep.CanBeSilenced and not wep:GetSilenced() and wep.Clip3)) then
 				local clip2 = wep.Secondary.ClipSize
 				local resclip2 = wep.Secondary.DefaultClip
 
 				local ammoType2 = wep:GetSecondaryAmmoType()
-				local ammoTotal = ply:GetAmmoCount(wep:GetPrimaryAmmoType())
+				local ammoTotal2 = ply:GetAmmoCount(ammoType2)
 				local ammoCol = color_white
 				local reserveCol = color_white
 
 				if clip2 and clip2 > 0 and wep:Clip2() <= math.ceil(clip2/3) then
 					ammoCol = color_red_255
 				end
-				if resclip2 and resclip2 > 0 and ammoTotal <= math.ceil(resclip2/3) then
+				if resclip2 and resclip2 > 0 and ammoTotal2 <= math.ceil(resclip2/3) then
 					reserveCol = color_red_255
 				end
 
-				if clip2 and clip2 > 0 then
-					local diff2 = 12*scale
-					if ammoTotal > 0 then
-						diff2 = string_len(tostring(ammoTotal))*12*scale
-					end
+				surface.SetFont(ammofont)
+				local tw, th = surface.GetTextSize(clipstring)
 
-					if ammoType2 == -1 then
-						draw.SimpleTextOutlined(wep:Clip2(), ammo2font, w - 340*scale, h - 80*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
-					else
-						draw.SimpleTextOutlined(wep:Clip2(), ammofont, w - (330 + diff2)*scale, h - 80*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
-						draw.SimpleTextOutlined("|", ammofont, w - (310 + diff2)*scale, h - 80*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+				if clip2 and clip2 > 0 then
+					draw.SimpleTextOutlined(wep:Clip2().." | ", ammofont, w - 270*scale - tw, h - 82*scale, ammoCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
+				else
+					if ammoTotal2 and ammoTotal2 > 0 then
+						draw.SimpleTextOutlined(ammoTotal2.." | ", ammofont, w - 270*scale - tw, h - 82*scale, reserveCol, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 					end
 				end
 
 				if wep.CanBeSilenced and wep.NZHudIcon then
-					ammoTotal = ply:GetAmmoCount(ammoType2)
-					if wep.Clip3 then
-						ammoTotal = ammoTotal + wep:Clip3()
-					end
-
-					local key = tfa_key_silence:GetInt()
 					local icon = wep.NZHudIcon
 
 					surface.SetMaterial(icon)
 					surface.SetDrawColor(color_white)
 					surface.DrawTexturedRect((w - 160*scale) - 32, (h - 90*scale) - 32, 48, 48)
 
-					if ammoTotal > 0 then
-						draw.SimpleTextOutlined(ammoTotal, ammo2font, w - 165*scale, h - 90*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black_180)
+					local ammoTotal3 = ply:GetAmmoCount(wep:GetSecondaryAmmoType()) + (wep.Clip3 and wep:Clip3() or wep:Clip2())
+					if ammoTotal3 > 0 then
+						draw.SimpleTextOutlined(ammoTotal3, ammo2font, w - 165*scale, h - 90*scale, color_white, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
 					end
 				end
 			end
 
 			local name = wep:GetPrintName()
-			draw.SimpleTextOutlined(name, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black_180)
+			draw.SimpleTextOutlined(name, smallfont, w - 200*scale, h - 130*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 2, color_black)
 
 			if nz_showgun:GetBool() and killicon.Exists(class) then
-				local lenth = string_len(name)*15
-				killicon.Draw(w - 340*scale - lenth, h - 170*scale, class, 255)
+				surface.SetFont(smallfont)
+				local tw, th = surface.GetTextSize(name)
+
+				killicon.Draw(w - 200*scale - (64*scale) - tw, h - 130*scale - (32*scale), class, 255)
 			end
 
 			if ply:HasPerk("mulekick") then
@@ -892,21 +1048,19 @@ local function GunHud()
 	end
 
 	if numspecial > 0 then
-		local custom = false
 		local icon = zmhud_icon_grenade
 		local plyweptab = ply:GetWeapons()
 
 		for _, wep in pairs(plyweptab) do
 			if wep.NZSpecialCategory == "specialgrenade" and wep.NZHudIcon then
 				icon = wep.NZHudIcon
-				custom = true
 				break
 			end
 		end
 
 		surface.SetMaterial(icon)
 		for i = numspecial, 1, -1 do
-			surface.SetDrawColor(ColorAlpha(custom and color_white or color_tacnade, 255/i))
+			surface.SetDrawColor(ColorAlpha(color_white, 255/i))
 			surface.DrawTexturedRect(w - 470*scale + i * 30, h - 60*scale, 40*scale, 40*scale)
 		end
 	end
@@ -919,155 +1073,68 @@ local function PerksMMOHud()
 	local ply = LocalPlayer()
 	if not IsValid(ply) then return end
 	if ply:IsNZMenuOpen() then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
 	local wep = ply:GetActiveWeapon()
-	if IsValid(wep) and illegalspecials[wep.NZSpecialCategory] then return end
+	if IsValid(wep) and (illegalspecials[wep.NZSpecialCategory] or wep:GetClass() == "nz_multi_tool") then return end
 
+	local fontColor = !IsColor(nzMapping.Settings.textcolor) and color_red_200 or nzMapping.Settings.textcolor
 	local w, h = ScrW(), ScrH()
 	local scale = ((w/1920) + 1) / 2
 	local curtime = CurTime()
 
-	local fontColor = !IsColor(nzMapping.Settings.textcolor) and color_red_200 or nzMapping.Settings.textcolor
 	local traycount = 0
-	if ply:HasPerk("mulekick") then //on/off
-		//code for mulekick moved back to gunhud
+	if ply:HasPerk("mulekick") then
 		traycount = traycount + 1
 	end
-	if ply:HasPerk("whoswho") then //percentage
-		local chuggatime = ply:GetNW2Float("nz.ChuggaDelay", 0)
-		local time = math.max(chuggatime - curtime, 0)
-		local chuggapercent = math.Round(100 * (1 - math.Clamp(time / 180, 0, 1)))
+
+	for k, v in pairs(ply:GetPerks()) do
+		local data = nzPerks:Get(v)
+		if not data or not data.mmohud then continue end
+
+		local mmohud = data.mmohud
+		if not mmohud.style then continue end
+		if mmohud.upgradeonly and not ply:HasUpgrade(v) then continue end
 
 		surface.SetDrawColor(color_white)
-		if chuggatime > curtime then
+		if (mmohud.countdown and ply:GetNW2Int(tostring(mmohud.count), 0) == 0) or (mmohud.delay and ply:GetNW2Float(tostring(mmohud.delay), 0) > curtime) then
 			surface.SetDrawColor(color_white_50)
 		end
-		surface.SetMaterial(zmhud_mmo_chugga)
+
+		surface.SetMaterial(data.icon_waw)
 		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
 
-		if ply:HasUpgrade("whoswho") and ply:GetNW2Float("nz.ChuggaTeleDelay",0) < CurTime() then
+		if ply:HasUpgrade(v) and mmohud.border and ply:GetNW2Float(tostring(mmohud.upgrade), 0) < curtime then
 			surface.SetDrawColor(color_gold)
 			surface.SetMaterial(zmhud_icon_frame)
 			surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
 		end
 
-		if chuggapercent < 100 then
-			draw.SimpleTextOutlined(chuggapercent.."%", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		end
-		traycount = traycount + 1
-	end
-	if ply:HasUpgrade("sake") then //percentage
-		local saketime = ply:GetNW2Float("nz.SakeDelay", 0)
-		local time = math.max(saketime - curtime, 0)
-		local sakepercent = math.Round(100 * (1 - math.Clamp(time / 7, 0, 1)))
+		if mmohud.style == "toggle" then
+		elseif mmohud.style == "count" then
+			draw.SimpleTextOutlined(ply:GetNW2Int(tostring(mmohud.count), 0), ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
+		elseif mmohud.style == "%" then
+			local perkpercent = 100
+			if mmohud.time then
+				local perktime = ply:GetNW2Float(tostring(mmohud.delay), 0)
+				local time = math.max(perktime - curtime, 0)
+				perkpercent = math.Round(100 * (1 - math.Clamp(time / mmohud.max, 0, 1)))
+			else
+				perkpercent = 100 * (1 - math.Clamp(ply:GetNW2Int(tostring(mmohud.count), 0) / mmohud.max, 0, 1))
+			end
 
-		surface.SetDrawColor(color_white)
-		if ply:GetNW2Float("nz.SakeDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_sake)
-		surface.DrawTexturedRect(w - 320*scale - (40*traycount*scale), h - 245*scale, 35*scale, 35*scale)
-
-		if sakepercent < 100 then
-			draw.SimpleTextOutlined(sakepercent.."%", ChatFont, w - 285*scale - (40*traycount*scale), h - 205*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		end
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("cherry") then //percentage
-		local cherrypercent = 100 * (1 - math.Clamp(ply:GetNW2Int("nz.CherryCount", 0) / 10, 0, 1))
-		cherrypercent = math.min(cherrypercent + 10, 100)
-
-		surface.SetDrawColor(color_white)
-		surface.SetMaterial(zmhud_mmo_cherry)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		if ply:HasUpgrade("cherry") and ply:GetNW2Float("nz.CherryWaffe",0) < curtime then
-			surface.SetDrawColor(color_gold)
-			surface.SetMaterial(zmhud_icon_frame)
-			surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
+			if (not mmohud.hide) or (mmohud.hide and perkpercent < 100) then
+				draw.SimpleTextOutlined(perkpercent.."%", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
+			end
+		elseif mmohud.style == "chance" then
+			draw.SimpleTextOutlined(ply:GetNW2Int(tostring(mmohud.count), 0).."/"..mmohud.max, ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
 		end
 
-		draw.SimpleTextOutlined(cherrypercent.."%", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("tortoise") then //percentage
-		local tortscale = 100 * (1 - math.Clamp(ply:GetNW2Int("nz.TortCount", 0) / 10, 0, 1))
-
-		surface.SetDrawColor(color_white)
-		if tortscale == 0 and ply:GetNW2Float("nz.TortDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_tort)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(tortscale.."%", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("winters") then //count down
-		surface.SetDrawColor(color_white)
-		if ply:GetNW2Int("nz.WailCount", 0) == 0 or ply:GetNW2Float("nz.WailDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_winter)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(ply:GetNW2Int("nz.WailCount", 0), ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("fire") then //count up
-		surface.SetDrawColor(color_white)
-		if ply:GetNW2Float("nz.BurnDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_fire)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(ply:GetNW2Int("nz.BurnCount", 0), ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("everclear") then //count up
-		surface.SetDrawColor(color_white)
-		if ply:GetNW2Float("nz.ZombShellDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_everclear)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(ply:GetNW2Int("nz.ZombShellCount", 0), ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("deadshot") then //proc chance
-		surface.SetDrawColor(color_white)
-		surface.SetMaterial(zmhud_mmo_deadshot)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(ply:GetNW2Int("nz.DeadshotChance", 0).."/15", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
-		traycount = traycount + 1
-	end
-	if ply:HasPerk("pop") then //proc chance
-		surface.SetDrawColor(color_white)
-		if ply:GetNW2Float("nz.EPopDelay", 0) > curtime then
-			surface.SetDrawColor(color_white_50)
-		end
-		surface.SetMaterial(zmhud_mmo_pop)
-		surface.DrawTexturedRect(w - 235*scale - (40*traycount*scale), h - 220*scale, 35*scale, 35*scale)
-
-		draw.SimpleTextOutlined(ply:GetNW2Int("nz.EPopChance", 0).."/15", ChatFont, w - 200*scale - (40*traycount*scale), h - 180*scale, fontColor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_BOTTOM, 1, color_black)
 		traycount = traycount + 1
 	end
 end
-
-local hud_grenadetypes = {
-	["bo1_m67_grenade"] = true,
-	["nz_bo3_tac_gersch"] = true,
-	["nz_bo3_tac_gstrike"] = true,
-	["nz_bo3_tac_lilarnie"] = true,
-	["nz_bo4_tac_matryoshka"] = true,
-	["nz_bo3_tac_matryoshka"] = true,
-	["nz_bo3_tac_matryoshka_mini"] = true,
-	["nz_bo3_tac_monkeybomb"] = true,
-	["nz_bo3_tac_qed"] = true,
-}
 
 local function DeathHud()
 	if not cl_drawhud:GetBool() then return end
@@ -1076,56 +1143,31 @@ local function DeathHud()
 
 	local screen = ScreenScale(16)
 	local pscale = ScreenScale(128)
+	local screen2 = ScreenScale(24)
 
 	local pos = ply:GetPos()
-	local range = 400
+	local range = 160000
 	local ang = 0.65
 	local zeds = {}
 	local nades = {}
 
-	local cone = ents_FindInSphere(pos, range)
-
-	for _, ent in pairs(cone) do
-		if hud_grenadetypes[ent:GetClass()] and ent:GetCreationTime() + 0.5 < CurTime() then
+	for i, ent in nzLevel.GetHudEntityArray() do
+		if not IsValid(ent) then continue end
+		if (ent.NZThrowIcon or ent.NZNadeRethrow) and (ent:GetCreationTime() + 0.3 < CurTime()) then
 			local epos = ent:WorldSpaceCenter() + vector_up*10
 			local data = epos:ToScreen()
-
 			if data.visible then
 				if ent.GetActivated and ent:GetActivated() then continue end
-				local dist = 1 - math.Clamp(pos:DistToSqr(epos) / 160000, 0, 1)
+				local dist = 1 - math.Clamp(pos:DistToSqr(ent:GetPos()) / 160000, 0, 1)
 
-				surface.SetMaterial(zmhud_icon_grenade)
 				surface.SetDrawColor(ColorAlpha(color_white, 300*dist))
+				surface.SetMaterial(ent.NZThrowIcon or zmhud_icon_grenade)
 				surface.DrawTexturedRect(data.x - screen*0.5, data.y - screen*0.5, screen, screen)
-			elseif ply == ent:GetOwner() then
+			else
+				if ent.NZNadeRethrow and ply ~= ent:GetOwner() then continue end
 				table_insert(nades, ent)
 			end
 		end
-
-		if ply:HasPerk("death") and ent:IsValidZombie() and ent:Alive() then
-			local dir = ply:EyeAngles():Forward()
-			local facing = (pos - ent:GetPos()):GetNormalized()
-
-			if (facing:Dot(dir) + 1) / 2 > ang then
-				table_insert(zeds, ent)
-			end
-		end
-	end
-
-	for _, ent in ipairs(zeds) do
-		local epos = ent:GetPos()
-
-		local dist = math.Clamp(pos:DistToSqr(epos) / 40000, 0, 1)
-		local dir = (epos - pos):Angle()
-		dir = dir - EyeAngles()
-		local angle = dir.y + 90
-
-		local x = (math.cos(math.rad(angle)) * pscale) + ScrW() / 2
-		local y = (math.sin(math.rad(angle)) * -pscale) + ScrH() / 2
-
-		surface.SetMaterial(zmhud_icon_death)
-		surface.SetDrawColor(Color(255,255*dist,255*dist,225))
-		surface.DrawTexturedRectRotated(x, y, screen, screen, angle - 90)
 	end
 
 	for _, ent in ipairs(nades) do
@@ -1139,9 +1181,64 @@ local function DeathHud()
 		local x = (math.cos(math.rad(angle)) * pscale) + ScrW() / 2
 		local y = (math.sin(math.rad(angle)) * -pscale) + ScrH() / 2
 
-		surface.SetMaterial(zmhud_icon_grenade)
-		surface.SetDrawColor(ColorAlpha(color_white, 300*dist))
-		surface.DrawTexturedRect(x, y, screen, screen)
+		surface.SetDrawColor(ColorAlpha(color_white, 400*dist))
+
+		surface.SetMaterial(ent.NZThrowIcon or zmhud_icon_grenade)
+		surface.DrawTexturedRect(x - (screen*0.5), y - (screen*0.5), screen, screen)
+
+		if nz_useplayercolor:GetBool() then
+			local owner = ent:GetOwner()
+			if IsValid(owner) and owner:IsPlayer() then
+				local pcol = owner:GetPlayerColor()
+				surface.SetDrawColor(Color(255*pcol.x, 255*pcol.y, 255*pcol.z, math.min(400*dist, 200)))
+			end
+		end
+
+		surface.SetMaterial(zmhud_icon_offscreen)
+		surface.DrawTexturedRectRotated(x, y, screen2, screen2, angle - 90)
+	end
+
+	if ply:HasPerk("death") then
+		for i, ent in nzLevel.GetZombieArray() do
+			if not IsValid(ent) then continue end
+			if ent:IsValidZombie() and ent:Alive() then
+				if pos:DistToSqr(ent:GetPos()) > range then continue end
+				local dir = ply:EyeAngles():Forward()
+				local facing = (pos - ent:GetPos()):GetNormalized()
+
+				if (facing:Dot(dir) + 1) / 2 > ang then
+					table_insert(zeds, ent)
+				end
+			end
+		end
+
+		for i, ent in nzLevel.GetZombieBossArray() do
+			if not IsValid(ent) then continue end
+			if ent:IsValidZombie() and ent:Alive() then
+				local dir = ply:EyeAngles():Forward()
+				local facing = (pos - ent:GetPos()):GetNormalized()
+
+				if (facing:Dot(dir) + 1) / 2 > ang then
+					table_insert(zeds, ent)
+				end
+			end
+		end
+
+		for _, ent in ipairs(zeds) do
+			local epos = ent:GetPos()
+
+			local dist = math.Clamp(pos:DistToSqr(epos) / 40000, 0, 1)
+			local dir = (epos - pos):Angle()
+			dir = dir - EyeAngles()
+			local angle = dir.y + 90
+
+			local x = (math.cos(math.rad(angle)) * pscale) + ScrW() / 2
+			local y = (math.sin(math.rad(angle)) * -pscale) + ScrH() / 2
+
+			surface.SetMaterial(zmhud_icon_death)
+			surface.SetDrawColor(Color(255,255*dist,255*dist,225))
+			surface.DrawTexturedRectRotated(x, y, screen, screen, angle - 90)
+		end
 	end
 end
 
@@ -1319,7 +1416,6 @@ local function PowerupNotification(text)
 		end)
 
 		timer.Create(timername, lifetime, 1, function()
-			print('wake up')
 			hook.Remove("HUDPaint", "t7zod_PowerupDraw")
 		end)
 	else //black ops 4 style
@@ -1364,7 +1460,7 @@ local function PowerupNotification(text)
 			//---------BACKROUND---------\\	
 			surface.SetMaterial(t8_powerup_maxammobg) 
 			surface.SetDrawColor(powerupcol)	
-			surface.DrawTexturedRect(w/2 - 125*scale, 60, 250, 250)
+			surface.DrawTexturedRect(w/2 - 125, 60, 250, 250)
 			//---------BACKROUND---------\\
 
 			//---------CIRCLE---------\\
@@ -1388,7 +1484,7 @@ local function PowerupNotification(text)
 			//---------GLOW---------\\
 			surface.SetMaterial(t8_powerup_maxammoglow) 
 			surface.SetDrawColor(powerupcol)	
-			surface.DrawTexturedRect(w/2 - 125*scale, 60, 250, 250)
+			surface.DrawTexturedRect(w/2 - 125, 60, 250, 250)
 			//---------GLOW---------\\
 
 			//---------SWISH---------\\
@@ -1400,11 +1496,11 @@ local function PowerupNotification(text)
 			//---------TRAY---------\\
 			surface.SetMaterial(t8_powerup_maxammotray) 
 			surface.SetDrawColor(powerupcol)	
-			surface.DrawTexturedRect(w/2 - 130*scale, 210, 260, 30)
+			surface.DrawTexturedRect(w/2 - 130, 210, 260, 30)
 			//---------TRAY---------\\
 
 			//---------TEXT---------\\
-			draw.SimpleTextOutlined(text, "nz.pointsmain.blackops4", w/2, 230*scale, ColorAlpha(color_yellow, 255*timescale), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 4, ColorAlpha(color_black_180, 180*timescale))
+			draw.SimpleTextOutlined(text, "nz.pointsmain.blackops4", w/2, 230, ColorAlpha(color_yellow, 255*timescale), TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM, 4, ColorAlpha(color_black_180, 180*timescale))
 			//---------TEXT---------\\
 			//--------------------------------MAXAMMO--------------------------------\\	
 		end)
@@ -1436,14 +1532,12 @@ local totalWidth = 0
 
 local function PowerUpsHud()
 	if not cl_drawhud:GetBool() then return end
-	if not (nzRound:InProgress() or nzRound:InState(ROUND_CREATE)) then
-		if IsValid(LocalPlayer()) then
-			local p = LocalPlayer()
-			if p.Ambi then p.Ambi:Stop() end
-			if p.Ambi2 then p.Ambi2:Stop() end
-			if p.Ambi3 then p.Ambi3:Stop() end
-		end
-		return
+	local ply = LocalPlayer()
+	if not IsValid(ply) then return end
+	local spectating = false
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+		spectating = true
 	end
 
 	local ctime = CurTime()
@@ -1488,22 +1582,22 @@ local function PowerUpsHud()
 	for k,v in pairs(nzPowerUps.ActivePowerUps) do	
 		if nzPowerUps:IsPowerupActive(k) then
 			if k == "dp" then
-				AddPowerup(nz_powerup_2x, v)
+				AddPowerup(t8_powerup_2x, v)
 				ReturnPosition("Returning" .. "dp", math.Round(v - ctime))	
 			end
 
 			if k == "insta" then
-				AddPowerup(nz_powerup_killjoy, v)
+				AddPowerup(t8_powerup_killjoy, v)
 				ReturnPosition("Returning" .. "insta", math.Round(v - ctime))	
 			end
 
 			if k == "firesale" then
-				AddPowerup(nz_powerup_firesale, v)
+				AddPowerup(t8_powerup_firesale, v)
 				ReturnPosition("Returning" .. "firesale", math.Round(v - ctime))	
 			end
 
 			if k == "bonfiresale" then
-				AddPowerup(nz_powerup_bonfiresale, v)
+				AddPowerup(t8_powerup_bonfiresale, v)
 				ReturnPosition("Returning" .. "bonfiresale", math.Round(v - ctime))	
 			end
 
@@ -1513,16 +1607,16 @@ local function PowerUpsHud()
 		end
 	end
 
-	if not nzPowerUps.ActivePlayerPowerUps[LocalPlayer()] then nzPowerUps.ActivePlayerPowerUps[LocalPlayer()] = {} end
-	for k,v in pairs(nzPowerUps.ActivePlayerPowerUps[LocalPlayer()]) do
-		if nzPowerUps:IsPlayerPowerupActive(LocalPlayer(), k) then
+	if not nzPowerUps.ActivePlayerPowerUps[ply] then nzPowerUps.ActivePlayerPowerUps[ply] = {} end
+	for k,v in pairs(nzPowerUps.ActivePlayerPowerUps[ply]) do
+		if nzPowerUps:IsPlayerPowerupActive(ply, k) then
 			if k == "zombieblood" then
-				AddPowerup(nz_powerup_blood, v)
+				AddPowerup(t8_powerup_blood, v)
 				ReturnPosition("Returning" .. "zombieblood", math.Round(v - ctime))	
 			end
 
 			if k == "deathmachine" then
-				AddPowerup(nz_powerup_minigun, v)
+				AddPowerup(t8_powerup_minigun, v)
 				ReturnPosition("Returning" .. "deathmachine", math.Round(v - ctime))	
 			end
 
@@ -1532,77 +1626,59 @@ local function PowerUpsHud()
 		end
 	end
 
-	local p = LocalPlayer()
+	if spectating then return end
+	if not ply.ambiences then ply.ambiences = {} end
+	if not ply.refstrings then ply.refstrings = {} end
+	if not ply.picons then ply.picons = {} end
 
-	if not p.ambiences then p.ambiences = {} end
-	if not p.refstrings then p.refstrings = {} end
-	if not p.picons then p.picons = {} end
-
-	for k, v in pairs(nzPowerUps.Data) do
+	for powerup, data in pairs(nzPowerUps.Data) do
 		local active = false
 
-		if v.global then
-			active = nzPowerUps:IsPowerupActive(k)
+		if data.global then
+			active = nzPowerUps:IsPowerupActive(powerup)
 		else
-			if nzPowerUps.ActivePlayerPowerUps[p] then
-				active = nzPowerUps:IsPlayerPowerupActive(p, k)
+			if nzPowerUps.ActivePlayerPowerUps[ply] then
+				active = nzPowerUps:IsPlayerPowerupActive(ply, powerup)
 			end
 		end
 
-		if v.loopsound then
+		if data.loopsound then
 			if active then
-				if not p.refstrings[k] then --Haven't cached yet
-					p.refstrings[k] = v.loopsound
-					p.ambiences[k] = CreateSound(p, v.loopsound)
-				elseif p.refstrings[k] ~= v.loopsound then --Cached but the sound was changed, requires re-cache
-					if p.ambiences[k] then p.ambiences[k]:Stop() end --stop the existing sound if it's still playing
+				if not ply.refstrings[powerup] then --Haven't cached yet
+					ply.refstrings[powerup] = data.loopsound
+					ply.ambiences[powerup] = CreateSound(ply, data.loopsound)
+				elseif ply.refstrings[powerup] ~= data.loopsound then --Cached but the sound was changed, requires re-cache
+					if ply.ambiences[powerup] then ply.ambiences[powerup]:Stop() end --stop the existing sound if it's still playing
 
-					p.refstrings[k] = v.loopsound
-					p.ambiences[k] = CreateSound(p, v.loopsound)
+					ply.refstrings[powerup] = data.loopsound
+					ply.ambiences[powerup] = CreateSound(ply, data.loopsound)
 				end
 
-				if p.ambiences[k] then
-					p.ambiences[k]:Play()
-					if p.picons[k] then
-						local timer = p.picons[k].time - CurTime()
-						p.ambiences[k]:ChangePitch(100 + (v.nopitchshift and 0 or math.max(0, (10-timer)*5)) + (v.addpitch or 0))
+				if ply.ambiences[powerup] then
+					ply.ambiences[powerup]:Play()
+					if ply.picons[powerup] then
+						local timer = ply.picons[powerup].time - CurTime()
+						ply.ambiences[powerup]:ChangePitch(100 + (data.nopitchshift and 0 or math.max(0, (10-timer)*5)) + (data.addpitch or 0))
 					end
 				end
-			elseif p.ambiences[k] then
-				if v.stopsound and p.ambiences[k]:IsPlaying() then
-					LocalPlayer():EmitSound(v.stopsound, 95, 100 + (v.addpitch or 0))
+			elseif ply.ambiences[powerup] then
+				if data.stopsound and ply.ambiences[powerup]:IsPlaying() then
+					ply:EmitSound(data.stopsound, 95, 100 + (data.addpitch or 0))
 				end
 
-				p.ambiences[k]:Stop()
+				ply.ambiences[powerup]:Stop()
 			end
 		end
 	end
 end
 
-local iconsStringName = {
-	["Rezzurrection"] = 			function(perk) return nzPerks:Get(perk).icon end,
-	["Infinite Warfare"] = 			function(perk) return nzPerks:Get(perk).icon_iw end,
-	["No Background"] = 			function(perk) return nzPerks:Get(perk).icon_glow end,
-	["World at War/ Black Ops 1"] = function(perk) return nzPerks:Get(perk).icon_waw end,
-	["Black Ops 2"] = 				function(perk) return nzPerks:Get(perk).icon_bo2 end,
-	["Black Ops 3"] = 				function(perk) return nzPerks:Get(perk).icon_bo3 end,
-	["Black Ops 4"] = 				function(perk) return nzPerks:Get(perk).icon_bo4 end,
-	["Modern Warfare"] =			function(perk) return nzPerks:Get(perk).icon_mw end,
-	["Hololive"] =					function(perk) return nzPerks:Get(perk).icon_holo end,
-	["Cold War"] =					function(perk) return nzPerks:Get(perk).icon_cw end,
-	["April Fools"] =				function(perk) return nzPerks:Get(perk).icon_dumb end,
-	["WW2"] = 						function(perk) return nzPerks:Get(perk).icon_ww2 end,
-	["Shadows of Evil"] =			function(perk) return nzPerks:Get(perk).icon_soe end,
-	["Halloween"] =					function(perk) return nzPerks:Get(perk).icon_halloween end,
-	["Christmas"] =					function(perk) return nzPerks:Get(perk).icon_xmas end,
-	["Vanguard"] =					function(perk) return nzPerks:Get(perk).icon_griddy end,
-	["Neon"] =						function(perk) return nzPerks:Get(perk).icon_neon end,
-}
-
 local function PerksHud()
 	if not cl_drawhud:GetBool() then return end
 	local ply = LocalPlayer()
 	if not IsValid(ply) then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
 	local pscale = 1
 	if nz_betterscaling:GetBool() then
@@ -1639,24 +1715,30 @@ local function PerksHud()
 	end
 
 	for _, perk in pairs(perks) do
-		local icon
-		local iconType = tostring(nzRound:GetIconType(nzMapping.Settings.icontype))
-		if iconsStringName[iconType] then
-			icon = iconsStringName[iconType](perk)
-		end
-
+		local icon = GetPerkIconMaterial(perk)
 		if not icon or icon:IsError() then
 			icon = zmhud_icon_missing
 		end
 
 		surface.SetMaterial(icon)
 		surface.SetDrawColor(color_white)
-		surface.DrawTexturedRect(w + num*(size + 8)*pscale, h - (labymode and 196 or 75)*pscale - 64*row, 50*pscale, 50*pscale)
+		surface.DrawTexturedRect(w + num*(size + 6)*pscale, h - (labymode and 196 or 75)*pscale - 64*row, 50*pscale, 50*pscale)
 
 		if ply:HasUpgrade(perk) then
 			surface.SetDrawColor(color_gold)
 			surface.SetMaterial(zmhud_icon_frame)
-			surface.DrawTexturedRect(w + num*(size + 8)*pscale, h - (labymode and 196 or 75)*pscale - 64*row, 50*pscale, 50*pscale)
+			surface.DrawTexturedRect(w + num*(size + 6)*pscale, h - (labymode and 196 or 75)*pscale - 64*row, 50*pscale, 50*pscale)
+		end
+
+		if perk == "vulture" and ply:HasVultureStink() then
+			surface.SetMaterial(zmhud_vulture_glow)
+			surface.SetDrawColor(color_white)
+			surface.DrawTexturedRect((w + num*(size + 6)*pscale) - 24*pscale, (h - (labymode and 196 or 75)*pscale - 64*row) - 24*pscale, 98*pscale, 96*pscale)
+			
+			local stink = surface.GetTextureID("nz_moo/huds/t6/zm_hud_stink_ani_green")
+			surface.SetTexture(stink)
+			surface.SetDrawColor(color_white)
+			surface.DrawTexturedRect((w + num*(size + 6)*pscale), (h - (labymode and 196 or 75)*pscale - 64*row) - 62*pscale, 64*pscale, 64*pscale)
 		end
 
 		num = num + 1
@@ -1677,17 +1759,18 @@ local vulture_textures = {
 
 local function VultureVision()
 	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
 	if not ply:HasPerk("vulture") then return end
 	local scale = (ScrW()/1920 + 1)/2
 	local icon = vulture_textures["wunderfizz_machine"] //? if unknown
 
-	for k, v in pairs(nzPerks.VultureArray) do
+	for k, v in nzLevel.GetVultureArray() do
 		if not IsValid(v) then continue end
 
 		local data = v:WorldSpaceCenter():ToScreen()
 		if not data.visible then continue end
 
-		if ply:GetPos():DistToSqr(v:GetPos()) > 562500  then continue end //750^2
+		if ply:GetPos():DistToSqr(v:GetPos()) > 562500 then continue end //750^2
 
 		local class = v:GetClass()
 
@@ -1698,10 +1781,7 @@ local function VultureVision()
 			if perk == "pap" then
 				icon = vulture_textures["pap"]
 			else
-				local iconType = tostring(nzRound:GetIconType(nzMapping.Settings.icontype))
-				if iconsStringName[iconType] then
-					icon = iconsStringName[iconType](perk)
-				end
+				icon = GetPerkIconMaterial(perk)
 			end
 		end
 
@@ -1850,7 +1930,253 @@ local function ResetRound()
 	round_num = 0
 end
 
+local function PlayerStaminaHUD()
+	if not cl_drawhud:GetBool() then return end
+	if not nz_showstamina:GetBool() then return end
+
+	local ply = LocalPlayer()
+	if not IsValid(ply) then return end
+	if not ply.GetStamina then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
+
+	if not (nzRound:InProgress() or nzRound:InState(ROUND_CREATE)) then return end
+
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1) / 2
+	local pscale = 1
+	if nz_betterscaling:GetBool() then
+		pscale = scale
+	end
+	if nz_labymode:GetBool() then
+		wr = w - 219
+	end
+
+	local stamina = ply:GetStamina()
+	local maxstamina = ply:GetMaxStamina()
+	local fade = maxstamina*0.15 //lower the number, faster the fade in
+	local offset = 56*pscale
+
+	local staminascale = math.Clamp(stamina / maxstamina, 0, 1)
+	local stamalpha = 1 - math.Clamp((stamina - maxstamina + fade) / fade, 0, 1)
+	local staminacolor = ColorAlpha(color_white, 255*stamalpha)
+
+	if stamina < maxstamina then
+		surface.SetDrawColor(staminacolor)
+		surface.DrawRect(w/1920 + (75*pscale) + 4, h - (285*scale) + (offset), 110 * staminascale, 4)
+	end
+end
+
+local function PlayerHealthHUD()
+	if not cl_drawhud:GetBool() then return end
+	if not nz_showhealth:GetBool() then return end
+
+	local ply = LocalPlayer()
+	if not IsValid(ply) then return end
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
+
+	if not (nzRound:InProgress() or nzRound:InState(ROUND_CREATE)) then return end
+
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1) / 2
+	local pscale = 1
+	if nz_betterscaling:GetBool() then
+		pscale = scale
+	end
+	if nz_labymode:GetBool() then
+		wr = w - 219
+	end
+
+	local health = ply:Health()
+	local maxhealth = ply:GetMaxHealth()
+	local offset = 48*pscale + 5 //player portrait dimensions + 5 for a bit of room
+
+	local healthscale = math.Clamp(health / maxhealth, 0, 1)
+	local healthcolor = Color(255, 300*healthscale, 300*healthscale, 255)
+
+	surface.SetDrawColor(healthcolor)
+	surface.DrawRect(w/1920 + (25*pscale), h - (275*scale) + offset, 164 * healthscale, 6)
+
+	local armor = ply:Armor()
+	if armor > 0 then //there is no 'max armor' value, the hardcoded limit is 255, citadel armor chargers max out at 200, and the max thru armor pickups is 100
+		local maxarmor = (armor <= 100) and 100 or (armor <= 200) and 200 or 255
+		local armorscale = math.Clamp(armor / maxarmor, 0, 1)
+
+		surface.SetDrawColor(color_black_180)
+		surface.DrawRect(w/1920 + 25*pscale, h - 260 * scale + offset, 164, 12)
+
+		surface.SetDrawColor(color_armor)
+		surface.DrawRect(w/1920 + (25*pscale) + 4, h - 260 * scale + (offset + 3), 156 * armorscale, 6)
+	end
+end
+
+local talksize = 64
+local voicesize = 32
+local namesize = 16
+
+local name_cvarname = "nz_hud_player_names"
+local name_enabled = CreateConVar(name_cvarname, 1, FCVAR_ARCHIVE, "Enable or Disable drawing player names above their head in 3d space. (1 Enabled, 0 Disabled), Default is 1.", 0, 1):GetBool()
+cvars.AddChangeCallback(name_cvarname, function(name, old, new)
+	name_enabled = tonumber(new) == 1
+end)
+
+local namedist_cvarname = "nz_hud_player_name_distance"
+local max_namedist = CreateConVar(namedist_cvarname, 400, FCVAR_ARCHIVE, "Distance to draw player names from. Default is 400.", 0, 2048):GetInt()^2
+cvars.AddChangeCallback(namedist_cvarname, function(name, old, new)
+	max_namedist = tonumber(new)^2
+end)
+
+local namefull_cvarname = "nz_hud_player_name_showfull"
+local namefull_enabled = CreateConVar(namefull_cvarname, 0, FCVAR_ARCHIVE, "Enable or Disable displaying full player names above their head instead of the first 16 characters. (1 is Enabled, 0 is Disabled),  Default is 0.", 0, 1):GetBool()
+cvars.AddChangeCallback(namefull_cvarname, function(name, old, new)
+	namefull_enabled = tonumber(new) == 1
+end)
+
+local function PlayerInfoHUD(bdepth, bskybox) //credit to Player Status Icons by Haaax
+	if not cl_drawhud:GetBool() then return end
+	if bskybox then return end
+
+	local localply = LocalPlayer()
+
+	local render_ang = EyeAngles()
+	render_ang:RotateAroundAxis(render_ang:Right(), 90)
+	render_ang:RotateAroundAxis(-render_ang:Up(), 90)
+
+	local fontsmall = "nz.points."..GetFontType(nzMapping.Settings.smallfont)
+	local namefade = max_namedist*0.8
+
+	local plytab = player.GetAll()
+	for i, ply in ipairs(plytab) do
+		if not IsValid(ply) or ply:IsDormant() or not ply:Alive() then continue end
+		local index = ply:EntIndex()
+		if index == localply:EntIndex() and not localply:ShouldDrawLocalPlayer() then continue end
+
+		local id = ply:LookupAttachment("anim_attachment_head") or 0
+		local att = ply:GetAttachment(id)
+
+		local pos = (att and att.Pos) and att.Pos or ply:WorldSpaceCenter() + ply:GetUp()*26
+		local distfac = pos:DistToSqr(EyePos())
+		local ratio = 1 - math.Clamp((distfac - max_namedist + namefade) / namefade, 0, 1)
+		if ratio <= 0 then continue end
+
+		if ply:IsTyping() then
+			local talk_pos = pos + vector_up*24
+
+			cam.Start3D2D(talk_pos, render_ang, 0.24)
+				cam.IgnoreZ(true)
+				surface.SetMaterial(zmhud_icon_talk)
+				surface.SetDrawColor(ColorAlpha(color_white, 255*ratio))
+				surface.DrawTexturedRect(-talksize/2, -talksize/2, talksize, talksize)
+				cam.IgnoreZ(false)
+			cam.End3D2D()
+		end
+
+		if name_enabled then
+			local name_pos = pos + vector_up*14
+
+			local nick = ply:Nick()
+			if not namefull_enabled and #nick > namesize then
+				nick = string.sub(nick, 1, namesize).."..."
+			end
+
+			local pcolor = player.GetColorByIndex(index)
+			if nz_useplayercolor:GetBool() then
+				local pvcol = ply:GetPlayerColor()
+				pcolor = Color(255*pvcol.x, 255*pvcol.y, 255*pvcol.z, 255)
+			end
+
+			cam.Start3D2D(name_pos, render_ang, 0.24)
+				cam.IgnoreZ(true)
+
+				if ply:IsSpeaking() then //voicechat icon
+					local icon = zmhud_icon_voicedim
+					if ply:VoiceVolume() > 0 then
+						icon = zmhud_icon_voiceon
+					end
+					if ply:IsMuted() then
+						icon = zmhud_icon_voiceoff
+					end
+
+					surface.SetFont(fontsmall)
+					local tw, th = surface.GetTextSize(nick)
+
+					surface.SetMaterial(icon)
+					surface.SetDrawColor(ColorAlpha(color_white, 255*ratio))
+					surface.DrawTexturedRect(-tw/2 - voicesize, -voicesize/2, voicesize, voicesize)
+				elseif ply:GetNW2Bool("ThirtOTS", false) and ply ~= localply then //thirdperson icon
+					local icon = zmhud_icon_camera
+
+					surface.SetFont(fontsmall)
+					local tw, th = surface.GetTextSize(nick)
+
+					surface.SetMaterial(icon)
+					surface.SetDrawColor(ColorAlpha(color_white, 255*ratio))
+					surface.DrawTexturedRect(-tw/2 - voicesize, -voicesize/2, voicesize, voicesize)
+				end
+
+				draw.SimpleTextOutlined(nick, fontsmall, 0, 0, ColorAlpha(pcolor, 255*ratio), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 1, ColorAlpha(color_black, 180*ratio))
+				cam.IgnoreZ(false)
+			cam.End3D2D()
+		end
+	end
+end
+
+local function PlayerVoiceHUD()
+	if not cl_drawhud:GetBool() then return end
+	if nz_shownames:GetBool() then return end
+
+	local pply = LocalPlayer()
+	local fontsmall = "nz.points."..GetFontType(nzMapping.Settings.smallfont)
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1) / 2
+	local count = 0
+
+	for _, ply in ipairs(player.GetAll()) do
+		if not ply:IsSpeaking() then continue end
+
+		local istheplayer = pply:EntIndex() == ply:EntIndex()
+
+		local pcolor = player.GetColorByIndex(ply:EntIndex())
+		if nz_useplayercolor:GetBool() then
+			local pvcol = ply:GetPlayerColor()
+			pcolor = Color(255*pvcol.x, 255*pvcol.y, 255*pvcol.z, 255)
+		end
+
+		local nick = ply:Nick()
+		if not namefull_enabled and #nick > 24 then
+			nick = string.sub(nick, 1, 24)..".." //limit name to 24 chars
+		end
+
+		local icon = zmhud_icon_voicedim
+		if ply:VoiceVolume() > 0 then
+			icon = zmhud_icon_voiceon
+		end
+		if not istheplayer and ply:IsMuted() then
+			icon = zmhud_icon_voiceoff
+		end
+		if istheplayer and not voiceloopback:GetBool() then
+			icon = zmhud_icon_voiceon
+		end
+
+		surface.SetFont(fontsmall)
+		local tw, th = surface.GetTextSize(nick)
+
+		surface.SetMaterial(icon)
+		surface.SetDrawColor(color_white)
+		surface.DrawTexturedRect(w - 140*scale, (90*scale) + (th+6)*count - 21, 42, 42)
+
+		draw.SimpleText(nick, fontsmall, w - 140*scale, (90*scale) + (th+6)*count, pcolor, TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+		count = count + 1
+	end
+end
+
 -- Hooks
+hook.Add("HUDPaint", "playersvoiceHUD", PlayerVoiceHUD )
+hook.Add("PostDrawTranslucentRenderables", "nzplayerinfoHUD", PlayerInfoHUD )
+
 hook.Add("HUDPaint", "nzHUDswapping_default", function()
 	if not nzDisplay.reworkedHUDs[nzMapping.Settings.hudtype] then
 		hook.Add("HUDPaint", "roundHUD", StatesHud )
@@ -1872,7 +2198,6 @@ hook.Add("HUDPaint", "nzHUDswapping_default", function()
 	end
 end)
 
-
 local blockedweps = {
 	["nz_revive_morphine"] = true,
 	["nz_packapunch_arms"] = true,
@@ -1887,7 +2212,7 @@ function GM:HUDWeaponPickedUp( wep )
 	if blockedweps[wep:GetClass()] then return end
 
 	wep.NZPickedUpTime = CurTime()
-	local pickup = {}
+	/*local pickup = {}
 	pickup.time			= CurTime()
 	pickup.name			= wep:GetPrintName()
 	pickup.holdtime		= 5
@@ -1906,10 +2231,11 @@ function GM:HUDWeaponPickedUp( wep )
 	end
 
 	table_insert( self.PickupHistory, pickup )
-	self.PickupHistoryLast = pickup.time
-	
+	self.PickupHistoryLast = pickup.time*/
+
 	if wep.NearWallEnabled then wep.NearWallEnabled = false end
 	if wep:IsFAS2() then wep.NoNearWall = true end
+	return false
 end
 
 local function ParseAmmoName(str)
@@ -1933,7 +2259,8 @@ local function ParseAmmoName(str)
 end
 
 function GM:HUDAmmoPickedUp( itemname, amount )
-	if ( !IsValid( LocalPlayer() ) || !LocalPlayer():Alive() ) then return end
+	return false
+	/*if ( !IsValid( LocalPlayer() ) || !LocalPlayer():Alive() ) then return end
 	
 	itemname = ParseAmmoName(itemname)
 	
@@ -1972,10 +2299,10 @@ function GM:HUDAmmoPickedUp( itemname, amount )
 	end
 	
 	table.insert( self.PickupHistory, pickup )
-	self.PickupHistoryLast = pickup.time
+	self.PickupHistoryLast = pickup.time*/
 end
 
-//------------------------------------------------ GhostlyMoo and Fox's HUD ------------------------------------------------\\
+//------------------------------------------------GHOSTLYMOO'S HUD------------------------------------------------\\
 /*Connection terminated.
 
 I'm sorry to interrupt you, Elizabeth- if you still even remember that name.

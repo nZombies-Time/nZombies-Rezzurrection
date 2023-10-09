@@ -385,7 +385,7 @@ function ENT:Attack( data )
 					dmgInfo:SetDamageForce( (self:GetTarget():GetPos() - self:GetPos()) * 7 + Vector( 0, 0, 16 ) )
 					self:GetTarget():TakeDamageInfo(dmgInfo)
 					if !IsValid(self:GetTarget()) then return end
-					self:GetTarget():EmitSound( "effects/hit/evt_zombie_hit_player_0"..math.random(1,5)..".wav", SNDLVL_TALKING, math.random(95,105))
+					self:GetTarget():EmitSound( "nz/zombies/attack/player_hit_"..math.random(0,5)..".wav", SNDLVL_TALKING, math.random(95,105))
 					self:GetTarget():ViewPunch( VectorRand():Angle() * 0.01 )
 				end
 			end)
@@ -402,5 +402,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

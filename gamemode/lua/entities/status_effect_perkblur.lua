@@ -49,7 +49,7 @@ if SERVER then
 
 		self.perk_blurscreen_logic:SetOwner(self)
 		self.perk_blurscreen_logic:UpdateDuration(duration)
-		self:SetNWEntity("PERK.BlurLogic", self.perk_blurscreen_logic)
+		self:SetNW2Entity("PERK.BlurLogic", self.perk_blurscreen_logic)
 		return self.perk_blurscreen_logic
 	end
 	hook.Add("PlayerDeath", "PERK.BlurLogic", function(self)
@@ -60,14 +60,14 @@ if SERVER then
 end
 
 entMeta.PerkBlurIntensity = function(self)
-	local ent = self:GetNWEntity("PERK.BlurLogic")
+	local ent = self:GetNW2Entity("PERK.BlurLogic")
 	if not IsValid(ent) then return 0 end
 
 	return math.Clamp((ent.statusEnd - CurTime()) / ent.duration, 0, 1)
 end
 
 entMeta.HasPerkBlur = function(self)
-	return IsValid(self:GetNWEntity("PERK.BlurLogic"))
+	return IsValid(self:GetNW2Entity("PERK.BlurLogic"))
 end
 
 ENT.SetupDataTables = function(self)

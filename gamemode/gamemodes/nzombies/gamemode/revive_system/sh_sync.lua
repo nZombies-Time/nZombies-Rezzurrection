@@ -19,7 +19,7 @@ if SERVER then
 	end
 
 	function nzRevive:SendPlayerDowned(ply, receiver, attdata)
-		print("Sent")
+		--print("Sent")
 		attdata = attdata or {}
 		net.Start( "nzRevivePlayerDowned" )
 			net.WriteInt(ply:EntIndex(), 13)
@@ -63,7 +63,7 @@ end
 if CLIENT then
 
 	local function ReceivePlayerDowned()
-		print("Gotten")
+		--print("Gotten")
 		local id = net.ReadInt(13)
 		local attached = net.ReadTable()
 		
@@ -71,7 +71,7 @@ if CLIENT then
 		nzRevive.Players[id].DownTime = CurTime()
 		
 		for k,v in pairs(attached) do
-			print(k,v)
+			--print(k,v)
 			nzRevive.Players[id][k] = v
 		end
 		
@@ -123,6 +123,7 @@ if CLIENT then
 		nzRevive.Players[id] = nil
 		local ply = Entity(id)
 		if IsValid(ply) and ply:IsPlayer() then
+		ply:StopSound("nzrevive/laststand_lp.wav")
 			--ply:AnimResetGestureSlot(GESTURE_SLOT_CUSTOM)
 			if ply == LocalPlayer() then nzRevive:ResetColorFade() end
 			nzRevive:DownedHeadsUp(ply, "has died!")

@@ -120,7 +120,7 @@ function ENT:StatsInitialize()
 		self:SetMooSpecial(true)
 		self:SetRunSpeed( 55 )
 		self.loco:SetDesiredSpeed( 55 )
-		self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+		self:SetCollisionBounds(Vector(-25,-25, 0), Vector(25, 25, 70))
 	end
 end
 
@@ -199,11 +199,11 @@ function ENT:OnPathTimeOut()
 function ENT:HandleAnimEvent(a,b,c,d,e)
 
 	if e == "brute_stepl" then
-		self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_"..math.random(0,21)..".ogg",80,math.random(95,100))
+		self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".ogg",80,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 	end
 	if e == "brute_stepr" then
-		self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_"..math.random(0,21)..".ogg",80,math.random(95,100))
+		self:EmitSound("enemies/bosses/brute/brut_fs_walk_heel_01_0"..math.random(0,9)..".ogg",80,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		
 	end
@@ -230,5 +230,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

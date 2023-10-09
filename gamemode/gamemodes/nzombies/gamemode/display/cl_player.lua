@@ -42,6 +42,10 @@ function player:GetHUDPointsType(id)
 	 return "bo1s.png"
 	end
 	
+	if id == "Deep Rock Galactic" then
+	 return "DRG_score.png"
+	end
+	
 	if id == "666" then
 	 return "chained_small.png"
 	end
@@ -102,6 +106,12 @@ function player:GetHUDPointsType(id)
 	end
 	if id == "Gears of War" then
 	return "gears_score1.png"
+	end
+	if id == "Miku" then
+	return "miku_score.png"
+	end
+	if id == "BSAA" then
+	return "bsaa_score.png"
 	end
 	if id == "Killing Floor 2" then
 	return "hd_score4.png"

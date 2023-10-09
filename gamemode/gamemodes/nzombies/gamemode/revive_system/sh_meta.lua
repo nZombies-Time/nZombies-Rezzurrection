@@ -1,9 +1,17 @@
 local playerMeta = FindMetaTable("Player")
 if SERVER then
-
 	function playerMeta:DownPlayer()
 		local id = self:EntIndex()
-		--self:AnimRestartGesture(GESTURE_SLOT_CUSTOM, ACT_HL2MP_SIT_PISTOL)
+
+		local reviving = self:GetPlayerReviving()
+		if IsValid(reviving) then //stop reviving if u die
+			local revid = reviving:EntIndex()
+			local data = nzRevive.Players[revid]
+			if data and data.ReviveTime then
+				reviving:StopRevive()
+				self.Reviving = nil
+			end
+		end
 
 		nzRevive.Players[id] = {}
 		nzRevive.Players[id].DownTime = CurTime()
@@ -97,7 +105,7 @@ if SERVER then
 		self.DownPoints = nil
 		self.DownedWithSoloRevive = nil
 
-		for k, v in pairs(ents.GetAll()) do
+		--[[for k, v in pairs(ents.GetAll()) do
 			if v:IsValidZombie() then
 				table.insert(tbl, v)
 			end
@@ -107,23 +115,24 @@ if SERVER then
 				local SND = "RevivalStinger"
 				nzSounds:Play(SND)
 			end
-		end
+		end]]
 		self:ResetHull()
 	end
 
 	function playerMeta:StartRevive(revivor, nosync)
 		local id = self:EntIndex()
+		if not revivor then revivor = self end
 		if !nzRevive.Players[id] then return end
 		if nzRevive.Players[id].ReviveTime then return end
+		if IsValid(nzRevive.Players[id].RevivePlayer) then return end
 
 		nzRevive.Players[id].ReviveTime = CurTime()
 		nzRevive.Players[id].RevivePlayer = revivor
 		revivor.Reviving = self
 
-		print("Started revive", self, revivor)
-
-		if revivor:GetNotDowned() then
-			--revivor:Give("nz_revive_morphine") -- Give them the viewmodel
+		if not revivor:GetUsingSpecialWeapon() and revivor:GetNotDowned() then
+			revivor:Give("tfa_bo4_syrette") //alternatively 'tfa_bo2_syrette' or 'tfa_bo3_syrette'
+			revivor:SelectWeapon("tfa_bo4_syrette")
 		end
 
 		if !nosync then hook.Call("PlayerBeingRevived", nzRevive, self, revivor) end
@@ -136,8 +145,16 @@ if SERVER then
 		local revivor = nzRevive.Players[id].RevivePlayer
 		nzRevive.Players[id].ReviveTime = nil
 		nzRevive.Players[id].RevivePlayer = nil
+		revivor.Reviving = nil
 
-		print("Stopped revive", self)
+		if revivor:HasWeapon("tfa_bo4_syrette") and not revivor:IsRevivingPlayer() then
+			revivor:SetUsingSpecialWeapon(false)
+			revivor:EquipPreviousWeapon()
+			timer.Simple(0, function() 
+				if not IsValid(revivor) then return end
+				revivor:StripWeapon("tfa_bo4_syrette")
+			end)
+		end
 
 		if !nosync then hook.Call("PlayerNoLongerBeingRevived", nzRevive, self) end
 	end
@@ -171,6 +188,16 @@ if SERVER then
 	end
 end
 
+function playerMeta:IsRevivingPlayer()
+	for id, data in pairs(nzRevive.Players) do
+		if data.RevivePlayer and IsValid(data.RevivePlayer) and data.RevivePlayer == self then
+			return true
+		end
+	end
+
+	return false
+end
+
 function playerMeta:GetNotDowned()
 	local id = self:EntIndex()
 	if nzRevive.Players[id] then
@@ -191,4 +218,9 @@ end
 
 function playerMeta:GetPlayerReviving()
 	return self.Reviving
+end
+
+//this is to prevent IW anims mod from erroring
+function playerMeta:IsReviving()
+	return false
 end

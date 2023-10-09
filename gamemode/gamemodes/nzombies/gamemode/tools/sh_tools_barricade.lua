@@ -7,10 +7,10 @@ nzTools:CreateTool("barricade", {
 	PrimaryAttack = function(wep, ply, tr, data)
 		local ent = tr.Entity
 		if IsValid(ent) and ent:GetClass() == "breakable_entry" then
-			nzMapping:BreakEntry(ent:GetPos(), ent:GetAngles(), data.planks, data.jump, data.boardtype, data.prop, ply)
+			nzMapping:BreakEntry(ent:GetPos(), ent:GetAngles(), data.planks, data.jump, data.boardtype, data.prop, data.jumptype, data.plycollision, ply)
 			ent:Remove()
 		else
-			nzMapping:BreakEntry(tr.HitPos + Vector(0,0,0), Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.planks, data.jump, data.boardtype, data.prop, ply)
+			nzMapping:BreakEntry(tr.HitPos + Vector(0,0,0), Angle(0,(tr.HitPos - ply:GetPos()):Angle()[2],0), data.planks, data.jump, data.boardtype, data.prop, data.jumptype, data.plycollision, ply)
 		end
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
@@ -41,6 +41,8 @@ nzTools:CreateTool("barricade", {
 		valz["Row2"] = data.jump
 		valz["Row3"] = data.boardtype
 		valz["Row4"] = data.prop
+		valz["Row5"] = data.jumptype
+		valz["Row6"] = data.plycollision
 
 		local DProperties = vgui.Create( "DProperties", frame )
 		DProperties:SetSize( 280, 180 )
@@ -51,6 +53,8 @@ nzTools:CreateTool("barricade", {
 			data.jump = valz["Row2"]
 			data.boardtype = valz["Row3"]
 			data.prop = valz["Row4"]
+			data.jumptype = valz["Row5"]
+			data.plycollision = valz["Row6"]
 
 			--PrintTable(data)
 			
@@ -93,6 +97,24 @@ nzTools:CreateTool("barricade", {
 		Row4:AddChoice("Barbwire Fence",9)
 		Row4.DataChanged = function( _, val ) valz["Row4"] = val DProperties.UpdateData(DProperties.CompileData()) end
 
+		local Row5 = DProperties:CreateRow( "Barricade", "Jump Type" )
+		Row5:Setup( "Combo" )
+		Row5:AddChoice("Normal(Default)",0)
+        Row5:AddChoice("Mantle Over: 128 Units",1)
+        Row5:AddChoice("Mantle Over: 96 Units",2)
+        Row5:AddChoice("Mantle Over: 72 Units",3)
+        Row5:AddChoice("Mantle Over: 48 Units",4)
+        Row5:AddChoice("Jump Up: 128 Units",5)
+        Row5:AddChoice("Jump Up Fast: 128 Units",6)
+        Row5:AddChoice("Jump Down: 128 Units",7)
+		Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
+		local Row6 = DProperties:CreateRow( "Barricade", "Player Collision" )
+		Row6:Setup( "Boolean" )
+		Row6:SetValue( valz["Row6"] )
+		Row6.DataChanged = function( _, val ) valz["Row6"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
+
 		return DProperties
 	end,
 	defaultdata = {
@@ -100,5 +122,7 @@ nzTools:CreateTool("barricade", {
 		jump = 0,
 		boardtype = 1,
 		prop = 0,
+		jumptype = 0,
+		plycollision = 1,
 	}
 })

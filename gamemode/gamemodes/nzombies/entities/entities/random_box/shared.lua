@@ -23,6 +23,7 @@ function ENT:Draw()
 end
 
 function ENT:Initialize()
+self:SetTargetPriority(TARGET_PRIORITY_MONSTERINTERACT) -- This inserts the it into the target array.
 	self:SetModel("models/nzr/2022/magicbox/bo2/magic_box.mdl")
 	if (nzMapping.Settings.boxtype == "Original") then
 		self:SetModel("models/nzr/2022/magicbox/bo2/magic_box.mdl")

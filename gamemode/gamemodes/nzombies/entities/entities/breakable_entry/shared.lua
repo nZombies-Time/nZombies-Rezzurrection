@@ -13,19 +13,21 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 0, "NumPlanks" )
 	self:NetworkVar( "Bool", 0, "HasPlanks" )
 	self:NetworkVar( "Bool", 1, "TriggerJumps" )
+	self:NetworkVar( "Bool", 2, "PlayerCollision" )
 	self:NetworkVar( "Int", 1, "BoardType" )
 	self:NetworkVar( "Int", 2, "Prop" )
+	self:NetworkVar( "Int", 3, "JumpType" )
 end
 
 -- What positions the barricade can possibly use
 ENT.BarricadeTearPositions = {
 	Front = {
-		Vector(-55,0,0),
+		Vector(-50,0,0),
 		--Vector(-55,35,0),
 		--Vector(-55,-35,0),
 	},
 	Back = {
-		Vector(55,0,0),
+		Vector(50,0,0),
 		--Vector(55,35,0),
 		--Vector(55,-35,0),
 	}
@@ -50,6 +52,7 @@ function ENT:Initialize()
 	self.ClassicNumsPlanks = {}
 
 	self:SetBoardType(self:GetBoardType())
+
 	self:UpdateBarricadePos()
 
 	if SERVER then
@@ -144,31 +147,18 @@ end
 function ENT:RemovePlank(plank)
 	if plank == nil then return end
 
-	--[[local validnum = {1,2,3,4,5,6}
-	if validnum[plank:GetFlags()] then
-		table.insert(self.ClassicNumsPlanks, plank:GetFlags())
-	end]]
-	
-	--local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
-
-	--[[if !IsValid(plank) and plank != nil then -- Not valid but not nil (NULL)
-		table.RemoveByValue(self.Planks, plank) -- Remove it from the table
-		self:RemovePlank() -- and try again
-	end]]
-	
-	--[[if IsValid(plank) then
-		plank:ResetSequence(sequence)
-		timer.Simple(2, function() 
-			if IsValid(plank) then 
-				plank:Remove() 
-			end 
-		end)
-	end]]
-
-	local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
+	local sequence, duration = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
 	plank:ResetSequence(sequence)
-	--table.RemoveByValue(self.Planks, plank)
 	plank.Torn = true
+
+	timer.Simple(duration, function()
+		if IsValid(self) and IsValid(plank) then
+			if !plank:GetNoDraw() and plank.Torn then
+				plank:SetNoDraw(true)
+			end
+		end
+	end)
+
 	self:SetNumPlanks( self:GetNumPlanks() - 1 )
 	
 	self.ZombieUsing = nil
@@ -214,10 +204,25 @@ function ENT:PlankCheck(plank)
 	--print(plank.Torn)
 	if plank.Torn then
 		self:SetNumPlanks( (self:GetNumPlanks() or 0) + 1 )
-		--table.insert(self.Planks, plank)
-		local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
+
+		local sequence, duration = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
 		plank:ResetSequence(sequence)
 		plank.Torn = false
+
+		if plank:GetNoDraw() and !plank.Torn then
+			plank:SetNoDraw(false)
+		end
+
+		timer.Simple(duration, function()
+			if IsValid(self) and IsValid(plank) then
+				local bone = plank:GetBonePosition(plank:LookupBone("tag_origin"))
+				util.ScreenShake(self:GetPos(), 5, 15, 0.3, 200)
+
+				for i = 1, 3 do
+					ParticleEffect(self:GetBoardType() >= 2 and "impact_metal" or "impact_wood", bone, Angle(0,0,0))
+				end
+			end
+		end)
 	end
 end
 
@@ -225,10 +230,10 @@ function ENT:SpawnPlank()
 	local plank = self:GetBoardType() == 1 and ents.Create("breakable_entry_plank") or self:GetBoardType() == 2 and ents.Create("breakable_entry_bar") or self:GetBoardType() == 3 and ents.Create("breakable_entry_ventslat")
 	plank:SetParent(self)
 	if self:GetBoardType() == 1 then
-		plank:SetLocalPos( Vector(35,0,30))
+		plank:SetLocalPos( Vector(32,0,31))
 		plank:SetLocalAngles( Angle(0,180,0))
 	elseif self:GetBoardType() == 2 or self:GetBoardType() == 3 then
-		plank:SetLocalPos( Vector(35,0,30))
+		plank:SetLocalPos( Vector(32,0,31))
 		plank:SetLocalAngles( Angle(0,90,0))
 	end
 	plank:Spawn()
@@ -239,9 +244,6 @@ function ENT:SpawnPlank()
 	table.insert(self.Planks, plank)
 
 	self:PlankCheck(plank)
-
-	--[[local sequence = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_repair")
-	plank:ResetSequence(sequence)]]
 
 	return plank
 end
@@ -305,6 +307,7 @@ function IsStuck(ply)
 end
 
 hook.Add("ShouldCollide", "zCollisionHook", function(ent1, ent2)
+	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and ent2:IsPlayer() and !ent1:GetPlayerCollision() then return false end
 	if IsValid(ent1) and ent1:GetClass() == "breakable_entry" and !ent2:IsPlayer() and ent2.Type != "nextbot" then return false end
 	if IsValid(ent1) and ent1:GetClass() == "breakable_entry_plank" and !ent2:IsPlayer() and ent2.Type != "nextbot" then return false end
 	if IsValid(ent1) and (ent1:GetClass() == "invis_wall"

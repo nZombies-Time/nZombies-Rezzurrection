@@ -10,6 +10,7 @@ PLAYER.CanUseFlashlight     = true
 
 function PLAYER:SetupDataTables()
 	self.Player:NetworkVar("Bool", 0, "UsingSpecialWeapon")
+	self.Player:NetworkVar("Bool", 1, "GettingFacefucked")
 end
 
 function PLAYER:Init()
@@ -93,6 +94,7 @@ function PLAYER:Spawn()
 	end
 	
 	self.Player:SetUsingSpecialWeapon(false)
+	self.Player:SetGettingFacefucked(false)
 end
 
 function PLAYER:OnTakeDamage(dmginfo)

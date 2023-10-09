@@ -1202,7 +1202,7 @@ nzTools:CreateTool("settings", {
 					["Title"] = "Pack-A-Punch Sound",
 					["ToolTip"] = "",
 					["Bind"] = valz["SndRow25"]
-				}
+				},
 			}
 
 			local SndMenuPowerUp = { 

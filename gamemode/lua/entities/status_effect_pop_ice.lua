@@ -30,6 +30,7 @@ local entMeta = FindMetaTable("Entity")
 
 if SERVER then
 	entMeta.ATTCryoFreeze = function(self, duration, attacker, inflictor)
+		if self.IsAATTurned and self:IsAATTurned() then return end
 		if duration == nil then
 			duration = 0
 		end

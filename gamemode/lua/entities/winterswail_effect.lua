@@ -27,12 +27,13 @@ ENT.PrintName = "Frost Bite"
 ENT.Spawnable = false
 ENT.AdminOnly = false
 
-ENT.Delay = 3
-ENT.Kills = 0
-ENT.MaxKills = 12
+ENT.Delay = 6
 ENT.Range = 160
-ENT.KillRange = 120
+ENT.KillRange = 240
 ENT.Duration = 10
+
+ENT.MaxKills = 12
+ENT.Kills = 0
 
 function ENT:SetupDataTables()
 	self:NetworkVar("Entity", 0, "Attacker")
@@ -42,18 +43,10 @@ end
 function ENT:Initialize()
 	local p = self:GetParent()
 	if IsValid(p) then
-		p:EmitSound("TFA_BO4_WINTERS.Break")
-		if p:IsPlayer() then
-			if p:HasUpgrade("winters") then
-				self.KillRange = self.Range
-				self.Delay = 8
-				self.Duration = 54000 //~15 hours
-			end
-		else
-			self:SetParent(nil)
-		end
+		p:EmitSound("NZ.Winters.Start")
+		ParticleEffect("bo3_aat_freeze_explode", p:WorldSpaceCenter(), angle_zero)
 	else
-		self:EmitSound("TFA_BO4_WINTERS.Break")
+		self:EmitSound("NZ.Winters.Start")
 	end
 
 	self:SetModel("models/dav0r/hoverball.mdl")
@@ -64,7 +57,7 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_NONE)
 	self:SetSolid(SOLID_NONE)
 
-	self:EmitSound("TFA_BO4_ALISTAIR.Charged.WindLoop")
+	self:EmitSound("NZ.Winters.Loop")
 
 	ParticleEffectAttach("nz_perks_winters", PATTACH_ABSORIGIN_FOLLOW, self, 0)
 
@@ -72,13 +65,15 @@ function ENT:Initialize()
 
 	if CLIENT then return end
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), self.KillRange)) do
-		if not v.BO4WintersFreeze then break end
 		if self.Kills >= self.MaxKills then break end
 		if not (v:IsNPC() or v:IsNextBot()) then continue end
 		if v:Health() <= 0 then continue end
-		if v:BO4IsFrozen() then continue end
+		if v:IsATTCryoFreeze() then continue end
+		if v.NZBossType then continue end
+		if string.find(v:GetClass(), "nz_zombie_boss") then continue end
+		if v.IsAATTurned and v:IsAATTurned() then continue end
 
-		v:BO4WintersFreeze(math.Rand(3,5), self:GetAttacker(), self:GetInflictor())
+		v:ATTCryoFreeze(math.Rand(1.4,1.6), self:GetAttacker(), self:GetInflictor())
 		self.Kills = self.Kills + 1
 	end
 
@@ -94,12 +89,14 @@ function ENT:Think()
 			if not (v:IsNPC() or v:IsNextBot()) then continue end
 			if v:Health() <= 0 then continue end
 			if v:IsWintersWailSlow() then continue end
+			if v:IsATTCryoFreeze() then continue end
+			if string.find(v:GetClass(), "nz_zombie_boss") then continue end
+			if v.IsAATTurned and v:IsAATTurned() then continue end
 
 			v:WintersWailSlow(self.Duration, 0.1)
 		end
 
 		if self.killtime < CurTime() then
-			self:StopSound("TFA_BO4_ALISTAIR.Charged.WindLoop")
 			self:Remove()
 			return false
 		end
@@ -109,12 +106,3 @@ function ENT:Think()
 	return true
 end
 
-function ENT:OnRemove()
-	self:StopSound("TFA_BO4_ALISTAIR.Charged.WindLoop")
-	local p = self:GetParent()
-	if IsValid(p) then
-		p:EmitSound("TFA_BO4_ALISTAIR.Charged.WindEnd")
-	else
-		self:EmitSound("TFA_BO4_ALISTAIR.Charged.WindEnd")
-	end
-end

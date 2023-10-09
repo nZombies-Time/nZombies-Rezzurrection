@@ -30,6 +30,7 @@ local entMeta = FindMetaTable("Entity")
 
 if SERVER then
 	entMeta.AATBlastFurnace = function(self, duration, attacker, inflictor)
+		if self.IsAATTurned and self:IsAATTurned() then return end
 		if duration == nil then
 			duration = 0
 		end
@@ -124,6 +125,11 @@ ENT.InflictDamage = function(self, ent)
 	damage:SetInflictor(IsValid(self:GetInflictor()) and self:GetInflictor() or self)
 	damage:SetDamagePosition(ent:EyePos())
 	damage:SetDamageForce(vector_up)
+
+	if nzombies and ent.NZBossType then
+		damage:SetDamage(math.max(1400, ent:GetMaxHealth() / 6))
+		damage:ScaleDamage(math.Round(nzRound:GetNumber()/8))
+	end
 
 	ent:TakeDamageInfo(damage)
 end

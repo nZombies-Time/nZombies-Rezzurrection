@@ -94,6 +94,8 @@ function ENT:PhysicsCollide(data, physobj) end
 
 function ENT:Think() end
 
-function ENT:Draw()
-	self:DrawModel()
+if CLIENT then
+    function ENT:Draw()
+    	self:DrawModel()
+    end
 end

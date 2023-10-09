@@ -24,9 +24,6 @@ local t7_hud_revive_glow = Material("nz_moo/huds/t7/uie_t7_zm_hud_revive_glow.pn
 local t7_hud_revive_arrow = Material("nz_moo/huds/t7/uie_t7_zm_hud_revive_arrow.png", "unlitgeneric smooth")
 local t7_hud_revive_ringblur = Material("nz_moo/huds/t7/uie_t7_zm_hud_revive_ringblur.png", "unlitgeneric smooth")
 
-local bloodpulse = true --if true, going up
-local pulse = 0
-
 local vector_up_35 = Vector(0,0,35)
 
 local color_white_100 = Color(255, 255, 255, 100)
@@ -73,85 +70,97 @@ local function DrawDownedPlayers_t7()
 	local scale = (w/1920 + 1)/2
 	local bleedtime = nz_bleedouttime:GetFloat()
 	local pply = LocalPlayer()
+	if IsValid(pply:GetObserverTarget()) then
+		pply = pply:GetObserverTarget()
+	end
 
-	for k, v in pairs(nzRevive.Players) do
-		local ply = Entity(k)
-		if IsValid(ply) then
-			local id = ply:EntIndex()
-			if ply == pply then continue end
-			if not nzRevive.Players[id].DownTime then continue end
-			local revivor = nzRevive.Players[id].RevivePlayer
-			if IsValid(revivor) and revivor == pply then continue end
+	for id, data in pairs(nzRevive.Players) do
+		local ply = Entity(id)
+		if not IsValid(ply) then continue end
 
-			local ppos = ply:GetPos()
-			local posxy = (ppos + vector_up_35):ToScreen()
-			local dir = ((ppos + vector_up_35) - EyeVector()*2):GetNormal():ToScreen()
-			local dying = false
-			local hasrevive = false
+		if ply == pply then continue end
+		if not data.DownTime then continue end
 
-			if posxy.x-35 < 60 or posxy.x-35 > w-130 or posxy.y-50 < 60 or posxy.y-50 > h-110 then
-				posxy.x, posxy.y = XYCompassToScreen((ppos + vector_up_35), 64*scale)
-			end
+		local revivor = data.RevivePlayer
+		if IsValid(revivor) and revivor == pply then continue end
 
-			local revivescale = 1 - math.Clamp((CurTime() - nzRevive.Players[id].DownTime) / bleedtime, 0, 1)
-			if IsValid(revivor) then
-				hasrevive = revivor:HasPerk("revive")
-				local revtime = hasrevive and 2 or 4
-				revivescale = math.Clamp((CurTime() - nzRevive.Players[id].ReviveTime) / revtime, 0, 1)
-			end
+		local ppos = ply:GetPos()
+		local posxy = (ppos + vector_up_35):ToScreen()
+		local dir = ((ppos + vector_up_35) - EyeVector()*2):GetNormal():ToScreen()
 
-			if not IsValid(revivor) and revivescale <= 0.35 then
-				dying = true
-			end
+		local dying = false
+		local hasrevive = false
 
-			surface.SetDrawColor(color_white_100)
-			surface.SetMaterial(t7_hud_revive_glow)
-			surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+		if posxy.x-35 < 60 or posxy.x-35 > w-130 or posxy.y-50 < 60 or posxy.y-50 > h-110 then
+			posxy.x, posxy.y = XYCompassToScreen((ppos + vector_up_35), 64*scale)
+		end
 
-			surface.SetDrawColor(color_white)
-			surface.SetMaterial(t7_hud_revive_skull)
-			surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+		local revivescale = 1 - math.Clamp((CurTime() - data.DownTime) / bleedtime, 0, 1)
+		if data.ReviveTime and IsValid(revivor) then
+			hasrevive = revivor:HasPerk("revive")
+			local revtime = hasrevive and 2 or 4
+			revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
+		end
 
-			surface.SetDrawColor(dying and color_red_50 or color_green_50)
-			surface.SetMaterial(t7_hud_revive_ringblur)
-			surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+		if not IsValid(revivor) and revivescale <= 0.35 then
+			dying = true
+		end
 
-			DrawReviveCircle(posxy.x, posxy.y, 32*scale, 1*revivescale, dying, hasrevive)
-		end	
+		surface.SetDrawColor(color_white_100)
+		surface.SetMaterial(t7_hud_revive_glow)
+		surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+
+		surface.SetDrawColor(color_white)
+		surface.SetMaterial(t7_hud_revive_skull)
+		surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+
+		surface.SetDrawColor(dying and color_red_50 or color_green_50)
+		surface.SetMaterial(t7_hud_revive_ringblur)
+		surface.DrawTexturedRect(posxy.x - 40*scale, posxy.y - 40*scale, 80*scale, 80*scale)
+
+		DrawReviveCircle(posxy.x, posxy.y, 32*scale, 1*revivescale, dying, hasrevive)
 	end
 end
 
+local revnum = 0
 local function DrawRevivalProgress_t7()
 	if not cl_drawhud:GetBool() then return end
 
 	local ply = LocalPlayer()
-	local tr = util.QuickTrace(ply:EyePos(), ply:GetAimVector()*100, ply)
-	local dply = tr.Entity
-	if IsValid(dply) then
-		local id = dply:EntIndex()
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
-		local hasrevive = ply:HasPerk("revive")
-		local revtime = hasrevive and 2 or 4
-		local w, h = ScrW(), ScrH()
-		local scale = (w/1920 + 1)/2
+	local reviving = ply:GetPlayerReviving()
+	if not IsValid(reviving) then return end
+	local id = reviving:EntIndex()
 
-		if nzRevive.Players[id] and nzRevive.Players[id].RevivePlayer == ply then
-			local revivescale = math.Clamp((CurTime() - nzRevive.Players[id].ReviveTime) / revtime, 0, 1)
+	local hasrevive = ply:HasPerk("revive")
+	local revtime = hasrevive and 2 or 4
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1)/2
 
-			surface.SetDrawColor(color_white_100)
-			surface.SetMaterial(t7_hud_revive_glow)
-			surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
+	local data = nzRevive.Players[id]
+	if data and data.RevivePlayer == ply then
+		revnum = revnum + FrameTime()
+		if revnum >= 1 then revnum = 0 end
+		local pulsing = 1.5 - ((1 + revnum)*0.25)
 
-			surface.SetDrawColor(color_white)
-			surface.SetMaterial(t7_hud_revive_skull)
-			surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
+		local revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
 
-			surface.SetDrawColor(dying and color_red_50 or color_green_50)
-			surface.SetMaterial(t7_hud_revive_ringblur)
-			surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
+		surface.SetDrawColor(color_white_100)
+		surface.SetMaterial(t7_hud_revive_glow)
+		surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
 
-			DrawReviveCircle(w/2, h/2, 32*scale, 1*revivescale, false, hasrevive)
-		end
+		surface.SetDrawColor(color_white)
+		surface.SetMaterial(t7_hud_revive_skull)
+		surface.DrawTexturedRect(w/2 - (40*pulsing)*scale, h/2 - (40*pulsing)*scale, (80*pulsing)*scale, (80*pulsing)*scale)
+
+		surface.SetDrawColor(dying and color_red_50 or color_green_50)
+		surface.SetMaterial(t7_hud_revive_ringblur)
+		surface.DrawTexturedRect(w/2 - 40*scale, h/2 - 40*scale, 80*scale, 80*scale)
+
+		DrawReviveCircle(w/2, h/2, 32*scale, 1*revivescale, false, hasrevive)
 	end
 end
 

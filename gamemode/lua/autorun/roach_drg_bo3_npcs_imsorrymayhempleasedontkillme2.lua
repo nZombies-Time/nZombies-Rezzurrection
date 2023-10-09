@@ -1,5 +1,6 @@
 
 game.AddParticles("particles/bo1overhaul_blood_fx.pcf")
+game.AddParticles("particles/gearsofwar_effects.pcf")
 	PrecacheParticleSystem("nz_blood_gib")
 	PrecacheParticleSystem("nz_blood_headshot")
 game.AddParticles("particles/driese_fx.pcf")

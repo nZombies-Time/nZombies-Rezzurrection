@@ -47,7 +47,7 @@ function ENT:Initialize()
 
 	if math.random(100) >= 70 then
 		self.Dance = true
-		self.Delay = 12
+		self.Delay = 11.5
 	end
 
 	for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
@@ -55,9 +55,10 @@ function ENT:Initialize()
 			if v:IsAATTurned() then continue end
 			if v:GetClass() == "nz_zombie_boss_astro" then
 				v:AATTurned(10, self:GetAttacker(), true)
+				v:SetOwner(self:GetAttacker())
 				break
 			end
-			if v.IsMooSpecial and not v.MooSpecialZombie then continue end
+			if v.IsMooSpecial and !v.MooSpecialZombie then continue end
 
 			v:AATTurned(self.Delay, self:GetAttacker(), self.Dance)
 			v:SetOwner(self:GetAttacker())

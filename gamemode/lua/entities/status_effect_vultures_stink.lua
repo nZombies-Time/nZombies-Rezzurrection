@@ -27,6 +27,7 @@ ENT.AdminSpawnable = false
 ENT.Author = "DBot, FlamingFox"
 ENT.RenderGroup = RENDERGROUP_OTHER
 local entMeta = FindMetaTable("Entity")
+local nzombies = engine.ActiveGamemode() == "nzombies"
 
 if SERVER then
 	entMeta.VulturesStink = function(self, duration)
@@ -49,7 +50,7 @@ if SERVER then
 
 		self.perk_vulturesstink_logic:SetOwner(self)
 		self.perk_vulturesstink_logic:UpdateDuration(duration)
-		self:SetNWEntity("PERK.VultureStinkLogic", self.perk_vulturesstink_logic)
+		self:SetNW2Entity("PERK.VultureStinkLogic", self.perk_vulturesstink_logic)
 		return self.perk_vulturesstink_logic
 	end
 	hook.Add("PlayerDeath", "PERK.VultureStinkLogic", function(self)
@@ -60,7 +61,7 @@ if SERVER then
 end
 
 entMeta.HasVultureStink = function(self)
-	return IsValid(self:GetNWEntity("PERK.VultureStinkLogic"))
+	return IsValid(self:GetNW2Entity("PERK.VultureStinkLogic"))
 end
 
 ENT.SetupDataTables = function(self)
@@ -80,7 +81,7 @@ ENT.Initialize = function(self)
 		p:EmitSound("NZ.Vulture.Stink.Loop")
 		if SERVER then
 			p:SetNoTarget(true)
-			if p.SetTargetPriority then
+			if nzombies then
 				p:SetTargetPriority(TARGET_PRIORITY_NONE)
 			end
 		end
@@ -88,8 +89,8 @@ ENT.Initialize = function(self)
 
 	if CLIENT then return end
 	self.statusStart = CurTime()
-	self.duration = 1
-	self.statusEnd = self.statusStart + 1
+	self.duration = 0.1
+	self.statusEnd = self.statusStart + 0.1
 end
 
 ENT.UpdateDuration = function(self, newtime)
@@ -120,14 +121,8 @@ ENT.OnRemove = function(self)
 		if SERVER then
 			p:SetNoTarget(false)
 			p:StopParticles()
-			if engine.ActiveGamemode() == "nzombies" then
-				if IsValid(nzPowerUps.ActivePlayerPowerUps[p]) then
-					if !nzPowerUps:IsPlayerPowerupActive(p, "zombieblood") then
-						p:SetTargetPriority(TARGET_PRIORITY_PLAYER)
-					end
-				else
-					p:SetTargetPriority(TARGET_PRIORITY_PLAYER)
-				end
+			if nzombies and !nzPowerUps:IsPlayerPowerupActive(p, "zombieblood") then
+				p:SetTargetPriority(TARGET_PRIORITY_PLAYER)
 			end
 		end
 	end

@@ -35,6 +35,7 @@ function ENT:SetupDataTables()
 end
 
 function ENT:Initialize()
+self:SetTargetPriority(TARGET_PRIORITY_MONSTERINTERACT) -- This inserts the it into the target array.
 	if SERVER then
 		self:SetBeingUsed(false)
 		self:SetLooseChange(true)

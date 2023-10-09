@@ -332,7 +332,7 @@ function ENT:PerformDeath(dmgInfo)
 	ParticleEffectAttach("driese_tp_arrival_ambient",PATTACH_ABSORIGIN,self,0)
 	if self:GetSpecialAnimation() then
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:DoDeathAnimation(self.RagdollDeathSequences[math.random(#self.RagdollDeathSequences)])
+		self:BecomeRagdoll(dmgInfo)
 	else
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
@@ -340,6 +340,7 @@ function ENT:PerformDeath(dmgInfo)
 end
 
 function ENT:AI()
+	if !self:Alive() then return end
 	if CurTime() > self.NextAI then
 		if !self.GeneralDestruction then
 			local roll = math.random(2)
@@ -430,7 +431,7 @@ function ENT:IsValidTarget( ent )
 	if not ent then return false end
 	if self.PerkDestruction then return IsValid(ent) and ent:GetClass() == "perk_machine" end
 	if self.BoxDestruction then return IsValid(ent) and ent:GetClass() == "random_box" end
-	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 
 function ENT:HasHelmet() return self:GetHelmet() end

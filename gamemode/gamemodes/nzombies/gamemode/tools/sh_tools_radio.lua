@@ -5,7 +5,7 @@ nzTools:CreateTool("radio", {
 		return true
 	end,
 	PrimaryAttack = function(wep, ply, tr, data)
-		nzMapping:Radio(tr.HitPos + tr.HitNormal, Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2],0), ply, data)
+		nzMapping:Radio(tr.HitPos + tr.HitNormal, Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2],0)+Angle(0,-90,0), data.sound, ply)
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
 		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_radio" then
@@ -66,7 +66,7 @@ if SERVER then
 				table.insert(radio_spawns, {
 					pos = v:GetPos(),
 					angle = v:GetAngles(),
-					sound = v:GetSound()
+					sound = v:GetRadio()
 				})
 			end
 

@@ -1,24 +1,3 @@
-
--- Copyright (c) 2018-2020 TFA Base Devs
-
--- Permission is hereby granted, free of charge, to any person obtaining a copy
--- of this software and associated documentation files (the "Software"), to deal
--- in the Software without restriction, including without limitation the rights
--- to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
--- copies of the Software, and to permit persons to whom the Software is
--- furnished to do so, subject to the following conditions:
-
--- The above copyright notice and this permission notice shall be included in all
--- copies or substantial portions of the Software.
-
--- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
--- IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
--- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
--- AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
--- LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
--- OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
--- SOFTWARE.
-
 AddCSLuaFile()
 
 --[Info]--
@@ -30,10 +9,10 @@ ENT.AdminOnly = false
 --[Parameters]--
 ENT.MaxChain = 8
 ENT.ZapRange = 300
+ENT.ArcDelay = 0.2
+ENT.Decay = 15
 
 function ENT:SetupDataTables()
-	self:NetworkVar("Int", 0, "Kills")
-
 	self:NetworkVar("Entity", 0, "Target")
 	self:NetworkVar("Entity", 1, "Attacker")
 	self:NetworkVar("Entity", 2, "Inflictor")
@@ -57,6 +36,7 @@ function ENT:Initialize()
 	end
 
 	if CLIENT then return end
+	self.Kills = 0
 	self:StartChain()
 end
 
@@ -85,10 +65,9 @@ function ENT:StartChain()
 	end
 
 	self:Zap(self:GetTarget())
-	self:SetKills(0)
 
 	local timername = self:EntIndex().."wunderwaffetimer"
-	timer.Create(timername, 0.2, self.MaxChain, function()
+	timer.Create(timername, self.ArcDelay, self.MaxChain, function()
 		if not IsValid(self) then
 			timer.Stop(timername)
 			timer.Remove(timername)
@@ -104,11 +83,11 @@ function ENT:StartChain()
 			return
 		end
 
-		self.ZapRange = self.ZapRange - 15
+		self.ZapRange = self.ZapRange - self.Decay
 		self:Zap(self:GetTarget())
 
-		self:SetKills(self:GetKills() + 1)
-		if self:GetKills() >= self.MaxChain then
+		self.Kills = self.Kills + 1
+		if self.Kills >= self.MaxChain then
 			timer.Stop(timername)
 			timer.Remove(timername)
 			SafeRemoveEntity(self)
@@ -134,10 +113,10 @@ function ENT:Zap(ent)
 	if ent:OnGround() then
 		ParticleEffectAttach("bo3_waffe_ground", PATTACH_ABSORIGIN_FOLLOW, ent, 0)
 	end
-	if nzombies and ent:IsValidZombie() and not ent.IsMooSpecial then
+	/*if nzombies and ent:IsValidZombie() and not ent.IsMooSpecial then
 		ParticleEffectAttach("bo3_waffe_eyes", PATTACH_POINT_FOLLOW, ent, 3)
 		ParticleEffectAttach("bo3_waffe_eyes", PATTACH_POINT_FOLLOW, ent, 4)
-	end
+	end*/
 
 	ent:EmitSound("TFA_BO3_WAFFE.Sizzle")
 	ent:EmitSound("NZ.POP.Deadwire.Die")
@@ -146,7 +125,7 @@ function ENT:Zap(ent)
 	self:SetPos(att)
 
 	ent:TakeDamageInfo(damage)
-	self.TargetsToIgnore[self:GetKills()] = ent
+	self.TargetsToIgnore[self.Kills] = ent
 end
 
 function ENT:FindNearestEntity(pos, tab)

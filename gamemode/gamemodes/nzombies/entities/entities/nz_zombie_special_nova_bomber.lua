@@ -192,6 +192,8 @@ function ENT:StatsInitialize()
 			self:SetHealth( nzRound:GetZombieHealth() or 75 )
 		end
 
+		self.Exploded = false
+
 		self.TargetZobies = false
 		self.StopChasingZobies = 0
 		self.NextGas = CurTime() + 7
@@ -199,45 +201,57 @@ function ENT:StatsInitialize()
 end
 
 function ENT:OnSpawn()
+	local spawn
+	local types = {
+		["nz_spawn_zombie_normal"] = true,
+		["nz_spawn_zombie_special"] = true,
+		["nz_spawn_zombie_extra1"] = true,
+		["nz_spawn_zombie_extra2"] = true,
+		["nz_spawn_zombie_extra3"] = true,
+		["nz_spawn_zombie_extra4"] = true,
+	}
+	for k,v in pairs(ents.FindInSphere(self:GetPos(), 10)) do
+		if types[v:GetClass()] then
+			if !v:GetMasterSpawn() then
+				spawn = v
+			end
+		end
+	end
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
 
-	local nav = navmesh.GetNavArea(self:GetPos(), 50)
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
 	if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
 	self:EmitSound("nz_moo/zombies/vox/_quad/spawn/spawn_0"..math.random(3)..".mp3", 511, math.random(95, 105), 1, 2)
 
-	if IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP) then
+	if IsValid(spawn) and spawn:GetSpawnType() == 1 then
 		if IsValid(self) then
 			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
 			if IsValid(self) then ParticleEffect("panzer_spawn_tp", self:GetPos() + Vector(0,0,20), Angle(0,0,0), self) end
-
 		end
 		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 		self:CollideWhenPossible()
 	else
-		local SpawnMatSound = {
-			[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
-			[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
-			[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
-			[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
-		}
-		SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
-		SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
-
-		local norm = (self:GetPos()):GetNormalized()
-		local tr = util.QuickTrace(self:GetPos(), norm*10, self)
-
 		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+
+		self:SetSpecialAnimation(true)
+		self:SetIsBusy(true)
+		local seq = self:SelectSpawnSequence()
 
 		if tr.Hit then
 			local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
 			self:EmitSound(finalsound)
 		end
-
 		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-		self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
-
-		self:SetSpecialAnimation(true)
-		self:SetIsBusy(true)
-		local seq = self:SelectSpawnSequence()
+		self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
 
 		if seq then
 			self:PlaySequenceAndMove(seq, {gravity = true})
@@ -248,9 +262,11 @@ function ENT:OnSpawn()
 	end
 end
 
-
 function ENT:PerformDeath(dmginfo)
 	local damagetype = dmginfo:GetDamageType()
+
+	self:PostDeath(dmginfo)
+
 	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
 		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
 	end
@@ -284,6 +300,8 @@ end
 
 function ENT:PostDeath(dmginfo)
 	if math.random(2) == 2 then
+		if self.Exploded then return end
+		self.Exploded = true -- Prevent a possible infinite loop that causes crashes.
 		--print("Stinky Child... Gross")
 		local fuckercloud = ents.Create("nova_gas_cloud")
 		fuckercloud:SetPos(self:GetPos())
@@ -321,9 +339,10 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 				start = self:GetPos() + Vector(0,50,0),
 				endpos = self:GetTarget():GetPos() + Vector(0,0,50),
 				filter = self,
+				ignoreworld = true,
 			})
 			
-			if IsValid(tr.Entity) and !IsValid(self.GasShot) then
+			if IsValid(tr.Entity) then
 				--print(self:GetTarget())
 				--print(tr.Entity)
 				self:EmitSound("nz_moo/zombies/vox/_quad/charge/charge_0"..math.random(2)..".mp3",100,math.random(95, 105))
@@ -395,15 +414,6 @@ if SERVER then
 		self:SetLastHurt(CurTime())
 	end
 	
-	function ENT:IsValidTarget( ent )
-		if not ent then return false end
-
-		if self.TargetZobies then return IsValid(ent) and ent:IsValidZombie() and !ent.IsTurned and ent.IsMooZombie and !ent.IsMooSpecial and ent:Alive() end
-		if self.IsTurned then return IsValid(ent) and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooSpecial and ent:Alive() end
-	
-		return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY -- This is really funny.
-	end
-
 	function ENT:PerformIdle()
 		if self:GetSpecialAnimation() and !self.IsTornado then return end
 		if (self.BO4IsShocked and self:BO4IsShocked() or self.BO4IsScorped and self:BO4IsScorped() or self.BO4IsSpinning and self:BO4IsSpinning() or self:GetNW2Bool("OnAcid")) and !self:GetCrawler() then
@@ -461,6 +471,17 @@ if SERVER then
 			self.LastStatusUpdate = CurTime() + 0.25
 		end
 	end
+end
+
+function ENT:IsValidTarget( ent )
+	if not ent then return false end
+
+	-- Turned Zombie Targetting
+	if self.IsTurned or self.TargetZobies then
+		return IsValid(ent) and ent:GetTargetPriority() == TARGET_PRIORITY_MONSTERINTERACT and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooSpecial and ent:Alive() 
+	end
+	
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY -- This is really funny.
 end
 
 --[[

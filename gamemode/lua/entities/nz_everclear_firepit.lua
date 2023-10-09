@@ -62,7 +62,7 @@ end
 function ENT:Think()
 	if SERVER then
 		for k, v in pairs(ents.FindInSphere(self:GetPos(), self.Range)) do
-			if v:IsValidZombie() and not v.NZBossType then
+			if v:IsValidZombie() then
 				local round = nzRound:GetNumber() > 0 and nzRound:GetNumber() or 1
 				local health = tonumber(nzCurves.GenerateHealthCurve(round))
 
@@ -73,6 +73,11 @@ function ENT:Think()
 				damage:SetDamagePosition(v:WorldSpaceCenter())
 				damage:SetDamageForce(vector_origin)
 				damage:SetDamage(health / 10)
+
+				if v.NZBossType or string.find(v:GetClass(), "nz_zombie_boss") then
+					damage:SetDamage(math.max(50, ent:GetMaxHealth() / 50))
+					damage:ScaleDamage(math.Round(nzRound:GetNumber()/8))
+				end
 
 				v:TakeDamageInfo(damage)
 			end

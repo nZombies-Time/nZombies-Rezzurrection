@@ -11,6 +11,7 @@ PLAYER.CanUseFlashlight     = true
 
 function PLAYER:SetupDataTables()
 	self.Player:NetworkVar("Bool", 0, "UsingSpecialWeapon")
+	self.Player:NetworkVar("Bool", 1, "GettingFacefucked")
 end
 
 function PLAYER:Init()
@@ -48,6 +49,7 @@ function PLAYER:Spawn()
 		self.Player:SetTargetPriority(TARGET_PRIORITY_PLAYER)
 	end
 	self.Player:SetUsingSpecialWeapon(false)
+	self.Player:SetGettingFacefucked(false)
 end
 
 player_manager.RegisterClass( "player_create", PLAYER, "player_default" )

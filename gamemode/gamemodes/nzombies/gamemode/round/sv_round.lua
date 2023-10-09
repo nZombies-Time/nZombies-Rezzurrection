@@ -10,10 +10,46 @@ function nzRound:Waiting()
 
 end
 
+	
 function nzRound:Init()
+
 
 	timer.Simple( 5, function() self:SetupGame() self:Prepare() end )
 	self:SetState( ROUND_INIT )
+	--Support for old configs, but it is still a good idea to place a master spawner normally for each spawn type.
+	--normal spawn
+	 	local normalMaster = false
+		for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_normal" ) ) do
+            	if v:GetMasterSpawn() then
+                	normalMaster = true
+					break
+            	end        	
+			end
+
+		if not normalMaster then
+		    	for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_normal" ) ) do
+					v:SetMasterSpawn(true)
+					break
+    	end
+		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Don't make me ask you again." )
+		end
+		--special spawn
+		local specialMaster = false
+		for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_special" ) ) do
+            	if v:GetMasterSpawn() then
+                	specialMaster = true
+					break
+            	end        	
+			end
+
+		if not specialMaster then
+		    	for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_special" ) ) do
+					v:SetMasterSpawn(true)
+					break
+    	end
+		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Don't make me ask you again." )
+		end
+		
 	self:SetEndTime( CurTime() + 5 )
 	PrintMessage( HUD_PRINTTALK, "5 seconds till start time." )
 	hook.Call( "OnRoundInit", nzRound )
@@ -44,17 +80,15 @@ function nzRound:Prepare( time )
 	self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
 	self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
 	
-	for k,v in pairs(ents.FindByClass("stinky_lever")) do
-		if v:Getohfuck(true) then
-		local tbl = {[250] = 100}
-		self:SetZombieSpeeds(tbl )
+	if nzRound:GetRampage() and self:GetNumber() < 35 then -- Silently disable it once round 35 is passed.(This is only for the speed table, the spawnrate will remain sped up.)
+		local tbl = {
+			[200] = 100, -- You did this to yourself.
+		}
+		self:SetZombieSpeeds( tbl )
 		self:SetZombieCoDSpeeds( tbl )
-		--you fool owl boy, you've fallen for the classic blunder
-		break;
-		else
+	else
 		self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
 		self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
-		end
 	end
 
 	self:SetZombiesKilled( 0 )
@@ -435,12 +469,6 @@ function nzRound:ResetGame()
 	self:SetZombiesKilled( 0 )
 	self:SetZombiesMax( 0 )
 
-	--Reset zombie ai so no stench happens if you ready up again
-	
-	  for k,v in pairs(ents.FindByClass("player_spawns")) do
-        v:SetTargetPriority(TARGET_PRIORITY_NONE) -- Get rid of the spawn's target priority.
-    end
-	
 	--Reset all player ready states
 	for _, ply in pairs( player.GetAllReady() ) do
 		ply:UnReady()
@@ -485,6 +513,10 @@ function nzRound:ResetGame()
 	
 	for k,v in pairs(ents.FindByClass("stinky_lever")) do
 		v:Setohfuck(false)
+	end
+
+	if nzRound:GetRampage() then
+		nzRound:DisableRampage()
 	end
 
 	for _, ply in pairs(player.GetAll()) do

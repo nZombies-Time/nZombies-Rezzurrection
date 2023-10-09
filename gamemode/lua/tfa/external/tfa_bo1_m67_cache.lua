@@ -35,13 +35,20 @@ TFA.AddWeaponSound("TFA.BO1.KNIFE.HitFlesh", {"nzr/2022/weapons/tfa_bo1/knife/kn
 
 hook.Add("SetupMove", "nzknifeshmove", function(ply, mv, cmd)
 	local wep = ply:GetActiveWeapon()
-	if IsValid(wep) and wep.CanKnifeLunge then
-		if ply:IsOnGround() and wep:GetLunging() and IsValid(ply:GetKnifingTarget()) then
-			mv:SetVelocity((ply:GetKnifingTarget():GetPos() - ply:GetPos()):GetNormalized() * (wep.KnifeLungeSpeed or 800))
-			if ply:GetPos():DistToSqr(ply:GetKnifingTarget():GetPos()) <= 1024 then
-				mv:SetVelocity(vector_origin)
-				wep:SetLunging(false)
-			end
+	if IsValid(wep) and wep.CanKnifeLunge and wep:GetLunging() and IsValid(ply:GetKnifingTarget()) then
+		if ply:IsOnGround() then
+			local lunge = (ply:GetKnifingTarget():GetPos() - ply:GetPos()):GetNormalized()
+			mv:SetVelocity(lunge * (wep.KnifeLungeSpeed or 800))
+		end
+
+		local vel = mv:GetVelocity()
+		if vel[3] > ply:GetJumpPower() then
+			mv:SetVelocity(vel - (vector_up*math.abs(vel[3])))
+		end
+
+		if ply:GetPos():DistToSqr(ply:GetKnifingTarget():GetPos()) <= 1024 then
+			mv:SetVelocity(vector_origin)
+			wep:SetLunging(false)
 		end
 	end
 end)
@@ -72,29 +79,65 @@ if engine.ActiveGamemode() == "nzombies" then
 		nzSpecialWeapons:AddDisplay("tfa_zomdeath", false, function(wep)
 			return ply:GetNotDowned()
 		end)
+		nzSpecialWeapons:AddDisplay("tfa_bo3_syrette", false, function(wep)
+			if SERVER then
+				local ply = wep:GetOwner()
+				local revive = ply:GetPlayerReviving()
+				local reviving = true
+				if ply.IsRevivingPlayer then //dont take away if reviving someone else
+					reviving = not ply:IsRevivingPlayer()
+				end
+
+				return reviving and (not IsValid(revive) or not revive:Alive() or revive:GetNotDowned()) or not wep:GetOwner():KeyDown(IN_USE)
+			end
+		end)
+		nzSpecialWeapons:AddDisplay("tfa_bo2_syrette", false, function(wep)
+			if SERVER then
+				local ply = wep:GetOwner()
+				local revive = ply:GetPlayerReviving()
+				local reviving = true
+				if ply.IsRevivingPlayer then //dont take away if reviving someone else
+					reviving = not ply:IsRevivingPlayer()
+				end
+
+				return reviving and (not IsValid(revive) or not revive:Alive() or revive:GetNotDowned()) or not wep:GetOwner():KeyDown(IN_USE)
+			end
+		end)
+		nzSpecialWeapons:AddDisplay("tfa_bo4_syrette", false, function(wep)
+			if SERVER then
+				local ply = wep:GetOwner()
+				local revive = ply:GetPlayerReviving()
+				local reviving = true
+				if ply.IsRevivingPlayer then //dont take away if reviving someone else
+					reviving = not ply:IsRevivingPlayer()
+				end
+
+				return reviving and (not IsValid(revive) or not revive:Alive() or revive:GetNotDowned()) or not wep:GetOwner():KeyDown(IN_USE)
+			end
+		end)
 	end)
 end
 
 hook.Add("PlayerButtonDown", "nzKOBEEE", function(ply, but)
 	if not IsValid(ply) then return end
 	if but == ply:GetInfoNum("nz_key_grenade", KEY_G) then
-		for k, v in pairs(ents.FindInSphere(ply:GetPos(), 64)) do
-			if v:GetClass() == "bo1_m67_grenade" and v:GetCreationTime() + 0.25 < CurTime() then
-				local wep = ply:GetWeapon("tfa_bo1_m67")
-				if IsValid(wep) then //if ur at full and pickup someone elses nade, youll still lose one
-					ply:SetAmmo(ply:GetAmmoCount("nz_grenade") + 1, "nz_grenade") //but thats just the cost of doin buisness
-					ply:SelectWeapon(wep:GetClass())
+		local wep = ply:GetWeapon("tfa_bo1_m67")
+		if IsValid(wep) then
+			for k, v in pairs(ents.FindInSphere(ply:GetPos(), 64)) do
+				if v.NZNadeRethrow and v:GetCreationTime() + 0.25 < CurTime() then
+					ply:SetAmmo(ply:GetAmmoCount("nz_grenade") + 1, "nz_grenade")
+					ply:SelectWeapon("tfa_bo1_m67")
 
 					timer.Simple(0.5, function() //uhh ohh stinky
 						if not IsValid(wep) then return end
 						wep:SetHeldTime(wep:GetHeldTime() - 2)
 					end)
+
 					if SERVER then
 						v:Remove()
 					end
+					break
 				end
-
-				break
 			end
 		end
 	end

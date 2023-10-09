@@ -234,8 +234,8 @@ function ENT:OnTakeDamage(dmginfo)
 		dmginfo:ScaleDamage(0)
 	else
 		if CurTime() > self.LastStun then
+			dmginfo:ScaleDamage(1.25) -- Increase damage done by melee because the nZ knives don't do consistent damage.
 			self:AvoPain()
-
 		else
 			dmginfo:ScaleDamage(0)
 		end
@@ -276,9 +276,10 @@ function ENT:OnPathTimeOut()
 					start = self:GetPos() + Vector(0,50,0),
 					endpos = self:GetTarget():GetPos() + Vector(0,0,50),
 					filter = self,
+					ignoreworld = true,
 				})
 			
-				if IsValid(tr.Entity) and !IsValid(self.ZapShot) then
+				if IsValid(tr.Entity) then
 					self:EmitSound("enemies/bosses/avo/att"..math.random(2)..".ogg",100,math.random(95, 105))
 					self.ZapShot = ents.Create("nz_avo_shot")
 					self.ZapShot:SetPos(self:GetBonePosition(larmfx_tag))
@@ -314,6 +315,6 @@ end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end

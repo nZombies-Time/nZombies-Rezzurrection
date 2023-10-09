@@ -172,6 +172,7 @@ function ENT:OOBTest(ply)
 		if v:GetClass() == "breakable_entry" then
 			//print('Powerup3, Barricade too close')
 			local ply2 = self:FindNearestPlayer(v:GetPos())
+			if not IsValid(ply2) then continue end
 			local normal = (self:GetPos() - v:GetPos()):GetNormalized()
 			local normal2 = (ply2:GetPos() - v:GetPos()):GetNormalized()
 			local fwd = v:GetForward()
@@ -194,7 +195,7 @@ function ENT:FindNearestPlayer(pos)
 	end
 
 	local nearbyents = {}
-	for k, v in pairs(player.GetAll()) do
+	for k, v in ipairs(player.GetAll()) do
 		if v:Alive() then
 			table.insert(nearbyents, v)
 		end
@@ -272,7 +273,7 @@ function ENT:Think()
 
 		self:SetNoDraw(not self:GetNoDraw())
 		self.NextDraw = CurTime() + math.Clamp(1 * final, 0.1, 1)
-		if not self:GetNoDraw() then
+		if not self:GetNoDraw() and final > 0.4 then
 			ParticleEffectAttach("nz_powerup_mini", PATTACH_ABSORIGIN_FOLLOW, self, 0)
 		end
 	end

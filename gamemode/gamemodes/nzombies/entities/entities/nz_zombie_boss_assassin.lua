@@ -11,10 +11,12 @@ end
 
 if CLIENT then return end
 
+ENT.RedEyes = false
 ENT.SpeedBasedSequences = true
+
 ENT.IsMooZombie = true
 ENT.IsMooSpecial = true
-ENT.RedEyes = false
+ENT.IsMooBossZombie = true
 
 ENT.AttackRange = 100
 ENT.AttackDamage = 60
@@ -145,15 +147,19 @@ ENT.BehindSoundDistance = 0
 
 function ENT:StatsInitialize()
 	if SERVER then
-		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
 		if nzRound:InState( ROUND_CREATE ) then
-			self:SetHealth(500)
-			self:SetMaxHealth(500)
+			self:SetHealth(3000)
+			self:SetMaxHealth(3000)
 		else
-			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			if nzRound:InState( ROUND_PROG ) then
+				self:SetHealth(math.Clamp(nzRound:GetNumber() * 500 + (3000 * count), 7000, 13000 * count))
+				self:SetMaxHealth(math.Clamp(nzRound:GetNumber() * 500 + (3000 * count), 7000, 13000 * count))
+			else
+				self:SetHealth(3000)
+				self:SetMaxHealth(3000)	
+			end
 		end
 
 		self.Cooldown = CurTime() + 4 
@@ -195,7 +201,7 @@ end
 
 function ENT:IsValidTarget( ent )
 	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 
