@@ -11,7 +11,9 @@ ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = true
 ENT.IsMooSpecial = true
-ENT.AttackRange = 80
+ENT.DamageRange = 80
+ENT.AttackDamage = 35
+ENT.AttackRange = 75
 
 ENT.Models = {
 	{Model = "models/specials/locust_wretch.mdl", Skin = 0, Bodygroups = {0,0}},
