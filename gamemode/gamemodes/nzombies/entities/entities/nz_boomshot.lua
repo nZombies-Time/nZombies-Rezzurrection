@@ -51,7 +51,11 @@ end
 
 function ENT:StartTouch(ent)
 local panzer = self:GetParent()
-
+	local tr = {
+            	start = pos,
+            	filter = self,
+            	mask = MASK_NPCSOLID_BRUSHONLY
+        	}
 if ent:IsPlayer() or ent:IsWorld() then
 ParticleEffect("obj_gearsofwar_boomshot_projectile_explosion", self:GetPos(), Angle(0,0,0), nil)
 self:EmitSound("enemies/bosses/boomer/explosion"..math.random(1,5)..".ogg",80,math.random(95,100))
@@ -61,7 +65,9 @@ self:EmitSound("enemies/bosses/boomer/explosion"..math.random(1,5)..".ogg",80,ma
                 	if v:EntIndex() == self:EntIndex() then continue end
                 	if v:Health() <= 0 then continue end
                 	if !v:Alive() then continue end
-                	
+                	tr.endpos = v:WorldSpaceCenter()
+                	local tr1 = util.traceline(tr)
+                	if tr1.HitWorld then continue end
 
                 	local expdamage = DamageInfo()
                 	expdamage:SetAttacker(self)

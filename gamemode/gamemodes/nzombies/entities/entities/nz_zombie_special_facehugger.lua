@@ -145,8 +145,6 @@ function ENT:OnPathTimeOut()
 	if CurTime() < self.NextAction then return end
 	
 	if math.random(0,5) == 6 and CurTime() > self.NextAction then
-		-- Claw
-		print("fuck")
 		if self:IsValidTarget(target) then
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
@@ -154,43 +152,17 @@ function ENT:OnPathTimeOut()
 				filter = self,
 			})
 			
-			
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-			self.flying = true
-				local fuck = self:GetGroundEntity( nil )
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) then
+				self:Jump()
+				self:SetSpecialAnimation(true)
+				--self.loco:SetVelocity( (self:GetForward() * 1000) + Vector(0,0,200) )
 				self:EmitSound("npc/antlion/digup1.wav")
 				local dir = (tr.Entity:GetPos() + Vector(0,0,50)) - self:GetPos():GetNormalized()
-				self:SetGroundEntity( nil )
-				self:SetPos( self:GetPos() + Vector(0,0,50))
-				self.loco:SetVelocity( (self:GetForward() * 1000) + Vector(0,0,200) )
-				--self:SetAbsVelocity( Vector( 0, 0, 100) )
-				-- local phys = self:GetPhysicsObject()
-				--phys:SetVelocity(  Vector( 0, 0, 1000) )
-				--self:SetVelocity( Vector( 0, 0, 1000))
-				--self:SetLocalVelocity(dir * 5)
-				--self.loco:SetVelocity( Vector( 0, 0, 1000) )
-				
-				timer.Simple(2, function()
-		if IsValid(self) then
-		self.flying = false
-			--self:SetGroundEntity( fuck )
-		end
-	end)
-				--self.loco:SetDesiredSpeed( 450 )
-	--self.loco:SetAcceleration( 5000 )
-	--self:SetJumping( true )
-	--self:SetSolidMask( MASK_NPCSOLID_BRUSHONLY )
-	--self.loco:Jump()
-	--Boost them
-	--self.loco:SetVelocity( self:GetForward() * 5 )
-				--self:SetAngles(((dir)):Angle()+  Angle( 50, 0, 0 ))
-				--self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				--self:PlaySequenceAndWait("jump")
-				--self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
+				--self:SetPos( self:GetPos() + Vector(0,0,50))
+				--timer.Simple(1, function()
+				--self:SetSpecialAnimation(false)
+				--end)
+
 				self.NextAction = CurTime() + math.random(4, 8)
 				self.NextAction = CurTime() + math.random(5, 10)
 			end
@@ -201,7 +173,7 @@ end
 
 function ENT:OnContact( ent )
 if SERVER then
-	if ent:IsPlayer() and not self.isFucking  then
+	if ent:IsPlayer() and not self.isFucking and not ent:GetGettingFacefucked()  then
 	print("GIVE ME YOUR FACE")
 	self:SetSpecialAnimation(true)
 	self.isFucking = true

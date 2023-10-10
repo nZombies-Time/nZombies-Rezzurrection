@@ -135,6 +135,7 @@ function ENT:OnSpawn()
 	ParticleEffectAttach("ins_skybox_lightning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	
 	self:SetMaterial("")
+	self.NextAction = CurTime()
 	self:SetInvulnerable(nil)
 	self:SetBlockAttack(false)
 	self:CollideWhenPossible()
@@ -211,6 +212,42 @@ dying = true
 
 end
 
+
+function ENT:OnPathTimeOut()
+	local target = self:GetTarget()
+	if CurTime() < self.NextAction then return end
+	
+	if math.random(0,2) == 1 and CurTime() > self.NextAction then
+		if self:IsValidTarget(target) then
+			local tr = util.TraceLine({
+				start = self:GetPos() + Vector(0,50,0),
+				endpos = target:GetPos() + Vector(0,0,50),
+				filter = self,
+			})
+			
+			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) then
+				timer.Simple(0.9, function()
+			if IsValid(self) then 
+				self:EmitSound("nz_moo/zombies/vox/_sonic/evt_sonic_attack_flux.mp3", 100, math.random(85, 105))
+		self:EmitSound("enemies/specials/wretch/ambi"..math.random(8,9)..".ogg",100)
+		ParticleEffectAttach("screamer_scream", 4, self, 1)
+		for k,v in pairs(ents.FindInSphere(self:GetPos(), 200)) do
+			if IsValid(v) and v:IsPlayer() and !self:IsAttackEntBlocked(v) then
+				v:NZSonicBlind(1)
+			end
+		end
+		end
+		end)
+		self:PlaySequenceAndMove("Scream", 1, self.FaceEnemy)
+	end
+	
+
+				self.NextAction = CurTime() + math.random(4, 8)
+				self.NextAction = CurTime() + math.random(5, 10)
+			end
+		end
+		
+	end
 
 
 function ENT:PostTookDamage( dmgInfo )

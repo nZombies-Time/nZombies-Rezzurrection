@@ -15,7 +15,7 @@ ENT.RedEyes = true
 ENT.IsMooSpecial = true
 
 ENT.DamageRange = 120
-ENT.AttackDamage = 40
+ENT.AttackDamage = 35
 ENT.AttackRange = 115
 
 ENT.TraversalCheckRange = 80

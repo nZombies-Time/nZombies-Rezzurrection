@@ -160,7 +160,9 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 	guygettingrobbed:Freeze(true)
 	self:FleeTarget(999)
 	local wep = guygettingrobbed:GetActiveWeapon():GetClass()
+	if math.random(1,100) == 21 then
 	self:EmitSound("BUM.ogg",511)
+	end
 	guygettingrobbed:StripWeapon(wep)
 	guygettingrobbed:Give("tfa_bo3_wepsteal")
 	guygettingrobbed:SelectWeapon("tfa_bo3_wepsteal")

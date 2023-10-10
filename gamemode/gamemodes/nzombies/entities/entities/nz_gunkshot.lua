@@ -44,14 +44,18 @@ if SERVER then
 		end
 	end
 function ENT:Launch(dir)
-	self:SetLocalVelocity(dir * 500)
+	self:SetLocalVelocity(dir * 750)
 	self:SetAngles(((dir)):Angle())
 	self.AutoReturnTime = CurTime() + 5
 end
 
 function ENT:StartTouch(ent)
 local panzer = self:GetParent()
-
+	local tr = {
+            	start = pos,
+            	filter = self,
+            	mask = MASK_NPCSOLID_BRUSHONLY
+        	}
 if ent:IsPlayer() or ent:IsWorld() then
 ParticleEffect("obj_gearsofwar_gunk_explosion", self:GetPos(), Angle(0,0,0), nil)
 self:EmitSound("enemies/bosses/gunker/impact"..math.random(1,3)..".ogg",80,math.random(95,100))
@@ -61,7 +65,10 @@ self:EmitSound("enemies/bosses/gunker/impact"..math.random(1,3)..".ogg",80,math.
                 	if v:EntIndex() == self:EntIndex() then continue end
                 	if v:Health() <= 0 then continue end
                 	if !v:Alive() then continue end
-                	
+                	tr.endpos = v:WorldSpaceCenter()
+                	local tr1 = util.traceline(tr)
+                	if tr1.HitWorld then continue end
+
 
                 	local expdamage = DamageInfo()
                 	expdamage:SetAttacker(self)

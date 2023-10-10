@@ -31,7 +31,7 @@ function nzRound:Init()
 					v:SetMasterSpawn(true)
 					break
     	end
-		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Don't make me ask you again." )
+		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Skill issue." )
 		end
 		--special spawn
 		local specialMaster = false
@@ -47,7 +47,7 @@ function nzRound:Init()
 					v:SetMasterSpawn(true)
 					break
     	end
-		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Don't make me ask you again." )
+		PrintMessage( HUD_PRINTTALK, "You need to place a special master spawner. Skill issue." )
 		end
 		
 	self:SetEndTime( CurTime() + 5 )
