@@ -13,17 +13,16 @@ ENT.IsMooZombie = true
 ENT.RedEyes = true
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 0, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 1, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 2, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 3, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 1, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 2, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 3, Bodygroups = {0,0}},
 
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 4, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 5, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 6, Bodygroups = {0,0}},
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 7, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 4, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 5, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 6, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard.mdl", Skin = 7, Bodygroups = {0,0}},
 	
-	{Model = "models/moo/_codz_ports/t4/moo_codz_t4_honorguard_enhanced.mdl", Skin = 8, Bodygroups = {0,0}},
 }
 
 local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}

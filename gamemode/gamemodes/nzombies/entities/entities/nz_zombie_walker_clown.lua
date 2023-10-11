@@ -13,11 +13,20 @@ ENT.IsMooZombie = true
 ENT.RedEyes = true
 
 ENT.Models = {
+
+	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_park_clown.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_park_clown.mdl", Skin = 1, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_park_clown.mdl", Skin = 2, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_park_clown.mdl", Skin = 3, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_park_clown.mdl", Skin = 4, Bodygroups = {0,0}},
+
+	--[[ Rest in Peace... Of what once was, they are now one.
 	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_quarterintelligent.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_dimeaware.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_dollargenius.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_nicklesmart.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/iw7/park/moo_codz_iw7_currencyknowledge.mdl", Skin = 0, Bodygroups = {0,0}},
+	]]
 }
 
 local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}
@@ -43,6 +52,10 @@ ENT.DeathSequences = {
 	"nz_death_f_12",
 	"nz_death_f_13",
 	"nz_death_fallback",
+	"nz_l4d_death_running_11a",
+	"nz_l4d_death_running_11g",
+	"nz_l4d_death_02a",
+	"nz_l4d_death_11_02d",
 }
 
 ENT.ElectrocutionSequences = {
@@ -87,22 +100,41 @@ local SlowClimbUp96 = {
 	"nz_traverse_climbup96"
 }
 local SlowClimbUp128 = {
-	"nz_traverse_climbup128"
+	"nz_traverse_climbup128",
+	"nz_l4d_traverse_climbup132_01",
+	"nz_l4d_traverse_climbup132_02",
+	"nz_l4d_traverse_climbup132_03",
 }
 local SlowClimbUp160 = {
-	"nz_traverse_climbup160"
+	"nz_traverse_climbup160",
+	"nz_l4d_traverse_climbup156_01",
+	"nz_l4d_traverse_climbup156_02",
+	"nz_l4d_traverse_climbup156_03",
 }
 local FastClimbUp36 = {
-	"nz_traverse_fast_climbup36"
+	"nz_traverse_fast_climbup36",
+	"nz_l4d_traverse_climbup36_01",
+	"nz_l4d_traverse_climbup36_02",
+	"nz_l4d_traverse_climbup36_03",
 }
 local FastClimbUp48 = {
-	"nz_traverse_fast_climbup48"
+	"nz_traverse_fast_climbup48",
+	"nz_l4d_traverse_climbup48_01",
+	"nz_l4d_traverse_climbup48_02",
+	"nz_l4d_traverse_climbup48_03",
+	"nz_l4d_traverse_climbup48_04",
 }
 local FastClimbUp72 = {
-	"nz_traverse_fast_climbup72"
+	"nz_traverse_fast_climbup72",
+	"nz_l4d_traverse_climbup72_01",
+	"nz_l4d_traverse_climbup72_02",
+	"nz_l4d_traverse_climbup72_03",
 }
 local FastClimbUp96 = {
-	"nz_traverse_fast_climbup96"
+	"nz_traverse_fast_climbup96",
+	"nz_l4d_traverse_climbup96_01",
+	"nz_l4d_traverse_climbup96_02",
+	"nz_l4d_traverse_climbup96_03",
 }
 local ClimbUp200 = {
 	"nz_traverse_climbup200"
@@ -181,6 +213,7 @@ local JumpSequences = {
 }
 local RunJumpSequences = {
 	{seq = "nz_barricade_run_1"},
+	{seq = "nz_l4d_mantle_over_36"},
 }
 
 local SprintJumpSequences = {
@@ -735,6 +768,7 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
+				"nz_l4d_run_05",
 				"nz_supersprint_ad1",
 				"nz_supersprint_ad2",
 				"nz_supersprint_ad3",
@@ -748,6 +782,12 @@ ENT.SequenceTables = {
 				"nz_supersprint_ad11",
 				"nz_supersprint_ad12",
 				"nz_supersprint_ad13",
+				"nz_s1_zom_core_sprint_1",
+				"nz_s1_zom_core_sprint_2",
+				"nz_s1_zom_core_sprint_3",
+				"nz_s1_zom_core_sprint_4",
+				"nz_s1_zom_core_sprint_5",
+				"nz_s1_zom_core_sprint_6",
 			},
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
@@ -778,6 +818,8 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -800,6 +842,7 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
+				"nz_l4d_run_05",
 				"nz_supersprint_au1",
 				"nz_supersprint_au2",
 				"nz_supersprint_au3",
@@ -811,6 +854,12 @@ ENT.SequenceTables = {
 				"nz_supersprint_au20",
 				"nz_supersprint_au21",
 				"nz_supersprint_au25",
+				"nz_s1_zom_core_sprint_1",
+				"nz_s1_zom_core_sprint_2",
+				"nz_s1_zom_core_sprint_3",
+				"nz_s1_zom_core_sprint_4",
+				"nz_s1_zom_core_sprint_5",
+				"nz_s1_zom_core_sprint_6",
 			},
 			LowgMovementSequence = {
 				"nz_supersprint_lowg",
@@ -841,6 +890,8 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
