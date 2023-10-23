@@ -42,7 +42,7 @@ function ENT:Touch(ent)
     end
 
     if ent:IsValidZombie() and ent:Health() > 0 and !ent.NZBossType then
-        ent:Kill(dmg)
+        ent:TakeDamageInfo(dmg)
         self:SlicedEnemy(ent)
     end
 end

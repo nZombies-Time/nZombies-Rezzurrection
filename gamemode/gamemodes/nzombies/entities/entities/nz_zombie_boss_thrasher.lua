@@ -3,13 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Thrasher aka The Cheekeater"
 ENT.Category = "Brainz"
-ENT.Author = "Laby and Moo"
-
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-end
+ENT.Author = "Laby and GhostlyMoo"
 
 --Girly weak ass bitch
 --tag_spore_leg
@@ -24,6 +18,8 @@ ENT.RedEyes = true
 ENT.IsMooSpecial = true
 
 ENT.AttackRange = 100
+
+ENT.TraversalCheckRange = 80
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/island/thrasher/moo_codz_t7_thrasher.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -79,15 +75,6 @@ ENT.DeathSounds = {
 	"enemies/bosses/thrasher/vox/death_03.ogg",
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	}
-}
-
 ENT.IdleSequence = "nz_idle"
 
 ENT.SequenceTables = {
@@ -98,6 +85,8 @@ ENT.SequenceTables = {
 				"nz_walk_v1",
 				"nz_walk_v2",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
@@ -108,6 +97,8 @@ ENT.SequenceTables = {
 				"nz_run_v1",
 				"nz_run_v2",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}
@@ -115,6 +106,17 @@ ENT.SequenceTables = {
 
 function ENT:StatsInitialize()
 	if SERVER then
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		if nzRound:InState( ROUND_CREATE ) then
+			self:SetHealth(500)
+			self:SetMaxHealth(500)
+		else
+			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		end
+		
 		enraged = false
 		self.NextAction = 0
 		self.NextTeleporTime = 0
@@ -174,6 +176,8 @@ end
 function ENT:OnPathTimeOut()
 	local target = self:GetTarget()
 	local actionchance = math.random(10)
+	local comedyday = os.date("%d-%m") == "01-04"
+
 	if CurTime() < self.NextAction then return end
 	for k,v in pairs(player.GetAll()) do
 		if not v:GetNotDowned() and enraged then
@@ -186,7 +190,7 @@ function ENT:OnPathTimeOut()
 						target = self:GetTarget()
 					end
 				end
-				if math.random(100) == 69 then
+				if math.random(100) == 69  or comedyday then
 					self:EmitSound("Thrasher_roar_laby.wav",511)
 				else
 					self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",511)
@@ -343,12 +347,8 @@ function ENT:Attack( data )
 	
 	data.attackseq = data.attackseq
 	if !data.attackseq then
-		local curstage = self:GetActStage()
-		local actstage = self.ActStages[curstage]
-		if !self:GetCrawler() and !actstage and curstage <= 0 then actstage = self.ActStages[1] end
-		--if self:GetCrawler() then self.CrawlAttackSequences end
 		
-		local attacktbl = actstage and actstage.attackanims or self.AttackSequences
+		local attacktbl = self.AttackSequences
 		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
 		
 		if type(target) == "table" then
@@ -402,5 +402,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

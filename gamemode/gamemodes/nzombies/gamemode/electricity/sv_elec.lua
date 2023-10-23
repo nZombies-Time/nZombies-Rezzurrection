@@ -54,7 +54,7 @@ end
 
 function nzElec:Reset(nochat)
 
-	if !self.Active then return end -- No need to turn it off again
+	--if !self.Active then return end -- No need to turn it off again
 	
 	self.Active = false
 	-- Reset the button aswell

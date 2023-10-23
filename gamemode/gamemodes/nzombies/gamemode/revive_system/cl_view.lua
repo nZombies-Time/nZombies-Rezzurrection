@@ -1,3 +1,61 @@
+-------------------------
+-- Localize
+local pairs = pairs
+local IsValid = IsValid
+local LocalPlayer = LocalPlayer
+local CurTime = CurTime
+local Color = Color
+
+local math = math
+local surface = surface
+local table = table
+local draw = draw
+
+local table_insert = table.insert
+
+local TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
+local TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
+local TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
+
+CreateClientConVar("nz_bloodoverlay", 1, true, false, "Enable or disable drawing the blood overlay when low health. (0 false, 1 true), Default is 1.", 0, 1)
+
+local cl_drawhud = GetConVar("cl_drawhud")
+local nz_bleedouttime = GetConVar("nz_downtime")
+local nz_betterscaling = GetConVar("nz_hud_better_scaling")
+local nz_bloodoverlay = GetConVar("nz_bloodoverlay")
+
+local zmhud_icon_revive = Material("materials/Revive.png", "unlitgeneric smooth")
+local zmhud_blood_overlay = Material("materials/nz_moo/huds/t7/i_blood_damage_c.png", "unlitgeneric smooth")
+local zmhud_blood_highlight = Material("materials/nz_moo/huds/t7/i_blood_highlights_c.png", "unlitgeneric smooth")
+
+local vector_up_35 = Vector(0,0,35)
+
+local color_black_100 = Color(0, 0, 0, 100)
+local color_black_180 = Color(0, 0, 0, 180)
+local color_red_200 = Color(200, 0, 0, 255)
+local color_revive = Color(150, 200, 255)
+
+local reworkedHUDs = {
+	["Shadows of Evil"] = true,
+	["Black Ops 3"] = true,
+	["Black Ops 1"] = true,
+	["Buried"] = true,
+	["Mob of the Dead"] = true,
+	["Origins (Black Ops 2)"] = true,
+	["Tranzit (Black Ops 2)"] = true
+}
+
+local dahudz = {
+	["Shadows of Evil"] = true,
+	["Black Ops 3"] = true,
+}
+
+local SyretteClass = {
+	["tfa_bo2_syrette"] = true,
+	["tfa_bo3_syrette"] = true,
+	["tfa_bo4_syrette"] = true,
+}
+
 -- Useful ToScreen replacement for better directional
 function XYCompassToScreen(pos, boundary)
 	local boundary = boundary or 0
@@ -7,85 +65,25 @@ function XYCompassToScreen(pos, boundary)
 	local dir = (pos - EyePos()):GetNormalized()
 	dir = Vector(dir.x, dir.y, 0)
 	eyedir = Vector(eyedir.x, eyedir.y, 0)
-	
+
 	eyedir:Rotate(Angle(0,-90,0))
 	local newdirx = eyedir:Dot(dir)
-	--draw.SimpleText(newdirx, "nz.display.hud.small", ScrW()/2, ScrH() - 50, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	
+
 	return ScrW()/2 + (newdirx*w/2), math.Clamp(pos:ToScreen().y, boundary, h)
 end
 
-local tab = {
- [ "$pp_colour_addr" ] = 0,
- [ "$pp_colour_addg" ] = 0,
- [ "$pp_colour_addb" ] = 0,
- [ "$pp_colour_brightness" ] = 0,
- [ "$pp_colour_contrast" ] = 1,
- [ "$pp_colour_colour" ] = 0,
- [ "$pp_colour_mulr" ] = 0,
- [ "$pp_colour_mulg" ] = 0,
- [ "$pp_colour_mulb" ] = 0
-} 
 local fade = 1
-
-local mat_revive = Material("materials/Revive.png", "unlitgeneric smooth")
-
-function GetFontType(id)
-	if id == "Classic NZ" then
-	return "classic"
-	end
-	if id == "Old Treyarch" then
-	return "waw"
-	end
-	if id == "BO2/3" then
-	return "blackops2"
-	end
-	if id == "BO4" then
-	return "blackops4"
-	end
-		if id == "Comic Sans" then
-	return "xd"
-	end
-		if id == "Warprint" then
-	return "grit"
-	end
-		if id == "Road Rage" then
-	return "rage"
-	end
-		if id == "Black Rose" then
-	return "rose"
-	end
-		if id == "Reborn" then
-	return "reborn"
-	end
-		if id == "Rio Grande" then
-	return "rio"
-	end
-		if id == "Bad Signal" then
-	return "signal"
-	end
-		if id == "Infection" then
-	return "infected"
-	end
-		if id == "Brutal World" then
-	return "brutal"
-	end
-		if id == "Generic Scifi" then
-	return "ugly"
-	end
-		if id == "Tech" then
-	return "tech"
-	end
-		if id == "Krabby" then
-	return "krabs"
-	end
-		if id == "Default NZR" then
-	return "default"
-	end
-	if id == nil then
-	return "default"
-	end
-end
+local tab = {
+	[ "$pp_colour_addr" ] = 0,
+	[ "$pp_colour_addg" ] = 0,
+	[ "$pp_colour_addb" ] = 0,
+	[ "$pp_colour_brightness" ] = 0,
+	[ "$pp_colour_contrast" ] = 1,
+	[ "$pp_colour_colour" ] = 0,
+	[ "$pp_colour_mulr" ] = 0,
+	[ "$pp_colour_mulg" ] = 0,
+	[ "$pp_colour_mulb" ] = 0
+}
 
 function nzRevive:ResetColorFade()
 	tab = {
@@ -100,118 +98,10 @@ function nzRevive:ResetColorFade()
 		 [ "$pp_colour_mulb" ] = 0
 	}
 	fade = 1
-	
-	--print("Color reset!")
-end
-
-local function CalcDownView(ply, pos, ang, fov, znear, zfar)
-	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local pos = pos + Vector(0,0,-15)
-		local ang = ang + Angle(0,0,20)
-		
-		return {origin = pos, angles = ang, fov = fov, znear = znear, zfar = zfar, drawviewer = false }
-	end
-end
-
-local function CalcDownViewmodelView(wep, vm, oldpos, oldang, pos, ang)
-	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local oldpos = oldpos + Vector(0,0,-15)
-		local oldang = oldang + Angle(0,0,20)
-		if wep:IsCW2() or wep:IsFAS2() then oldpos = oldpos + oldang:Up() * -100 end
-		
-		return oldpos, oldang
-	end
-end
-
-local function DrawColorModulation()
-	if nzRevive.Players[LocalPlayer():EntIndex()] then
-		local fadeadd = ((1/GetConVar("nz_downtime"):GetFloat()) * FrameTime()) * -1 	-- Change 45 to the revival time
-		tab[ "$pp_colour_colour" ] = math.Approach(tab[ "$pp_colour_colour" ], 0, fadeadd)
-		tab[ "$pp_colour_addr" ] = math.Approach(tab[ "$pp_colour_addr" ], 0.5, fadeadd *-0.5)
-		tab[ "$pp_colour_mulr" ] = math.Approach(tab[ "$pp_colour_mulr" ], 1, -fadeadd)
-		tab[ "$pp_colour_mulg" ] = math.Approach(tab[ "$pp_colour_mulg" ], 0, fadeadd)
-		tab[ "$pp_colour_mulb" ] = math.Approach(tab[ "$pp_colour_mulb" ], 0, fadeadd)
-		
-		--print(fadeadd, tab[ "$pp_colour_colour" ], tab[ "$pp_colour_brightness" ]) 
-		DrawColorModify(tab)
-	end
-end
-
-function surface.DrawTexturedRectRotatedPoint( x, y, w, h, rot, x0, y0 )
-
-	local c = math.cos( math.rad( rot ) )
-	local s = math.sin( math.rad( rot ) )
-
-	local newx = y0 * s - x0 * c
-	local newy = y0 * c + x0 * s
-
-	surface.DrawTexturedRectRotated( x + newx, y + newy, w, h, rot )
-
-end
-
-local function DrawDownedPlayers()
-	
-	for k,v in pairs(nzRevive.Players) do
-		local ply = Entity(k)
-		if IsValid(ply) then -- If they're outside PVS, don't draw the icon at all
-			if ply == LocalPlayer() then return end
-			local posxy = (ply:GetPos() + Vector(0,0,35)):ToScreen()
-			local dir = ((ply:GetPos() + Vector(0,0,35)) - EyeVector()*2):GetNormal():ToScreen()
-			--print(posxy["x"], posxy["y"], posxy["visible"])
-			
-			if posxy.x - 35 < 60 or posxy.x - 35 > ScrW()-130 or posxy.y - 50 < 60 or posxy.y - 50 > ScrH()-110 then
-				posxy.x, posxy.y = XYCompassToScreen((ply:GetPos() + Vector(0,0,35)), 60)
-			end
-			
-			surface.SetMaterial(mat_revive)
-			if v.ReviveTime then
-				surface.SetDrawColor(255, 255, 255)
-			else
-				surface.SetDrawColor(255, 150 - (CurTime() - v.DownTime)*(150/GetConVar("nz_downtime"):GetFloat()), 0)
-			end
-			
-			--draw.SimpleText(v.ReviveTime and "REVIVING" or "DOWNED", font, posxy["x"], posxy["y"] + 10, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			--draw.SimpleText(k:Nick(), font2, posxy["x"], posxy["y"] - 20, v.ReviveTime and Color(255,255,255) or Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
-			
-			surface.DrawTexturedRect(posxy.x - 35, posxy.y - 50, 70, 50)
-		end	
-	end
-end
-
-local function DrawRevivalProgress()
-	local tr = util.QuickTrace(LocalPlayer():EyePos(), LocalPlayer():GetAimVector()*100, LocalPlayer())
-	local dply = tr.Entity
-	local id = dply:EntIndex()
-	
-	local revtime = LocalPlayer():HasPerk("revive") and 2 or 4
-	
-	if IsValid(dply) and nzRevive.Players[id] and nzRevive.Players[id].RevivePlayer == LocalPlayer() then
-		surface.SetDrawColor(0,0,0)
-		surface.DrawRect(ScrW()/2 - 150, ScrH() - 300, 300, 20)
-		
-		surface.SetDrawColor(255,255,255)
-		surface.DrawRect(ScrW()/2 - 145, ScrH() - 295, 290 * (CurTime()-nzRevive.Players[id].ReviveTime)/revtime, 10)
-	end
-end
-
-local function DrawDownedNotify()
-
-	if !LocalPlayer():GetNotDowned() then
-		local text = "YOU NEED HELP!"
-		local font = ("nz.main."..GetFontType(nzMapping.Settings.mainfont))
-		local rply = nzRevive.Players[LocalPlayer():EntIndex()].RevivePlayer
-		
-		if IsValid(rply) and rply:IsPlayer() then
-			text = rply:Nick().." is reviving you!"
-		end
-		draw.SimpleText(text, font, ScrW() / 2, ScrH() * 0.9, Color(200, 0, 0,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-	end
-
 end
 
 function nzRevive:DownedHeadsUp(ply, text)
 	nzRevive.Notify[ply] = {time = CurTime(), text = text}
-	--PrintTable(nzRevive.Notify[ply])
 end
 
 function nzRevive:CustomNotify(text, time)
@@ -221,68 +111,279 @@ function nzRevive:CustomNotify(text, time)
 	else
 		table.insert(nzRevive.Notify, {time = CurTime() + 5, text = text})
 	end
-	--PrintTable(nzRevive.Notify[ply])
+end
+
+function surface.DrawTexturedRectRotatedPoint( x, y, w, h, rot, x0, y0 )
+	local c = math.cos( math.rad( rot ) )
+	local s = math.sin( math.rad( rot ) )
+
+	local newx = y0 * s - x0 * c
+	local newy = y0 * c + x0 * s
+
+	surface.DrawTexturedRectRotated( x + newx, y + newy, w, h, rot )
+end
+
+local function DrawColorModulation()
+	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
+
+	if nzRevive.Players[ply:EntIndex()] then
+		local fadeadd = ((1/nz_bleedouttime:GetFloat()) * FrameTime()) * -1
+		tab[ "$pp_colour_addr" ] = math.Approach(tab[ "$pp_colour_addr" ], 0.28, fadeadd *-0.28)
+		tab[ "$pp_colour_mulr" ] = math.Approach(tab[ "$pp_colour_mulr" ], 1, -fadeadd)
+		tab[ "$pp_colour_contrast" ] = math.Approach(tab[ "$pp_colour_contrast" ], 0.5, fadeadd *-0.5)
+		DrawColorModify(tab)
+	end
+end
+
+local function DrawDownedPlayers()
+	if not cl_drawhud:GetBool() then return end
+
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1)/2
+	local bleedtime = nz_bleedouttime:GetFloat()
+	local pply = LocalPlayer()
+	if IsValid(pply:GetObserverTarget()) then
+		pply = pply:GetObserverTarget()
+	end
+
+	for id, data in pairs(nzRevive.Players) do
+		local ply = Entity(id)
+		if not IsValid(ply) then continue end
+
+		if ply == pply then continue end
+		if not data.DownTime then continue end
+		local revivor = data.RevivePlayer
+
+		local ppos = ply:GetPos()
+		local posxy = (ppos + vector_up_35):ToScreen()
+
+		if posxy.x - 35 < 60 or posxy.x - 35 > w-130 or posxy.y - 50 < 60 or posxy.y - 50 > h-110 then
+			posxy.x, posxy.y = XYCompassToScreen((ppos + vector_up_35), 60)
+		end
+
+		local downscale = 1 - math.Clamp((CurTime() - data.DownTime) / bleedtime, 0, 1)
+		surface.SetDrawColor(255, 180*downscale, 0)
+		surface.SetMaterial(zmhud_icon_revive)
+		surface.DrawTexturedRect(posxy.x - 32*scale, posxy.y - 32*scale, 64*scale, 48*scale)
+
+		if IsValid(revivor) and data.ReviveTime then
+			local hasrevive = revivor:HasPerk("revive")
+			local revtime = hasrevive and 2 or 4
+			local revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
+
+			surface.SetDrawColor(color_white)
+			if hasrevive then
+				surface.SetDrawColor(color_revive)
+			end
+			surface.SetMaterial(zmhud_icon_revive)
+			surface.DrawTexturedRectUV(posxy.x - 32*scale, posxy.y - 32*scale, 64*scale, 48*revivescale*scale, 0, 0, 1, 1*revivescale)
+		end
+	end
+end
+
+local function DrawRevivalProgress()
+	if not cl_drawhud:GetBool() then return end
+
+	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
+
+	local reviving = ply:GetPlayerReviving()
+	if not IsValid(reviving) then return end
+	local id = reviving:EntIndex()
+
+	local hasrevive = ply:HasPerk("revive")
+	local revtime = hasrevive and 2 or 4
+	local w, h = ScrW(), ScrH()
+	local pscale = 1
+	if nz_betterscaling:GetBool() then
+		pscale = (w/1920 + 1)/2
+	end
+
+	local data = nzRevive.Players[id]
+	if data and data.RevivePlayer == ply then
+		local revivescale = math.Clamp((CurTime() - data.ReviveTime) / revtime, 0, 1)
+
+		surface.SetDrawColor(color_black_180)
+		surface.DrawRect(w/2 - 150, h - 400*pscale, 300, 20)
+
+		surface.SetDrawColor(color_white)
+		if hasrevive then
+			surface.SetDrawColor(color_revive)
+		end
+		surface.DrawRect(w/2 - 145, h - 395*pscale, 290*revivescale, 10)
+	end
+end
+
+local downed = false
+local downdelay = 0
+local huddowndata = {
+	["Classic"] = { -- default/fallback
+		loop = "nz_moo/player/t6/laststand_loop.wav",
+		revive = "nz_moo/player/t6/plr_revived.wav",
+		delay = 0,
+		volume = 0.5,
+	},
+	["Black Ops 3"] = {
+		down = "nz_moo/player/t7/player_downed.wav",
+		loop = "nz_moo/player/t7/player_downed_loop.wav",
+		revive = "nz_moo/player/t7/player_revived.wav",
+		delay = 0.5,
+		volume = 0.25,
+	},
+	["Shadows of Evil"] = {
+		down = "nz_moo/player/t7/player_downed.wav",
+		loop = "nz_moo/player/t7/player_downed_loop.wav",
+		revive = "nz_moo/player/t7/player_revived.wav",
+		delay = 0.5,
+		volume = 0.25,
+	},
+}
+
+local function DrawDownedNotify()
+	if not cl_drawhud:GetBool() then return end
+	local hudtype = nzMapping.Settings.hudtype
+	local ply = LocalPlayer()
+	/*if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end*/
+
+	local downdata = huddowndata[hudtype]
+	if not downdata then
+		downdata = huddowndata["Classic"]
+	end
+
+	if downdata then
+		if not ply.downambience then
+			ply.downstring = downdata.loop
+			ply.downambience = CreateSound(ply, downdata.loop)
+		elseif ply.downstring ~= downdata.loop then
+			if ply.downambience:IsPlaying() then ply.downambience:Stop() end
+
+			ply.downstring = downdata.loop
+			ply.downambience = CreateSound(ply, downdata.loop)
+		end
+
+		if !ply:GetNotDowned() and not downed then
+			downed = true
+			downdelay = CurTime() + downdata.delay
+			if downdata.down then
+				surface.PlaySound(downdata.down)
+			end
+		end
+		if (not ply:Alive() or ply:GetNotDowned()) and downed then
+			downed = false
+		end
+
+		if downed then
+			if downdelay < CurTime() then
+				ply.downambience:Play()
+				ply.downambience:ChangeVolume(downdata.volume,0)
+			end
+		else
+			if downdata.revive and ply.downambience:IsPlaying() then
+				ply:EmitSound(downdata.revive)
+			end
+			ply.downambience:Stop()
+		end
+	end
+
+	if nzRevive.Players and nzRevive.Players[ply:EntIndex()] then
+		local rply = nzRevive.Players[ply:EntIndex()].RevivePlayer
+		if !ply:GetNotDowned() and IsValid(rply) and rply:IsPlayer() then
+			local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
+			local w, h = ScrW(), ScrH()
+			local scale = (w/1920 + 1)/2
+			local pscale = 1
+			if nz_betterscaling:GetBool() then
+				pscale = scale
+			end
+			if scale < 0.96 then
+				font = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
+			end
+
+			draw.SimpleTextOutlined(rply:Nick().." is reviving you!", font, w/2, h - 280*pscale, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, color_black_180)
+		end
+	end
 end
 
 local function DrawDownedHeadsUp()
+	if not cl_drawhud:GetBool() then return end
 	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
-	local h = 40
-	local offset = 20
-	local max = 2
-	local c = 0
-	--table.SortByMember(nz.nzRevive.Data.Notify, "time")
-	
-	for k,v in pairs(nzRevive.Notify) do
+
+	local w, h = ScrW(), ScrH()
+	local scale = (w/1920 + 1)/2
+	local count = 0
+	local pscale = 1
+	if nz_betterscaling:GetBool() then
+		pscale = scale
+	end
+	if scale < 0.96 then
+		font = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
+	end
+
+	surface.SetFont(font)
+	for k, v in pairs(nzRevive.Notify) do
 		if type(k) == "Player" and IsValid(k) then
 			local fade = math.Clamp(CurTime() - v.time - 5, 0, 1)
 			local status = v.text or "needs to be revived!"
-			draw.SimpleText(k:Nick().." "..status, font, ScrW()/2, ScrH() - h - offset * c, Color(255, 255, 255,255-(255*fade)), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			local alpha = 255 - (255*fade)
+			local wt, ht = surface.GetTextSize(status)
+			local offset = ht + 5*pscale
+
+			draw.SimpleTextOutlined(k:Nick().." "..status, font, w/2, h - (220*pscale) + (offset*count), ColorAlpha(color_white, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, ColorAlpha(color_black, 180*(1-fade)))
+
 			if fade >= 1 then nzRevive.Notify[k] = nil end
-			c = c + 1
+			count = count + 1
 		else
 			local fade = math.Clamp(CurTime() - v.time, 0, 1)
-			local status = v.text
-			draw.SimpleText(status, font, ScrW()/2, ScrH() - h - offset * c, Color(255, 255, 255,255-(255*fade)), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			local status = v.text or ""
+			local alpha = 255 - (255*fade)
+			local wt, ht = surface.GetTextSize(status)
+			local offset = ht + 5*pscale
+
+			draw.SimpleTextOutlined(status, font, w/2, h - (220*pscale) + (offset*count), ColorAlpha(color_white, alpha), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, ColorAlpha(color_black, 180*(1-fade)))
+
 			if fade >= 1 then nzRevive.Notify[k] = nil end
-			c = c + 1
+			count = count + 1
 		end
 	end
 end
 
-CreateClientConVar("nz_bloodoverlay", 1, true, false)
+local function DrawDamageOverlay()
+	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then
+		ply = ply:GetObserverTarget()
+	end
 
-local blood_overlay = Material("materials/overlay_urdyinglol.png", "unlitgeneric smooth")
-local bloodpulse = true --if true, going up
-local pulse = 0
-local function DrawDamagedOverlay()
-	if GetConVar("nz_bloodoverlay"):GetBool() and LocalPlayer():Alive() then
-		local fade = (math.Clamp(LocalPlayer():Health()/LocalPlayer():GetMaxHealth(), 0.3, 0.7)-0.3)/0.4
-		local fade2 = 1 - math.Clamp(LocalPlayer():Health()/LocalPlayer():GetMaxHealth(), 0, 0.7)/0.7
-		
-		surface.SetMaterial(blood_overlay)
-		surface.SetDrawColor(255,255,255,255-fade*255)
-		surface.DrawTexturedRect( -10, -10, ScrW()+20, ScrH()+20)
-		
-		if fade2 > 0 then
-			if bloodpulse then
-				pulse = math.Approach(pulse, 255, math.Clamp(pulse, 1, 50)*FrameTime()*100)
-				if pulse >= 255 then bloodpulse = false end
-			else
-				if pulse <= 0 then bloodpulse = true end
-				pulse = math.Approach(pulse, 0, -255*FrameTime())
+	if nz_bloodoverlay:GetBool() and (ply:Alive() or !ply:GetNotDowned()) then
+		local health = ply:Health()
+		local diff = ply:GetMaxHealth()*0.2
+		local maxhealth = ply:GetMaxHealth() - diff
+
+		if health < maxhealth or !ply:GetNotDowned() then
+			local w, h = ScrW(), ScrH()
+			local fade = 1 - math.Clamp(health/maxhealth, 0, 1)
+			if !ply:GetNotDowned() then fade = 1 end
+			local alpha = 255*fade
+
+			surface.SetDrawColor(ColorAlpha(color_white, alpha))
+
+			surface.SetMaterial(zmhud_blood_highlight)
+			surface.DrawTexturedRect(0, 0, w, h)
+
+			surface.SetMaterial(zmhud_blood_overlay)
+			surface.DrawTexturedRect(0, 0, w, h)
+
+			if fade > 0 then
+				local pulse = math.abs(math.sin(CurTime()*4))
+				surface.SetDrawColor(ColorAlpha(color_white, (255*pulse)*fade))
+				surface.SetMaterial(zmhud_blood_overlay)
+				surface.DrawTexturedRect(0, 0, w, h)
 			end
-			surface.SetDrawColor(255,255,255,pulse*fade2)
-			surface.DrawTexturedRect( -10, -10, ScrW()+20, ScrH()+20)
 		end
-	end
-end
-
-local function DrawTombstoneNotify()
-	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
-	
-	if LocalPlayer():GetDownedWithTombstone() then
-		local text = "Hold E to feed the zombies"
-		draw.SimpleText(text, font, ScrW()/2, ScrH() - 320, Color(255, 255, 255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 	end
 end
 
@@ -290,22 +391,29 @@ local tombstonetime = nil
 local senttombstonerequest = false
 
 local function DrawTombstoneProgress()
-	if LocalPlayer():GetDownedWithTombstone() then
-	
+	local ply = LocalPlayer()
+
+	if ply:GetDownedWithTombstone() then
+		local w, h = ScrW(), ScrH()
+		local pscale = 1
+		if nz_betterscaling:GetBool() then
+			pscale = (w/1920 + 1)/2
+		end
+
 		local killtime = 1
-		
-		if LocalPlayer():KeyDown(IN_USE) then
+
+		if ply:KeyDown(IN_USE) then
 			if !tombstonetime then
 				tombstonetime = CurTime()
 			end
-			
+
 			local pct = math.Clamp((CurTime()-tombstonetime)/killtime, 0, 1)
-			
-			surface.SetDrawColor(0,0,0)
-			surface.DrawRect(ScrW()/2 - 150, ScrH() - 300, 300, 20)
-			
-			surface.SetDrawColor(255,255,255)
-			surface.DrawRect(ScrW()/2 - 145, ScrH() - 295, 290 * pct, 10)
+
+			surface.SetDrawColor(color_black_180)
+			surface.DrawRect(w/2 - 150, h - 500*pscale, 300, 20)
+			surface.SetDrawColor(color_white)
+			surface.DrawRect(w/2 - 145, h - 495*pscale, 290 * pct, 10)
+
 			if pct >= 1 and !senttombstonerequest then
 				net.Start("nz_TombstoneSuicide")
 				net.SendToServer()
@@ -318,31 +426,86 @@ local function DrawTombstoneProgress()
 	end
 end
 
-local whoswhoactive = false
-net.Receive("nz_WhosWhoActive", function()
-	whoswhoactive = net.ReadBool()
-end)
-local whoswhomat = "models/shadertest/shader4"
-local firemat = "models/onfire"
+local whoswhotime = nil
+local sentwhoswhorequest = false
+local attacktime = 0
 
-local function DrawWhosWhoOverlay()
-	if whoswhoactive then
-		DrawMaterialOverlay(whoswhomat, 0.03)
+local function DrawWhosWhoProgress()
+	if not cl_drawhud:GetBool() then return end
+	local ply = LocalPlayer()
+	local curtime = CurTime()
+
+	if ply:HasUpgrade("whoswho") and ply:GetNW2Float("nz.ChuggaTeleDelay",0) < CurTime() then
+		local w, h = ScrW(), ScrH()
+		local scale = (w/1920 + 1) / 2
+		local usetime = 3
+		local pscale = 1
+		if nz_betterscaling:GetBool() then
+			pscale = scale
+		end
+		local revive = ply:GetPlayerReviving()
+
+		local fuck = true
+
+		if (not ply:IsOnGround())
+		or (ply:GetNW2Float("nz.LastHit", 0) + 5) > CurTime()
+		or (IsValid(revive) and nzRevive.Players[revive:EntIndex()])
+		or (ply:KeyDown(IN_ATTACK)) then
+			fuck = false
+			attacktime = curtime + 0.5
+		end
+
+		if attacktime > curtime then
+			fuck = false
+		end
+
+		if ply:KeyDown(IN_USE) and ply:KeyDown(IN_RELOAD) and fuck then
+			if !whoswhotime then
+				whoswhotime = CurTime()
+			end
+
+			local pct = math.Clamp((CurTime() - whoswhotime) / usetime, 0, 1)
+
+			surface.SetDrawColor(color_black_180)
+			surface.DrawRect(w/2 - 150, h - 500*pscale, 300, 20)
+			surface.SetDrawColor(color_white)
+			surface.DrawRect(w/2 - 145, h - 495*pscale, 290 * pct, 10)
+
+			if pct >= 1 and !sentwhoswhorequest then
+				net.Start("nz_WhosWhoTeleRequest")
+				net.SendToServer()
+				sentwhoswhorequest = true
+			end
+		else
+			whoswhotime = nil
+			sentwhoswhorequest = false
+		end
 	end
-	--[[if LocalPlayer():IsOnFire() then
-		DrawMaterialOverlay("firemat", 1)
-	end]]
 end
 
 -- Hooks
-hook.Add("CalcView", "CalcDownedView", CalcDownView )
-hook.Add("CalcViewModelView", "CalcDownedViewmodelView", CalcDownViewmodelView )
-hook.Add("RenderScreenspaceEffects", "DrawColorModulation", DrawColorModulation)
-hook.Add("HUDPaint", "DrawDamageOverlay", DrawDamagedOverlay)
-hook.Add("HUDPaint", "DrawDownedPlayers", DrawDownedPlayers )
+hook.Add("RenderScreenspaceEffects", "DrawColorModulation", DrawColorModulation )
+hook.Add("HUDPaint", "DrawDamageOverlay", DrawDamageOverlay )
 hook.Add("HUDPaint", "DrawDownedNotify", DrawDownedNotify )
-hook.Add("HUDPaint", "DrawRevivalProgress", DrawRevivalProgress )
 hook.Add("HUDPaint", "DrawDownedPlayersNotify", DrawDownedHeadsUp )
-hook.Add("HUDPaint", "DrawTombstoneNotify", DrawTombstoneNotify )
 hook.Add("HUDPaint", "DrawTombstoneProgress", DrawTombstoneProgress )
-hook.Add("RenderScreenspaceEffects", "DrawWhosWhoOverlay", DrawWhosWhoOverlay )
+hook.Add("HUDPaint", "DrawWhosWhoProgress", DrawWhosWhoProgress )
+
+hook.Add("TFA_DrawCrosshair", "ReviveBlockCrosshair", function(wep)
+	local ply = LocalPlayer()
+	if not IsValid(ply) then return end
+	if not IsValid(wep) then return end
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
+
+	local reviving = ply:GetPlayerReviving()
+	if SyretteClass[wep:GetClass()] and IsValid(reviving) and reviving:IsPlayer() and not reviving:GetNotDowned() then
+		return true
+	end
+end)
+
+hook.Add("HUDPaint", "nzHUDreviveswap", function()
+	if not reworkedHUDs[nzMapping.Settings.hudtype] then
+		hook.Add("HUDPaint", "DrawDownedPlayers", DrawDownedPlayers )
+		hook.Add("HUDPaint", "DrawRevivalProgress", DrawRevivalProgress )
+	end
+end)

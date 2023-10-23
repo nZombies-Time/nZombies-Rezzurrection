@@ -1,615 +1,320 @@
 AddCSLuaFile()
 
-ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Avogadro"
+ENT.Base = "nz_zombiebase_moo"
+ENT.PrintName = "A narcissistic lightning man"
 ENT.Category = "Brainz"
-ENT.Author = "Laby"
+ENT.Author = "GhostlyMoo"
 
-ENT.Models = { "models/boz_new/bo2_avo.mdl" }
-
-ENT.AttackRange = 95
-ENT.DamageLow = 76
-ENT.DamageHigh = 79
-
-
-ENT.AttackSequences = {
-	{seq = "melee"}
+local meleetypes = {
+	[DMG_CLUB] = true,
+	[DMG_SLASH] = true,
+	[DMG_CRUSH] = true,
+	[DMG_GENERIC] = true,
 }
 
-ENT.DeathSequences = {
-	"death"
+function ENT:Draw()
+	self:DrawModel()
+end
+
+if CLIENT then return end -- Client doesn't really need anything beyond the basics
+
+ENT.SpeedBasedSequences = true
+ENT.IsMooZombie = true
+ENT.RedEyes = false
+ENT.IsMooSpecial = true
+
+ENT.AttackDamage = 75
+ENT.AttackRange = 72
+
+
+ENT.SoundDelayMin = 10
+ENT.SoundDelayMax = 20
+
+ENT.TraversalCheckRange = 40
+
+ENT.Models = {
+	{Model = "models/moo/_codz_ports/t8/white/moo_codz_t8_avogadro.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-ENT.AttackSounds = {
-	"avo/att1.mp3",
-	"avo/att2.mp3"
+local spawn = {"nz_avo_arrive"}
 
+local AttackSequences = {
+	{seq = "nz_avo_ranged_melee"},
+}
+
+local JumpSequences = {
+	{seq = "nz_avo_jump_across_120"},
+}
+
+local walksounds = {
+	Sound("enemies/bosses/avo/avogadro_taunt_0.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_1.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_2.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_3.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_4.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_5.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_6.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_7.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_8.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_9.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_10.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_11.ogg"),
+	Sound("enemies/bosses/avo/avogadro_taunt_12.ogg"),
+}
+
+ENT.IdleSequence = "nz_avo_idle"
+
+ENT.SequenceTables = {
+	{Threshold = 0, Sequences = {
+		{
+			MovementSequence = {
+				"nz_avo_walk",
+				"nz_avo_walk_twitch",
+			},
+			SpawnSequence = {spawn},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 71, Sequences = {
+		{
+			MovementSequence = {
+				"nz_avo_run",
+				"nz_avo_run_twitch"
+			},
+			SpawnSequence = {spawn},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
+			PassiveSounds = {walksounds},
+		},
+	}}
+}
+
+ENT.SpawnSounds = {
+	"enemies/bosses/avo/avogadro_spawn_0.ogg",
+	"enemies/bosses/avo/avogadro_spawn_1.ogg",
+	"enemies/bosses/avo/avogadro_spawn_2.ogg",
+	"enemies/bosses/avo/avogadro_spawn_3.ogg",
+	"enemies/bosses/avo/avogadro_spawn_4.ogg",
 }
 
 ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
+	"enemies/bosses/avo/avogadro_damaged_0.ogg",
+	"enemies/bosses/avo/avogadro_damaged_1.ogg",
+	"enemies/bosses/avo/avogadro_damaged_2.ogg",
+	"enemies/bosses/avo/avogadro_damaged_3.ogg",
+	"enemies/bosses/avo/avogadro_damaged_4.ogg",
+	"enemies/bosses/avo/avogadro_damaged_5.ogg",
+	"enemies/bosses/avo/avogadro_damaged_6.ogg",
+	"enemies/bosses/avo/avogadro_damaged_7.ogg",
+	"enemies/bosses/avo/avogadro_damaged_8.ogg",
+	"enemies/bosses/avo/avogadro_damaged_9.ogg",
+	"enemies/bosses/avo/avogadro_damaged_10.ogg",
+	"enemies/bosses/avo/avogadro_damaged_11.ogg",
+	"enemies/bosses/avo/avogadro_damaged_12.ogg",
 }
 
-ENT.AttackHitSounds = {
-	"avo/att1.mp3",
-	"avo/att2.mp3"
-	
-	
+ENT.DeathSounds = {
+	"enemies/bosses/avo/avogadro_death_0.ogg",
+	"enemies/bosses/avo/avogadro_death_1.ogg",
+	"enemies/bosses/avo/avogadro_death_2.ogg",
+	"enemies/bosses/avo/avogadro_death_3.ogg",
+	"enemies/bosses/avo/avogadro_death_4.ogg",
+	"enemies/bosses/avo/avogadro_death_5.ogg",
+	"enemies/bosses/avo/avogadro_death_6.ogg",
+	"enemies/bosses/avo/avogadro_death_7.ogg",
+	"enemies/bosses/avo/avogadro_death_8.ogg",
+	"enemies/bosses/avo/avogadro_death_9.ogg",
+	"enemies/bosses/avo/avogadro_death_10.ogg",
+	"enemies/bosses/avo/avogadro_death_11.ogg",
+	"enemies/bosses/avo/avogadro_death_12.ogg",
+	"enemies/bosses/avo/avogadro_death_13.ogg",
 }
 
-ENT.WalkSounds = {
-	"avo/move_loop.wav"
+ENT.PhaseSequences = {
+	"nz_avo_teleport_back_short",
+	"nz_avo_teleport_back_med",
+	"nz_avo_teleport_back_long",
+
+	"nz_avo_teleport_forward_short",
+	"nz_avo_teleport_forward_med",
+	"nz_avo_teleport_forward_long",
+
+	"nz_avo_teleport_left_short",
+	"nz_avo_teleport_left_med",
+	"nz_avo_teleport_left_long",
+
+	"nz_avo_teleport_right_short",
+	"nz_avo_teleport_right_med",
+	"nz_avo_teleport_right_long",
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 1,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 70,
-	},
-	[3] = {
-		act = ACT_DISARM,
-		minspeed = 500
-	}
-}
-
--- We overwrite the Init function because we do not change bodygroups randomly!
-function ENT:Initialize()
-
-	self:Precache()
-
-	self:SetModel( self.Models[math.random( #self.Models )] )
-
-	self:SetJumping( false )
-	self:SetLastLand( CurTime() + 1 ) --prevent jumping after spawn
-	self:SetLastTargetCheck( CurTime() )
-	self:SetLastTargetChange( CurTime() )
-
-	--sounds
-	self:SetNextMoanSound( CurTime() + 1 )
-
-	--stuck prevetion
-	self:SetLastPush( CurTime() )
-	self:SetLastPostionSave( CurTime() )
-	self:SetStuckAt( self:GetPos() )
-	self:SetStuckCounter( 0 )
-
-	self:SetAttacking( false )
-	self:SetLastAttack( CurTime() )
-	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
-
-	--target ignore
-	self:ResetIgnores()
-
-	self:SetHealth( 75 ) --fallback
-
-	self:SetRunSpeed( self.RunSpeed ) --fallback
-	self:SetWalkSpeed( self.WalkSpeed ) --fallback
-
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
-
-	self:SetActStage(0)
-	self:SetSpecialAnimation(false)
-
-	self:StatsInitialize()
-	self:SpecialInit()
-	
-	-- Fallback for buggy tool
-	if !self:GetRunSpeed() then self:SetRunSpeed(150) end
-
-	if SERVER then
-		self.loco:SetDeathDropHeight( self.DeathDropHeight )
-		self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		self.loco:SetAcceleration( self.Acceleration )
-		self.loco:SetJumpHeight( self.JumpHeight )
-		if GetConVar("nz_zombie_lagcompensated"):GetBool() then
-			self:SetLagCompensated(true)
-		end
-		
-		self.HelmetDamage = 0 -- Used to save how much damage the light has taken
-		self:SetUsingClaw(false)
-		self:SetisBall(false)
-		
-		self.NextAction = 0
-		self.NextClawTime = 0
-		self.NextFlameTime = 0
-	end
-	
-	self.ZombieAlive = true
-
-end
+ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, play these sounds instead
 
 function ENT:StatsInitialize()
 	if SERVER then
-		isTaunting=false
-		isBall=false
-		self:SetRunSpeed(69)
-		self:SetHealth(8000)
-	end
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
 
-	--PrintTable(self:GetSequenceList())
+		if nzRound:InState( ROUND_CREATE ) then
+			self:SetHealth(1250)
+			self:SetMaxHealth(1250)
+		else
+			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		end
+
+		self.LastShot = CurTime() + 10
+		self.LastTeleport = CurTime() + 5
+		self.LastStun = CurTime() + 5
+
+		self:SetRunSpeed(36)
+	end
 end
 
 function ENT:SpecialInit()
-
 	if CLIENT then
-		--make them invisible for a really short duration to blend the emerge sequences
-		self:SetNoDraw(true)
-		self:TimedEvent( 0.5, function()
-			self:SetNoDraw(false)
-		end)
-
-		self:SetRenderClipPlaneEnabled( true )
-		self:SetRenderClipPlane(self:GetUp(), self:GetUp():Dot(self:GetPos()))
-
-		self:TimedEvent( 2, function()
-			self:SetRenderClipPlaneEnabled(false)
-		end)
-
 	end
-end
-
-function ENT:InitDataTables()
-	self:NetworkVar("Entity", 0, "ClawHook")
-	self:NetworkVar("Bool", 1, "UsingClaw")
-	self:NetworkVar("Bool", 2, "Flamethrowing")
-	self:NetworkVar("Bool", 3, "isBall")
-	self:NetworkVar("Vector", 4, "TargetPlayer")
 end
 
 function ENT:OnSpawn()
-	local seq = "emerge"
-	local tr = util.TraceLine({
-		start = self:GetPos() + Vector(0,0,500),
-		endpos = self:GetPos(),
-		filter = self,
-		mask = MASK_SOLID_BRUSHONLY,
-	})
-	if tr.Hit then seq = "emerge" end
+	local seq = self:SelectSpawnSequence()
 	local _, dur = self:LookupSequence(seq)
 
-	-- play emerge animation on spawn
-	-- if we have a coroutine else just spawn the zombie without emerging for now.
-	if coroutine.running() then
-		
-		local pos = self:GetPos() + (seq == "emerge" and Vector(0,0,100) or Vector(0,0,450))
-		
-		self:SetNoDraw(true)
-		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		ParticleEffect("driese_tp_arrival_ambient_lightning",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		ParticleEffect("driese_tp_arrival_phase1",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		self:EmitSound("bo1_overhaul/lgtstrike.mp3")
-		self:SetNoDraw(true)
+	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	self:SetInvulnerable(true)
-		
-		--[[effectData = EffectData()
-		effectData:SetStart( pos + Vector(0, 0, 1000) )
-		effectData:SetOrigin( pos )
-		effectData:SetMagnitude( 0.75 )
-		util.Effect("lightning_strike", effectData)]]
-		
-		self:TimedEvent(dur, function()
-			--dust cloud
-			self:SetNoDraw(false)
-			self:SetPos(self:GetPos() + Vector(0,0,0))
-			ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,3)
-			ParticleEffect("driese_tp_arrival_phase2",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-			ParticleEffect("driese_tp_arrival_impact_fx02_a",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-			self:EmitSound("avo/avogadro_spawn_"..math.random(4)..".mp3")
-			self:SetInvulnerable(false)
-			local effectData = EffectData()
-			effectData:SetStart( self:GetPos() )
-			effectData:SetOrigin( self:GetPos() )
-			effectData:SetMagnitude(1)
-			
-		end)
+	self:SetSpecialAnimation(true)
+
+	self:EmitSound("enemies/bosses/avo/move_loop.wav", 65)
+	self:EmitSound(self.SpawnSounds[math.random(#self.SpawnSounds)], 100, math.random(95,105), 1, 2)
+	self.NextSound = CurTime() + 7
+
+	ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,1)
+
+	if seq then
 		self:PlaySequenceAndWait(seq)
+		self:SetSpecialAnimation(false)
+		self:SetInvulnerable(false)
+		self:CollideWhenPossible()
 	end
 end
 
-function ENT:OnZombieDeath(dmgInfo)
-
-	self:ReleasePlayer()
-	self:StopFlames()
-	self:SetRunSpeed(0)
-	self.loco:SetVelocity(Vector(0,0,0))
-	self:Stop()
-	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
-	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:ResetSequence(seq)
-	self:SetCycle(0)
-	self:EmitSound("avo/avogadro_death_"..math.random(13)..".mp3")
-	timer.Simple(dur, function()
-		if IsValid(self) then
-		self:StopSound("avo/move_loop.wav")
-			self:Remove()
-			ParticleEffect("summon_beam",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-			ParticleEffect("driese_tp_arrival_phase2",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-			ParticleEffect("driese_tp_arrival_impact_fx02_a",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "melee" then
+		if self.AttackSounds then
+			self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
 		end
-	end)
-
+		self:DoAttackDamage()
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+	if e == "phase_in" then
+		self:EmitSound("nz_moo/zombies/vox/_quad/teleport/warp_in.mp3", 100)
+		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end
+	end
+	if e == "phase_out" then
+		self:SetMaterial("")
+		self:EmitSound("enemies/bosses/avo/tele.ogg", 100)
+		if IsValid(self) then ParticleEffectAttach("hcea_shield_impact", 3, self, 2) end
+	end
 end
 
-
-function ENT:BodyUpdate()
-
-	self.CalcIdeal = ACT_IDLE
-
-	local velocity = self:GetVelocity()
-
-	local len2d = velocity:Length2D()
-
-	if ( len2d > 100 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
-
-	if self:IsJumping() and self:WaterLevel() <= 0 then
-		self.CalcIdeal = ACT_JUMP
-	end
-
-	if !self:GetSpecialAnimation() and !self:IsAttacking() then
-		if self:GetActivity() != self.CalcIdeal and !self:GetStop() then self:StartActivity(self.CalcIdeal) end
-
-		if self.ActStages[self:GetActStage()] then
-			self:BodyMoveXY()
+function ENT:OnTakeDamage(dmginfo)
+	if !meleetypes[dmginfo:GetDamageType()] then
+		dmginfo:ScaleDamage(0)
+	else
+		if CurTime() > self.LastStun then
+			dmginfo:ScaleDamage(1.25) -- Increase damage done by melee because the nZ knives don't do consistent damage.
+			self:AvoPain()
+		else
+			dmginfo:ScaleDamage(0)
 		end
 	end
-
-	self:FrameAdvance()
-
 end
 
-function ENT:OnTargetInAttackRange()
-    local atkData = {}
-    atkData.dmglow = 70
-    atkData.dmghigh = 79
-    atkData.dmgforce = Vector( 0, 0, 0 )
-	atkData.dmgdelay = 0.2
-    self:Attack( atkData )
-	
+function ENT:AvoPain()
+	self:EmitSound("enemies/bosses/avo/pain"..math.random(2)..".ogg", 85)
+	self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(95,105), 1, 2)
+
+	self.NextSound = CurTime() + 7
+	self.LastStun = CurTime() + 5
+
+	self:SetInvulnerable(true)
+	self:DoSpecialAnimation("nz_avo_pain_long", true, true)
+	self:SetInvulnerable(false)
 end
 
-function ENT:Teleport()
-
-end
-	
 function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
-	
-	if math.random(0,5) == 0 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
+	local chance = math.random(2)
+	if !self:IsAttackBlocked() then
+		if chance == 1 then
+			if CurTime() > self.LastTeleport then
+				local seq = self.PhaseSequences[math.random(#self.PhaseSequences)]
+				if self:SequenceHasSpace(seq) then
+					self:SetMaterial("invisible")
+					self:DoSpecialAnimation(seq, true, true)
+				end
+				self.LastTeleport = CurTime() + 5
+			end
+		elseif chance == 2 then
+			if CurTime() > self.LastShot then
+
+				self:PlaySequenceAndMove("nz_avo_ranged_attack_intro", 1, self.FaceEnemy)
+
+				local larmfx_tag = self:LookupBone("j_wrist_le")
+				local tr = util.TraceLine({
+					start = self:GetPos() + Vector(0,50,0),
+					endpos = self:GetTarget():GetPos() + Vector(0,0,50),
+					filter = self,
+					ignoreworld = true,
+				})
 			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:StopParticles()
-				self:SetisBall(true)
-				local clawpos = self:GetAttachment(self:LookupAttachment("tag_bolt_le")).Pos
-				self.ClawHook = ents.Create("nz_avo_dive")
-				self.ClawHook:SetPos(clawpos)
-				self.ClawHook:Spawn()
-				self.ClawHook:SetNWBool( "Panzer", self )
-				self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())
-				self:SetNWVector( "TargetPlayer", tr.Entity:GetPos() )
-				self:SetClawHook(self.ClawHook)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("range_in")
-				self.loco:SetDesiredSpeed(0)
-				
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-				local seq = "dodge_f"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
+				if IsValid(tr.Entity) then
+					self:EmitSound("enemies/bosses/avo/att"..math.random(2)..".ogg",100,math.random(95, 105))
+					self.ZapShot = ents.Create("nz_avo_shot")
+					self.ZapShot:SetPos(self:GetBonePosition(larmfx_tag))
+					self.ZapShot:Spawn()
+					self.ZapShot:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ZapShot:GetPos()):GetNormalized())
+				end
+
+				self:PlaySequenceAndMove("nz_avo_ranged_attack_end", 1, self.FaceEnemy)
+
+				self.LastShot = CurTime() + math.random(5,10)
 			end
 		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
 	end
 end
 
-
-function ENT:IsValidTarget( ent )
-	if !ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() != TARGET_PRIORITY_NONE and ent:GetTargetPriority() != TARGET_PRIORITY_SPECIAL
-	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
+function ENT:PerformDeath(dmgInfo)
+	self:StopSound("enemies/bosses/avo/move_loop.wav")
+	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+	self:DoDeathAnimation("nz_avo_exit")
 end
 
--- This function is run every time a path times out, once every 1 seconds of pathing
-
-if CLIENT then
-	local eyeGlow =  Material( "sprites/redglow1" )
-	local white = Color( 255, 255, 255, 255 )
-	local lightglow = Material( "sprites/physg_glow1_noz" )
-	local lightyellow = Color( 255, 255, 200, 200 )
-	local clawglow = Material( "sprites/orangecore1" )
-	local clawred = Color( 255, 100, 100, 255 )
+function ENT:DoDeathAnimation(seq)
+	self.BehaveThread = coroutine.create(function()
+		self:SetSpecialAnimation(true)
+		self:PlaySequenceAndWait(seq)
+		self:Remove(DamageInfo())
+	end)
 end
 
 function ENT:OnRemove()
-	if IsValid(self.ClawHook) then self.ClawHook:Remove() end
-	if IsValid(self.GrabbedPlayer) then self.GrabbedPlayer:SetMoveType(MOVETYPE_WALK) end
-	if IsValid(self.FireEmitter) then self.FireEmitter:Finish() end
+	self:StopSound("enemies/bosses/avo/move_loop.wav")
 end
 
-function ENT:StartFlames(time)
-	self:Stop()
-	if time then self:TimedEvent(time, function() self:StopFlames() end) end
-end
-
-function ENT:StopFlames()
-	self:SetStop(false)
-end
-
-function ENT:OnThink()
-self.ClawHook = self:GetClawHook()
-	if self.ClawHook:GetNWBool( "Hit" ) then
-		local v = self:GetForward()
-		print( v[1], v[2], v[3] )
-		if(v[2] > 0) then
-		self:SetPos(self.ClawHook:GetPos() - Vector(0,100,0))
-		self:StopParticles()
-		ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,3)
-		--print("Teleport backwards")
-		else
-		
-		self:SetPos(self.ClawHook:GetPos() + Vector(0,100,0))
-		self:StopParticles()
-		ParticleEffectAttach("avo_glow",PATTACH_POINT_FOLLOW,self,3)
-		--print("Teleport forwards")
-		end
-	 
-	end
-
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
-
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
-			end
-			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
-end
-
-function ENT:OnInjured( dmginfo )
-	if dmginfo:GetDamageType() == DMG_BULLET then
-		dmginfo:ScaleDamage(0.1)
-		if  math.random(0,20)==14  then
-			self:EmitSound("avo/avogadro_damaged_"..math.random(12)..".mp3")
-		end
-	end
-end
-
-function ENT:GrabPlayer(ply)
-	if CLIENT then return end
-	
-	
-	self:SetUsingClaw(false)
-	self:SetStop(false)
-	self.loco:SetDesiredSpeed(self:GetRunSpeed())
-	
-	if self:IsValidTarget(ply) then
-		self.GrabbedPlayer = ply
-		
-		self:TimedEvent(0, function()
-			local att = self:GetAttachment(self:LookupAttachment("clawlight"))
-			local pos = att.Pos + att.Ang:Forward()*10
-			
-			ply:SetPos(pos - Vector(0,0,50))
-			ply:SetMoveType(MOVETYPE_NONE)
-		end)
-		
-		
-		self:SetSequence(self:LookupSequence("nz_grapple_flamethrower"))
-		self:SetCycle(0)
-		self:StartFlames()
-	--[[elseif ply then
-		self.loco:SetDesiredSpeed(self:GetRunSpeed())
-		self:SetSpecialAnimation(false)
-		self:SetBlockAttack(false)
-		self:SetStop(false)]]
-	else
-		
-	end
-end
-
-function ENT:ReleasePlayer()
-	if IsValid(self.GrabbedPlayer) then
-		self.GrabbedPlayer:SetMoveType(MOVETYPE_WALK)
-	end
-	if IsValid(self.ClawHook) then
-		self.ClawHook:Release()
-	end
-	if !self:GetFlamethrowing() then
-		self:SetStop(false)
-	end
-	self:SetUsingClaw(false)
-	self:SetStop(false)
-	self.loco:SetDesiredSpeed(self:GetRunSpeed())
-end
-
-function ENT:OnBarricadeBlocking( barricade )
-	if (IsValid(barricade) and barricade:GetClass() == "breakable_entry" ) then
-		if barricade:GetNumPlanks() > 0 then
-			timer.Simple(0.3, function()
-
-				for i = 1, barricade:GetNumPlanks() do
-					barricade:EmitSound("physics/wood/wood_plank_break" .. math.random(1, 4) .. ".wav", 100, math.random(90, 130))
-					barricade:RemovePlank()
-				end
-
-			end)
-
-			self:SetAngles(Angle(0,(barricade:GetPos()-self:GetPos()):Angle()[2],0))
-			
-			local seq, dur
-
-			local attacktbl = self.ActStages[1] and self.ActStages[1].attackanims or self.AttackSequences
-			local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-			
-			if type(target) == "table" then
-				seq, dur = self:LookupSequenceAct(target.seq)
-			elseif target then -- It is a string or ACT
-				seq, dur = self:LookupSequenceAct(target)
-			else
-				seq, dur = self:LookupSequence("swing")
-			end
-			
-			self:SetAttacking(true)
-			self:PlaySequenceAndWait(seq, 1)
-			self:SetLastAttack(CurTime())
-			self:SetAttacking(false)
-			self:UpdateSequence()
-			if coroutine.running() then
-				coroutine.wait(2 - dur)
-			end
-
-			-- this will cause zombies to attack the barricade until it's destroyed
-			local stillBlocked = self:CheckForBarricade()
-			if stillBlocked then
-				self:OnBarricadeBlocking(stillBlocked)
-				return
-			end
-
-			-- Attacking a new barricade resets the counter
-			self.BarricadeJumpTries = 0
-		elseif barricade:GetTriggerJumps() and self.TriggerBarricadeJump then
-			local dist = barricade:GetPos():DistToSqr(self:GetPos())
-			if dist <= 3500 + (1000 * self.BarricadeJumpTries) then
-				self:TriggerBarricadeJump()
-				self.BarricadeJumpTries = 0
-			else
-				-- If we continuously fail, we need to increase the check range (if it is a bigger prop)
-				self.BarricadeJumpTries = self.BarricadeJumpTries + 1
-				-- Otherwise they'd get continuously stuck on slightly bigger props :(
-			end
-		else
-			self:SetAttacking(false)
-		end
-	end
+function ENT:IsValidTarget( ent )
+	if !ent then return false end
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end

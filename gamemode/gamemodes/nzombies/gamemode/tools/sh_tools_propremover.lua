@@ -112,8 +112,10 @@ nzTools:CreateTool("propremover", {
 		local send = {}
 		for k,v in pairs(tbl) do
 			local id = v:MapCreationID()
-			if IsValid(v) and v != Entity(0) and id != -1 and string.sub(v:GetClass(), 1, 5) != "class" then
-				send[v] = nzMapping.MarkedProps[id] or false
+			if IsValid(v) and v != Entity(0) and id != -1 then
+			v:SetColor(Color(200,0,0))
+			nzMapping.MarkedProps[id] = true
+				--send[v] = nzMapping.MarkedProps[id] or false
 			end
 		end
 		net.Start("nzPropRemoverSearch")

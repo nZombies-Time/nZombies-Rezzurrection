@@ -16,6 +16,7 @@ function ENT:SetupDataTables()
 	
 	self:NetworkVar( "String", 0, "PerkID")
 	self:NetworkVar( "Bool", 2, "IsTeddy" )
+	self:NetworkVar( "Bool", 3, "Sharing" ) ////////////////////Communism
 end
 
 function ENT:DecideOutcomePerk(ply, specific)
@@ -52,7 +53,7 @@ end
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel("models/alig96/perks/wunderfizz/nz_wunderfizz.mdl")
+		self:SetModel("models/nzr/2022/machines/wonder/vending_wonder.mdl")
 		self:SetMoveType( MOVETYPE_NONE )
 		self:SetSolid( SOLID_VPHYSICS )
 		--self:DrawShadow( false )
@@ -60,7 +61,9 @@ function ENT:Initialize()
 		self:SetBeingUsed(false)
 		self:SetIsTeddy(false)
 		self:SetPrice(1500)
-		
+
+		self:SetSharing(false) ////////////////////Communism
+
 		self.NextLightning = CurTime() + math.random(10)
 		self:SetAutomaticFrameAdvance(true)
 		self:TurnOff(true)
@@ -73,12 +76,14 @@ function ENT:TurnOn()
 	self:SetCycle(0)
 	self:ResetSequence(turnon)
 	self.GoIdle = CurTime() + dur -- Delay when to go idle (after turn on animation)
+	self:EmitSound("nz_moo/perks/wonderfizz/ball_drop.mp3", 100)
 end
 
 function ENT:TurnOff(spawn)
 	self:SetActive(false)
 	local turnoff, dur = self:LookupSequence("turn_off")
 	self:ResetSequence(turnoff)
+	self:EmitSound("nz_moo/perks/wonderfizz/rand_perk_mach_leave.mp3", 100)
 	if spawn then self:SetCycle(1) else self:SetCycle(0) end
 	--self:SetCycle(0)
 	--self:SetPlaybackRate(10)
@@ -105,6 +110,8 @@ function ENT:Think()
 			e:SetOrigin(self:GetPos() + Vector(0,0,100))
 			e:SetMagnitude(0.5)
 			util.Effect("lightning_strike_wunderfizz", e)
+			ParticleEffect("ins_skybox_lightning",self:GetPos(),self:GetAngles(),nil)
+			--self:EmitSound("amb/weather/lightning/lightning_flash_0"..math.random(0,3)..".wav",511)
 			self.NextLightning = CurTime() + math.random(30)
 		end
 		self:NextThink(CurTime())
@@ -125,8 +132,8 @@ function ENT:Use(activator, caller)
 					
 					self.OutcomePerk = self:DecideOutcomePerk(activator)
 					self.Bottle = ents.Create("wunderfizz_windup")
-					self.Bottle:SetPos(self:GetPos() + Vector(0,0,45))
-					self.Bottle:SetAngles(self:GetAngles() + Angle(0,-90,0))
+					self.Bottle:SetPos(self:GetPos() + Vector(0,0,50))
+					self.Bottle:SetAngles(self:GetAngles() + Angle(0,140,0))
 					self.Bottle.WMachine = self
 					self.Bottle.Perk = self.OutcomePerk
 					self.Bottle:Spawn()
@@ -147,16 +154,44 @@ function ENT:Use(activator, caller)
 			else
 				print(activator:Nick().." already has max perks")
 			end
-		elseif self:GetUser() == activator and !self.Bottle:GetWinding() and !self:GetIsTeddy() then
-			local perk = self:GetPerkID()
-			local wep = activator:Give("nz_perk_bottle")
-			wep:SetPerk(perk)
-			activator:GivePerk(perk)
-			self:SetBeingUsed(false)
-			self:SetPerkID("")
-			self:SetUser(nil)
-			self.Bottle:Remove()
-		end
+		elseif !self.Bottle:GetWinding() and !self:GetIsTeddy() then  //////////////////// FROM HERE
+			if nzMapping.Settings.sharing then
+				if activator == self:GetUser() or self:GetSharing() then
+					if self:GetSharing() and #activator:GetPerks() >= GetConVar("nz_difficulty_perks_max"):GetInt() then
+						activator:PrintMessage( HUD_PRINTTALK, "BITCH YOU THOUGHT" )
+						return
+					end
+
+					local perk = self:GetPerkID()
+					local wep = activator:Give("tfa_perk_bottle")
+					if IsValid(wep) then
+						wep:SetPerk(perk)
+					end
+					activator:GivePerk(perk)
+					self:SetBeingUsed(false)
+					self:SetPerkID("")
+					self:SetUser(nil)
+					self.Bottle:Remove()
+					self:SetSharing(false)
+				end
+			else
+				if activator == self:GetUser() then	
+					local perk = self:GetPerkID()
+					local wep = activator:Give("tfa_perk_bottle")
+					if IsValid(wep) then
+						wep:SetPerk(perk)
+					end
+					activator:GivePerk(perk)
+					self:SetBeingUsed(false)
+					self:SetPerkID("")
+					self:SetUser(nil)
+					self.Bottle:Remove()
+					self:SetSharing(false)
+				else
+					activator:PrintMessage( HUD_PRINTTALK, "This is " .. self:GetUser():Nick() .. "'s perk. You cannot take it." )
+				end
+			end
+		end  //////////////////// TO HERE IS COMMUNISM (i think)
 	end
 end
 

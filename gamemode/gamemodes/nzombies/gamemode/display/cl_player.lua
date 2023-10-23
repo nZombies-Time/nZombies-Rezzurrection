@@ -28,9 +28,26 @@ function player:GetHUDPointsType(id)
 	if id == "Sus" then
 	 return "kawaii_hud_score.png"
 	end
-	
+	if id == "Black Ops 4" then
+	 return "bo4s.png"
+	end
+	if id == "Spongebob" then
+	 return "spongesmall.png"
+	end
 	if id == "Breen Desk" then
 	 return "buried_score1.png"
+	end
+	
+	if id == "Chemical Spill" then
+	 return "bo1s.png"
+	end
+	
+	if id == "Deep Rock Galactic" then
+	 return "DRG_score.png"
+	end
+	
+	if id == "666" then
+	 return "chained_small.png"
 	end
 	
 	if id == "Infinite Warfare" then
@@ -66,6 +83,9 @@ function player:GetHUDPointsType(id)
 	if id == "Covenant" then
 	return "covenant_score1.png"
 	end
+	if id == "Fallout" then
+	return "fallout_small.png"
+	end
 	if id == "UNSC" then
 	return "unsc_score1.png"
 	end
@@ -86,6 +106,12 @@ function player:GetHUDPointsType(id)
 	end
 	if id == "Gears of War" then
 	return "gears_score1.png"
+	end
+	if id == "Miku" then
+	return "miku_score.png"
+	end
+	if id == "BSAA" then
+	return "bsaa_score.png"
 	end
 	if id == "Killing Floor 2" then
 	return "hd_score4.png"

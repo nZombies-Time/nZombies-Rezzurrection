@@ -3,13 +3,7 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.PrintName = "Hellhound"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle and Moo"
-
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-end
+ENT.Author = "GhostlyMoo"
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -20,27 +14,36 @@ ENT.IsMooSpecial = true
 ENT.AttackRange = 80
 
 ENT.Models = {
-	{Model = "models/moo/pupper/moo_zombie_woofer.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t5/hellhound/moo_codz_t5_devildoggo.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-local spawn = {"nz_sleep_wake_fast"}
+local spawn = {"idle"}
 
 local AttackSequences = {
-	{seq = "nz_attack1", dmgtimes = {0.3}},
-	{seq = "nz_attack2", dmgtimes = {0.3}},
-	{seq = "nz_attack3", dmgtimes = {0.3}},
+	{seq = "nz_dog_run_attack", dmgtimes = {0.3}},
 }
 
 local JumpSequences = {
-	{seq = ACT_JUMP, speed = 30},
+	{seq = ACT_JUMP, speed = 100},
 }
 
-ENT.IdleSequence = "nz_idle1"
+
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
+ENT.IdleSequence = "nz_dog_idle"
 
 ENT.DeathSequences = {
-	"nz_death1",
-	"nz_death2",
-	"nz_death3",
+	"nz_dog_death_front",
+}
+
+ENT.ElectrocutionSequences = {
+	"nz_dog_tesla_death_a",
+	"nz_dog_tesla_death_b",
+	"nz_dog_tesla_death_c",
+	"nz_dog_tesla_death_d",
+	"nz_dog_tesla_death_e",
 }
 
 ENT.AttackSounds = {
@@ -50,23 +53,6 @@ ENT.AttackSounds = {
 	"nz_moo/zombies/vox/_hellhound/attack/attack_03.mp3",
 	"nz_moo/zombies/vox/_hellhound/attack/attack_04.mp3",
 	"nz_moo/zombies/vox/_hellhound/attack/attack_05.mp3"
-}
-
-ENT.AttackHitSounds = {
-	"nz_moo/zombies/vox/_hellhound/bite/bite_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/bite/bite_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/bite/bite_02.mp3"
-}
-
-ENT.WalkSounds = {
-	"nz_moo/zombies/vox/_hellhound/movement/movement_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3",
-	"nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"
 }
 
 local walksounds = {
@@ -87,14 +73,6 @@ local runsounds = {
 	Sound("nz/hellhound/close/close_03.wav"),
 }
 
-ENT.PainSounds = {
-	"physics/flesh/flesh_impact_bullet1.wav",
-	"physics/flesh/flesh_impact_bullet2.wav",
-	"physics/flesh/flesh_impact_bullet3.wav",
-	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav"
-}
-
 ENT.DeathSounds = {
 	"nz_moo/zombies/vox/_hellhound/death/death_00.mp3",
 	"nz_moo/zombies/vox/_hellhound/death/death_01.mp3",
@@ -112,39 +90,37 @@ ENT.AppearSounds = {
 	"nz_moo/zombies/vox/_hellhound/appear/appear_03.mp3"
 }
 
-ENT.SprintSounds = {
-	"nz/hellhound/close/close_00.wav",
-	"nz/hellhound/close/close_01.wav",
-	"nz/hellhound/close/close_02.wav",
-	"nz/hellhound/close/close_03.wav",
-}
-
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	}
-}
-
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
 			SpawnSequence = {spawn},
 			MovementSequence = {
-				"nz_search",
-				"nz_walk",
+				"nz_dog_walk",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 150, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
 			SpawnSequence = {spawn},
 			MovementSequence = {
-				"nz_run1",
+				"nz_dog_trot",
 			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 71, Sequences = {
+		{
+			SpawnSequence = {spawn},
+			MovementSequence = {
+				"nz_dog_run",
+			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {runsounds},
 		},
 	}}
@@ -153,41 +129,33 @@ ENT.SequenceTables = {
 function ENT:StatsInitialize()
 	if SERVER then
 		self.Sprinting = false
-		self:SetRunSpeed( 125 )
-		self.loco:SetDesiredSpeed( 125 )
-		--[[if not nzRound:InState( ROUND_CREATE ) or nzRound:GetNumber() == -1 then
-			self:SetHealth( nzRound:GetNumber() * 1.5 + 150 )
-			print(self:Health())
-		else
-			self:SetHealth( math.random(120, 1200) ) -- Creative/Infinite Round Health
-		end]]
+		self.IgnitedFoxy = false
+		self:SetRunSpeed( 36 )
+		self.loco:SetDesiredSpeed( 36 )
 	end
-	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 48))
+	self:SetCollisionBounds(Vector(-13,-13, 0), Vector(13, 13, 45))
 end
 
 function ENT:OnSpawn()
-	self:SetNoDraw(true)
+	self:SetMaterial("invisible")
 	self:SetInvulnerable(true)
 	self:SetBlockAttack(true)
-	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
-	self:SetSpecialAnimation(true)
+	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 
-	self:EmitSound("bo1_overhaul/hhound/prespawn.mp3",511,100)
+	self:EmitSound("nz/hellhound/spawn/prespawn.wav",511,100)
 	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)
+	--ParticleEffect("fx_hellhound_summon",self:GetPos(),self:GetAngles(),nil)
 
-	local seq = self:SelectSpawnSequence()
-	if seq then
-		self:PlaySequenceAndWait(seq)
-		self:EmitSound("bo1_overhaul/lgtstrike.mp3",511,100)
-		self:SetNoDraw(false)
-		self:SetInvulnerable(nil)
-		self:SetBlockAttack(false)
-		self:SetSpecialAnimation(false)
-		self:CollideWhenPossible()
-		self:ResetMovementSequence()
-		ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
-		self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 100, math.random(85, 105), 1, 2)
-	end
+	self:TimeOut(0.85)
+	
+	self:EmitSound("nz/hellhound/spawn/strike.wav",511,100)
+	ParticleEffectAttach("ins_skybox_lightning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+	
+	self:SetMaterial("")
+	self:SetInvulnerable(nil)
+	self:SetBlockAttack(false)
+	self:CollideWhenPossible()
+	self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 511, math.random(85, 105), 1, 2)
 
 	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
 end
@@ -196,13 +164,22 @@ function ENT:PerformDeath(dmgInfo)
 	if self:GetSpecialAnimation() then
 		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 		if IsValid(self) then
-			ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
-			self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
-			self:Remove()
+			if self.IgnitedFoxy then
+				ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
+				self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
+				self:Remove()
+			else
+				self:Remove()
+			end
 		end
 	else
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+		if dmgInfo:GetDamageType() == DMG_SHOCK then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+			self:DoDeathAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
+		else
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+			self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+		end
 	end
 end
 
@@ -210,9 +187,13 @@ function ENT:DoDeathAnimation(seq)
 	self.BehaveThread = coroutine.create(function()
 		self:PlaySequenceAndWait(seq)
 		if IsValid(self) then
-			ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
-			self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
-			self:Remove()
+			if self.IgnitedFoxy then
+				ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
+				self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
+				self:Remove()
+			else
+				self:Remove()
+			end
 		end
 	end)
 end
@@ -223,11 +204,11 @@ function ENT:OnPathTimeOut()
 	if IsValid(self:GetTarget()) then
 		if not self.Sprinting and distToTarget < 750 then
 			self.Sprinting = true
-			self:SetRunSpeed( 275 )
-			self.loco:SetDesiredSpeed( 275 )
+			self.IgnitedFoxy = true
+			self:SetRunSpeed( 71 )
+			self.loco:SetDesiredSpeed( 71 )
 			self:SpeedChanged()
-			self:ResetMovementSequence()
-			self:EmitSound("nz/hellhound/close/close_0"..math.random(3)..".wav",100,math.random(95,105),1,2)
+			ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 		end
 	end
 end
@@ -265,5 +246,5 @@ end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

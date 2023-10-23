@@ -280,9 +280,7 @@ function ENT:GetPriorityTarget()
 	else self:TimeOut(0.2) end
 end
 
-function ENT:IsValidTarget(ent)
+function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	
-	--Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
-	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL
+	return IsValid( ent ) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end

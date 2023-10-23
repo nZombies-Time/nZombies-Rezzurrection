@@ -1,90 +1,80 @@
---
+local usekey = "" .. string.upper(input.LookupBinding( "+use", true )) .. " - "
 
 local traceents = {
 	["wall_buys"] = function(ent)
+		local ply = LocalPlayer()
+		if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
+
 		local wepclass = ent:GetWepClass()
 		local price = ent:GetPrice()
 		local wep = weapons.Get(wepclass)
-		local pap = false
-		upgrade= ""
-		upgrade2=""
-		if wep.NZPaPReplacement then
-		upgrade = wep.NZPaPReplacement
-		local wep2 =  weapons.Get( wep.NZPaPReplacement)
-		if  wep2.NZPaPReplacement then
-		 upgrade2 = wep2.NZPaPReplacement
-		else
-		 upgrade2 = ""
-		end
-		else
-		 upgrade = ""
-		end
 		if !wep then return "INVALID WEAPON" end
+
+		local pap = false
+		local hacked = false
+		local upgrade
+		local upgrade2
+
+		if wep.NZPaPReplacement then
+			upgrade = wep.NZPaPReplacement
+			if ply:HasWeapon(upgrade) then
+				pap = true
+			end
+
+			local wep2 = weapons.Get(wep.NZPaPReplacement)
+			if wep2.NZPaPReplacement then
+				upgrade2 = wep2.NZPaPReplacement
+				if ply:HasWeapon(upgrade2) then
+					pap = true
+				end
+			end
+		end
+
+		if ent.GetHacked and ent:GetHacked() then
+			hacked = true
+		end
+
 		local name = wep.PrintName
-		local ammo_price = math.Round((price - (price % 10))/2)
+		local ammo_price = hacked and 4500 or math.ceil((price - (price % 10))/2)
+		local ammo_price_pap = hacked and math.ceil((price - (price % 10))/2) or 4500
 		local text = ""
-		if  LocalPlayer():HasWeapon( upgrade ) then
-		 pap = true
-		end
-		if  LocalPlayer():HasWeapon( upgrade2 ) then
-		 pap = true
-		end
-		
-		if !LocalPlayer():HasWeapon( wepclass ) then
-		if !pap then
-			text = "Press E to buy " .. name .." for " .. price .. " points."
-	
-		
-   -- text = "Press E to buy " .. name .."  Ammo refill for " .. ammo_price .. " points."
 
-
-if wepclass == "nz_grenade" then
-    local nade = LocalPlayer():GetItem("grenade")
-    if (LocalPlayer():HasPerk("widowswine") and (!nade or nade and nade.price < 4000)) then
-        text = "Press E to refill primary grenades for 4000 points."
-    elseif (nade and ammo_price < nade.price) then
-	 text = "Press E to refill primary grenades" .. nade.price .. " points."
-    else
-	text = "Press E to refill primary grenades" .. ammo_price .. " points."
-    end
-end
-		 else
-			if pap then
-			text = "Press E to buy upgraded " .. name .."  Ammo refill for " .. 4500 .. " points."
-			end
+		if !ply:HasWeapon( wepclass ) then
+			if !pap then
+				text = "Press "..usekey..name.." [Cost: "..string.Comma(price).."]"
+			else
+				text = "Press "..usekey.."Upgraded Ammo ["..string.Comma(ammo_price_pap).."]"
 			end
 		else
-		if LocalPlayer():HasWeapon( wepclass ) then
-		text = "Press E to buy " .. name .."  Ammo refill for " .. ammo_price .. " points."
-		else
-			text = "You already have this weapon."
+			if ply:HasWeapon( wepclass ) then
+				text = "Press "..usekey.."Ammo ["..string.Comma(ammo_price).."], Upgraded Ammo ["..string.Comma(ammo_price_pap).."]"
+			else
+				text = "You already have this Weapon"
 			end
 		end
-
+		if nzRound:InState(ROUND_CREATE) then
+			text = ""..name.." | "..string.upper(wepclass).." | Price "..string.Comma(price)..""
+		end
 
 		return text
 	end,
 	["breakable_entry"] = function(ent)
 		if ent:GetHasPlanks() and ent:GetNumPlanks() < GetConVar("nz_difficulty_barricade_planks_max"):GetInt() then
-			local text = "Hold E to rebuild the barricade."
+			local text = "Hold " .. usekey .. "Rebuild Barricade"
 			return text
 		end
 	end,
 	["ammo_box"] = function(ent)
-		
-			local text = "Press E to buy ammo for " ..ent:GetPrice() .. " points."
-			return text
-		
+		local text = "Press " .. usekey .. "Ammo [" .. string.Comma(ent:GetPrice()) .. "]"
+		return text
 	end,
 	["stinky_lever"] = function(ent)
-		
-			local text = "Press E to hasten your demise"
-			return text
-		
+		local text = "Press " .. usekey .. "Hasten your demise"
+		return text
 	end,
 	["random_box"] = function(ent)
-		if !ent:GetOpen() then
-			local text = nzPowerUps:IsPowerupActive("firesale") and "Press E to buy a random weapon for 10 points." or "Press E to buy a random weapon for 950 points."
+		if not ent:GetOpen() then
+			local text = nzPowerUps:IsPowerupActive("firesale") and ("Press " .. usekey .. "Open Mystery Box [Cost: 10]") or ("Press " .. usekey .. "Open Mystery Box [Cost: 950]")
 			return text
 		end
 	end,
@@ -97,57 +87,66 @@ end
 				name = wep.PrintName
 			end
 			if name == nil then name = wepclass end
-			name = "Press E to take " .. name .. " from the box."
+			name = usekey .. "Take " .. name
 
 			return name
 		end
 	end,
 	["perk_machine"] = function(ent)
+		local nz_maxperks = GetConVar("nz_difficulty_perks_max")
+		local ply = LocalPlayer()
+		if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
 		local text = ""
+
 		if !ent:IsOn() then
-			text = "No Power."
+			text = "You must turn on the electricity first!"
 		elseif ent:GetBeingUsed() then
-			text = "Currently in use."
+			text = "Currently in Use"
+		elseif ent.BrutusLocked and ent:BrutusLocked() then
+			text = "Press " .. usekey .. " Unlock " .. "[Cost: 2000]"
 		else
 			if ent:GetPerkID() == "pap" then
-				local wep = LocalPlayer():GetActiveWeapon()
-				if wep:HasNZModifier("pap") then
+				local wep = ply:GetActiveWeapon()
+				
+				if IsValid(wep) and wep:HasNZModifier("pap") then
 					if wep.NZRePaPText then
-						text = "Press E to "..wep.NZRePaPText.." for 3000 points."
+						text = nzPowerUps:IsPowerupActive("bonfiresale") and ("Press " .. usekey .. ""..wep.NZRePaPText.." [Cost: 500]") or ("Press " .. usekey .. ""..wep.NZRePaPText.." [Cost: 3,000]")
 					elseif wep:CanRerollPaP() then
-						text = "Press E to reroll attachments for 3000 points."
+						text = nzPowerUps:IsPowerupActive("bonfiresale") and ("Press " .. usekey .. "Repack [Cost: 500]") or ("Press " .. usekey .. "Repack [Cost: 3,000]")
 					else
-						text = "This weapon is already upgraded."
+						text = "This weapon cannot be upgraded any further"
 					end
 				else
-					text = "Press E to buy Pack-a-Punch for 5000 points."
+					text = nzPowerUps:IsPowerupActive("bonfiresale") and ("Press " .. usekey .. "Pack-a-Punch Weapon [Cost: 1,000]") or ("Press " .. usekey .. "Pack-a-Punch Weapon [Cost: 5,000]")
 				end
 			else
 				local perkData = nzPerks:Get(ent:GetPerkID())
-				-- Its on local iconType = nzRound:GetIconType(nzMapping.Settings.icontype)
+
 				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
-						text = "Press E to buy " .. perkData.name_skin .. " for " .. ent:GetPrice() .. " points."
-						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
-						text = "Press E to buy " .. perkData.name_holo .. " for " .. ent:GetPrice() .. " points."
-						else
-						text = "Press E to buy " .. perkData.name .. " for " .. ent:GetPrice() .. " points."
-						end
-				-- Check if they already own it
-				if LocalPlayer():HasPerk(ent:GetPerkID()) and (LocalPlayer():HasUpgrade(ent:GetPerkID()) or tobool(nzMapping.Settings.perkupgrades) == false) then
-				
-					text = "You already own this perk."
-					elseif LocalPlayer():HasPerk(ent:GetPerkID()) and !LocalPlayer():HasUpgrade(ent:GetPerkID()) then
+					text = "Press " .. usekey .. perkData.name_skin .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()) .. "]"
+				elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
+					text = "Press " .. usekey .. perkData.name_holo .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()) .. "]"
+				else
+					text = "Press " .. usekey .. perkData.name .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()) .. "]"
+				end
+
+				if #ply:GetPerks() >= nz_maxperks:GetInt() then
+					text = "You may only carry " .. nz_maxperks:GetInt() .. " perks"
+				end
+
+				if ply:HasPerk(ent:GetPerkID()) and (ply:HasUpgrade(ent:GetPerkID()) or tobool(nzMapping.Settings.perkupgrades) == false) then
+					text = "You already own this perk"
+				elseif ply:HasPerk(ent:GetPerkID()) and !ply:HasUpgrade(ent:GetPerkID()) then
 					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
-						text = "Press E to upgrade " .. perkData.name_skin .. " for " .. ent:GetPrice()*2 .. " points."
-						elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
-						text = "Press E to upgrade " .. perkData.name_holo .. " for " .. ent:GetPrice()*2 .. " points."
-						else
-						text = "Press E to upgrade " .. perkData.name .. " for " .. ent:GetPrice()*2 .. " points."
-						end
+						text = "Press " .. usekey .. " Upgrade " .. perkData.name_skin .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()*2) .. "]"
+					elseif nzRound:GetIconType(nzMapping.Settings.icontype) == "Hololive" then
+						text = "Press " .. usekey .. " Upgrade " .. perkData.name_holo .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()*2) .. "]"
+					else
+						text = "Press " .. usekey .. " Upgrade " .. perkData.name .. " " .. "[Cost: " .. string.Comma(ent:GetPrice()*2) .. "]"
+					end
 				end
 			end
 		end
-
 		return text
 	end,
 	["nz_teleporter"] = function(ent)
@@ -163,16 +162,14 @@ end
 		elseif ent:GetCooldown() then
 			text = "Teleporter on cooldown!"
 		else
-				-- Its on
-						text = "Press E to Teleport for " .. ent:GetPrice() .. " points."
-			
+			text = "Press E to Teleport for " .. ent:GetPrice() .. " points."
 		end
 
 		return text
 	end,
 	["buyable_ending"] = function(ent)
 		local text = ""
-		text = "Press E to end the game for " .. ent:GetPrice() .. " points."
+		text = "Press " .. usekey .. "End game [Cost: " .. string.Comma(ent:GetPrice()) .. "]"
 		return text
 	end,
 	["player_spawns"] = function() if nzRound:InState( ROUND_CREATE ) then return "Player Spawn" end end,
@@ -186,30 +183,49 @@ end
 		if wep != nil then
 			name = nz.Display_PaPNames[wepclass] or nz.Display_PaPNames[wep.PrintName] or "Upgraded "..wep.PrintName
 		end
-		name = "Press E to take " .. name .. " from the machine."
+		name = "Press " .. usekey .. " for " .. name .. ""
 
 		return name
 	end,
 	["wunderfizz_machine"] = function(ent)
+		local nz_maxperks = GetConVar("nz_difficulty_perks_max")
+		local ply = LocalPlayer()
+		if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
 		local text = ""
-		if !ent:IsOn() then
-			text = "The Wunderfizz Orb is currently at another location."
-		elseif ent:GetBeingUsed() then
-			if ent:GetUser() == LocalPlayer() and ent:GetPerkID() != "" and !ent:GetIsTeddy() then
-				
-				if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
-						text = "Press E to take "..nzPerks:Get(ent:GetPerkID()).name_skin.." from Der Wunderfizz."
-						else
-						text = "Press E to take "..nzPerks:Get(ent:GetPerkID()).name.." from Der Wunderfizz."
-						end
+
+		if not ent:IsOn() then
+			text = "The Wunderfizz Orb is currently at another location"
+		elseif ent:GetBeingUsed() and IsValid(ent:GetUser()) then
+			if ent:GetUser() == ply then
+				if ent:GetPerkID() ~= "" and not ent:GetIsTeddy() then
+					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						text = "Press " ..usekey.. "for " ..nzPerks:Get(ent:GetPerkID()).name_skin
+					else
+						text = "Press " ..usekey.. "for " ..nzPerks:Get(ent:GetPerkID()).name
+					end
+				elseif ent:GetIsTeddy() then
+					text = "Changing Location..."
+				else
+					text = "Selecting Beverage..."
+				end
 			else
-				text = "Currently in use."
+				if ent:GetPerkID() ~= "" and not ent:GetIsTeddy() then
+					if nzPerks:GetMachineType(nzMapping.Settings.perkmachinetype) == "IW" then
+						text = tostring(nzPerks:Get(ent:GetPerkID()).name_skin)
+					else
+						text = tostring(nzPerks:Get(ent:GetPerkID()).name)
+					end
+				elseif ent:GetIsTeddy() then
+					text = "You may now clown "..ent:GetUser():Nick()
+				else
+					text = "Selecting Beverage..."
+				end
 			end
-		else
-			if #LocalPlayer():GetPerks() >= GetConVar("nz_difficulty_perks_max"):GetInt() then
-				text = "You cannot have more perks."
+		elseif not ent:GetBeingUsed() and ent:IsOn() then
+			if #ply:GetPerks() >= nz_maxperks:GetInt() then
+				text = "You may only carry " .. nz_maxperks:GetInt() .. " perks"
 			else
-				text = "Press E to buy Der Wunderfizz for " .. ent:GetPrice() .. " points."
+				text = "Press " .. usekey .. "Use Wunderfizz Orb [Cost: " .. string.Comma(ent:GetPrice()) .. "]"
 			end
 		end
 
@@ -217,19 +233,33 @@ end
 	end,
 }
 
-local function GetTarget()
-	local tr =  {
-		start = EyePos(),
-		endpos = EyePos() + LocalPlayer():GetAimVector()*150,
-		filter = LocalPlayer(),
-	}
-	local trace = util.TraceLine( tr )
-	if (!trace.Hit) then return end
-	if (!trace.HitNonWorld) then return end
+local ents = ents
+local surface = surface
+local draw = draw
 
-	--print(trace.Entity:GetClass())
-	return trace.Entity
+local ents_FindByClass = ents.FindByClass
+local ents_FindInSphere = ents.FindInSphere
+
+local color_black_100 = Color(0, 0, 0, 100)
+local color_nzwhite = Color(225, 235, 255,255)
+local color_gold = Color(255, 255, 100, 255)
+
+local cl_drawhud = GetConVar("cl_drawhud")
+local nz_betterscaling = GetConVar("nz_hud_better_scaling")
+
+local dahudz = {
+	["Black Ops 3"] = true,
+	["Shadows of Evil"] = true,
+	["Black Ops 4"] = true,
+}
+
+if GetConVar("nz_hud_show_targeticon") == nil then
+	CreateClientConVar("nz_hud_show_targeticon", 0, true, false, "Enable or disable displaying an entity's HUD icon above their hint string. (0 false, 1 true), Default is 0.", 0, 1)
 end
+
+local nz_showicons = GetConVar("nz_hud_show_targeticon")
+local zmhud_icon_frame = Material("nz_moo/icons/perk_frame.png", "unlitgeneric smooth")
+local zmhud_vulture_glow = Material("nz_moo/huds/t6/specialty_vulture_zombies_glow.png", "unlitgeneric smooth")
 
 local function GetDoorText( ent )
 	local door_data = ent:GetDoorData()
@@ -249,11 +279,12 @@ local function GetDoorText( ent )
 		if ent:IsLocked() then
 			if req_elec and !IsElec() then
 				text = "You must turn on the electricity first!"
-			elseif door_data.text then
-				text = door_data.text
-			elseif price != 0 then
-				--print("Still here", nz.nzDoors.Data.OpenedLinks[tonumber(link)])
-				text = "Press E to open for " .. price .. " points."
+			elseif price > 0 then
+				text = "Press " .. usekey .. "Clear Debris [Cost: " .. string.Comma(price) .. "]"
+			elseif price < 0 then
+				text = "Press " .. usekey .. "Salvage [+Cost: " .. string.Comma(price * -1) .. "]"
+			else
+				text = "Press " .. usekey .. "Clear Debris"
 			end
 		end
 		elseif door_data and tonumber(door_data.buyable) != 1 and nzRound:InState( ROUND_CREATE ) then
@@ -265,11 +296,12 @@ local function GetDoorText( ent )
 end
 
 local function GetText( ent )
-
 	if !IsValid(ent) then return "" end
 	
 	if ent.GetNZTargetText then return ent:GetNZTargetText() end
 
+	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
 	local class = ent:GetClass()
 	local text = ""
 
@@ -277,23 +309,31 @@ local function GetText( ent )
 	local itemcategory = ent:GetNWString("NZItemCategory")
 
 	if neededcategory != "" then
-		local hasitem = LocalPlayer():HasCarryItem(neededcategory)
+		local hasitem = ply:HasCarryItem(neededcategory)
 		text = hasitem and hastext != "" and hastext or deftext
 	elseif deftext != "" then
 		text = deftext
 	elseif itemcategory != "" then
 		local item = nzItemCarry.Items[itemcategory]
-		local hasitem = LocalPlayer():HasCarryItem(itemcategory)
+		local hasitem = ply:HasCarryItem(itemcategory)
 		if hasitem then
-			text = item and item.hastext or "You already have this."
+			text = item and item.hastext or "You already have this"
 		else
-			text = item and item.text or "Press E to pick up."
+			text = usekey .. "Take"
 		end
 	elseif ent:IsPlayer() then
 		if ent:GetNotDowned() then
-			text = ent:Nick() .. " - " .. ent:Health() .. " HP"
+			local health = ent:Health()
+			local armor = ent:Armor()
+			if armor <= 0 then
+				armor = ""
+			else
+				armor = " | "..armor.." AP"
+			end
+
+			text = ent:Nick().." - "..health.." HP"..armor
 		else
-			text = "Hold E to revive "..ent:Nick()
+			text = usekey.."Revive "..ent:Nick()
 		end
 	elseif ent:IsDoor() or ent:IsButton() or ent:GetClass() == "class C_BaseEntity" or ent:IsBuyableProp() then
 		text = GetDoorText(ent)
@@ -306,10 +346,10 @@ end
 
 local function GetMapScriptEntityText()
 	local text = ""
+	local pos = EyePos()
 
-	for k,v in pairs(ents.FindByClass("nz_script_triggerzone")) do
-		local dist = v:NearestPoint(EyePos()):Distance(EyePos())
-		if dist <= 1 then
+	for k, v in nzLevel.GetTriggerZoneArray() do
+		if IsValid(v) and v:NearestPoint(pos):DistToSqr(pos) <= 1 then
 			text = GetDoorText(v)
 			break
 		end
@@ -318,111 +358,149 @@ local function GetMapScriptEntityText()
 	return text
 end
 
-function GetFontType(id)
-	if id == "Classic NZ" then
-	return "classic"
-	end
-	if id == "Old Treyarch" then
-	return "waw"
-	end
-	if id == "BO2/3" then
-	return "blackops2"
-	end
-	if id == "BO4" then
-	return "blackops4"
-	end
-		if id == "Comic Sans" then
-	return "xd"
-	end
-		if id == "Warprint" then
-	return "grit"
-	end
-		if id == "Road Rage" then
-	return "rage"
-	end
-		if id == "Black Rose" then
-	return "rose"
-	end
-		if id == "Reborn" then
-	return "reborn"
-	end
-		if id == "Rio Grande" then
-	return "rio"
-	end
-		if id == "Bad Signal" then
-	return "signal"
-	end
-		if id == "Infection" then
-	return "infected"
-	end
-		if id == "Brutal World" then
-	return "brutal"
-	end
-		if id == "Generic Scifi" then
-	return "ugly"
-	end
-		if id == "Tech" then
-	return "tech"
-	end
-		if id == "Krabby" then
-	return "krabs"
-	end
-		if id == "Default NZR" then
-	return "default"
-	end
-	if id == nil then
-	return "default"
-	end
-end
+local perkmachineclasses = {
+	["wunderfizz_machine"] = true,
+	["perk_machine"] = true,
+}
 
-local function DrawTargetID( text )
-
-	if !text then return end
+local function DrawTargetID(text, ent)
+	if not text then return end
+	if not cl_drawhud:GetBool() then return end
 
 	local font = ("nz.small."..GetFontType(nzMapping.Settings.smallfont))
-	local font2 = ("nz.ammo."..GetFontType(nzMapping.Settings.smallfont))
-	surface.SetFont( font )
-	local w, h = surface.GetTextSize( text )
+	local font2 = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
 
-	local MouseX, MouseY = gui.MousePos()
-
-	if ( MouseX == 0 && MouseY == 0 ) then
-
-		MouseX = ScrW() / 2
-		MouseY = ScrH() / 2
-
-	end
-
-	local x = MouseX
-	local y = MouseY
-
-	x = x - w / 2
-	y = y + 30
 	local ply = LocalPlayer()
-	local ent = ply:GetEyeTrace().Entity
-	
-	if IsValid(ent) and ent:GetClass() == "perk_machine"  then
-	local dist = ent:GetPos():Distance(ply:GetPos())
-	if dist<165 then
-	local perkData = nzPerks:Get(ent:GetPerkID())
-	if perkData.desc then
-	draw.SimpleText( perkData.desc, font2, x-(string.len( perkData.desc )*3), y+60, perkData.color )
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
+
+	local wep = ply:GetActiveWeapon()
+	if IsValid(wep) and wep.IsSpecial and wep:IsSpecial() then return end
+
+	if nzRevive.Players and nzRevive.Players[ply:EntIndex()] then
+		local rply = nzRevive.Players[ply:EntIndex()].RevivePlayer
+		if !ply:GetNotDowned() and IsValid(rply) and rply:IsPlayer() then return end
 	end
+
+	if !ply:GetNotDowned() and not ply:GetDownedWithTombstone() then return end
+
+	local modern = dahudz[nzMapping.Settings.hudtype]
+	local scw, sch = ScrW(), ScrH()
+	local scale = (scw/1920 + 1)/2
+	local lowres = scale < 0.96
+	local pscale = 1
+	if nz_betterscaling:GetBool() then
+		pscale = scale
 	end
+
+	if lowres then
+		font = ("nz.points."..GetFontType(nzMapping.Settings.smallfont))
+		font2 = ("nz.ammo."..GetFontType(nzMapping.Settings.ammofont))
 	end
-	-- The fonts internal drop shadow looks lousy with AA on
-	draw.SimpleText( text, font, x+1, y+1, Color(255,255,255,255) )
+
+	// grenade rethrow
+	for k, v in pairs(ents_FindInSphere(ply:GetPos(), 64)) do
+		if v.NZNadeRethrow and v:GetCreationTime() + 0.25 < CurTime() then
+			local nadekey = GetConVar("nz_key_grenade"):GetInt()
+			text = "Press "..string.upper(input.GetKeyName(nadekey)).." - Rethrow Grenade"
+			ent = v
+			break
+		end
+	end
+
+	// tombstone
+	if ply:GetDownedWithTombstone() then text = "Press & Hold "..usekey.." Feed the Zombies" end
+
+	surface.SetFont(font)
+	local tw, th = surface.GetTextSize(text)
+
+	if IsValid(ent) then
+		local showicons = nz_showicons:GetBool()
+		// player perks
+		if showicons and ent:IsPlayer() then
+			local perks = ent:GetPerks()
+			local size = 34
+			local num, row = 0, 0
+
+			for _, perk in pairs(perks) do
+				local icon = GetPerkIconMaterial(perk)
+				if not icon or icon:IsError() then
+					icon = zmhud_icon_missing
+				end
+
+				local fuck = math.min(#perks, 8)
+
+				surface.SetMaterial(icon)
+				surface.SetDrawColor(color_white)
+				surface.DrawTexturedRect(scw/2 + (num*(size + 2)*pscale) - (fuck/2)*size*pscale, (sch - 280*pscale - (th+12)) - size*row, size*pscale, size*pscale)
+
+				if ent:HasUpgrade(perk) then
+					surface.SetDrawColor(color_gold)
+					surface.SetMaterial(zmhud_icon_frame)
+					surface.DrawTexturedRect(scw/2 + (num*(size + 2)*pscale) - (fuck/2)*size*pscale, (sch - 280*pscale - (th+12)) - size*row, size*pscale, size*pscale)
+				end
+
+				if perk == "vulture" and ent:HasVultureStink() then
+					surface.SetMaterial(zmhud_vulture_glow)
+					surface.SetDrawColor(color_white)
+					surface.DrawTexturedRect(scw/2 + (num*(size + 2)*pscale) - (fuck/2)*size*pscale - 15*pscale, (sch - 280*pscale - (th+12)) - size*row - 15*pscale, 64*pscale, 64*pscale)
+
+					local stink = surface.GetTextureID("nz_moo/huds/t6/zm_hud_stink_ani_green")
+					surface.SetTexture(stink)
+					surface.SetDrawColor(color_white)
+					surface.DrawTexturedRect(scw/2 + (num*(size + 2)*pscale) - (fuck/2)*size*pscale, (sch - 280*pscale - (th+12)) - size*row - 42*pscale, 42*pscale, 42*pscale)
+				end
+
+				num = num + 1
+				if num%8 == 0 then row = row + 1 num = 0 end
+			end
+		end
+
+		// hud icon
+		if showicons and ent.NZHudIcon then
+			surface.SetMaterial((modern and ent.NZHudIcon_t7) and ent.NZHudIcon_t7 or ent.NZHudIcon)
+			surface.SetDrawColor(color_white)
+			surface.DrawTexturedRect(scw/2 - 32, sch - 280*pscale - (th+48), 64, 64)
+		end
+
+		// perk machines
+		if perkmachineclasses[ent:GetClass()] and (nzRound:InState(ROUND_CREATE) or (ent.IsOn and ent:IsOn() or IsElec())) then
+			local perkData = nzPerks:Get(ent:GetPerkID())
+			if perkData and perkData.desc then
+				draw.SimpleTextOutlined("Effect: "..perkData.desc, font2, scw/2, sch - 230*pscale, perkData.color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, color_black_100)
+				if perkData.desc2 then
+					draw.SimpleTextOutlined("Modifier: "..perkData.desc2, font2, scw/2, sch - 200*pscale, perkData.color, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, color_black_100)
+				end
+
+				if showicons then
+					local icon = GetPerkIconMaterial(ent:GetPerkID())
+					if icon and !icon:IsError() then
+						surface.SetMaterial(icon)
+						surface.SetDrawColor(color_white)
+						surface.DrawTexturedRect(scw/2 - 32, sch - 280*pscale - (th+48), 64, 64)
+					end
+				end
+			end
+		end
+	end
+
+	// textbox background
+	if text ~= "" and modern then
+		surface.SetDrawColor(color_black_100)
+		surface.DrawRect(scw/2 - ((tw/2)+12), sch - 280*pscale - (th/2), tw+24, th)
+	end
+
+	draw.SimpleTextOutlined(text, font, scw/2, sch - 280*pscale, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 2, color_black_100)
 end
 
-
 function GM:HUDDrawTargetID()
+	local ply = LocalPlayer()
+	if IsValid(ply:GetObserverTarget()) then ply = ply:GetObserverTarget() end
+	local tr = ply:GetEyeTrace()
+	local ent = tr.Entity
 
-	local ent = GetTarget()
-
-	if ent != nil then
-		DrawTargetID(GetText(ent))
+	if IsValid(ent) and tr.HitPos:DistToSqr(ply:EyePos()) < 14400 then
+		DrawTargetID(GetText(ent), ent)
 	else
 		DrawTargetID(GetMapScriptEntityText())
 	end
-
 end

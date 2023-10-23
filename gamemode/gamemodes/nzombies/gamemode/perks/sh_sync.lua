@@ -59,29 +59,29 @@ if CLIENT then
 	
 	-- Server to client (Client)
 	local function ReceiveSync( length )
-		print("Received Player Perks Sync")
+		--print("Received Player Perks Sync")
 		local ply = net.ReadEntity()
 		nzPerks.Players[ply] = net.ReadTable()
 		--PrintTable(nzPerks.Players)
 	end
 	
 	local function ReceiveFullSync( length )
-		print("Received Full Perks Sync")
+		--print("Received Full Perks Sync")
 		nzPerks.Players = net.ReadTable()
-		PrintTable(nzPerks.Players)
+		--PrintTable(nzPerks.Players)
 	end
 	
 	local function ReceiveUpgradeSync( length )
-		print("Received Player Upgrades Sync")
+		--print("Received Player Upgrades Sync")
 		local ply = net.ReadEntity()
 		nzPerks.PlayerUpgrades[ply] = net.ReadTable()
-		PrintTable(nzPerks.PlayerUpgrades[ply])
+		--PrintTable(nzPerks.PlayerUpgrades[ply])
 	end
 	
 	local function ReceiveFullUpgradeSync( length )
-		print("Received Full Upgrades Sync")
+		--print("Received Full Upgrades Sync")
 		nzPerks.PlayerUpgrades = net.ReadTable()
-		PrintTable(nzPerks.PlayerUpgrades)
+		--PrintTable(nzPerks.PlayerUpgrades)
 	end
 	
 	-- Receivers 

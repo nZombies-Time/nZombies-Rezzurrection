@@ -4,16 +4,52 @@ function GM:InitPostEntity()
 end
 
 function nzRound:Waiting()
-
+	--InitZombieTypes()
 	self:SetState( ROUND_WAITING )
 	hook.Call( "OnRoundWaiting", nzRound )
 
 end
 
+	
 function nzRound:Init()
+
 
 	timer.Simple( 5, function() self:SetupGame() self:Prepare() end )
 	self:SetState( ROUND_INIT )
+	--Support for old configs, but it is still a good idea to place a master spawner normally for each spawn type.
+	--normal spawn
+	 	local normalMaster = false
+		for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_normal" ) ) do
+            	if v:GetMasterSpawn() then
+                	normalMaster = true
+					break
+            	end        	
+			end
+
+		if not normalMaster then
+		    	for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_normal" ) ) do
+					v:SetMasterSpawn(true)
+					break
+    	end
+		PrintMessage( HUD_PRINTTALK, "You need to place a normal master spawner. Skill issue." )
+		end
+		--special spawn
+		local specialMaster = false
+		for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_special" ) ) do
+            	if v:GetMasterSpawn() then
+                	specialMaster = true
+					break
+            	end        	
+			end
+
+		if not specialMaster then
+		    	for k, v in ipairs( ents.FindByClass( "nz_spawn_zombie_special" ) ) do
+					v:SetMasterSpawn(true)
+					break
+    	end
+		PrintMessage( HUD_PRINTTALK, "You need to place a special master spawner. Skill issue." )
+		end
+		
 	self:SetEndTime( CurTime() + 5 )
 	PrintMessage( HUD_PRINTTALK, "5 seconds till start time." )
 	hook.Call( "OnRoundInit", nzRound )
@@ -42,16 +78,17 @@ function nzRound:Prepare( time )
 	self:SetZombiesMax( nzCurves.GenerateMaxZombies(self:GetNumber()) )
 
 	self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
+	self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
 	
-	for k,v in pairs(ents.FindByClass("stinky_lever")) do
-		if v:Getohfuck(true) then
-		local tbl = {[250] = 100}
-		self:SetZombieSpeeds(tbl )
-		--you fool owl boy, you've fallen for the classic blunder
-		break;
-		else
+	if nzRound:GetRampage() and self:GetNumber() < 35 then -- Silently disable it once round 35 is passed.(This is only for the speed table, the spawnrate will remain sped up.)
+		local tbl = {
+			[200] = 100, -- You did this to yourself.
+		}
+		self:SetZombieSpeeds( tbl )
+		self:SetZombieCoDSpeeds( tbl )
+	else
 		self:SetZombieSpeeds( nzCurves.GenerateSpeedTable(self:GetNumber()) )
-		end
+		self:SetZombieCoDSpeeds( nzCurves.GenerateCoDSpeedTable(self:GetNumber()) )
 	end
 
 	self:SetZombiesKilled( 0 )
@@ -214,7 +251,12 @@ function nzRound:Prepare( time )
 
 	-- else just do regular walker spawning
 	else
+		local comedyday = os.date("%d-%m") == "01-04"
+		--if comedyday then
+		--local normalSpawner = Spawner("nz_spawn_zombie_normal", {["nz_zombie_walker_anchovy"] = {chance = 100}}, self:GetZombiesMax())
+		--else
 		local normalSpawner = Spawner("nz_spawn_zombie_normal", {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}, self:GetZombiesMax())
+		--end
 		-- after round 20 spawn some hellhounds aswell (half of the round number 21: 10, 22: 11, 23: 11, 24: 12 ...)
 		
 		if nzMapping.Settings.newwave1 then
@@ -459,9 +501,11 @@ function nzRound:ResetGame()
 	nzRandomBox.Remove()
 
 	--Reset all perk machines
-	for k,v in pairs(ents.FindByClass("perk_machine")) do
-		v:TurnOff()
-	end
+	 for k,v in pairs(ents.FindByClass("perk_machine")) do
+        v:TurnOff()
+        v:SetLooseChange(true)
+        v:SetBrutusLocked(false)
+    end
 	
 	for k,v in pairs(ents.FindByClass("ammo_box")) do
 		v:SetPrice(4500)
@@ -469,6 +513,10 @@ function nzRound:ResetGame()
 	
 	for k,v in pairs(ents.FindByClass("stinky_lever")) do
 		v:Setohfuck(false)
+	end
+
+	if nzRound:GetRampage() then
+		nzRound:DisableRampage()
 	end
 
 	for _, ply in pairs(player.GetAll()) do
@@ -694,8 +742,10 @@ function nzRound:SetupGame()
 		-- Setup barricades
 		if v:GetClass() == "breakable_entry" then
 			v:ResetPlanks()
+			v:SetBodygroup(1,v:GetProp())
 		end
 	end
+
 
 	-- Empty the link table
 	table.Empty(nzDoors.OpenedLinks)

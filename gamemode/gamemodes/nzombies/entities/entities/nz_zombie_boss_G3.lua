@@ -219,6 +219,7 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:SetCycle(0)
 	timer.Simple(dur, function()
 		if IsValid(self) then
+		nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
 			self:Remove()
 			ParticleEffect("nbnz_gib_explosion",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		end

@@ -22,7 +22,7 @@ function nzRound:SetZombiesMax( num )
 end
 
 function nzRound:GetZombiesToSpawn()
-	return self.ZombiesToSpawn
+	return self.ZombiesToSpawn or 0
 end
 function nzRound:SetZombiesToSpawn( num )
 	self.ZombiesToSpawn = num
@@ -89,8 +89,17 @@ end
 function nzRound:GetZombieSpeeds()
 	return self.ZombieSpeeds
 end
+
+function nzRound:GetZombieCoDSpeeds()
+	return self.ZombieSpeedsCoD
+end
+
 function nzRound:SetZombieSpeeds( tbl )
 	self.ZombieSpeeds = tbl
+end
+
+function nzRound:SetZombieCoDSpeeds( tbl )
+	self.ZombieSpeedsCoD = tbl
 end
 
 function nzRound:SetGlobalZombieData( tbl )
@@ -169,4 +178,27 @@ function nzRound:GetNextSpawnTime()
 end
 function nzRound:SetNextSpawnTime( time )
 	self.NextSpawnTime = time
+end
+
+
+function nzRound:GetRampage()
+	self.OhShitOhFuck = self.OhShitOhFuck or false
+	return self.OhShitOhFuck
+end
+
+function nzRound:EnableRampage()
+	self.OhShitOhFuck = true
+end
+
+function nzRound:DisableRampage()
+	self.OhShitOhFuck = false
+end
+
+function nzRound:GetZombiesRemaining() -- Returns the total number of Zombies... Replacement for the "Total Alive" function.
+	self.NumberZombies = self.NumberZombies or 0
+	return self.NumberZombies 
+end
+
+function nzRound:ResetZombiesRemaining()
+	self.NumberZombies = 0
 end

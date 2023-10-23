@@ -12,12 +12,25 @@ if Spawner == nil then
 		-- spawnDelay: delays the next spawn by the amount set in this value
 		-- roundNum: the round this spawner was created (after this round teh spawn will be removed)
 		constructor = function(self, spointClass, data, zombiesToSpawn, spawnDelay, roundNum)
+			local basedelay = 2 -- Moo Mark. Base Zombie spawn delay to be more like how 3arc did it.
+
 			self.sSpointClass = spointClass or "nz_spawn_zombie_normal"
 			self.tData = data or {[nzRound:GetZombieType(nzMapping.Settings.zombietype)] = {chance = 100}}
 			self.iZombiesToSpawn = zombiesToSpawn or 5
 			self.tSpawns = ents.FindByClass(self.sSpointClass)
 			self.tValidSpawns = {}
-			self:SetDelay(spawnDelay or 0.25)
+
+			if nzRound:GetNumber() == -1 or nzRound:GetRampage() then
+				basedelay = 0.01
+			else
+				for i=1,nzRound:GetNumber() do -- Moo Mark. I finally figured out how spawn delay is done in the real games... Turns out its a "for loop", for every round Base value is multiplied by 0.95.
+					basedelay = math.Clamp(basedelay * 0.95, 0.05, 2)
+				end
+			end
+
+			self:SetDelay(spawnDelay or basedelay or 0.75)
+
+
 			self:SetNextSpawn(CurTime())
 			self:SetZombieData(self.tData)
 			-- not really sure if this is 100% unique but for our purpose it will be enough
@@ -35,8 +48,7 @@ function Spawner:Activate()
 	for _, spawn in pairs(self.tSpawns) do
 		spawn:SetSpawner(self)
 	end
-	-- curently does the costly zombie distribution 4 seconds can be lowered (without any problems)
-	timer.Create("nzZombieSpawnThink" .. self.sUniqueName, GetConVar("nz_spawnpoint_update_rate"):GetInt(), 0, function() self:Update() end)
+	timer.Create("nzZombieSpawnThink" .. self.sUniqueName, 2, 0, function() self:Update() end) -- Since it's process is overall simpler, I've shortened the time it takes for the spawn to update.
 end
 
 function Spawner:DecrementZombiesToSpawn()
@@ -69,26 +81,7 @@ function Spawner:Update()
 		self:Remove()
 	end
 
-	self:UpdateWeights()
 	self:UpdateValidSpawns()
-end
-
-function Spawner:UpdateWeights()
-	local plys = player.GetAllTargetable()
-	for _, spawn in pairs(self.tSpawns) do
-		-- reset
-		spawn:SetSpawnWeight(0)
-		local weight = math.huge
-		for _, ply in pairs(plys) do
-			local dist = spawn:GetPos():Distance(ply:GetPos())
-			if dist < weight then
-				weight = dist
-			end
-		end
-		spawn:SetSpawnWeight(10000/weight) -- The spawnweight is inversely related to the distance
-		-- E.g. Distance = 10, 20, weights = 10000/10, 10000/20 = 1000, 500
-		-- We could do 1/weight, but 10000 makes then number easier to read (often around 10-50 depending on the amount of spawns)
-	end
 end
 
 function Spawner:UpdateValidSpawns()
@@ -98,58 +91,23 @@ function Spawner:UpdateValidSpawns()
 	-- reset
 	self.tValidSpawns = {}
 
-	local average = self:GetAverageWeight()
-	local total = 0
 	for _, spawn in pairs(self.tSpawns) do
-		-- reset the zombiesToSpawn value on every Spawnpoint
 		spawn:SetZombiesToSpawn(0)
-		if spawn:GetSpawnWeight() <= average then
-			if spawn.link == nil or nzDoors:IsLinkOpened( spawn.link ) then
-				table.insert(self.tValidSpawns, spawn)
-				total = total + spawn:GetSpawnWeight()
-			end
+
+		-- Don't put more than one Master, it'll cause issues and I don't wanna make failsafes for it right now.
+		if spawn:GetMasterSpawn() then -- Find the master spawner and enable it.
+            table.insert(self.tValidSpawns, spawn) -- Put it in the table.
 		end
 	end
-	table.sort(self.tValidSpawns, function(a, b) return a:GetSpawnWeight() < b:GetSpawnWeight() end )
-	
+
 	local zombiesToSpawn = self:GetZombiesToSpawn()
 	local numspawns = table.Count(self.tValidSpawns)
 
-	-- distribute zombies to spawn on to the valid spawnpoints
-	
-	if numspawns == 1 then -- 1 spawnpoint, give it all the zomblez
-		local vspawn = self.tValidSpawns[1]
-		vspawn:SetZombiesToSpawn(zombiesToSpawn)
-		debugoverlay.Text(vspawn:GetPos() + Vector(0,0,75), "%: 100, #: "..tostring(toSpawn)..", B: "..tostring(vspawn:IsSuitable())..", T: "..math.Round(vspawn:GetNextSpawn()-CurTime(), 2)..", ST: "..(vspawn:GetSpawner() and math.Round(vspawn:GetSpawner():GetNextSpawn() - CurTime(), 2) or "nil"), 4)
-	else
-		local totalDistributed = 0
-		
-		for k, vspawn in pairs(self.tValidSpawns) do
-			local w = vspawn:GetSpawnWeight() -- The weight
-			if w > 0 then -- 0 weight is disabled (or it'd take all the zombies)
-				local toSpawn = math.Round((w/total) * zombiesToSpawn)
-				
-				if zombiesToSpawn - totalDistributed - toSpawn <= 0 or k == numspawns then -- If we're using more than our total or it's the last one
-					toSpawn = zombiesToSpawn - totalDistributed -- Then just give the rest
-					vspawn:SetZombiesToSpawn(toSpawn)
-					debugoverlay.Text(vspawn:GetPos() + Vector(0,0,75), "W: "..math.Round(w, 2)..", %: "..math.Round((w/total), 2)..", #: "..tostring(toSpawn)..", B: "..tostring(vspawn:IsSuitable())..", T: "..math.Round(vspawn:GetNextSpawn()-CurTime(), 2)..", ST: "..(vspawn:GetSpawner() and math.Round(vspawn:GetSpawner():GetNextSpawn() - CurTime(), 2) or "nil"), 4)
-					break -- Just stop here, we got no more zombies to distribute
-				end
-				
-				vspawn:SetZombiesToSpawn(toSpawn)
-				totalDistributed = totalDistributed + toSpawn
-				debugoverlay.Text(vspawn:GetPos() + Vector(0,0,75), "W: "..math.Round(w, 2)..", %: "..math.Round((w/total), 2)..", #: "..tostring(toSpawn)..", B: "..tostring(vspawn:IsSuitable())..", T: "..math.Round(vspawn:GetNextSpawn()-CurTime(), 2)..", ST: "..(vspawn:GetSpawner() and math.Round(vspawn:GetSpawner():GetNextSpawn() - CurTime(), 2) or "nil"), 4)
-			end
-		end
+	local vspawn = self.tValidSpawns[1]
+	if IsValid(vspawn) then
+		vspawn:SetZombiesToSpawn(zombiesToSpawn) -- Found the Master Spawner and its valid, time to give it the zombies to spawn for the round.
+		debugoverlay.Text(vspawn:GetPos() + Vector(0,0,75), "ZombiesToSpawn: "..tostring(zombiesToSpawn)..", B: "..tostring(vspawn:IsSuitable())..", T: "..math.Round(vspawn:GetNextSpawn()-CurTime(), 2)..", ST: "..(vspawn:GetSpawner() and math.Round(vspawn:GetSpawner():GetNextSpawn() - CurTime(), 2) or "nil"), 4)
 	end
-end
-
-function Spawner:GetAverageWeight()
-	local sum = 0
-	for _, spawn in pairs(self.tSpawns) do
-		sum = sum + spawn:GetSpawnWeight()
-	end
-	return ((sum / #self.tSpawns) * 0.5) + 1500
 end
 
 function Spawner:GetValidSpawns()

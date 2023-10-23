@@ -165,12 +165,17 @@ function nzMapping:LoadMapSettings(data)
 		nzMapping.Settings.perkupgrades = (data.perkupgrades) or nil
 	end
 	
+	
 	if data.sharing then
 		nzMapping.Settings.sharing = (data.sharing) or nil
 	end
 	
-	if data.negative then
-		nzMapping.Settings.negative = (data.negative) or nil
+	if data.comedy then
+		nzMapping.Settings.comedy = (data.comedy) or nil
+	end
+
+	if data.navgroupbased then
+		nzMapping.Settings.navgroupbased = (data.navgroupbased) or nil
 	end
 
 	nzMapping.Settings.startingspawns = data.startingspawns == nil and 35 or data.startingspawns

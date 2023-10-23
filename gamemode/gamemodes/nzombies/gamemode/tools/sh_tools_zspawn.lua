@@ -11,7 +11,7 @@ nzTools:CreateTool("zspawn", {
 		if IsValid(tr.Entity) and tr.Entity:GetClass() == "nz_spawn_zombie_normal" then
 			ent = tr.Entity -- No need to recreate if we shot an already existing one
 		else
-			ent = nzMapping:ZedSpawn(tr.HitPos, tobool(data.flag) and data.link or nil, tobool(data.skip), tobool(data.barricade), ply)
+			ent = nzMapping:ZedSpawn(tr.HitPos,(Angle(0,(ply:GetPos() - tr.HitPos):Angle()[2],0)), tobool(data.flag) and data.link or nil, tobool(data.master), data.spawntype, data.zombietype, data.roundactive, ply)
 		end
 
 		ent.flag = data.flag
@@ -23,6 +23,9 @@ nzTools:CreateTool("zspawn", {
 		if data.link then
 			ent:SetLink(data.link)
 		end
+
+		ent.master = data.master
+		ent.roundactive = data.roundactive
 	end,
 	SecondaryAttack = function(wep, ply, tr, data)
 		-- Remove entity if it is a zombie spawnpoint
@@ -52,6 +55,10 @@ nzTools:CreateTool("zspawn", {
 		local valz = {}
 		valz["Row1"] = data.flag
 		valz["Row2"] = data.link
+		valz["Row3"] = data.master
+		valz["Row4"] = data.spawntype
+		valz["Row5"] = data.zombietype
+		valz["Row6"] = data.roundactive
 
 
 		local DProperties = vgui.Create( "DProperties", frame )
@@ -60,6 +67,7 @@ nzTools:CreateTool("zspawn", {
 		
 		function DProperties.CompileData()
 			local str="nil"
+			local num = 0
 			if valz["Row1"] == 0 then
 				str=nil
 				data.flag = 0
@@ -68,8 +76,12 @@ nzTools:CreateTool("zspawn", {
 				data.flag = 1
 			end
 			data.link = str
-	
-			
+
+			data.master = valz["Row3"]
+			data.spawntype = valz["Row4"]
+			data.zombietype = valz["Row5"]
+			data.roundactive = valz["Row6"]
+
 			return data
 		end
 		
@@ -81,15 +93,63 @@ nzTools:CreateTool("zspawn", {
 		Row1:Setup( "Boolean" )
 		Row1:SetValue( valz["Row1"] )
 		Row1.DataChanged = function( _, val ) valz["Row1"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
 		local Row2 = DProperties:CreateRow( "Zombie Spawn", "Flag" )
 		Row2:Setup( "Integer" )
 		Row2:SetValue( valz["Row2"] )
 		Row2.DataChanged = function( _, val ) valz["Row2"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
+		local Row3 = DProperties:CreateRow( "Zombie Spawn", "Master Spawner?" )
+		Row3:Setup( "Boolean" )
+		Row3:SetValue( valz["Row3"] )
+		Row3.DataChanged = function( _, val ) valz["Row3"] = val DProperties.UpdateData(DProperties.CompileData()) end
+
+		local Row4 = DProperties:CreateRow( "Zombie Spawn", "Spawn Type" )
+		Row4:Setup( "Combo" )
+		Row4:AddChoice("Riser",0)
+        Row4:AddChoice("No Animation",1)
+        Row4:AddChoice("Undercroft",3)
+		Row4:AddChoice("Wall Emerge",4)
+		Row4:AddChoice("Jump Spawn",5)
+		Row4:AddChoice("Barrel Climbout",6)
+		Row4:AddChoice("Ceiling Dropdown Low",7)
+		Row4:AddChoice("Ceiling Dropdown High",8)
+		Row4:AddChoice("Ground Wall(Like Undercroft)",9)
+		Row4.DataChanged = function( _, val ) valz["Row4"] = val DProperties.UpdateData(DProperties.CompileData()) end
+
+		local Row5 = DProperties:CreateRow("Zombie Spawn", "Zombie Type")
+		Row5:Setup( "Combo" )
+		local found = false
+		for k,v in pairs(nzConfig.ValidEnemies) do
+			if k == valz["Row5"] then
+				Row5:AddChoice(k, k, true)
+				found = true
+			else
+				Row5:AddChoice(k, k, false)
+			end
+		end
+		Row5.DataChanged = function( _, val ) valz["Row5"] = val DProperties.UpdateData(DProperties.CompileData()) end
+
+		local Row6 = DProperties:CreateRow( "Zombie Spawn", "Round Activation" )
+		Row6:Setup( "Integer" )
+		Row6:SetValue( valz["Row6"] )
+		Row6.DataChanged = function( _, val ) valz["Row6"] = val DProperties.UpdateData(DProperties.CompileData()) end
+		
+		local text = vgui.Create("DLabel", DProperties)
+		text:SetText("You can only have one Master Spawn! You need at least one so zombies can spawn!")
+		text:SetFont("Trebuchet18")
+		text:SetTextColor( Color(50, 50, 50) )
+		text:SizeToContents()
+		text:Center()
 
 		return DProperties
 	end,
 	defaultdata = {
 		flag = 0,
-		link = 1
+		link = 1,
+		master = 0,
+		spawntype = 0,
+		zombietype = zombietype or "none",
+		roundactive = 0,
 	}
 })

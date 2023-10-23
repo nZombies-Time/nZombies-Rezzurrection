@@ -100,7 +100,7 @@ hook.Add("OnRoundStart", "TFAVOX_nZombies_Round", function( num )
 		local plys = player.GetAllPlayingAndAlive()
 		local valid = {}
 		for k,v in pairs(plys) do
-			if TFAVOX_IsValid(v) and v.TFAVOX_Sounds and v.TFAVOX_Sounds.nzombies and v:GetNotDowned() then
+			if v.TFAVOX_Sounds and v.TFAVOX_Sounds.nzombies and v:GetNotDowned() then
 				table.insert(valid, v)
 			end
 		end

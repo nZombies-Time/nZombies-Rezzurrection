@@ -1,29 +1,14 @@
-AddCSLuaFile( )
+AddCSLuaFile()
 
 ENT.Type = "anim"
-
+ 
 ENT.PrintName		= "wunderfizz_windup"
 ENT.Author			= "Zet0r"
 ENT.Contact			= "youtube.com/Zet0r"
 ENT.Purpose			= ""
 ENT.Instructions	= ""
 
---[[local perk_materials = {
-	["jugg"] = "models/perk_bottle/c_perk_bottle_jugg",
-	["speed"] = "models/perk_bottle/c_perk_bottle_speed",
-	["dtap"] = "models/perk_bottle/c_perk_bottle_dtap",
-	["revive"] = "models/perk_bottle/c_perk_bottle_revive",
-	["dtap2"] = "models/perk_bottle/c_perk_bottle_dtap2",
-	["staminup"] = "models/perk_bottle/c_perk_bottle_stamin",
-	["phd"] = "models/perk_bottle/c_perk_bottle_phd",
-	["deadshot"] = "models/perk_bottle/c_perk_bottle_deadshot",
-	["mulekick"] = "models/perk_bottle/c_perk_bottle_mulekick",
-	["cherry"] = "models/perk_bottle/c_perk_bottle_cherry",
-	["tombstone"] = "models/perk_bottle/c_perk_bottle_tombstone",
-	["whoswho"] = "models/perk_bottle/c_perk_bottle_whoswho",
-	["vulture"] = "models/perk_bottle/c_perk_bottle_vulture",
-	["teddy"] = "models/perk_bottle/c_perk_bottle_teddy",
-}]]
+ENT.VortexLoopSound = Sound("nz_moo/perks/wonderfizz/vortex_loop.wav")
 
 local teddymat = "models/perk_bottle/c_perk_bottle_teddy"
 
@@ -34,35 +19,47 @@ end
 function ENT:RandomizeSkin()
 	local skin
 	if nzMapping.Settings.wunderfizzperks then
-		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperklist))).wfz
+		skin = nzPerks:Get(table.Random(table.GetKeys(nzMapping.Settings.wunderfizzperklist))).material
 	else
-		skin = nzPerks:Get(table.Random(table.GetKeys(nzPerks:GetList()))).wfz
+		skin = nzPerks:Get(table.Random(table.GetKeys(nzPerks:GetList()))).material
 	end
-	
+
 	if skin then
-		self:SetMaterial(skin)
+		self:SetSkin(skin)
 	end
 end
 
 function ENT:Initialize()
-
 	self:SetMoveType(MOVETYPE_NONE)
-	
-	self:SetSolid( SOLID_OBB )
-	self:DrawShadow( false )
+	self:SetSolid(SOLID_OBB)
+	self:DrawShadow(false)
 
-	self:SetModel("models/alig96/perks/perkacola/perkacola.mdl")
+	self:SetModel("models/nzr/2022/perks/w_perk_bottle.mdl")
 	self:RandomizeSkin()
-	local machine = self.WMachine
 
+	local machine = self.WMachine
 	if SERVER then
 		self:SetWinding(true)
-		//Stop winding up
+		self.SoundPlayer = CreateSound(self, self.VortexLoopSound)
+    	if (self.SoundPlayer) then
+        	self.SoundPlayer:Play()
+    	end
+
 		timer.Simple(5, function()
 			self:SetWinding(false)
-			
+			timer.Simple(5, function()
+				if IsValid(self) and IsValid(self.WMachine) then
+					self.WMachine:SetSharing(true)
+				end
+			end)
+
+			self:EmitSound("nz_moo/perks/wonderfizz/elec/hit/random_perk_imp_0"..math.random(0, 2)..".mp3", 90, math.random(97, 103))
+
+			if (self.SoundPlayer) then
+        		self.SoundPlayer:FadeOut(0.8)
+    		end
 			if self.Perk == "teddy" then
-				self:SetMaterial(teddymat)
+				self:SetSkin(30)
 				machine:SetIsTeddy(true)
 				machine:GetUser():GivePoints(machine:GetPrice())
 				timer.Simple(5, function() 
@@ -72,21 +69,20 @@ function ENT:Initialize()
 					end
 				end)
 			else
-				self:SetMaterial(nzPerks:Get(self.Perk).wfz)
+				self:SetSkin(nzPerks:Get(self.Perk).material)
 			end
 			machine:SetPerkID(self.Perk)
 		end)
-		-- If we time out, remove the object
+
 		timer.Simple(25, function() if IsValid(self) then self:Remove() end end)
 	end
 end
 
-function ENT:WindUp( )
+function ENT:WindUp()
 	self:RandomizeSkin()
 end
 
-function ENT:TeddyFlyUp( )
-	
+function ENT:TeddyFlyUp()
 end
 
 function ENT:Think()
@@ -95,6 +91,9 @@ function ENT:Think()
 			self:WindUp()
 		end
 	end
+
+	self:NextThink(CurTime() + 0.0666)
+	return true
 end
 
 function ENT:OnRemove()
@@ -104,16 +103,11 @@ function ENT:OnRemove()
 	end
 end
 
-if CLIENT then
-	function ENT:Draw()
-		self:DrawModel()
-		if self:GetWinding() then
-			if !self:GetRenderAngles() then self:SetRenderAngles(self:GetAngles() + Angle(20,0,0)) end
-			self:SetRenderAngles(self:GetRenderAngles()+(Angle(0,50,0)*FrameTime()))
-		elseif !self.Stopped then
-			self:SetRenderAngles(self:GetNetworkAngles())
-			self.LightningAura = nil -- Kill the aura effect
-			self.Stopped = true
-		end
+function ENT:Draw()
+	self:DrawModel()
+	if !self.Stopped then
+		self:SetRenderAngles(self:GetNetworkAngles())
+		self.LightningAura = nil -- Kill the aura effect
+		self.Stopped = true
 	end
 end

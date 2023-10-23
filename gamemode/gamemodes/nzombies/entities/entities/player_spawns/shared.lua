@@ -22,7 +22,12 @@ end
 if CLIENT then
 	function ENT:Draw()
 		if nzRound:InState( ROUND_CREATE ) then
+			if GetConVar("nz_creative_preview"):GetBool() then
+			--self:SetBodygroup(0,1)
+			else
 			self:DrawModel()
+			end
+			
 		end
 	end
 end

@@ -22,6 +22,11 @@ concommand.Add("nz_test1", function()
 	timer.Simple(5, function() nz.nzDoors.Functions.RemoveMapDoorLink( 1236 ) end)
 end)
 
+concommand.Add("nz_beanmeup", function(ply)
+	local pspawns = ents.FindByClass("player_spawns")
+	ply:SetPos( pspawns[1]:GetPos() )
+end)
+
 concommand.Add("nz_forceround", function(ply, cmd, args, argStr)
 	if !IsValid(ply) or ply:IsSuperAdmin() then
 		local round = args[1] and tonumber(args[1]) or nil

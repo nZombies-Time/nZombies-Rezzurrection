@@ -1,11 +1,11 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase"
-ENT.PrintName = "Ubermorph"
+ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "Laby"
 
-ENT.Models = { "models/_maz_ter_/deadspace/deadspacenecros/zombie_hunter_ubermorph.mdl" }
+ENT.Models = { "models/bosses/zombie_hunter_ubermorph.mdl" }
 
 ENT.AttackRange = 90
 ENT.DamageLow = 65
@@ -13,18 +13,23 @@ ENT.DamageHigh = 70
 
 
 ENT.AttackSequences = {
-	{seq = "melee1"},
-	{seq = "melee2"}
+	{seq = "attack"},
+	{seq = "attack2"}
 }
 
 ENT.DeathSequences = {
-	"death"
+	"health2"
 }
 
 ENT.AttackSounds = {
-	"cb/att1.mp3",
-	"cb/att2.mp3",
-	"cb/att3.mp3"
+	"enemies/bosses/ubr/attack/ubermorph_090.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_091.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_092.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_093.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_094.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_095.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_096.ogg",
+	"enemies/bosses/ubr/attack/ubermorph_097.ogg",
 
 }
 
@@ -33,36 +38,34 @@ ENT.PainSounds = {
 	"physics/flesh/flesh_impact_bullet2.wav",
 	"physics/flesh/flesh_impact_bullet3.wav",
 	"physics/flesh/flesh_impact_bullet4.wav",
-	"physics/flesh/flesh_impact_bullet5.wav",
-	"cb/low_health.mp3"
+	"physics/flesh/flesh_impact_bullet5.wav"
 }
 
 ENT.AttackHitSounds = {
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_01.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_02.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_03.mp3",
-	"roach/bo3/_zhd_player_impacts/evt_zombie_hit_player_04.mp3",
-	
-	
+	"enemies/bosses/ubr/ubermorph_025.ogg"	
 }
 
 ENT.WalkSounds = {
-	"ubr/foot/pregnant_02.wav",
-	"ubr/foot/pregnant_06.wav"
+"enemies/bosses/ubr/idle/hunter_merge_00.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_01.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_02.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_03.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_04.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_05.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_06.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_07.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_08.ogg",
+"enemies/bosses/ubr/idle/hunter_merge_09.ogg",
 }
 
 ENT.ActStages = {
 	[1] = {
-		act = ACT_WALK,
+		act = ACT_SPRINT,
 		minspeed = 1,
 	},
 	[2] = {
-		act = ACT_RUN,
-		minspeed = 150,
-	},
-	[3] = {
-		act = ACT_RUN,
-		minspeed = 180
+		act = ACT_WALK,
+		minspeed = 60,
 	}
 }
 
@@ -71,6 +74,7 @@ function ENT:Initialize()
 
 	self:Precache()
 
+	
 	self:SetModel( self.Models[math.random( #self.Models )] )
 
 	self:SetJumping( false )
@@ -90,7 +94,7 @@ function ENT:Initialize()
 	self:SetAttacking( false )
 	self:SetLastAttack( CurTime() )
 	self:SetAttackRange( self.AttackRange )
-	self:SetTargetCheckRange(1250) -- 0 for no distance restriction (infinite)
+	self:SetTargetCheckRange(0) -- 0 for no distance restriction (infinite)
 
 	--target ignore
 	self:ResetIgnores()
@@ -100,7 +104,7 @@ function ENT:Initialize()
 	self:SetRunSpeed( self.RunSpeed ) --fallback
 	self:SetWalkSpeed( self.WalkSpeed ) --fallback
 
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 70))
+	self:SetCollisionBounds(Vector(-18,-18, 0), Vector(18, 18, 90))
 
 	self:SetActStage(0)
 	self:SetSpecialAnimation(false)
@@ -109,7 +113,7 @@ function ENT:Initialize()
 	self:SpecialInit()
 	
 	-- Fallback for buggy tool
-	if !self:GetRunSpeed() then self:SetRunSpeed(150) end
+	if !self:GetRunSpeed() then self:SetRunSpeed(145) end
 
 	if SERVER then
 		self.loco:SetDeathDropHeight( self.DeathDropHeight )
@@ -134,9 +138,10 @@ end
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self:SetRunSpeed(180)
-		self:SetHealth(100)
-		self:SetMaxHealth(9000)
+		baseHealth = 0
+		counting = true
+		self:SetRunSpeed(90)
+		self:SetHealth(5000)
 	end
 
 	--PrintTable(self:GetSequenceList())
@@ -165,7 +170,6 @@ function ENT:InitDataTables()
 	self:NetworkVar("Entity", 0, "ClawHook")
 	self:NetworkVar("Bool", 1, "UsingClaw")
 	self:NetworkVar("Bool", 2, "Flamethrowing")
-	self:NetworkVar("Bool", 3, "oof")
 end
 
 function ENT:OnSpawn()
@@ -184,10 +188,8 @@ function ENT:OnSpawn()
 	if coroutine.running() then
 		
 		local pos = self:GetPos() + (seq == "ready" and Vector(0,0,100) or Vector(0,0,450))
-		
 		ParticleEffect("brute_jumped",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
-		self:EmitSound("ubr/alret/hunter_merge_3"..math.random(4,7)..".wav")
-	self:SetInvulnerable(true)
+		self:EmitSound("enemies/bosses/ubr/alret/hunter_merge_3"..math.random(4,7)..".ogg")
 		
 		--[[effectData = EffectData()
 		effectData:SetStart( pos + Vector(0, 0, 1000) )
@@ -198,43 +200,51 @@ function ENT:OnSpawn()
 		self:TimedEvent(dur, function()
 			--dust cloud
 			self:SetPos(self:GetPos() + Vector(0,0,0))
-			self:SetInvulnerable(false)
 			local effectData = EffectData()
 			effectData:SetStart( self:GetPos() )
 			effectData:SetOrigin( self:GetPos() )
 			effectData:SetMagnitude(1)
-			self:SetNWBool( "oof", false )
 		end)
 		self:PlaySequenceAndWait(seq)
+		counting = false
+		self:StartActivity( ACT_WALK)
+		baseHealth = self:Health()
 	end
 end
 
 function ENT:OnZombieDeath(dmgInfo)
-
+	dying = true
 	self:ReleasePlayer()
 	self:StopFlames()
 	self:SetRunSpeed(0)
 	self.loco:SetVelocity(Vector(0,0,0))
 	self:Stop()
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
+	local seq, dur = self:LookupSequence(self.DeathSequences[math.random(#self.DeathSequences)])
+	self:EmitSound("enemies/bosses/ubr/dead/ubermorph_10"..math.random(1,2)..".wav")
+	self:ResetSequence(seq)
 	self:SetCycle(0)
-self:EmitSound("ubr/dead/ubermorph_10"..math.random(1,2)..".wav")
-	
+	timer.Simple(dur, function()
 		if IsValid(self) then
+			nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
 			self:Remove()
 			ParticleEffect("baby_dead",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 		end
-	
+	end)
 
 end
 
 function ENT:BodyUpdate()
-	
+
+	self.CalcIdeal = ACT_IDLE
+
 	local velocity = self:GetVelocity()
 
 	local len2d = velocity:Length2D()
-	
-		if self:IsJumping() and self:WaterLevel() <= 0 then
+
+	--if ( len2d >200 ) then self.CalcIdeal = ACT_WALK elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
+
+	if self:IsJumping() and self:WaterLevel() <= 0 then
 		self.CalcIdeal = ACT_JUMP
 	end
 
@@ -247,101 +257,11 @@ function ENT:BodyUpdate()
 	end
 
 	self:FrameAdvance()
-	
-	if self:GetNWBool( "oof" ) then
-		self.CalcIdeal = 	ACT_ID2
-
-	if ( len2d > 88 ) then self.CalcIdeal = ACT_SPRINT elseif ( len2d > 5 ) then self.CalcIdeal = ACT_SPRINT end
-	else
-	
-	self.CalcIdeal = ACT_IDLE
-
-	if ( len2d > 88 ) then self.CalcIdeal = ACT_RUN elseif ( len2d > 5 ) then self.CalcIdeal = ACT_WALK end
-end
-
 
 end
 
 function ENT:OnPathTimeOut()
-	local target = self:GetTarget()
-	if CurTime() < self.NextAction then return end
 	
-	if math.random(0,5) == 6 and CurTime() > self.NextClawTime then
-		-- Claw
-		if self:IsValidTarget(target) then
-			local tr = util.TraceLine({
-				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
-				filter = self,
-			})
-			
-			
-			if IsValid(tr.Entity) and self:IsValidTarget(tr.Entity) and !IsValid(self.ClawHook) then
-				self:Stop()
-				self:EmitSound("roach/bo3/raz/vox_plr_1_exert_charge_0"..math.random(4)..".mp3")
-			timer.Simple(0.2,function()
-				self:EmitSound("roach/bo3/raz/raz_gun_charge.mp3")
-				for i=1,15 do ParticleEffectAttach("bo3_mangler_charge",PATTACH_POINT_FOLLOW,self,4) end
-			end)
-				timer.Simple(29/58, function()
-				self:EmitSound("roach/bo3/raz/fire_0"..math.random(3)..".mp3")
-		self:StopParticles()
-	end)
-	local clawpos = self:GetAttachment(self:LookupAttachment("tag_pointandshooty")).Pos
-				timer.Simple(1.5, function()self.ClawHook = ents.Create("nz_mangler_shot")end)
-				timer.Simple(1.5, function()self.ClawHook:SetPos(clawpos)end)
-				timer.Simple(1.5, function()self.ClawHook:Spawn()end)
-				timer.Simple(1.5, function()self.ClawHook:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ClawHook:GetPos()):GetNormalized())end)
-				timer.Simple(1.5, function()self:SetClawHook(self.ClawHook)end)
-				self:SetAngles((target:GetPos() - self:GetPos()):Angle())
-				self:PlaySequenceAndWait("shoot")
-				self.loco:SetDesiredSpeed(0)
-				--self:SetSequence(self:LookupSequence("nz_grapple_loop"))
-				
-				local seq = "taunt"
-			local id, dur = self:LookupSequence(seq)
-				self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-				self.NextAction = CurTime() + math.random(1, 5)
-				self.NextClawTime = CurTime() + math.random(3, 15)
-			end
-		end
-	elseif  math.random(0,5) == 6 and CurTime() > self.NextFlameTime then
-		-- Flamethrower
-		if self:IsValidTarget(target) and self:GetPos():DistToSqr(target:GetPos()) <= 75000 then	
-			self:Stop()
-			self:PlaySequenceAndWait("nz_flamethrower_aim")
-			self.loco:SetDesiredSpeed(0)
-			local ang = (target:GetPos() - self:GetPos()):Angle()
-			self:SetAngles(Angle(ang[1], ang[2] + 10, ang[3]))
-			
-			self:StartFlames()
-			local seq = math.random(0,1) == 0 and "nz_flamethrower_loop" or "nz_flamethrower_sweep"
-			local id, dur = self:LookupSequence(seq)
-			self:ResetSequence(id)
-			self:SetCycle(0)
-			self:SetPlaybackRate(1)
-			self:SetVelocity(Vector(0,0,0))
-			
-			self:TimedEvent(dur, function()
-				self.loco:SetDesiredSpeed(self:GetRunSpeed())
-				self:SetSpecialAnimation(false)
-				self:SetBlockAttack(false)
-				self:StopFlames()
-			end)
-			
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextFlameTime = CurTime() + math.random(1, 10)
-		end
-	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -359,6 +279,7 @@ if CLIENT then
 	local lightyellow = Color( 255, 255, 200, 200 )
 	local clawglow = Material( "sprites/orangecore1" )
 	local clawred = Color( 255, 100, 100, 255 )
+		
 end
 
 function ENT:OnRemove()
@@ -376,91 +297,134 @@ function ENT:StopFlames()
 	self:SetStop(false)
 end
 
-function ENT:OnThink()
-	if self:GetFlamethrowing() then
-		if !self.NextFireParticle or self.NextFireParticle < CurTime() then
-			local bone = self:LookupBone("j_elbow_ri")
-			local pos, ang = self:GetBonePosition(bone)
-			pos = pos - ang:Forward() * 40 - ang:Up()*10
-			if CLIENT then
-				if !IsValid(self.FireEmitter) then self.FireEmitter = ParticleEmitter(self:GetPos(), false) end
-				
-				local p = self.FireEmitter:Add("particles/fire1.vmt", pos)
-				if p then
-					p:SetColor(math.random(30,60), math.random(40,70), math.random(0,50))
-					p:SetStartAlpha(255)
-					p:SetEndAlpha(0)
-					p:SetVelocity(ang:Forward() * -150 + ang:Up()*math.random(-5,5) + ang:Right()*math.random(-5,5))
-					p:SetLifeTime(0.25)
 
-					p:SetDieTime(math.Rand(0.75, 1.5))
-
-					p:SetStartSize(math.random(1, 5))
-					p:SetEndSize(math.random(20, 30))
-					p:SetRoll(math.random(-180, 180))
-					p:SetRollDelta(math.Rand(-0.1, 0.1))
-					p:SetAirResistance(50)
-
-					p:SetCollide(false)
-
-					p:SetLighting(false)
-				end
-			else
-				if IsValid(self.GrabbedPlayer) then
-					if self.GrabbedPlayer:GetPos():DistToSqr(self:GetPos()) > 10000 then
-						self:ReleasePlayer()
-						self:StopFlames()
-						self.loco:SetDesiredSpeed(self:GetRunSpeed())
-						self:SetSpecialAnimation(false)
-						self:SetBlockAttack(false)	
-						self:SetStop(false)
-					else
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						self.GrabbedPlayer:TakeDamageInfo(dmg)
-						self.GrabbedPlayer:Ignite(1, 0)
-					end
-				else
-					local tr = util.TraceHull({
-						start = pos,
-						endpos = pos - ang:Forward()*150,
-						filter = self,
-						--mask = MASK_SHOT,
-						mins = Vector( -5, -5, -10 ),
-						maxs = Vector( 5, 5, 10 ),
-					})
-					
-					debugoverlay.Line(pos, pos - ang:Forward()*150)
-					
-					if self:IsValidTarget(tr.Entity) then
-						local dmg = DamageInfo()
-						dmg:SetAttacker(self)
-						dmg:SetInflictor(self)
-						dmg:SetDamage(2)
-						dmg:SetDamageType(DMG_BURN)
-						
-						tr.Entity:TakeDamageInfo(dmg)
-						tr.Entity:Ignite(2, 0)
-					end
-				end
+function ENT:OnInjured( dmgInfo )
+			if dmginfo:IsDamageType( 2097152 )  then
+				dmginfo:ScaleDamage( 3 )
 			end
 			
-			self.NextFireParticle = CurTime() + 0.05
-		end
-	elseif CLIENT and self.FireEmitter then
-		self.FireEmitter:Finish()
-		self.FireEmitter = nil
-	end
-	
-	if SERVER and IsValid(self.GrabbedPlayer) and !self:IsValidTarget(self.GrabbedPlayer) then
-		self:ReleasePlayer()
-		self:StopFlames()
-	end
+			if  self:Health() < (baseHealth / 3) and self:GetRunSpeed() > 60  then
+			self:SetInvulnerable(true)
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				local id, dur = self:LookupSequence("change")
+				self:SetBodygroup( 4,1)
+				self:SetBodygroup(5,1 )
+				self:EmitSound("exploder/explode/brute_armour_slide_flesh_00.wav", 88, math.random(90,100))
+		self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav", 94, math.random(90,100))
+		self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav", 94, math.random(90,100))
+		self:EmitSound("exploder/explode/brute_belly_puss_shared_01.wav", 88, math.random(90,100))
+		self:EmitSound("exploder/explode/brute_puss_bomb_l_shared_00.wav", 88, math.random(90,100))
+		self:EmitSound("enemies/bosses/divider/divider_merge_18.ogg", 94, math.random(90,100))
+		self:EmitSound("enemies/bosses/divider/divider_merge_18.ogg", 94, math.random(90,100))
+				ParticleEffect("divider_slash2",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				ParticleEffect("divider_slash3",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				ParticleEffect("baby_dead",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				self:ResetSequence(id)
+				self:EmitSound("enemies/bosses/ubr/alret/hunter_merge_3"..math.random(4,7)..".ogg",511)
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur, function()
+				self:EmitSound("enemies/bosses/re2/em7000/mutate_finish"..math.random(6)..".ogg",511)
+					self.loco:SetDesiredSpeed(50)
+					self:SetRunSpeed(50)
+					self.AttackSequences = {{seq = "attack4", dmgtimes = {1.3}}}
+					self:StartActivity( ACT_SPRINT)
+					timer.Simple(45, function()
+					
+					if IsValid(self) then
+					
+						self:SetInvulnerable(true)
+				self:SetSpecialAnimation(true)
+				self:SetBlockAttack(true)
+				local id2, dur2 = self:LookupSequence("health2")
+				self:SetPlaybackRate(2)
+				self:EmitSound("exploder/explode/brute_armour_slide_flesh_00.wav", 88, math.random(90,100))
+		self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav", 94, math.random(90,100))
+		self:EmitSound("tubebeetle/explode/tubebeetle_pop_03.wav", 94, math.random(90,100))
+		self:EmitSound("exploder/explode/brute_belly_puss_shared_01.wav", 88, math.random(90,100))
+		self:EmitSound("exploder/explode/brute_puss_bomb_l_shared_00.wav", 88, math.random(90,100))
+		self:EmitSound("enemies/bosses/divider/divider_merge_18.ogg", 94, math.random(90,100))
+		self:EmitSound("enemies/bosses/divider/divider_merge_18.ogg", 94, math.random(90,100))
+				ParticleEffect("divider_slash2",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				ParticleEffect("divider_slash3",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				ParticleEffect("baby_dead",self:LocalToWorld(Vector(20,20,0)),Angle(0,0,0),nil)
+				self:SetBodygroup( 4,0)
+				self:SetBodygroup(5,0 )
+				self:ResetSequence(id2)
+				self:EmitSound("enemies/bosses/ubr/alret/hunter_merge_3"..math.random(4,7)..".ogg",511)
+				
+				self:SetCycle(0)
+				self:SetPlaybackRate(1)
+				self.loco:SetDesiredSpeed(0)
+				self:SetVelocity(Vector(0,0,0))
+				self:TimedEvent(dur2, function()
+					self:SetHealth(baseHealth * 1.25)
+					self.loco:SetDesiredSpeed(90)
+					self:SetRunSpeed(90)
+					self.AttackSequences = {{seq = "attack", dmgtimes = {0.9}}}
+					self:StartActivity( ACT_WALK)
+					self:SetInvulnerable(false)
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+					
+				end)
+				end
+					end)
+					self:SetInvulnerable(false)
+					self:SetSpecialAnimation(false)
+					self:SetBlockAttack(false)
+				end)
+			end
 end
+
+function ENT:PlayAttackAndWait( name, speed )
+
+	local len = self:SetSequence( name )
+	speed = speed or 1
+
+	self:ResetSequenceInfo()
+	self:SetCycle( 0 )
+	self:SetPlaybackRate( speed )
+
+	local endtime = CurTime() + len / speed
+
+	while ( true ) do
+
+		if ( endtime < CurTime() ) then
+			if !self:GetStop() then
+					if self:Health() < (baseHealth / 3) then
+			self.loco:SetDesiredSpeed(50)
+			    self:SetRunSpeed(50)
+				self:StartActivity( ACT_SPRINT)
+					else
+					self.loco:SetDesiredSpeed(90)
+			    self:SetRunSpeed(90)
+				self:StartActivity( ACT_WALK)
+			end
+			end
+			return
+		end
+
+		coroutine.yield()
+
+	end
+
+end
+
+
+function ENT:OnThink()
+if  self:Health() > 0 and !counting and !self:IsAttacking() and !self:GetSpecialAnimation() then
+counting = true
+timer.Simple(0.8,function()
+self:EmitSound("enemies/bosses/divider/footstep/divider_body_footstep-0"..math.random(1,9)..".ogg")
+counting = false
+end)
+end
+end
+
 
 function ENT:GrabPlayer(ply)
 	if CLIENT then return end

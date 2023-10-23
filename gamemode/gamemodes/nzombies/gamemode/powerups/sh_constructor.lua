@@ -8,6 +8,16 @@ nzPowerUps.ActivePlayerPowerUps = nzPowerUps.ActivePlayerPowerUps or {}
 
 AccessorFunc(nzPowerUps, "fPowerUpChance", "PowerUpChance", FORCE_NUMBER)
 
+-- Variables
+nzPowerUps.BoxMoved = false
+function nzPowerUps:GetBoxMoved()
+	return nzPowerUps.BoxMoved
+end
+
+nzPowerUps.HasPaped = false
+function nzPowerUps:GetHasPaped()
+	return nzPowerUps.HasPaped
+end
 
 function nzPowerUps:ResetPowerUpChance()
 	-- pseudo random so we start a bit lower than the actual chance

@@ -3,12 +3,11 @@ AddCSLuaFile()
 ENT.Base = "nz_zombie_walker_soemale"
 ENT.PrintName = "Burning Walker (Shadows of Evil)"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle"
+ENT.Author = "GhostlyMoo"
 
 function ENT:StatsInitialize()
     if SERVER then
         dying = false
-		self:SetNoDraw(true) --This hides the brief "Default Pose" the zombie does before doing the spawn anim
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 260) )
 			self:SetHealth( math.random(75, 1000) )
@@ -21,22 +20,6 @@ function ENT:StatsInitialize()
 		end
         self:Flames( true )
     end
-end
-
-function ENT:OnSpawn()
-	
-	--self:SetMaterial(table.Random({"burn"}))
-	ParticleEffect("doom_hellunit_spawn_small",self:GetPos(),self:GetAngles(),self)
-	self:EmitSound("nz_moo/zombies/spawn/zm_spawn_t9_0"..math.random(3)..".mp3", 90)
-	self:EmitSound("ambient/fire/mtov_flame2.wav")
-
-	self:SetSpecialAnimation(true)
-	local seq = self:SelectSpawnSequence()
-	if seq then
-		self:SetNoDraw(false)
-		self:PlaySequenceAndWait(seq)
-		self:SetSpecialAnimation(false)
-	end
 end
 
 function ENT:Sound()

@@ -1,15 +1,12 @@
 local playerMeta = FindMetaTable("Player")
 if SERVER then
-
 	function playerMeta:GivePerk(id, machine)
 		local block = hook.Call("OnPlayerBuyPerk", nil, self, id, machine)
 	
 		if block or self:HasPerk(id) then return end
 		local perkData = nzPerks:Get(id)
 		if !perkData or !perkData.func then return false end
-		
-		perkData.func(id, self, machine)
-		
+
 		-- Specialmachine blocks the networking and storing of the perk
 		if !perkData.specialmachine then
 			if nzPerks.Players[self] == nil then nzPerks.Players[self] = {} end
@@ -18,27 +15,29 @@ if SERVER then
 			nzPerks:SendSync(self)
 			hook.Call("OnPlayerGetPerk", nil, self, id, machine)
 		end
+
+		perkData.func(id, self, machine)
 	end
-	
+
 	function playerMeta:GiveUpgrade(id, machine)
-		local block = hook.Call("OnPlayerBuyPerk", nil, self, id, machine)
-	
+		local block = hook.Call("OnPlayerBuyUpgrade", nil, self, id, machine)
+
 		if block or self:HasUpgrade(id) then return end
 		local perkData = nzPerks:Get(id)
 		if !perkData or !perkData.upgradefunc then return false end
-		
-		perkData.upgradefunc(id, self, machine)
-		
+
 		-- Specialmachine blocks the networking and storing of the perk
 		if !perkData.specialmachine then
 			if nzPerks.PlayerUpgrades[self] == nil then nzPerks.PlayerUpgrades[self] = {} end
 			
 			table.insert(nzPerks.PlayerUpgrades[self], id)
 			nzPerks:SendUpgradeSync(self)
-			hook.Call("OnPlayerGetPerk", nil, self, id, machine)
+			hook.Call("OnPlayerGetUpgrade", nil, self, id, machine)
 		end
+
+		perkData.upgradefunc(id, self, machine)
 	end
-	
+
 	local exceptionperks = {
 		["whoswho"] = true,
 	}

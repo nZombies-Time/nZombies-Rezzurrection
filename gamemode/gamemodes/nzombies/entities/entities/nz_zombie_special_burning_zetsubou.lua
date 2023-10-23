@@ -3,23 +3,23 @@ AddCSLuaFile()
 ENT.Base = "nz_zombie_walker_zetsubou"
 ENT.PrintName = "Burning Walker (Zetsubou no Shima)"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle"
+ENT.Author = "GhostlyMoo"
+
 
 function ENT:StatsInitialize()
     if SERVER then
+        dying = false
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 260) )
 			self:SetHealth( math.random(75, 1000) )
 		else
 			local speeds = nzRound:GetZombieSpeeds()
 			if speeds then
-				self:SetRunSpeed( nzMisc.WeightedRandom(speeds) - 20 ) -- A bit slower here
+				self:SetRunSpeed( nzMisc.WeightedRandom(speeds) + 35 ) -- A bit faster here
 			end
 			self:SetHealth( nzRound:GetZombieHealth() or 75 )
 		end
         self:Flames( true )
-
-		self:SetEmergeSequenceIndex(math.random(#self.EmergeSequences))
     end
 end
 

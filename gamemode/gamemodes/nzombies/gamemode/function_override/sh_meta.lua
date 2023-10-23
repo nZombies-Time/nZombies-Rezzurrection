@@ -183,12 +183,23 @@ function GM:EntityFireBullets(ent, data)
 	-- Fire the PaP shooting sound if the weapon is PaP'd
 	--print(wep, wep:HasNZModifier("pap"))
 	if ent:IsPlayer() then
+	 local fuckercheck = ent:GetEyeTrace().Entity
+	 if IsValid(fuckercheck) and fuckercheck:IsPlayer() and fuckercheck:GetGettingFacefucked() then
+	    	for k, v in pairs(ents.FindInSphere(fuckercheck:GetPos(), 75)) do
+                	if v:GetClass() == "nz_facehugger" then
+					print("GET THIS SHIT OFF ME")
+					ParticleEffect("ins_blood_impact_headshot",v:GetPos(),Angle(0,0,0),nil)
+					v:EmitSound("nz_moo/zombies/gibs/gib_0"..math.random(3)..".mp3",100)
+					v:Remove()
+					end
+            	
+        	end
+	 end
 		local wep = ent:GetActiveWeapon()
 		if IsValid(wep) and wep:HasNZModifier("pap") and !wep.IsMelee and !wep.IsKnife then
 			nzSounds:PlayEnt("UpgradedShoot", ent)
 		end
 	end
-
 	-- Perform a trace that filters out entities from the table above
 	--[[local tr = util.TraceLine({
 		start = data.Src,

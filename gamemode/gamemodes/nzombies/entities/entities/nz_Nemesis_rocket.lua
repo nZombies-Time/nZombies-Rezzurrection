@@ -7,7 +7,7 @@ ENT.Spawnable		= false
 ENT.AdminSpawnable	= false
 
 
-ENT.MyModel = "models/missiles/rpg_rocket_cod4rm.mdl"
+ENT.MyModel = "models/weapons/w_type97.mdl"
 ENT.MyModelScale = 1
 ENT.Damage = 75
 ENT.Radius = 350
@@ -17,16 +17,16 @@ if SERVER then
 
 	function ENT:Initialize()
 
-		local model = self.MyModel and self.MyModel or  "models/missiles/rpg_rocket_cod4rm.mdl"
-		
+		local model = self.MyModel and self.MyModel or  "models/weapons/w_type97.mdl"
 		self.Class = self:GetClass()
 		
 		self:SetModel(model)
-		ParticleEffectAttach("rocket_smoke",PATTACH_ABSORIGIN_FOLLOW,self,0)
+		ParticleEffectAttach("bo3_panzer_engine",PATTACH_ABSORIGIN_FOLLOW,self,0)
+			--self:SetSequence( "fly_suicide" )
 		self:PhysicsInit(SOLID_OBB)
 		self:SetSolid(SOLID_NONE)
 		self:SetTrigger(true)
-		self:SetAngles( Angle( 180,180,180 ))
+		self:SetAngles( Angle( 0,0,0 ))
 		self:UseTriggerBounds(true, 0)
 		self:SetMoveType(MOVETYPE_FLY)
 		--self:SetCollisionGroup(COLLISION_GROUP_DEBRIS)
@@ -44,12 +44,12 @@ if SERVER then
 		end
 	end
 function ENT:Launch(dir)
-	self:SetLocalVelocity(dir * 1450)
+	self:SetLocalVelocity(dir * 1500)
 	self:SetAngles(((dir)):Angle())
 	self.AutoReturnTime = CurTime() + 5
 end
 
-function ENT:OnContact(ent)
+function ENT:StartTouch(ent)
 local panzer = self:GetParent()
 if ent:IsPlayer() or ent:IsWorld() then
 		self:EmitSound("ambient/explosions/explode_1.wav")
@@ -57,7 +57,7 @@ if ent:IsPlayer() or ent:IsWorld() then
 	ent:SetPos(self:GetPos())
 	ent:SetAngles(self:GetAngles())
 	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "75")
+	ent:SetKeyValue("imagnitude", "40")
 	ent:Fire("explode")
 			self.ExplosionLight1 = ents.Create("light_dynamic")
 		self.ExplosionLight1:SetKeyValue("brightness", "4")
@@ -84,7 +84,7 @@ if ent:IsPlayer() or ent:IsWorld() then
 	ent:SetPos(self:GetPos())
 	ent:SetAngles(self:GetAngles())
 	ent:Spawn()
-	ent:SetKeyValue("imagnitude", "75")
+	ent:SetKeyValue("imagnitude", "40")
 	ent:Fire("explode")
 			self.ExplosionLight1 = ents.Create("light_dynamic")
 		self.ExplosionLight1:SetKeyValue("brightness", "4")

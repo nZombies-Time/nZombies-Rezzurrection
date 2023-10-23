@@ -2,29 +2,38 @@
 if CLIENT then
 	local timeusetime = nil
 	local completetime = nil
-	
+	local color_black_180 = Color(0, 0, 0, 180)
+
+	local cl_drawhud = GetConVar("cl_drawhud")
+	local nz_betterscaling = GetConVar("nz_hud_better_scaling")
+
 	local function DrawUseProgress()		
 		local time = timeusetime
 		local ctime = completetime
 		if !time or !ctime then return end
 		
-		surface.SetDrawColor(0,0,0)
-		surface.DrawRect(ScrW()/2 - 150, ScrH() - 300, 300, 20)
-		surface.SetDrawColor(255,255,255)
-		
+		local w, h = ScrW(), ScrH()
+		local scale = 1
+		if nz_betterscaling:GetBool() then
+			scale = (w/1920 + 1)/2
+		end
+
+		surface.SetDrawColor(color_black_180)
+		surface.DrawRect(w/2 - 150, h - 400*scale, 300, 20)
+		surface.SetDrawColor(color_white)
+
 		if time < CurTime() then			
-			surface.DrawRect(ScrW()/2 - 145, ScrH() - 295, 290 * (1-(completetime - CurTime())/time), 10)
+			surface.DrawRect(w/2 - 145, h - 395*scale, 290 * (1-(completetime - CurTime())/time), 10)
 		else
-			surface.DrawRect(ScrW()/2 - 145, ScrH() - 295, 290, 10)
+			surface.DrawRect(w/2 - 145, h - 395*scale, 290, 10)
 		end
 	end
 	hook.Add("HUDPaint", "nzItemUseTimeDrawProgress", DrawUseProgress)
-	
+
 	net.Receive("nzTimedUse", function()
 		local start = net.ReadBool()
 		if start then
 			local time = net.ReadFloat()
-			print(time)
 			timeusetime = time
 			completetime = CurTime() + time
 		else
@@ -37,7 +46,7 @@ end
 if SERVER then
 	local function DetermineItemUseTime(ply, ent)
 		if ent.RelayUse then ent = ent.RelayUse end -- If we relay uses, we refer to the relay entity
-		
+
 		if ply.TimedUseEntity then
 			if ply.TimedUseEntity == ent and !ply:KeyReleased(IN_USE) then
 				if ply.TimedUseComplete < CurTime() then
@@ -49,11 +58,19 @@ if SERVER then
 		end
 	
 		if IsValid(ent) and ent.StartTimedUse then
-			if ply:KeyPressed(IN_USE) then
-				ply:StartTimedUse(ent)
+			local blockedwep = false
+			local wep = ply:GetActiveWeapon()
+			if IsValid(wep) and wep:IsSpecial() then
+				blockedwep = true
 			end
-			return false
-		end		
+
+			if not blockedwep then
+				if ply:KeyPressed(IN_USE) then
+					ply:StartTimedUse(ent)
+				end
+				return false
+			end
+		end
 	end
 	hook.Add( "FindUseEntity", "nzItemUseTime", DetermineItemUseTime )
 	

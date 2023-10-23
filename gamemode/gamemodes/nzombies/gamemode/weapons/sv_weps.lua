@@ -38,92 +38,106 @@ function GetPriorityWeaponSlot(ply)
 	if first then return 1, first else return 1 end
 end
 
-local function OnWeaponAdded( weapon )
+local function OnWeaponAdded( wep )
+	if wep:IsSpecial() then return end
+	wep.Weight = 10000
 
-	if !weapon:IsSpecial() then
-		weapon.Weight = 10000
-		-- 0 seconds timer for the next tick, where the weapon's owner will be valid
-		timer.Simple(0, function()
-			local ply = weapon:GetOwner()
-			if !nzRound:InState( ROUND_CREATE ) then
-				local slot, exists = GetPriorityWeaponSlot(ply)
-				if IsValid(exists) then ply:StripWeapon( exists:GetClass() ) end
-				
-				weapon:SetNWInt( "SwitchSlot", slot )
-				local oldammo = weapon.Primary.Ammo
-				local newammo = weapon:GetPrimaryAmmoType() -- Get the ammo ID used for this weapon slot
-				weapon.Primary.Ammo = game.GetAmmoName(newammo) -- Set ammo type to the ammo type designated by this slot!
-				weapon.Primary.OldAmmo = oldammo -- Save the old ammo (just in case)
-				--weapon:GiveMaxAmmo() We can't do this! PaP should NOT give ammo when rerolling!
-				
-				weapon.Weight = 10000
-				ply:SelectWeapon(weapon:GetClass())
-				timer.Simple(0, function()
-					if IsValid(ply) then
-						if ply:HasPerk("speed") then
-							weapon:ApplyNZModifier("speed")
+	timer.Simple(engine.TickInterval(), function()
+		if not IsValid(wep) then return end
+		local ply = wep:GetOwner()
+		if not IsValid(ply) then return end
+
+		if !nzRound:InState( ROUND_CREATE ) then
+			local slot, exists = GetPriorityWeaponSlot(ply)
+			if IsValid(exists) then ply:StripWeapon(exists:GetClass()) end
+
+			wep:SetNWInt("SwitchSlot", slot)
+
+			local oldammo = wep.Primary.Ammo
+			local newammo = wep:GetPrimaryAmmoType()
+			if wep.IsTFAWeapon then
+				wep.Primary_TFA.Ammo = game.GetAmmoName(newammo)
+				wep.Primary_TFA.OldAmmo = oldammo
+				wep:ClearStatCache("Primary.Ammo")
+			else
+				wep.Primary.Ammo = game.GetAmmoName(newammo)
+				wep.Primary.OldAmmo = oldammo
+			end
+
+			wep.Weight = 10000
+			ply:SelectWeapon(wep:GetClass())
+
+			timer.Simple(engine.TickInterval(), function()
+				if not IsValid(wep) then return end
+				if not IsValid(ply) then return end
+
+				/*if wep.NZSpecialCategory == "knife" and ply:HasPerk("sake") then
+					wep:ApplyNZModifier("sake")
+				end*/
+				if not wep.NZSpecialCategory and ply:HasPerk("staminup") then
+					wep:ApplyNZModifier("staminup")
+				end
+				if not wep.NZSpecialCategory and ply:HasPerk("deadshot") then
+					wep:ApplyNZModifier("deadshot")
+				end
+				if not wep.NZSpecialCategory and ply:HasPerk("dtap2") then
+					wep:ApplyNZModifier("dtap2")
+				end
+				if not wep.NZSpecialCategory and ply:HasPerk("dtap") then
+					wep:ApplyNZModifier("dtap")
+				end
+				if not wep.NZSpecialCategory and ply:HasPerk("vigor") then
+					wep:ApplyNZModifier("vigor")
+				end
+				if not wep.NZSpecialCategory and not wep:HasNZModifier("pap") and ply:HasPerk("wall") then
+					wep:ApplyNZModifier("pap")
+
+					if wep.NZPaPReplacement then
+					local wep2 = ply:Give(wep.NZPaPReplacement)
+						if IsValid(wep2) then
+							wep2:ApplyNZModifier("pap")
+							wep2:GiveMaxAmmo()
+							/*if wep2.Ispackapunched then //what the actual fuck is this
+								if !wep.Category == "NZ Rezzurrection" then
+									wep2.Ispackapunched = 1
+								end
+								if wep2.NZPaPName then
+									wep2.PrintName = wep2.NZPaPName
+								end
+							end*/
 						end
-						if ply:HasPerk("dtap") then
-							weapon:ApplyNZModifier("dtap")
-						end
-						if ply:HasPerk("dtap2") then
-							weapon:ApplyNZModifier("dtap2")
-						end
-						if ply:HasPerk("politan") then
-							weapon:ApplyNZModifier("rando")
-						end
-						if !weapon:HasNZModifier("pap") and ply:HasPerk("wall") then
-								weapon:ApplyNZModifier("pap")
-						if weapon.NZPaPReplacement then
-						ply:Give(weapon.NZPaPReplacement)
-						timer.Simple(0.1, function() 
-						local wep2 = ply:GetActiveWeapon()
-						wep2:ApplyNZModifier("pap") 
-						if IsValid(wep2) then wep2:GiveMaxAmmo() end
-						if wep2.Ispackapunched then 
-						if !weapon.Category == "NZ Rezzurrection" then
-						wep2.Ispackapunched = 1
-						end
-						end
-						if wep2.NZPaPName then
-						wep2.PrintName = wep2.NZPaPName
-						end
-						end)
-						else
-						timer.Simple(0.1, function() if IsValid(weapon) then weapon:GiveMaxAmmo() end
-						if weapon.Ispackapunched  then
-						if !weapon.Category == "NZ Rezzurrection" then
-						wep2.Ispackapunched = 1
-						end
-						end
-						if weapon.NZPaPName  then
-						weapon.PrintName = weapon.NZPaPName
-						end
-						end)
-						end
-						end
-						if !weapon.NoSpawnAmmo then
-							weapon:GiveMaxAmmo()
-						end
-						ply:SelectWeapon(weapon:GetClass())
 					end
-					weapon.Weight = 0
-				end)
-			end
-			if weapon.NearWallEnabled then weapon.NearWallEnabled = false end
-			if weapon:IsFAS2() then weapon.NoNearWall = true end
-			
-			
-			
-			weapon:ApplyNZModifier("equip")
-			if  weapon.Base == "arccw_base" then
-			ply:StripWeapon( weapon:GetClass() )
-			ply:EmitSound("arccw.wav",511)
-			ply:ChatPrint( "Maybe next time you'll follow directions. Go use TFA." )
-			end
-		end)
-	end
-	
+				end
+				/*if wep.Ispackapunched then //this is cancer
+					if !wep.Category == "NZ Rezzurrection" then
+						wep.Ispackapunched = 1
+					end
+					if wep.NZPaPName then
+						wep.PrintName = wep.NZPaPName
+					end
+				end*/
+
+				if not wep.NoSpawnAmmo then
+					wep:GiveMaxAmmo()
+				else
+					ply:SelectWeapon(wep:GetClass())
+				end
+
+				wep.Weight = 0
+			end)
+		end
+
+		wep:ApplyNZModifier("equip")
+
+		if wep.NearWallEnabled then wep.NearWallEnabled = false end
+		if wep:IsFAS2() then wep.NoNearWall = true end
+
+		if wep.ArcCW then
+			ply:StripWeapon(wep:GetClass())
+			ply:EmitSound("arccw.wav", 511)
+			ply:ChatPrint("Maybe next time you'll follow directions. Go use TFA.")
+		end
+	end)
 end
 
 --Hooks

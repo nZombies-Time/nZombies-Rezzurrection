@@ -25,8 +25,8 @@ hook.Add( "PlayerSpawn", "PlayerSprintSpawn", function( ply )
 	ply:SetMaxStamina( 100 )
 
 	--The rate is fixed on 0.05 seconds
-	ply:SetStaminaLossAmount( 2 )
-	ply:SetStaminaRecoverAmount( 4 )
+	ply:SetStaminaLossAmount( 0.9 ) -- Sprint now lasts around 8 seconds without Staminup.
+	ply:SetStaminaRecoverAmount( 4.5 ) -- Raised this slightly just incase.
 
 	ply:SetLastStaminaLoss( 0 )
 	ply:SetLastStaminaRecover( 0 )
@@ -52,7 +52,7 @@ hook.Add( "Think", "PlayerSprint", function()
 				ply:SetLastStaminaLoss( CurTime() )
 
 				-- Delay the recovery a bit, you can't sprint instantly after
-				ply:SetLastStaminaRecover( CurTime() + 0.75 )
+				ply:SetLastStaminaRecover( CurTime() + 0.5 )
 
 				if ply:GetStamina() == 0 then
 					ply:SetRunSpeed( ply:GetWalkSpeed() )

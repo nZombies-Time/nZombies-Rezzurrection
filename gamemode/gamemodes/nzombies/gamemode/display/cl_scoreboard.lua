@@ -1,393 +1,283 @@
+local columns = {
+	{Text = "Ping", Get = function(ply) return ply:Ping() end, Order = 0},
+	--{Text = "Headshots", Get = function(ply) return ply:Headshots() end, Order = 10},
+	{Text = "Revives", Get = function(ply) return ply:GetTotalRevives() end, Order = 20},
+	{Text = "Downs", Get = function(ply) return ply:GetTotalDowns() end, Order = 30},
+	{Text = "Kills", Get = function(ply) return ply:GetTotalKills() end, Order = 40},
+	{Text = "Score", Get = function(ply) return ply:GetPoints() end, Width = 200, Order = 50},
+}
 
-surface.CreateFont( "ScoreboardDefault", {
-	font	= "Helvetica",
-	size	= 22,
-	weight	= 800
-} )
+local lineheight = 25
+local statwidth = 100
 
-surface.CreateFont( "ScoreboardDefaultTitle", {
-	font	= "Helvetica",
-	size	= 32,
-	weight	= 800
-} )
+local color_base = Color(0,0,0,240)
+local color_alt = Color(0,30,40,240)
 
-local bloodline_scoreboard = Material("bloodline_scoreboard.png", "unlitgeneric smooth")
+local font = "nz.grenade"
+local textcol = Color(255,255,255)
+local textcol_highlight = Color(255,255,50)
 
---
--- This defines a new panel type for the player row. The player row is given a player
--- and then from that point on it pretty much looks after itself. It updates player info
--- in the think function, and removes itself when the player leaves the server.
---
-local PLAYER_LINE = {
-	Init = function( self )
+local zmhud_icon_voiceon = Material("nz_moo/icons/voice_on.png", "unlitgeneric smooth")
+local zmhud_icon_voicedim = Material("nz_moo/icons/voice_on_dim.png", "unlitgeneric smooth")
+local zmhud_icon_voiceoff = Material("nz_moo/icons/voice_off.png", "unlitgeneric smooth")
 
-		self.AvatarButton = self:Add( "DButton" )
-		self.AvatarButton:Dock( LEFT )
-		self.AvatarButton:SetSize( 32, 32 )
-		self.AvatarButton.DoClick = function() self.Player:ShowProfile() end
+local matblur = Material("pp/blurscreen")
+local function barpaint(self,w,h)
+	surface.SetMaterial(matblur)
+	surface.SetDrawColor(self.m_bgColor)
 
-		self.Avatar = vgui.Create( "AvatarImage", self.AvatarButton )
-		self.Avatar:SetSize( 32, 32 )
-		self.Avatar:SetMouseInputEnabled( false )
+	local x,y = self:LocalToScreen(0,0)
+	for i = 0.33,1,0.33 do
+		matblur:SetFloat("$blur", 5*i)
+		matblur:Recompute()
+		if render then render.UpdateScreenEffectTexture() end
+		surface.DrawTexturedRect(-x,-y,ScrW(),ScrH())
+	end
 
-		self.Name = self:Add( "DLabel" )
-		self.Name:Dock( FILL )
-		self.Name:SetFont( "ScoreboardDefault" )
-		self.Name:SetTextColor( self.TextColor or Color(255, 255, 255) )
+	self:DrawFilledRect()
+end
 
-		self.Mute = self:Add( "DImageButton" )
-		self.Mute:SetSize( 32, 32 )
-		self.Mute:Dock( RIGHT )
+local PLAYERLINE = {
+	Init = function(self)
+		self.Labels = {}
+		self.Values = {}
+		for k,v in pairs(columns) do
+			local p = self:Add("DPanel")
+			p:Dock(RIGHT)
+			p:SetZPos(v.Order or 0)
+			p:SetWide(v.Width or statwidth)
+			p:SetBackgroundColor(k%2 == 0 and color_base or color_alt)
+			--p:SetBackgroundColor(color_base)
+			p.Paint = barpaint
 
-		self.Ping = self:Add( "DLabel" )
-		self.Ping:Dock( RIGHT )
-		self.Ping:SetWidth( 50 )
-		self.Ping:SetFont( "ScoreboardDefault" )
-		self.Ping:SetTextColor( Color( 255, 255, 255 ) )
-		self.Ping:SetContentAlignment( 5 )
+			local lbl = p:Add("DLabel")
+			lbl:SetWide(statwidth)
+			lbl:SetFont(font)
+			lbl:Dock(FILL)
+			lbl:SetContentAlignment(5)
 
-		self.Revives = self:Add( "DLabel" )
-		self.Revives:Dock( RIGHT )
-		self.Revives:SetWidth( 100 )
-		self.Revives:SetFont( "ScoreboardDefault" )
-		self.Revives:SetTextColor( self.TextColor or Color(255, 255, 255)  )
-		self.Revives:SetContentAlignment( 5 )
-
-		self.Downs = self:Add( "DLabel" )
-		self.Downs:Dock( RIGHT )
-		self.Downs:SetWidth( 100 )
-		self.Downs:SetFont( "ScoreboardDefault" )
-		self.Downs:SetTextColor( self.TextColor or Color(255, 255, 255)  )
-		self.Downs:SetContentAlignment( 5 )
-
-		self.Kills = self:Add( "DLabel" )
-		self.Kills:Dock( RIGHT )
-		self.Kills:SetWidth( 100 )
-		self.Kills:SetFont( "ScoreboardDefault" )
-		self.Kills:SetTextColor( self.TextColor or Color(255, 255, 255)  )
-		self.Kills:SetContentAlignment( 5 )
-
-		self.Points = self:Add( "DLabel" )
-		self.Points:Dock( RIGHT )
-		self.Points:SetWidth( 100 )
-		self.Points:SetFont( "ScoreboardDefault" )
-		self.Points:SetTextColor( self.TextColor or Color(255, 255, 255) )
-		self.Points:SetContentAlignment( 5 )
-		
-		self.Items = self:Add( "DPanel" )
-		self.Items:Dock( RIGHT )
-		self.Items:SetWidth( 175 )
-		self.Items.Paint = function(pnl)
-			surface.SetDrawColor(255, 255, 255)
-			local num = 0
-			for k,v in pairs(self.Player:GetCarryItems()) do
-				local item = nzItemCarry.Items[v]
-				if item and (item.icon or item.model) then
-					local x, y = pnl:GetPos()
-					
-					if item.model then
-						surface.SetMaterial(item.model)
-						surface.DrawTexturedRect(x - num*26, y + 6, 24, 24)
-						if item.icon then
-							surface.SetMaterial(item.icon)
-							surface.DrawTexturedRect(x - num*26 + 18, y, 12, 12)
-						end
-					else
-						surface.SetMaterial(item.icon)
-						surface.DrawTexturedRect(x - num*26, y + 6, 24, 24)
-					end
-					
-					num = num + 1
-				end
-			end
+			self.Labels[k] = lbl
 		end
 
-		self:Dock( TOP )
-		self:SetSize( 32, 32)
-		self:DockMargin(5,0,5,0)
+		local main = self:Add("DPanel")
+		main:Dock(FILL)
+		main:SetBackgroundColor(color_base)
+		main.Paint = barpaint
 
+		self.PlayerAvatar = main:Add( "AvatarImage", self.AvatarButton )
+		self.PlayerAvatar:Dock(LEFT)
+		self.PlayerAvatar:DockMargin(5,5,5,5)
+		self.PlayerAvatar:SetWide(lineheight - 10)
+
+		self.Name = main:Add("DLabel")
+		self.Name:SetFont(font)
+		self.Name:Dock(FILL)
+
+		local profilebut = self:Add("DButton")
+		profilebut:Dock(FILL)
+		profilebut:SetText("")
+		profilebut.Paint = function() end
+		profilebut.DoClick = function()
+			self.Player:ShowProfile()
+		end
+
+		local mutebut = profilebut:Add("DButton")
+		mutebut:Dock(LEFT)
+		mutebut:SetMaterial(nil)
+		mutebut:SetSize(32, 32)
+		mutebut:SetText("")
+		mutebut.Paint = function() end
+		mutebut.DoClick = function()
+			mutebut:SetMaterial(not self.Player:IsMuted() and zmhud_icon_voiceoff or nil)
+			self.Player:SetMuted(not self.Player:IsMuted())
+		end
 	end,
+	Setup = function(self, ply)
+		self.Player = ply
+		self.PlayerAvatar:SetPlayer(ply)
 
-	Setup = function( self, pl )
+		local col = ply == LocalPlayer() and textcol_highlight or textcol
+		for k,v in pairs(self.Labels) do
+			v:SetTextColor(col)
+		end
+		self.Name:SetTextColor(col)
 
-		self.Player = pl
-
-		self.Avatar:SetPlayer( pl )
-
-		self:Think( self )
-
-		--local friend = self.Player:GetFriendStatus()
-		--MsgN( pl, " Friend: ", friend )
-
+		self:Think()
 	end,
-
-	Think = function( self )
-
-		if ( !IsValid( self.Player ) ) then
-			self:SetZPos( 9999 ) -- Causes a rebuild
+	Think = function(self)
+		if not IsValid(self.Player)then
+			self:SetZPos(99999)
 			self:Remove()
-			return
-		end
+		return end
 
-		if ( self.TextColor == nil || self.TextColor != player.GetColorByIndex( self.Player:EntIndex() ) ) then
-			self.TextColor = player.GetColorByIndex( self.Player:EntIndex() )
-			self.Name:SetTextColor( self.TextColor )
-			self.Points:SetTextColor( self.TextColor )
-			self.Revives:SetTextColor( self.TextColor )
-			self.Ping:SetTextColor( self.TextColor )
-			self.Downs:SetTextColor( self.TextColor  )
-			self.Kills:SetTextColor( self.TextColor )
-		end
-
-		if ( self.ZombieKills == nil || self.ZombieKills != self.Player:GetTotalKills() ) then
-			self.ZombieKills = self.Player:GetTotalKills()
-			self.Kills:SetText( self.ZombieKills )
-		end
-
-		if ( self.NumDowns == nil || self.Downs != self.Player:GetTotalDowns() ) then
-			self.NumDowns = self.Player:GetTotalDowns()
-			self.Downs:SetText( self.NumDowns )
-		end
-
-		if ( self.NumRevives == nil || self.NumRevives != self.Player:GetTotalRevives() ) then
-			self.NumRevives = self.Player:GetTotalRevives()
-			self.Revives:SetText( self.NumRevives )
-		end
-
-		if ( self.PName == nil || self.PName != self.Player:Nick() ) then
-			self.PName = self.Player:Nick()
-			self.Name:SetText( self.PName )
-		end
-
-		if ( self.NumPoints == nil || self.NumPoints != self.Player:GetPoints() ) then
-			self.NumPoints = self.Player:GetPoints()
-			self.Points:SetText( self.NumPoints )
-		end
-
-		if ( self.NumPing == nil || self.NumPing != self.Player:Ping() ) then
-			self.NumPing = self.Player:Ping()
-			self.Ping:SetText( self.NumPing )
-		end
-
-		--
-		-- Change the icon of the mute button based on state
-		--
-		if ( self.Muted == nil || self.Muted != self.Player:IsMuted() ) then
-
-			self.Muted = self.Player:IsMuted()
-			if ( self.Muted ) then
-				self.Mute:SetImage( "icon32/muted.png" )
-			else
-				self.Mute:SetImage( "icon32/unmuted.png" )
+		for k,v in pairs(self.Labels) do
+			if self.Values[k] == nil or self.Values[k] ~= columns[k].Get(self.Player) then
+				self.Values[k] = columns[k].Get(self.Player)
+				v:SetText(self.Values[k])
 			end
-
-			self.Mute.DoClick = function() self.Player:SetMuted( !self.Muted ) end
-
 		end
 
-		--
-		-- Connecting players go at the very bottom
-		--
-		if ( self.Player:Team() == TEAM_CONNECTING ) then
-			self:SetZPos( 2000 + self.Player:EntIndex() )
-			return
+		if self.PName == nil or self.PName ~= self.Player:Nick() then
+			self.PName = self.Player:Nick()
+			self.Name:SetText(self.PName)
 		end
-
-		--
-		-- This is what sorts the list. The panels are docked in the z order,
-		-- so if we set the z order according to kills they'll be ordered that way!
-		-- Careful though, it's a signed short internally, so needs to range between -32,768k and +32,767
-		--
-		self:SetZPos( ( self.NumPoints * -50 ) + self.NumPoints + self.Player:EntIndex() )
-
 	end,
-
-	Paint = function( self, w, h )
-
-		if ( !IsValid( self.Player ) ) then
-			return
-		end
-
-		--
-		-- We draw our background a different colour based on the status of the player
-		--
-
-		--if ( !self.Player:Alive() ) then
-			--draw.RoundedBox( 4, 0, 0, w, h, Color( pColor[1] * 150, pColor[2] * 150, pColor[3] * 150, 255 ) )
-			--return
-		--end
-
-		--draw.RoundedBox( 4, 0, 0, w, h, Color( pColor[1] * 100 + 155, pColor[2] * 100 + 155, pColor[3] * 100 + 155, 255 ) )
-
-		surface.SetMaterial(player.GetBloodByIndex(self.Player:EntIndex()))
-		surface.SetDrawColor(200,200,200)
-		surface.DrawTexturedRect(0, 0, w, h)
-
-	end
 }
+PLAYERLINE = vgui.RegisterTable(PLAYERLINE, "Panel")
 
---
--- Convert it from a normal table into a Panel Table based on DPanel
---
-PLAYER_LINE = vgui.RegisterTable( PLAYER_LINE, "DPanel" )
+local SCOREBOARD = {
+	Init = function(self)
+		local server = self:Add("DLabel")
+		server:Dock(TOP)
+		server:SetText(GetHostName())
+		server:SetFont("nz.small.classic")
+		server:SetTextColor(Color(255,0,0))
+		server:SetContentAlignment(5)
+		server:SizeToContentsY()
+		server:DockMargin(0,0,0,5)
 
---
--- Here we define a new panel table for the scoreboard. It basically consists
--- of a header and a scrollpanel - into which the player lines are placed.
---
+		local header = self:Add("DPanel")
+		header:Dock(TOP)
+		header:SetHeight(lineheight)
+		header:DockMargin(0,0,0,2)
+		for k,v in pairs(columns) do
+			local lbl = header:Add("DLabel")
+			lbl:SetText(v.Text)
+			lbl:SetWide(v.Width or statwidth)
+			lbl:Dock(RIGHT)
+			lbl:SetFont(font)
+			lbl:SetContentAlignment(5)
+			lbl:SetZPos(v.Order or 0)
+		end
+		header:SetBackgroundColor(color_base)
+		header.Paint = barpaint
 
-local SCORE_BOARD = {
-	Init = function( self )
+		self.ConfigName = header:Add("DLabel")
+		self.ConfigName:Dock(FILL)
+		self.ConfigName:DockMargin(5,5,5,5)
+		self.ConfigName:SetFont(font)
+		self.ConfigName:SetText(game.GetMap())
 
-		self.Header = self:Add( "Panel" )
-		self.Header:Dock( TOP )
-		self.Header:SetHeight( 100 )
-
-		self.Name = self.Header:Add( "DLabel" )
-		self.Name:SetFont("nz.main."..GetFontType(nzMapping.Settings.mainfont))
-		self.Name:SetTextColor( Color( 255, 255, 255, 255 ) )
-		self.Name:Dock( TOP )
-		self.Name:SetHeight( 40 )
-		self.Name:SetContentAlignment( 5 )
-
-		self.Key = self:Add( "DPanel" )
-		self.Key:Dock( TOP )
-		self.Key:SetContentAlignment( 6 )
-		self.Key:SetHeight( 20 )
-		self.Key.Paint = function() end
-
-		self.Mute = self.Key:Add( "DLabel" )
-		self.Mute:Dock( RIGHT )
-		self.Mute:SetWidth( 32 )
-		self.Mute:SetFont( "ScoreboardDefault" )
-		self.Mute:SetTextColor( Color( 255, 255, 255 ) )
-		self.Mute:SetContentAlignment( 5 )
-		self.Mute:SetText("")
-
-		self.Ping = self.Key:Add( "DLabel" )
-		self.Ping:Dock( RIGHT )
-		self.Ping:SetWidth( 50 )
-		self.Ping:SetFont( "ScoreboardDefault" )
-		self.Ping:SetTextColor( Color( 255, 255, 255 ) )
-		self.Ping:SetContentAlignment( 5 )
-		self.Ping:SetText("Ping")
-
-		self.Revives = self.Key:Add( "DLabel" )
-		self.Revives:Dock( RIGHT )
-		self.Revives:SetWidth( 100 )
-		self.Revives:SetFont( "ScoreboardDefault" )
-		self.Revives:SetTextColor( Color(255, 255, 255)  )
-		self.Revives:SetContentAlignment( 5 )
-		self.Revives:SetText("Revives")
-
-		self.Downs = self.Key:Add( "DLabel" )
-		self.Downs:Dock( RIGHT )
-		self.Downs:SetWidth( 100 )
-		self.Downs:SetFont( "ScoreboardDefault" )
-		self.Downs:SetTextColor( Color(255, 255, 255)  )
-		self.Downs:SetContentAlignment( 5 )
-		self.Downs:SetText("Downs")
-
-		self.Kills = self.Key:Add( "DLabel" )
-		self.Kills:Dock( RIGHT )
-		self.Kills:SetWidth( 100 )
-		self.Kills:SetFont( "ScoreboardDefault" )
-		self.Kills:SetTextColor( Color( 255, 255, 255, 255 ) )
-		self.Kills:SetContentAlignment( 5 )
-		self.Kills:SetText("Kills")
-
-		self.Points = self.Key:Add( "DLabel" )
-		self.Points:Dock( RIGHT )
-		self.Points:SetWidth( 100 )
-		self.Points:SetFont( "ScoreboardDefault" )
-		self.Points:SetTextColor( Color( 255, 255, 255, 255 ) )
-		self.Points:SetContentAlignment( 5 )
-		self.Points:SetText("Points")
-
-
-
-		--self.NumPlayers = self.Header:Add( "DLabel" )
-		--self.NumPlayers:SetFont( "ScoreboardDefault" )
-		--self.NumPlayers:SetTextColor( Color( 255, 255, 255, 255 ) )
-		--self.NumPlayers:SetPos( 0, 100 - 30 )
-		--self.NumPlayers:SetSize( 300, 30 )
-		--self.NumPlayers:SetContentAlignment( 4 )
-
-		self.Scores = self:Add( "DScrollPanel" )
-		self.Scores:Dock( FILL )
-
+		self.Lines = self:Add("DScrollPanel")
+		self.Lines:Dock(FILL)
+		end,
+	PerformLayout = function(self)
+		self:SetSize(ScrW()/2, ScrH() - 200)
+		self:SetPos(ScrW()/4, 100)
 	end,
-
-	PerformLayout = function( self )
-
-		self:SetSize( 800, ScrH() - 200 )
-		self:SetPos( ScrW() / 2 - 400, 100 )
-
-	end,
-
-	Paint = function( self, w, h )
-
-		--DrawBlurRect( 0, 0, w, h )
-
-	end,
-
-	Think = function( self, w, h )
-
-		self.Name:SetText( GetHostName() )
-
-		--
-		-- Loop through each player, and if one doesn't have a score entry - create it.
-		--
-		local plyrs = player.GetAll()
-		for id, pl in pairs( plyrs ) do
-
-			if ( IsValid( pl.ScoreEntry ) ) then continue end
-
-			pl.ScoreEntry = vgui.CreateFromTable( PLAYER_LINE, pl.ScoreEntry )
-			pl.ScoreEntry:Setup( pl )
-
-			self.Scores:AddItem( pl.ScoreEntry )
-
+	Think = function(self)
+		for k,v in pairs(player.GetAll()) do
+			if not IsValid(v.ScoreboardLine)then
+				v.ScoreboardLine = vgui.CreateFromTable(PLAYERLINE, self.Lines)
+				v.ScoreboardLine:Dock(TOP)
+				v.ScoreboardLine:SetTall(lineheight)
+				v.ScoreboardLine:Setup(v)
+				self.Lines:AddItem(v.ScoreboardLine)
+			end
 		end
 
-	end
+		if IsValid(self.GameOverPanel) and nzu.Round:GetState() ~= ROUND_GAMEOVER then
+			self.GameOverPanel:Remove()
+			self:Hide()
+		end
+	end,
 }
+SCOREBOARD = vgui.RegisterTable(SCOREBOARD, "EditablePanel")
 
-SCORE_BOARD = vgui.RegisterTable( SCORE_BOARD, "EditablePanel" )
+local scoreboard
+local function show()
+	if not IsValid(scoreboard) then
+		scoreboard = vgui.CreateFromTable(SCOREBOARD)
+	end
 
---[[---------------------------------------------------------
-	Name: gamemode:ScoreboardShow( )
-	Desc: Sets the scoreboard to visible
------------------------------------------------------------]]
+	scoreboard:Show()
+	scoreboard:MakePopup()
+	scoreboard:SetKeyboardInputEnabled(false)
+end
+
 function GM:ScoreboardShow()
-
-	if ( !IsValid( g_Scoreboard ) ) then
-		g_Scoreboard = vgui.CreateFromTable( SCORE_BOARD )
-	end
-
-	if ( IsValid( g_Scoreboard ) ) then
-		g_Scoreboard:Show()
-		g_Scoreboard:MakePopup()
-		g_Scoreboard:SetKeyboardInputEnabled( false )
-	end
-
+	show()
 end
 
---[[---------------------------------------------------------
-	Name: gamemode:ScoreboardHide( )
-	Desc: Hides the scoreboard
------------------------------------------------------------]]
 function GM:ScoreboardHide()
-
-	if ( IsValid( g_Scoreboard ) ) then
-		g_Scoreboard:Hide()
+	if IsValid(scoreboard) then
+		if not scoreboard.GameOverShown or nzu.Round:GetState() ~= ROUND_GAMEOVER then
+			scoreboard:Hide()
+		end
 	end
-
 end
 
---[[---------------------------------------------------------
-	Name: gamemode:HUDDrawScoreBoard( )
-	Desc: If you prefer to draw your scoreboard the stupid way (without vgui)
------------------------------------------------------------]]
-function GM:HUDDrawScoreBoard()
+--[[-------------------------------------------------------------------------
+Game over sequence panel
+---------------------------------------------------------------------------]]
+
+-- Global so extensions can replace it
+local gameoverpanelfunc = function()
+	local p = vgui.Create("Panel")
+	local txt = p:Add("DLabel")
+	txt:SetFont("nz.small.default")
+	txt:SetTextColor(Color(150,0,0))
+	txt:SetText("GAME OVER")
+	txt:SetContentAlignment(5)
+	txt:Dock(FILL)
+	txt:DockMargin(0,0,0,-50)
+
+	local r = p:Add("DLabel")
+	r:SetFont("nz.small.default")
+	r:SetText(nzu.Round:GetRound() == 1 and "You survived 1 round." or "You survived "..(nzu.Round:GetRound() or 0).." rounds.")
+	r:SetTextColor(Color(150,0,0))
+	r:SetContentAlignment(5)
+	r:Dock(BOTTOM)
+	r:SizeToContentsY()
+	r:DockMargin(0,0,0,50)
+
+	p:SetTall(250)
+	p:SetWide(1000)
+
+	return p
 end
+
+local gameoverpanel
+hook.Add("nzu_GameOverSequence", "nzu_Scoreboard_ShowOnGameOver", function(time)
+	if not LocalPlayer()then
+		local gp = gameoverpanel
+		if not gp then
+			local hud = nzu.HUD
+			if hud and hud.GameOverPanel then
+				gp = hud:GameOverPanel()
+			else
+				gp = gameoverpanelfunc()
+			end
+		end
+
+		show()
+
+		gp:SetParent(scoreboard)
+		gp:Dock(TOP)
+		gp:SetZPos(-1000)
+
+		scoreboard.GameOverPanel = gp
+		gameoverpanel = nil
+	end
+end)
+
+hook.Add("nzu_GameOver", "nzu_Scoreboard_ShowGameOverText", function(time)
+	if not LocalPlayer()then
+		if IsValid(gameoverpanel) then gameoverpanel:Remove() end
+
+		local hud = nzu.HUD
+		if hud and hud.GameOverPanel then -- Ask the HUD object to define a Game Over panel
+			gameoverpanel = hud:GameOverPanel()
+		else
+			gameoverpanel = gameoverpanelfunc()
+		end
+
+		gameoverpanel:ParentToHUD()
+		gameoverpanel:SetPos(ScrW()/2 - gameoverpanel:GetWide()/2, ScrH()/2 - gameoverpanel:GetTall()/2)
+		gameoverpanel:SetVisible(true)
+	end
+end)
+
+hook.Add("nzu_PlayerUnspawned", "nzu_Scoreboard_RemoveGameOverText", function(ply)
+	if ply == LocalPlayer() and IsValid(gameoverpanel) then gameoverpanel:Remove() end
+end)

@@ -9,15 +9,13 @@ ENT.Purpose			= ""
 ENT.Instructions	= ""
 
 function ENT:SetupDataTables()
-
-	self:NetworkVar( "String", 0, "WepClass" )
-	self:NetworkVar( "Entity", 0, "PaPOwner" )
-
+	self:NetworkVar("String", 0, "WepClass")
+	self:NetworkVar("Entity", 0, "PaPOwner")
 end
 
 function ENT:Initialize()
-	self:SetMoveType( MOVETYPE_NONE )
-	self:SetSolid( SOLID_OBB )
+	self:SetMoveType(MOVETYPE_NONE)
+	self:SetSolid(SOLID_OBB)
 	self:SetModel("models/hunter/blocks/cube05x1x025.mdl")
 	self:DrawShadow(false)
 
@@ -26,43 +24,59 @@ function ENT:Initialize()
 	end
 end
 
-function ENT:Use( activator, caller )
-	if activator == self:GetPaPOwner() then
+function ENT:Use(ply, caller)
+	if ply == self:GetPaPOwner() then
+		nzPowerUps.HasPaped = true
+
 		local class = self:GetWepClass()
-		local weapon
+		local wep
+
 		if self.RerollingAtts then
-			weapon = activator:GiveNoAmmo(class)
+			wep = ply:GiveNoAmmo(class)
 		else
-			weapon = activator:Give(class)
+			wep = ply:Give(class)
 		end
+
 		timer.Simple(0, function()
-			if IsValid(weapon) and IsValid(activator) then
-				if activator:HasPerk("speed") and weapon:IsFAS2() then
-					weapon:ApplyNZModifier("speed")
-				end
-				if activator:HasPerk("politan") then
-				weapon:ApplyNZModifier("rando")
-				end
-				if 	activator:HasPerk("dtap")  then
-					weapon:ApplyNZModifier("dtap")
-				end
-				
-				weapon:ApplyNZModifier("pap")
-				weapon:SetClip1(weapon.Primary.ClipSize)
-				if IsValid(self.wep) then
-					self.wep.machine:SetBeingUsed(false)
-					self.wep:Remove()
-				end
+			if not IsValid(ply) or not IsValid(wep) then return end
+
+			wep:ApplyNZModifier("pap")
+			if self.RerollingAtts then
+				wep:ApplyNZModifier("repap")
 			end
-			--[[if !self.RerollingAtts then -- A 2000 point reroll should not give max ammo
-				print("Giving ammo")
-				nzWeps:GiveMaxAmmoWep(activator, class, true) -- We give pap ammo count
-			end]]
+
+			if wep.IsTFAWeapon then
+				wep:SetClip1(wep.Primary_TFA.ClipSize)
+			else
+				wep:SetClip1(wep.Primary.ClipSize)
+			end
+
+			if IsValid(self.wep) then
+				self.wep.machine:SetBeingUsed(false)
+				self.wep:Remove()
+			end
+
+			if not wep.NZSpecialCategory and ply:HasPerk("staminup") then
+				wep:ApplyNZModifier("staminup")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("deadshot") then
+				wep:ApplyNZModifier("deadshot")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("dtap2") then
+				wep:ApplyNZModifier("dtap2")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("dtap") then
+				wep:ApplyNZModifier("dtap")
+			end
+			if not wep.NZSpecialCategory and ply:HasPerk("vigor") then
+				wep:ApplyNZModifier("vigor")
+			end
+
 			self:Remove()
 		end)
 	else
 		if IsValid(self:GetPaPOwner()) then
-			activator:PrintMessage( HUD_PRINTTALK, "This is " .. self:GetPaPOwner():Nick() .. "'s gun. You cannot take it." )
+			ply:PrintMessage( HUD_PRINTTALK, "This is " .. self:GetPaPOwner():Nick() .. "'s gun. You cannot take it." )
 		end
 	end
 end

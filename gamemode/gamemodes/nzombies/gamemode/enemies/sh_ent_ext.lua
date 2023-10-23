@@ -1,7 +1,10 @@
+
 TARGET_PRIORITY_NONE = 0
-TARGET_PRIORITY_PLAYER = 1
-TARGET_PRIORITY_SPECIAL = 2
-TARGET_PRIORITY_MAX = 2
+TARGET_PRIORITY_MONSTERINTERACT = 1
+TARGET_PRIORITY_PLAYER = 2
+TARGET_PRIORITY_SPECIAL = 3
+TARGET_PRIORITY_MAX = 3
+TARGET_PRIORITY_FUNNY = 3
 -- Someone could add a new priority level by doing this:
 -- TARGET_PRIORITY_CUSTOM = TARGET_PRIORITY_MAX + 1
 -- TARGET_PRIORITY_MAX = TARGET_PRIORITY_MAX + 1
@@ -109,6 +112,7 @@ nzEnemies:AddValidZombieType("nz_zombie_walker_ascension")
 nzEnemies:AddValidZombieType("nz_zombie_walker_motd")
 nzEnemies:AddValidZombieType("nz_zombie_walker_cotd")
 nzEnemies:AddValidZombieType("nz_zombie_walker_five")
+nzEnemies:AddValidZombieType("nz_zombie_walker_five_classic")
 nzEnemies:AddValidZombieType("nz_zombie_walker_gorodkrovi")
 nzEnemies:AddValidZombieType("nz_zombie_walker_soemale")
 nzEnemies:AddValidZombieType("nz_zombie_walker_nuketown")
@@ -118,7 +122,20 @@ nzEnemies:AddValidZombieType("nz_zombie_walker_greenrun")
 nzEnemies:AddValidZombieType("nz_zombie_walker_deathtrooper")
 nzEnemies:AddValidZombieType("nz_zombie_walker_skeleton")
 nzEnemies:AddValidZombieType("nz_zombie_walker_zetsubou")
+nzEnemies:AddValidZombieType("nz_zombie_walker_ascension_classic")
+nzEnemies:AddValidZombieType("nz_zombie_walker_diemachine")
+nzEnemies:AddValidZombieType("nz_zombie_walker_moon_classic")
+nzEnemies:AddValidZombieType("nz_zombie_walker_orange")
+nzEnemies:AddValidZombieType("nz_zombie_walker_kino")
+nzEnemies:AddValidZombieType("nz_zombie_walker_mansion")
+nzEnemies:AddValidZombieType("nz_zombie_walker_sentinel")
+nzEnemies:AddValidZombieType("nz_zombie_walker_titanic")
+nzEnemies:AddValidZombieType("nz_zombie_walker_former")
+nzEnemies:AddValidZombieType("nz_zombie_walker_mannequin")
 nzEnemies:AddValidZombieType("nz_zombie_walker_xeno")
+nzEnemies:AddValidZombieType("nz_zombie_walker_ww2")
+nzEnemies:AddValidZombieType("nz_zombie_walker_anchovy")
+nzEnemies:AddValidZombieType("nz_zombie_walker_derriese")
 nzEnemies:AddValidZombieType("nz_zombie_walker_necromorph")
 nzEnemies:AddValidZombieType("nz_zombie_special_burning")
 nzEnemies:AddValidZombieType("nz_zombie_special_burning_ascension")
@@ -142,19 +159,62 @@ nzEnemies:AddValidZombieType("nz_zombie_special_burning_templar")
 nzEnemies:AddValidZombieType("nz_zombie_special_burning_zetsubou")
 nzEnemies:AddValidZombieType("nz_zombie_special_keeper")
 nzEnemies:AddValidZombieType("nz_zombie_special_nova")
+nzEnemies:AddValidZombieType("nz_zombie_special_roach")
 nzEnemies:AddValidZombieType("nz_zombie_special_nova_bomber")
 nzEnemies:AddValidZombieType("nz_zombie_special_nova_electric")
+nzEnemies:AddValidZombieType("nz_zombie_special_dog_zhd")
 nzEnemies:AddValidZombieType("nz_zombie_special_dog")
 nzEnemies:AddValidZombieType("nz_zombie_special_donkey")
 nzEnemies:AddValidZombieType("nz_zombie_special_raptor")
 nzEnemies:AddValidZombieType("nz_zombie_special_facehugger")
 nzEnemies:AddValidZombieType("nz_zombie_special_chestburster")
 nzEnemies:AddValidZombieType("nz_zombie_special_pack")
+nzEnemies:AddValidZombieType("nz_zombie_special_bot")
+nzEnemies:AddValidZombieType("nz_zombie_special_bomba")
 nzEnemies:AddValidZombieType("nz_zombie_special_licker")
+nzEnemies:AddValidZombieType("nz_zombie_special_hunterbeta")
+nzEnemies:AddValidZombieType("nz_zombie_special_sprinter")
+nzEnemies:AddValidZombieType("nz_zombie_special_frog")
 nzEnemies:AddValidZombieType("nz_zombie_special_spooder")
+nzEnemies:AddValidZombieType("nz_zombie_special_grenade")
+nzEnemies:AddValidZombieType("nz_zombie_special_cloaker")
+nzEnemies:AddValidZombieType("nz_zombie_special_crawler")
+nzEnemies:AddValidZombieType("nz_zombie_special_xeno_runner")
+nzEnemies:AddValidZombieType("nz_zombie_special_xeno_spitter")
+nzEnemies:AddValidZombieType("nz_zombie_special_xeno_brute")
+nzEnemies:AddValidZombieType("nz_zombie_special_ss_fire")
+nzEnemies:AddValidZombieType("nz_zombie_special_sire")
+nzEnemies:AddValidZombieType("nz_zombie_special_ticker")
+nzEnemies:AddValidZombieType("nz_zombie_special_wildticker")
+nzEnemies:AddValidZombieType("nz_zombie_special_nemacyte")
+nzEnemies:AddValidZombieType("nz_zombie_special_wretch")
+nzEnemies:AddValidZombieType("nz_zombie_special_dog_gas")
+nzEnemies:AddValidZombieType("nz_zombie_special_catalyst_decay")
+nzEnemies:AddValidZombieType("nz_zombie_special_catalyst_plasma")
+nzEnemies:AddValidZombieType("nz_zombie_special_catalyst_water")
 
 function meta:ShouldPhysgunNoCollide()
 	return self.bPhysgunNoCollide
+end
+
+
+function meta:SetTargetPriority(value)
+    if nzLevel and nzLevel.TargetCache then
+        if value > 0 then
+            if !table.HasValue(nzLevel.TargetCache, self) then
+                table.insert(nzLevel.TargetCache, self)
+            end
+        else
+            for i = 1, #nzLevel.TargetCache do
+                if nzLevel.TargetCache[i] == self then
+                    table.remove(nzLevel.TargetCache, i)
+                    break
+                end
+            end
+        end
+    end
+
+    self.iTargetPriority = value
 end
 
 local base = "nz_zombiebase"

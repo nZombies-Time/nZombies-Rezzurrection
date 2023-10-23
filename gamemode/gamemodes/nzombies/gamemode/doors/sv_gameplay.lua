@@ -17,6 +17,14 @@ function nzDoors:OpenDoor( ent, ply )
 		ent:UnlockDoor()
 	end
 	
+	-- Merge Nav Groups
+	if ent.navgroup1 and ent.navgroup2 then
+		nzNav.Functions.MergeNavGroups(ent.navgroup1, ent.navgroup2)
+	end
+	if ent.linkedmeshes then
+		nzNav.Functions.OnNavMeshUnlocked(ent.linkedmeshes)
+	end
+	
 	-- Sync
 	if link != nil then
 		self.OpenedLinks[link] = true

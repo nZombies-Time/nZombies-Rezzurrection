@@ -1,5 +1,6 @@
 
 game.AddParticles("particles/bo1overhaul_blood_fx.pcf")
+game.AddParticles("particles/gearsofwar_effects.pcf")
 	PrecacheParticleSystem("nz_blood_gib")
 	PrecacheParticleSystem("nz_blood_headshot")
 game.AddParticles("particles/driese_fx.pcf")
@@ -42,3 +43,5 @@ game.AddParticles("particles/blackops3zombies_fx.pcf")
 	PrecacheParticleSystem("bo3_thrasher_blood")
 	
 	PrecacheParticleSystem("bo3_zombie_spawn")
+	game.AddParticles("particles/sentinel_laser.pcf")
+	PrecacheParticleSystem("sentinel_laser")

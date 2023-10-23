@@ -3,16 +3,28 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-	self:NetworkVar("Bool", 3, "StinkyGas") -- For both Bombers and Jacks
+function ENT:Draw()
+	self:DrawModel()
+	local elight = DynamicLight( self:EntIndex(), true )
+	if ( elight ) then
+		local bone = self:LookupBone("j_spineupper")
+		local pos = self:GetBonePosition(bone)
+		pos = pos 
+		elight.pos = pos
+		elight.r = 150
+		elight.g = 255
+		elight.b = 75
+		elight.brightness = 10
+		elight.Decay = 1000
+		elight.Size = 40
+		elight.DieTime = CurTime() + 1
+		elight.style = 0
+		elight.noworld = true
+	end
 end
-
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
@@ -22,29 +34,41 @@ ENT.RedEyes = false
 ENT.IsMooSpecial = true
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/t8/ofc_quadcrawler/moo_codz_t8_nova_bomber.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t8/white/moo_codz_t8_quad_bomber.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 ENT.DeathSequences = {
-	"nz_death_v1",
-	"nz_death_v2",
-	"nz_death_v3",
-	"nz_death_v4",
-	"nz_death_v5",
-	"nz_death_v6"
+	"nz_quad_death_v1",
+	"nz_quad_death_v2",
+	"nz_quad_death_v3",
+	"nz_quad_death_v4",
+	"nz_quad_death_v5",
+	"nz_quad_death_v6"
 }
 
+ENT.BarricadeTearSequences = {
+	--Leave this empty if you don't intend on having a special enemy use tear anims.
+}
+
+local SpawnSequences = {"nz_quad_traverse_ground_fast"}
+
 local AttackSequences = {
-	{seq = "nz_attack_v1", dmgtimes = {0.7}},
-	{seq = "nz_attack_v2", dmgtimes = {0.5}},
-	{seq = "nz_attack_v3", dmgtimes = {0.7}},
-	{seq = "nz_attack_v4", dmgtimes = {0.5}},
-	{seq = "nz_attack_v5", dmgtimes = {0.7}},
-	{seq = "nz_attack_v6", dmgtimes = {0.7}},
+	{seq = "nz_quad_attack_v1"},
+	{seq = "nz_quad_attack_v2"},
+	{seq = "nz_quad_attack_v3"},
+	{seq = "nz_quad_attack_v4"},
+	{seq = "nz_quad_attack_v5"},
+	{seq = "nz_quad_attack_v6"},
+	{seq = "nz_quad_attack_double_v1"},
+	{seq = "nz_quad_attack_double_v2"},
+	{seq = "nz_quad_attack_double_v3"},
+	{seq = "nz_quad_attack_double_v4"},
+	{seq = "nz_quad_attack_double_v5"},
+	{seq = "nz_quad_attack_double_v6"},
 }
 
 local JumpSequences = {
-	{seq = "nz_mantle", speed = 15, time = 2.5},
+	{seq = "nz_quad_traverse_mantle_36"},
 }
 
 local walksounds = {
@@ -63,76 +87,59 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_quad/amb/amb_12.mp3"),
 }
 
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 75,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[3] = {
-		act = ACT_SPRINT,
-		minspeed = 145,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-}
-
-ENT.IdleSequence = "nz_idle_v1"
+ENT.IdleSequence = "nz_quad_idle_v1"
 
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
 			MovementSequence = {
-				"nz_crawl_v1",
-				"nz_crawl_v2",
-				"nz_crawl_v3",
+				"nz_quad_crawl_walk_v1",
+				"nz_quad_crawl_walk_v2",
+				"nz_quad_crawl_walk_v3",
 			},
+			SpawnSequence = {SpawnSequences},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 35, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
 			MovementSequence = {
-				"nz_crawl_run_v1",
-				"nz_crawl_run_v2",
-				"nz_crawl_run_v3",
+				"nz_quad_crawl_run_v2",
+				"nz_quad_crawl_run_v3",
+				"nz_quad_crawl_run_v5",
 			},
+			SpawnSequence = {SpawnSequences},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 95, Sequences = {
+	{Threshold = 71, Sequences = {
 		{
 			MovementSequence = {
-				--"nz_crawl_sprint_v1", -- This anim looks poo poo most the time.
-				"nz_crawl_sprint_v2",
-				"nz_crawl_sprint_v3",
+				"nz_quad_crawl_sprint_v2",
+				"nz_quad_crawl_sprint_v3", -- Theres a v1 sprint anim but it looks like shit so you don't get to have it.
 			},
+			SpawnSequence = {SpawnSequences},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}}
 }
 
-ENT.AttackHitSounds = {
-	"nz/zombies/attack/player_hit_0.wav",
-	"nz/zombies/attack/player_hit_1.wav",
-	"nz/zombies/attack/player_hit_2.wav",
-	"nz/zombies/attack/player_hit_3.wav",
-	"nz/zombies/attack/player_hit_4.wav",
-	"nz/zombies/attack/player_hit_5.wav"
+ENT.ElectrocutionSequences = "nz_quad_stunned_electrobolt"
+
+
+ENT.UnawareSequences = {
+	"nz_quad_idle_v2",
 }
 
-ENT.PainSounds = {
-	"nz/zombies/death/nz_flesh_impact_1.wav",
-	"nz/zombies/death/nz_flesh_impact_2.wav",
-	"nz/zombies/death/nz_flesh_impact_3.wav",
-	"nz/zombies/death/nz_flesh_impact_4.wav"
+ENT.FreezeSequences = {
+	"nz_quad_death_freeze_v1",
+	"nz_quad_death_freeze_v2",
 }
 
 ENT.DeathSounds = {
@@ -171,9 +178,6 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
-		self.NextAction = 0
-		self.NextGasTime = 0
-		self.NextPhaseTime = 0
 		self:SetMooSpecial(true)
 		if nzRound:GetNumber() == -1 then
 			self:SetRunSpeed( math.random(20, 105) )
@@ -187,186 +191,298 @@ function ENT:StatsInitialize()
 			end
 			self:SetHealth( nzRound:GetZombieHealth() or 75 )
 		end
-	end
-end
 
-function ENT:SpecialInit()
-	if CLIENT then
+		self.Exploded = false
+
+		self.TargetZobies = false
+		self.StopChasingZobies = 0
+		self.NextGas = CurTime() + 7
 	end
 end
 
 function ENT:OnSpawn()
-	if self:GetRunSpeed() > 130 then -- Novas are slower than normal zombies so this makes sense.
-		timer.Simple(engine.TickInterval(), function()
-			--print("Little Gremlin")
-			self:SetRunSpeed(130)
-			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		end)
-	end
-	timer.Simple(engine.TickInterval(), function()
-		if IsValid(self) then
-			self:EmitSound("nz_moo/zombies/vox/_quad/spawn/spawn_0"..math.random(3)..".mp3", 100, math.random(95, 105), 1, 2)
-			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
-			if IsValid(self) then ParticleEffectAttach("panzer_spawn_tp", 3, self, 2) end
+	local spawn
+	local types = {
+		["nz_spawn_zombie_normal"] = true,
+		["nz_spawn_zombie_special"] = true,
+		["nz_spawn_zombie_extra1"] = true,
+		["nz_spawn_zombie_extra2"] = true,
+		["nz_spawn_zombie_extra3"] = true,
+		["nz_spawn_zombie_extra4"] = true,
+	}
+	for k,v in pairs(ents.FindInSphere(self:GetPos(), 10)) do
+		if types[v:GetClass()] then
+			if !v:GetMasterSpawn() then
+				spawn = v
+			end
 		end
-	end)
-end
+	end
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
 
---[[ CUSTOM/MODIFIED THINGS FROM BASE HERE ]]--
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
 
-function ENT:PerformDeath(dmgInfo)
-	if dmgInfo:GetDamageType() == DMG_REMOVENORAGDOLL then self:Remove(dmgInfo) end
-	if self.DeathRagdollForce == 0 or self.DeathRagdollForce <= dmgInfo:GetDamageForce():Length() and dmgInfo:GetDamageType() ~= DMG_REMOVENORAGDOLL or self:GetSpecialAnimation() then
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:Remove(dmgInfo)
+	if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
+	self:EmitSound("nz_moo/zombies/vox/_quad/spawn/spawn_0"..math.random(3)..".mp3", 511, math.random(95, 105), 1, 2)
+
+	if IsValid(spawn) and spawn:GetSpawnType() == 1 then
+		if IsValid(self) then
+			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
+			if IsValid(self) then ParticleEffect("panzer_spawn_tp", self:GetPos() + Vector(0,0,20), Angle(0,0,0), self) end
+		end
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+		self:CollideWhenPossible()
 	else
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+
+		self:SetSpecialAnimation(true)
+		self:SetIsBusy(true)
+		local seq = self:SelectSpawnSequence()
+
+		if tr.Hit then
+			local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+			self:EmitSound(finalsound)
+		end
+		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
+
+		if seq then
+			self:PlaySequenceAndMove(seq, {gravity = true})
+			self:SetSpecialAnimation(false)
+			self:SetIsBusy(false)
+			self:CollideWhenPossible()
+		end
 	end
 end
 
+function ENT:PerformDeath(dmginfo)
+	local damagetype = dmginfo:GetDamageType()
 
-function ENT:DoDeathAnimation(seq) -- Modified death function to have a chance of spawning a gas cloud on death.
-	self.BehaveThread = coroutine.create(function()
-		self:PlaySequenceAndWait(seq)
-		print("Stinky Child... Gross")
+	self:PostDeath(dmginfo)
+
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
+	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathRagdollForce == 0 or self:GetSpecialAnimation() then
+		if self.DeathSounds then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		end
+		self:BecomeRagdoll(dmginfo)
+	else
+		if self:RagdollForceTest(dmginfo:GetDamageForce()) then
+			if self.DeathSounds then
+				self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+			end
+			self:BecomeRagdoll(dmginfo)
+		elseif damagetype == DMG_SHOCK then
+			if self.ElecSounds then
+				self:PlaySound(self.ElecSounds[math.random(#self.ElecSounds)], 90, math.random(85, 105), 1, 2)
+			end
+			self:DoDeathAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
+		else
+			if self.DeathSounds then
+				self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+			end
+			self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+		end
+	end
+end
+
+function ENT:PostDeath(dmginfo)
+	if math.random(2) == 2 then
+		if self.Exploded then return end
+		self.Exploded = true -- Prevent a possible infinite loop that causes crashes.
+		--print("Stinky Child... Gross")
 		local fuckercloud = ents.Create("nova_gas_cloud")
 		fuckercloud:SetPos(self:GetPos())
 		fuckercloud:SetAngles(Angle(0,0,0))
 		fuckercloud:Spawn()
-		self:Remove(DamageInfo())
-	end)
-end
-
-function ENT:PlayAttackAndWait( name, speed )
-
-	local len = self:SetSequence( name )
-	speed = speed or 1
-
-	self:ResetSequenceInfo()
-	self:SetCycle( 0 )
-	self:SetPlaybackRate( speed )
-
-	local endtime = CurTime() + len / speed
-
-	while ( true ) do
-
-		if ( endtime < CurTime() ) then
-			if !self:GetStop() then
-				self:StartActivity( ACT_WALK )
-				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-			end
-			return
-		end
-		if self:IsValidTarget( self:GetTarget() ) then
-			self.loco:FaceTowards( self:GetTarget():GetPos() )
-		end
-
-		coroutine.yield()
-
 	end
-
 end
 
---[[ JOLTING JACK/NOVA BOMBER RELATED FUNCTIONS HERE! ]]--
-
-function ENT:OnPathTimeOut()
-	local ShootChance = math.random(1, 5) -- Seeing how powerful in certain situations Bombers can be... They have a far less chance of emitting gas.
-	local target = self:GetTarget()
-	local larmfx_tag = self:LookupBone("j_wrist_le")
-	if CurTime() < self.NextAction then return end
-	
-	if ShootChance == 1 and CurTime() > self.NextGasTime then
-	
-		-- Ranged Attack/Plasma Ball or Gas Ball
-		if self:IsValidTarget(target) then
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "melee" then
+		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+		self:DoAttackDamage()
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+	if e == "melee_whoosh" then
+		self:EmitSound("nz_moo/zombies/fly/attack/whoosh/zmb_attack_med_0"..math.random(0,2)..".mp3", 75, math.random(95,105))
+	end
+	if e == "quad_crawl" then
+		self:EmitSound("nz_moo/zombies/footsteps/crawl/crawl_0"..math.random(0,3)..".mp3", 65, math.random(95,105))
+	end
+	if e == "spore_attack" then
+		if IsValid(self:GetTarget()) then
+			local larmfx_tag = self:LookupBone("j_wrist_le")
 			local tr = util.TraceLine({
 				start = self:GetPos() + Vector(0,50,0),
-				endpos = target:GetPos() + Vector(0,0,50),
+				endpos = self:GetTarget():GetPos() + Vector(0,0,50),
 				filter = self,
+				ignoreworld = true,
 			})
-			for k, v in pairs(ents.FindInSphere(self:GetPos(), 150)) do
-				if IsValid(v) and v:IsValidZombie() and v.IsMooZombie or IsValid(v) and v:IsValidZombie() then
-				if v.IsMooSpecial or v.NZBossType then continue end -- Bomber will ignore itself and Bosses
-					--print("Homeless Man located")
-					--print(v)	-- We're gonna beef up every standard zombie in the Nova Bomber's range
-					self:FleeTarget(6) -- 11/26/22: Fuck you I'm running away! THIS FUCKING SUCKS WITH MORE THAN ONE PERSON BTW!!!
-					if v.SpeedBasedSequences then
-						v:EmitSound("nz_moo/zombies/vox/_classic/taunt/taunt_0"..math.random(1,6)..".mp3", 100, math.random(95, 105), 1, 2) -- Will they know?
-						v:SetRunSpeed(250)
-						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
-						v:SetHealth( nzRound:GetZombieHealth() * 2 )
-						v:SpeedChanged()
-					elseif !v.SpeedBasedSequences or !v.IsMooZombie then -- For non Moo Zombies. Your welcome Laby
-						v:SetRunSpeed(250)
-						v.loco:SetDesiredSpeed( v:GetRunSpeed() )
-						v:SetHealth( nzRound:GetZombieHealth() * 2 )
-					end
-				end
-			end
-
-			if IsValid(self) then ParticleEffectAttach("hcea_flood_runner_death", 3, self, 2) end
 			
-			local fuckercloud = ents.Create("nova_gas_cloud")
-			fuckercloud:SetPos(self:GetPos())
-			fuckercloud:SetAngles(Angle(0,0,0))
-			fuckercloud:Spawn()
+			if IsValid(tr.Entity) then
+				--print(self:GetTarget())
+				--print(tr.Entity)
+				self:EmitSound("nz_moo/zombies/vox/_quad/charge/charge_0"..math.random(2)..".mp3",100,math.random(95, 105))
+				self.GasShot = ents.Create("nz_gas_quad_shot")
+				self.GasShot:SetPos(self:GetBonePosition(larmfx_tag))
+				self.GasShot:Spawn()
+				self.GasShot:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.GasShot:GetPos()):GetNormalized(), tr.Entity)
+				self:StopParticles()
 
-
-			self.loco:SetDesiredSpeed(0)
-				
-			self:PlaySequenceAndWait("nz_attack_v6")
-				
-			local seq = "nz_attack_v6"
-			local id, dur = self:LookupSequence(seq)
-			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-			self:SetSpecialAnimation(false)
-			self:SetBlockAttack(false)
-
-			self.NextAction = CurTime() + math.random(1, 5)
-			self.NextGasTime = CurTime() + math.random(3, 15)
+				self.TargetZobies = false
+				self:Retarget()
+			end
 		end
 	end
 end
 
 function ENT:OnRemove()
-	if IsValid(self.StinkyGas) then self.StinkyGas:Remove() end
+	if IsValid(self.GasShot) then self.GasShot:Remove() end
 end
 
+function ENT:AI()
+	if CurTime() > self.NextGas then
+		--print("attempt buff")
 
+		self.NextGas = CurTime() + math.random(15)
+		if self.IsTurned then return end
 
+		self.TargetZobies = true
+		self:Retarget()
+		local target = self:GetTarget()
+		if IsValid(target) and target.IsMooZombie and !target.IsMooSpecial and !target:BomberBuff() then
+			--print(target)
+			self.StopChasingZobies = CurTime() + 3
+			self:DoSpecialAnimation("nz_quad_spore_attack", true, false)
+		else
+			self.TargetZobies = false
+			self:Retarget()
+		end
+	end
+	if CurTime() > self.StopChasingZobies and self.TargetZobies then
+		self.TargetZobies = false
+		self:Retarget()
+	end
+end
 
+if SERVER then
+	function ENT:OnTakeDamage(dmginfo)
+		if (dmginfo:GetDamageType() == DMG_DISSOLVE and dmginfo:GetDamage() >= self:Health() and self:Health() > 0) then
+			self:DissolveEffect()
+		end
 
+		if dmginfo:GetDamage() == 75 and dmginfo:IsDamageType(DMG_MISSILEDEFENSE) and !self:GetSpecialAnimation() then
+			self:SetTarget(nil)
+			--print("Uh oh Luigi, I'm about to commit insurance fraud lol.")
+			self:TempBehaveThread(function(self)
+				self:TimeOut(0)
+				self:SetSpecialAnimation(true)
 
+				self:SolidMaskDuringEvent(MASK_PLAYERSOLID, collision)
+				self:PlaySequenceAndMove("nz_quad_knockdown_faceup")
+				self:PlaySequenceAndMove("nz_quad_getup_faceup")
+				if !self:GetSpecialShouldDie() and IsValid(self) and self:Alive() then
+					self:CollideWhenPossible()
+					self:SetSpecialAnimation(false)
+				end
+			end)
+		end
 
+		self:SetLastHurt(CurTime())
+	end
+	
+	function ENT:PerformIdle()
+		if self:GetSpecialAnimation() and !self.IsTornado then return end
+		if (self.BO4IsShocked and self:BO4IsShocked() or self.BO4IsScorped and self:BO4IsScorped() or self.BO4IsSpinning and self:BO4IsSpinning() or self:GetNW2Bool("OnAcid")) and !self:GetCrawler() then
+			self:ResetSequence(self.ElectrocutionSequences)
+		elseif self.BO3IsMystified and self:BO3IsMystified() then
+			self:ResetSequence(self.UnawareAnim)
+		elseif self.BO4IsTornado and self:BO4IsTornado() and self.IsTornado then
+			self:ResetSequence(self.ElectrocutionSequences)
+		else
+			self:ResetSequence(self.IdleSequence)
+		end
+	end
 
+	function ENT:ZombieStatusEffects()
+		if CurTime() > self.LastStatusUpdate then
+			if self.IsTurned or !self:Alive() then return end
 
+			if self:GetSpecialAnimation() and !self.CanCancelSpecial then return end
+			if self.BO3IsSlipping and self:BO3IsSlipping() then
+				--print("Uh oh Luigi, I've been played for a fool lol.")
+				self:TempBehaveThread(function(self)
+					self:TimeOut(0)
+					self:SetSpecialAnimation(true)
 
+					self:SolidMaskDuringEvent(MASK_PLAYERSOLID, collision)
+					self:PlaySequenceAndMove("nz_quad_knockdown_facedown")
+					self:PlaySequenceAndMove("nz_quad_getup_facedown")
+					if !self:GetSpecialShouldDie() and IsValid(self) and self:Alive() then
+						self:CollideWhenPossible()
+						self:SetSpecialAnimation(false)
+					end
+				end)
+			end
+			if self.BO3IsSkullStund and self:BO3IsSkullStund() then
+				--print("Uh oh Mario, I'm ASCENDING lol.")
+				self:DoSpecialAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
+			end
+			if self.BO3IsCooking and self:BO3IsCooking() then
+				--print("Uh oh Mario, I'm about to fucking inflate lol.")
+				self:SetSpecialShouldDie(true)
+				self:DoSpecialAnimation(self.ElectrocutionSequences[math.random(#self.ElectrocutionSequences)])
+			end
+			if self.BO4IsFrozen and self:BO4IsFrozen() and !self:GetSpecialAnimation() then
+				--print("Uh oh Mario, I'm frozen lol.")
+				self:SetSpecialShouldDie(true)
+				self:DoSpecialAnimation(self.FreezeSequences[math.random(#self.FreezeSequences)])
+			end
+			if self.BO4IsShrunk and self:BO4IsShrunk() then
+				self:DoSpecialAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+			end
+			if self.IsATTCryoFreeze and self:IsATTCryoFreeze() then 
+				self:SetSpecialShouldDie(true)
+				self:DoSpecialAnimation(self.FreezeSequences[math.random(#self.FreezeSequences)])
+			end
+			self.LastStatusUpdate = CurTime() + 0.25
+		end
+	end
+end
 
+function ENT:IsValidTarget( ent )
+	if not ent then return false end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	-- Turned Zombie Targetting
+	if self.IsTurned or self.TargetZobies then
+		return IsValid(ent) and ent:GetTargetPriority() == TARGET_PRIORITY_MONSTERINTERACT and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooSpecial and ent:Alive() 
+	end
+	
+	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY -- This is really funny.
+end
 
 --[[
 
