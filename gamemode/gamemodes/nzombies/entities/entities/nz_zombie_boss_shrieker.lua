@@ -58,7 +58,7 @@ ENT.BarricadeTearSequences = {
 	"nz_legacy_door_tear_right",
 }
 
-local spawnfast = {"nz_spawn_ground_climbout_fast"}
+local spawnfast = {"nz_ent_ground_01", "nz_ent_ground_02"}
 
 local JumpSequences = {
 	{seq = "nz_barricade_trav_walk_1"},
@@ -148,6 +148,7 @@ ENT.SequenceTables = {
 				"nz_sonic_run_01",
 				"nz_sonic_run_02",
 				"nz_sonic_run_03",
+				"nz_l4d_run_04",
 			},
 			BlackholeMovementSequence = {
 				"nz_blackhole_1",
@@ -280,11 +281,30 @@ function ENT:OnSpawn()
 end
 
 function ENT:PerformDeath(dmginfo)
-	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		
+	self.Dying = true
+
+	local damagetype = dmginfo:GetDamageType()
+
+	self:PostDeath(dmginfo)
+
 	self:Explode(dmginfo)
-	if self.DeathRagdollForce == 0 or dmginfo:GetDamageType() == DMG_REMOVENORAGDOLL or self:GetSpecialAnimation() then
-		self:DoDeathAnimation(self.RagdollDeathSequences[math.random(#self.RagdollDeathSequences)])
+
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
+	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathRagdollForce == 0 or self:GetSpecialAnimation() then
+		if self.DeathSounds then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		end
+		self:BecomeRagdoll(dmginfo)
 	else
+		if self.DeathSounds then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		end
 		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
 	end
 end
@@ -313,13 +333,21 @@ function ENT:AdditionalZombieStuff()
 		if self:TargetInRange(90) then return end
 		self:SonicAttack()
 	end
-	if nzMapping.Settings.sidestepping then 
-		if self:TargetInRange(250) and !self.AttackIsBlocked and math.random(200) <= 15 and CurTime() > self.LastSideStep then
-			if !self:IsInSight() then return end
-			if self:TargetInRange(75) then return end
+	if nzMapping.Settings.sidestepping then -- Commence thy tomfoolery.
+		if self:GetCrawler() then return end -- But not if you're a cripple :man_in_manual_wheelchair:
+		if self.Non3arcZombie then return end -- Or if you're a WW2 man.if !self:IsAimedAt() then return end
+
+		if self:TargetInRange(500) and !self.AttackIsBlocked and math.random(20) <= 15 and CurTime() > self.LastSideStep then
+			if !self:IsFacingTarget() then return end
+			if !self:IsAimedAt() then return end
+			if self:TargetInRange(70) then return end
+			if self:GetRunSpeed() > 200 then return end
 			if IsValid(self:GetTarget()) and self:GetTarget():IsPlayer() then
-				self:DoSpecialAnimation(self.SonicSideStepSequences[math.random(#self.SonicSideStepSequences)])
-				self.LastSideStep = CurTime() + 4
+				local seq = self.SonicSideStepSequences[math.random(#self.SonicSideStepSequences)]
+				if self:SequenceHasSpace(seq) then
+					self:DoSpecialAnimation(seq, true, true)
+				end
+				self.LastSideStep = CurTime() + 3
 			end
 		end
 	end
@@ -362,12 +390,15 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		self.TraversalAnim = false
 	end
 	if e == "sonic_scream" then
+		local me = self
 		self:EmitSound("nz_moo/zombies/vox/_sonic/evt_sonic_attack_flux.mp3", 100, math.random(85, 105))
 		self:EmitSound("nz_moo/zombies/vox/_sonic/zmb_sonic_scream.mp3", 65, math.random(85, 105))
 		ParticleEffectAttach("screamer_scream", 4, self, 10)
 		for k,v in pairs(ents.FindInSphere(self:GetPos(), 325)) do
-			if IsValid(v) and v:IsPlayer() and !self:IsAttackEntBlocked(v) then
-				v:NZSonicBlind(3)
+			if IsValid(v) and !self:IsAttackEntBlocked(v) then
+				if v:IsPlayer() then
+					v:NZSonicBlind(3)
+				end
 			end
 		end
 	end

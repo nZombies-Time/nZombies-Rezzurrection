@@ -659,7 +659,7 @@ nzMapping:AddSaveModule("BreakEntry", {
 				boardtype = v:GetBoardType(),
 				prop = v:GetProp() or 0,
 				jumptype = v:GetJumpType() or 0,
-				plycollision = v:GetPlayerCollision() or 1,
+				plycollision = v:GetPlayerCollision(),
 			})
 		end
 		return break_entry
@@ -668,13 +668,13 @@ nzMapping:AddSaveModule("BreakEntry", {
 		for k,v in pairs(data) do
 			if not v.prop then v.prop = 0 end 
 			if not v.jumptype then v.jumptype = 0 end
-			if not v.plycollision then v.plycollision = 1 end
+			if v.plycollision == nil then print("duck") v.plycollision = true end
 			nzMapping:BreakEntry(v.pos, v.angle, v.planks, v.jump, v.boardtype, v.prop, v.jumptype, v.plycollision)
 		end
 	end,
 	cleanents = {"breakable_entry", "breakable_entry_plank", "breakable_entry_bar", "breakable_entry_ventslat"},
 	postrestorefunc = function(data)
-		-- Now we respawn them! :D
+		-- Now we respawn them! :D <-- This is my anger.
 		for k,v in pairs(ents.FindByClass("breakable_entry")) do
 			if IsValid(v) then
 				v:FullRepair()

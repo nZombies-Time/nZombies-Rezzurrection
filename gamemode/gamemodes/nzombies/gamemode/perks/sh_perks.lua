@@ -1768,10 +1768,10 @@ nzPerks:NewPerk("time", {
 
 nzPerks:NewPerk("winters", {
 	name = "Winter's Wail",
-	name_skin = "Frost Bitters",
+	name_skin = "Backshot Brew",
 	name_holo = "Frost Bitters",
-	model = "models/nzr/2022/misc/weaponlocker.mdl",
-	skin = "models/nzr/2022/misc/weaponlocker.mdl",
+	model = "models/perks/winterswail.mdl",
+	skin =  "models/perks/winterswail2.mdl",
 	//off_skin = 1,
 	//on_skin = 0,
 	price = 3000,

@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase_moo"
-ENT.PrintName = "Panzer Soldat(BO2)"
+ENT.PrintName = "Panzer Soldat(Origins)"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
@@ -36,7 +36,7 @@ AccessorFunc( ENT, "fLastToast", "LastToast", FORCE_NUMBER)
 function ENT:Draw()
 	self:DrawModel()
 
-	if self.RedEyes and self:Alive() and !self:GetDecapitated() and !self:GetMooSpecial() and !self.IsMooSpecial then
+	if self.RedEyes and self:Alive() and !self:GetDecapitated() then
 		self:DrawEyeGlow() 
 	end
 	if self:GetHelmet() then
@@ -45,6 +45,31 @@ function ENT:Draw()
 		
 	if GetConVar( "nz_zombie_debug" ):GetBool() then
 		render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+	end
+end
+
+function ENT:DrawEyeGlow()
+	local eyeglow = Material("nz/zlight")
+	local eyeColor = Color(255, 150, 50, 255)
+	local latt = self:LookupAttachment("lefteye")
+	local ratt = self:LookupAttachment("righteye")
+
+	if latt == nil then return end
+	if ratt == nil then return end
+
+	local leye = self:GetAttachment(latt)
+	local reye = self:GetAttachment(ratt)
+
+	if leye == nil then return end
+	if reye == nil then return end
+
+	local righteyepos = leye.Pos + leye.Ang:Forward()*1.5
+	local lefteyepos = reye.Pos + reye.Ang:Forward()*1.5
+
+	if lefteyepos and righteyepos then
+		render.SetMaterial(eyeglow)
+		render.DrawSprite(lefteyepos, 6, 6, eyeColor)
+		render.DrawSprite(righteyepos, 6, 6, eyeColor)
 	end
 end
 
@@ -108,12 +133,12 @@ local WalkAttackSequences = {
 }
 
 local AttackSequences = {
-	{seq = "nz_soldat_melee_a", dmgtimes = {0.7}},
-	{seq = "nz_soldat_melee_b", dmgtimes = {0.7}},
+	{seq = "nz_soldat_melee_a"},
+	{seq = "nz_soldat_melee_b"},
 }
 
 local JumpSequences = {
-	{seq = "nz_soldat_mantle_over", speed = 50, time = 2.5},
+	{seq = "nz_soldat_mantle_36"},
 }
 
 local ClimbUp48 = {
@@ -157,6 +182,30 @@ ENT.FatalSequences = {
 	"nz_soldat_pain_faceplate"
 }
 
+ENT.NormalMantleOver48 = {
+	"nz_soldat_mantle_48",
+}
+
+ENT.NormalMantleOver72 = {
+	"nz_soldat_mantle_72",
+}
+
+ENT.NormalMantleOver96 = {
+	"nz_soldat_mantle_96",
+}
+
+ENT.NormalJumpUp128 = {
+	"nz_soldat_jump_up_128",
+}
+
+ENT.NormalJumpUp128Quick = {
+	"nz_soldat_jump_up_128",
+}
+
+ENT.NormalJumpDown128 = {
+	"nz_soldat_jump_down_128",
+}
+
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
@@ -170,7 +219,7 @@ ENT.SequenceTables = {
 			FlyMovementSequence = {
 				"nz_soldat_launch_pad_move_loop",
 			},
-			AttackSequences = {WalkAttackSequences},
+			AttackSequences = {AttackSequences},
 			StandAttackSequences = {AttackSequences},
 			Climb48 = {ClimbUp48},
 			Climb72 = {ClimbUp72},
@@ -191,11 +240,29 @@ ENT.SequenceTables = {
 			FlyMovementSequence = {
 				"nz_soldat_launch_pad_move_loop",
 			},
-			AttackSequences = {WalkAttackSequences},
+			AttackSequences = {AttackSequences},
 			StandAttackSequences = {AttackSequences},
 			Climb48 = {ClimbUp48},
 			Climb72 = {ClimbUp72},
 			Climb96 = {ClimbUp96},
+			JumpSequences = {JumpSequences},
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 71, Sequences = {
+		{
+			SpawnSequence = {spawn},
+			MovementSequence = {
+				"nz_soldat_sprint",
+			},
+			FlameMovementSequence = {
+				"nz_soldat_ft_walk",
+			},
+			FlyMovementSequence = {
+				"nz_soldat_launch_pad_move_loop",
+			},
+			AttackSequences = {AttackSequences},
+			StandAttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
@@ -205,21 +272,36 @@ ENT.SequenceTables = {
 function ENT:StatsInitialize()
 	if SERVER then
 		local count = #player.GetAllPlaying()
+		local playerhpmod = 1
+
+		local basehealth = 1200
+		local basehealthmax = 22500
+
+		local bosshealth = basehealth
+
+		local healthincrease = 1000
+		local coopmultiplier = 0.75
+
+		if count > 1 then
+			playerhpmod = count * coopmultiplier
+		end
+
+		bosshealth = math.Round(playerhpmod * (basehealth + (healthincrease * nzRound:GetNumber())))
 
 		if nzRound:InState( ROUND_CREATE ) then
-			self:SetHealth(3900)
-			self:SetMaxHealth(3900)
+			self:SetHealth(basehealth)
+			self:SetMaxHealth(basehealth)
 		else
 			if nzRound:InState( ROUND_PROG ) then
-				self:SetHealth(math.Clamp(nzRound:GetNumber() * 400 + (700 * count), 3900, 8700 * count))
-				self:SetMaxHealth(math.Clamp(nzRound:GetNumber() * 400 + (700 * count), 3900, 8700 * count))
+				self:SetHealth(math.Clamp(bosshealth, basehealth, basehealthmax * playerhpmod))
+				self:SetMaxHealth(math.Clamp(bosshealth, basehealth, basehealthmax * playerhpmod))
 			else
-				self:SetHealth(3900)
-				self:SetMaxHealth(3900)	
+				self:SetHealth(basehealth)
+				self:SetMaxHealth(basehealth)	
 			end
 		end
 
-		self.HelmetDamage = 0
+		self.HelmetHP = self:GetMaxHealth() * 0.1
 
 		self.SpawnProtection = true -- Zero Health Zombies tend to be created right as they spawn.
 		self.SpawnProtectionTime = CurTime() + 5 -- So this is an experiment to see if negating any damage they take for a second will stop this.
@@ -250,6 +332,8 @@ function ENT:StatsInitialize()
 		self:SetMooSpecial(true)
 		self:SetHelmet(true)
 		self:SetStop(false)
+		self.CanCancelAttack = true
+
 		self:SetCollisionBounds(Vector(-21,-21, 0), Vector(21, 21, 90))
 		self:SetRunSpeed( 36 )
 	end
@@ -268,6 +352,8 @@ function ENT:OnSpawn()
 	self:EmitSound("nz/panzer/mech_alarm.wav",511)
 	self:EmitSound("enemies/bosses/newpanzer/mechz_entrance.ogg",100,100)
 
+	ParticleEffectAttach("doom_rev_missile_trail_smoke",PATTACH_POINT_FOLLOW,self,2)
+
 	if seq then
 		self:PlaySequenceAndWait(seq)
 		self:SetSpecialAnimation(false)
@@ -281,15 +367,8 @@ function ENT:PerformDeath(dmgInfo)
 	if IsValid(self.Claw) then self.Claw:Remove() end
 	self:EmitSound("enemies/bosses/newpanzer/rise.ogg",100, math.random(85, 105))
 
-	if self:GetSpecialAnimation() or self.PanzerDGLifted and self:PanzerDGLifted() then
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:EmitSound("enemies/bosses/newpanzer/explode.ogg", 511)
-   		self:Explode(50, false)
-		self:BecomeRagdoll(dmginfo)
-	else
-		self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
-	end
+	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+	self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
 end
 
 function ENT:OnTargetInAttackRange()
@@ -300,10 +379,10 @@ function ENT:OnTargetInAttackRange()
 		if self.UsingFlamethrower then
 			self:StopToasting()
 		end
-		if !self:GetBlockAttack() and !self.Jetpacking then
+		if !self:GetBlockAttack() then
 			self:Attack()
 		else
-			self:TimeOut(2)
+			self:TimeOut(1)
 		end
 	end
 end
@@ -315,8 +394,7 @@ function ENT:AI()
 		if !self:Alive() or self:GetIsBusy() then return end -- Not allowed to do anything.
 
 		-- FLAMETHROWER
-		if !self:IsAttackBlocked() and self:TargetInRange(250) then
-			if self:GetSpecialAnimation() then return end
+		if !self:GetSpecialAnimation() and !self:IsAttackBlocked() and self:TargetInRange(250) then
 			if self.Jetpacking then return end
 			if self.UsingGlowstick then return end
 			if self.DisallowFlamethrower then return end
@@ -328,75 +406,74 @@ function ENT:AI()
 		-- CLAW
 		if CurTime() > self.NextShootTime and self:TargetInRange(850) and !self:TargetInRange(350) then
 			if self:IsAttackBlocked() then return end
-			if !self.Target:Alive() then return end
 			if self:GetSpecialAnimation() then return end
 			if self.Jetpacking then return end
 			if self.UsingFlamethrower then return end
 
-			self:Retarget()
+			self:TempBehaveThread(function(self)
 
-			self.UsingClaw = true
-			self.NextShootTime = CurTime() + math.random(5, 12)
+				self:Retarget()
 
-			local shootpos = self:GetAttachment(18)
-			if self:IsValidTarget( self:GetTarget() ) then
-				self.loco:FaceTowards( self:GetTarget():GetPos() )
-			end
+				self.UsingClaw = true
+				self:SetSpecialAnimation(true)
+				self:PlaySequenceAndMove("nz_soldat_chaingun_intro_sprint_to_aim", 1, self.FaceEnemy)
+
+				self.KillClaw = CurTime() + 4
+				self.NextShootTime = CurTime() + math.random(5, 12)
+
+
+				local shootpos = self:GetBonePosition(self:LookupBone("tag_claw"))
 		
-			--self:FaceTowards(self:GetTarget():GetPos())
-			self:PlaySequenceAndMove("nz_soldat_chaingun_intro_sprint_to_aim", 1, self.FaceEnemy)
-			self.KillClaw = CurTime() + 4
+				if IsValid(self.Target) and self.Target:IsPlayer() then
+					local tr = util_traceline({
+						start = self:EyePos(),
+						endpos = self.Target:EyePos(),
+						filter = self,
+						ignoreworld = true,
+					})
+					local b = tr.Entity
 
-
-			if IsValid(self.Target) and self.Target:IsPlayer() then
-				local tr = util_traceline({
-					start = self:EyePos(),
-					endpos = self.Target:EyePos(),
-					filter = self,
-					ignoreworld = true,
-				})
-				local b = tr.Entity
-
-				debugoverlay.Line(self:EyePos(), self.Target:EyePos(), 5, Color( 255, 255, 255 ), false)
+					debugoverlay.Line(self:EyePos(), self.Target:EyePos(), 5, Color( 255, 255, 255 ), false)
 			
-				if IsValid(b) then
-					self.Claw = ents.Create("nz_panzer_claw")
-					self.Claw:SetPos(shootpos.Pos)
-					self.Claw:Spawn()
-					self.Claw:SetPanzer(self)
-					self.Claw:Launch(((b:GetPos() + Vector(0,0,50)) - self.Claw:GetPos()):GetNormalized())
+					if IsValid(self.Target) then
+						self.Claw = ents.Create("nz_panzer_claw")
+						self.Claw:SetPos(shootpos)
+						self.Claw:Spawn()
+						self.Claw:SetPanzer(self)
+						self.Claw:Launch(((self.Target:GetPos() + Vector(0,0,50)) - self.Claw:GetPos()):GetNormalized())
+					end
 				end
-			end
 
-			local comedyday = os.date("%d-%m") == "01-04"
-			if math.random(500) == 1 or comedyday then
-				self:EmitSound("nz_moo/zombies/vox/_mechz/claw/comedy/fire.mp3", 100, math.random(85, 105))
-				self.AutoStopComedy = CurTime() + 2.5
-				self.TheComedy = true
-			else
-				self:EmitSound("nz_moo/zombies/vox/_mechz/claw/fire.mp3", 100, math.random(85, 105))
-				self.TheComedy = false
-			end
+				local comedyday = os.date("%d-%m") == "01-04"
+				if math.random(100) == 1 or comedyday then
+					self:EmitSound("nz_moo/zombies/vox/_mechz/claw/comedy/fire.mp3", 100, math.random(85, 105))
+					self.AutoStopComedy = CurTime() + 2.5
+					self.TheComedy = true
+				else
+					self:EmitSound("nz_moo/zombies/vox/_mechz/claw/fire.mp3", 100, math.random(85, 105))
+					self.TheComedy = false
+				end
 
-			local selectcolor = Color(255,90,0,255)
-			local selectcolorstring = "255 90 0 255"
+				local selectcolor = Color(255,90,0,255)
+				local selectcolorstring = "255 90 0 255"
 		
-			self.ClawGlow = ents.Create("env_sprite")
-			self.ClawGlow:SetKeyValue("model","sprites/redglow1.vmt")
-			self.ClawGlow:SetKeyValue("scale","0.2")
-			self.ClawGlow:SetKeyValue("rendermode","5")
-			self.ClawGlow:SetKeyValue("rendercolor",selectcolorstring)
-			self.ClawGlow:SetKeyValue("spawnflags","1") -- If animated
-			self.ClawGlow:SetParent(self)
-			self.ClawGlow:Fire("SetParentAttachment","tag_claw",0)
-			self.ClawGlow:Spawn()
-			self.ClawGlow:Activate()
-			self:DeleteOnRemove(self.ClawGlow)
+				self.ClawGlow = ents.Create("env_sprite")
+				self.ClawGlow:SetKeyValue("model","sprites/redglow1.vmt")
+				self.ClawGlow:SetKeyValue("scale","0.2")
+				self.ClawGlow:SetKeyValue("rendermode","5")
+				self.ClawGlow:SetKeyValue("rendercolor",selectcolorstring)
+				self.ClawGlow:SetKeyValue("spawnflags","1") -- If animated
+				self.ClawGlow:SetParent(self)
+				self.ClawGlow:Fire("SetParentAttachment","tag_claw",0)
+				self.ClawGlow:Spawn()
+				self.ClawGlow:Activate()
+				self:DeleteOnRemove(self.ClawGlow)
 
 
-			self:SetBodygroup(1,1)
-			self:Stop()
-			self:PlaySequenceAndWait("nz_soldat_chaingun_fire")
+				self:SetBodygroup(1,1)
+				self:Stop()
+				self:PlaySequenceAndMove("nz_soldat_chaingun_fire")
+			end)
 		end
 
 		-- ENRAGE
@@ -420,6 +497,7 @@ function ENT:OnThink()
 		self:SetBodygroup(1,0)
 
 		self:SetStop(false)
+		self:SetSpecialAnimation(false)
 
 		self.WaitForClaw = false
 		self.UsingClaw = false
@@ -440,13 +518,10 @@ function ENT:OnInjured( dmgInfo )
 	local hitpos = dmgInfo:GetDamagePosition()
 	
 	if self:GetHelmet() then
-		local bone = self:LookupBone("j_faceplate")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Forward()*8 + ang:Up()*11
+		local bone = self:GetBonePosition(self:LookupBone("j_faceplate"))
 		
-		if hitpos:DistToSqr(finalpos) < 75 then
-			self.HelmetDamage = self.HelmetDamage + dmgInfo:GetDamage()
-			if self.HelmetDamage > (self:GetMaxHealth() * 0.1) then
+		if hitpos:DistToSqr(bone) < 200 then
+			if self.HelmetHP <= 0 and self:GetHelmet() then
 				self:SetHelmet(false)
 				self:DeflateBones({
 					"j_faceplate",
@@ -455,19 +530,19 @@ function ENT:OnInjured( dmgInfo )
 				if !self:Alive() then return end
 				self:DoSpecialAnimation("nz_soldat_pain_faceplate")
 				angering = true
+			else
+				self.HelmetHP = self.HelmetHP - dmgInfo:GetDamage()
 			end
 		end
 		
 		dmgInfo:ScaleDamage(0.25) -- When the helmet isn't lost, all damage only deals 25%
 	else
-		local bone = self:LookupBone("j_head")
-		local pos, ang = self:GetBonePosition(bone)
-		local finalpos = pos + ang:Up()*4
+		local bone = self:GetBonePosition(self:LookupBone("j_head"))
 		
-		if hitpos:DistToSqr(finalpos) < 150 then
+		if hitpos:DistToSqr(bone) < 150 then
 			-- No damage scaling on headshot, we keep it at 1x
 		else
-			dmgInfo:ScaleDamage(0.25) -- When the helmet is lost, a non-headshot still only deals 25%
+			dmgInfo:ScaleDamage(0.5) -- When the helmet is lost, a non-headshot still only deals 50%
 		end
 	end
 end
@@ -476,14 +551,12 @@ function ENT:ResetMovementSequence()
 	if self.UsingFlamethrower then
 		self:ResetSequence(self.FlameMovementSequence)
 		self.CurrentSeq = self.FlameMovementSequence
-	elseif self.Jetpacking then
-		self:ResetSequence(self.FlyMovementSequence)
-		self.CurrentSeq = self.FlyMovementSequence
 	else
 		self:ResetSequence(self.MovementSequence)
 		self.CurrentSeq = self.MovementSequence
 	end
-	if self.UpdateSeq ~= self.CurrentSeq then
+	if self:GetSequenceGroundSpeed(self:GetSequence()) ~= self:GetRunSpeed() or self.UpdateSeq ~= self.CurrentSeq then -- Moo Mark 4/19/23: Finally got a system where the speed actively updates when the movement sequence set is changed.
+		--print("update")
 		self.UpdateSeq = self.CurrentSeq
 		self:UpdateMovementSpeed()
 	end
@@ -636,66 +709,3 @@ end
 
 function ENT:HasHelmet() return self:GetHelmet() end
 
-function ENT:TriggerBarricadeJump( barricade, dir )
-	if not self:GetSpecialAnimation() and (not self.NextBarricade or CurTime() > self.NextBarricade) then
-
-		self:StopToasting()
-
-		self:SetSpecialAnimation(true)
-		self:SetBlockAttack(true) -- Moo Mark BarricadeJump
-
-		local id, dur, speed
-		local animtbl = self.JumpSequences
-
-		if self:GetCrawler() then
-			animtbl = self.CrawlJumpSequences
-		end
- 
-		if type(animtbl) == "number" then -- ACT_ is a number, this is set if it's an ACT
-			id = self:SelectWeightedSequence(animtbl)
-			dur = self:SequenceDuration(id)
-			speed = self:GetSequenceGroundSpeed(id)
-			if speed < 10 then
-				speed = 20
-			end
-		else
-			local targettbl = animtbl and animtbl[math.random(#animtbl)] or self.JumpSequences
-			if targettbl then -- It is a table of sequences
-				id, dur = self:LookupSequenceAct(targettbl.seq) -- Whether it's an ACT or a sequence string
-				speed = targettbl.speed
-			else
-				id = self:SelectWeightedSequence(ACT_JUMP)
-				dur = self:SequenceDuration(id)
-				speed = 30
-			end
-		end
-		self:SolidMaskDuringEvent(MASK_NPCSOLID_BRUSHONLY) -- Nocollide with props and other entities while we attempt to vault (Gets removed after event, or with CollideWhenPossible)
-
-		self.loco:SetDesiredSpeed(speed)
-		self:SetVelocity(self:GetForward() * speed)
-		self:SetSequence(id)
-		self:SetCycle(0)
-		self:SetPlaybackRate(1)
-		self:EmitSound("nz_moo/zombies/vox/_mechz/rocket/start.mp3",85)
-		self:TimedEvent(dur, function()
-			self.NextBarricade = CurTime() + 2
-			self:SetSpecialAnimation(false)
-			self:SetBlockAttack(false)
-			self.loco:SetAcceleration( self.Acceleration )
-			self.loco:SetDesiredSpeed(self:GetRunSpeed())
-			self:ResetMovementSequence()
-			self:CollideWhenPossible() -- Remove the mask as soon as we can
-			self:SetIsBusy(false)
-		end)
-		local warppos = barricade:GetPos() + dir * 30
-		self:SetPos(warppos)
-		local pos = barricade:GetPos() - dir * 50 -- Moo Mark
-		self:MoveToPos(pos, { -- Zombie will move through the barricade.
-			lookahead = 1,
-			tolerance = 1,
-			draw = false,
-			maxage = dur, 
-			repath = dur, 
-		})					
-	end
-end

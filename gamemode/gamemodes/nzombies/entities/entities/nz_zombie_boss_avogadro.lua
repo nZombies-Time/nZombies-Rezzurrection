@@ -154,20 +154,23 @@ ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, 
 
 function ENT:StatsInitialize()
 	if SERVER then
-		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
 		if nzRound:InState( ROUND_CREATE ) then
 			self:SetHealth(1250)
 			self:SetMaxHealth(1250)
 		else
-			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			self:SetHealth(1250 * count)
+			self:SetMaxHealth(1250 * count)
 		end
 
 		self.LastShot = CurTime() + 10
 		self.LastTeleport = CurTime() + 5
 		self.LastStun = CurTime() + 5
+
+		self.ShockWave = CurTime() + 5
+
+		self.ManIsMad = false
 
 		self:SetRunSpeed(36)
 	end
@@ -282,7 +285,7 @@ function ENT:OnPathTimeOut()
 				if IsValid(tr.Entity) then
 					self:EmitSound("enemies/bosses/avo/att"..math.random(2)..".ogg",100,math.random(95, 105))
 					self.ZapShot = ents.Create("nz_avo_shot")
-					self.ZapShot:SetPos(self:GetBonePosition(larmfx_tag))
+					self.ZapShot:SetPos(self:EyePos() + self:GetForward() * 2)
 					self.ZapShot:Spawn()
 					self.ZapShot:Launch(((tr.Entity:GetPos() + Vector(0,0,50)) - self.ZapShot:GetPos()):GetNormalized())
 				end
@@ -307,6 +310,50 @@ function ENT:DoDeathAnimation(seq)
 		self:PlaySequenceAndWait(seq)
 		self:Remove(DamageInfo())
 	end)
+end
+
+function ENT:PostAdditionalZombieStuff()
+
+	if self:Health() < self:Health() / 2 then
+		if !self.ManIsMad then
+			self.ManIsMad = true
+			self:SetRunSpeed(100)
+			self:SpeedChanged()
+		end
+	end
+
+	if CurTime() > self.ShockWave then
+		local plys = {}
+		for k,v in pairs(player.GetAll()) do
+			if v:IsPlayer() then
+				if self:GetRangeTo(v:GetPos()) < 100 then
+					table.insert(plys, v)
+					if #plys >= 2 then
+						self:Explode(20, false)
+						self.ShockWave = CurTime() + 5
+						self:DoSpecialAnimation("nz_avo_pain_med")
+					end
+				end
+			end
+		end
+	end
+end
+
+function ENT:Explode(dmg, suicide)
+    for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
+        if not v:IsWorld() and v:IsSolid() then
+            v:SetVelocity(((v:GetPos() - self:GetPos()):GetNormalized()*255) + v:GetUp()*255)
+            if v:IsPlayer() then
+            	v:SetGroundEntity(nil)
+                v:ViewPunch(Angle(-25,math.random(-10, 10),0))
+                v:TakeDamage(dmg)
+            end
+        end
+    end
+	ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
+	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_pop.mp3", 511, math.random(95, 105))
+	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
+    if suicide then self:TakeDamage(self:Health() + 666, self, self) end
 end
 
 function ENT:OnRemove()

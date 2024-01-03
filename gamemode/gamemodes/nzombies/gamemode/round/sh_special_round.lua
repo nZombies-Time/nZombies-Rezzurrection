@@ -804,6 +804,25 @@ nzRound:AddSpecialRoundType("Plague Hounds", {
 	end
 end) -- No round func or end func
 
+nzRound:AddSpecialRoundType("Hellhounds (Cold War)", {
+	specialTypes = {
+		["nz_zombie_special_dog_fire"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 55
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.13
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
 nzRound:AddSpecialRoundType("Pests", {
 	specialTypes = {
 		["nz_zombie_special_sprinter"] = {chance = 100}
@@ -846,6 +865,25 @@ end) -- No round func or end func
 nzRound:AddSpecialRoundType("Keepers", {
 	specialTypes = {
 		["nz_zombie_special_keeper"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 50
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.05
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Apothicon Fury", {
+	specialTypes = {
+		["nz_zombie_special_fury"] = {chance = 100}
 	},
 	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
 	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
@@ -1028,6 +1066,25 @@ nzRound:AddSpecialRoundType("Hunter Beta", {
 	local hp = 54
 	for i=1,nzRound:GetNumber() do 
 	hp = hp* 1.4
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Tempest", {
+	specialTypes = {
+		["nz_zombie_special_tempest"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 150
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.33
 								end 
 		dog:SetHealth(hp)
 	end
@@ -1578,6 +1635,14 @@ nzRound:AddAdditionalZombieType("Hunter Beta", "nz_zombie_special_hunterbeta", {
 nzRound:AddAdditionalZombieType("Pests", "nz_zombie_special_sprinter", {
 }) 
 
+nzRound:AddAdditionalZombieType("Fury", "nz_zombie_special_fury", {
+}) 
+nzRound:AddAdditionalZombieType("Tempest", "nz_zombie_special_tempest", {
+}) 
+nzRound:AddAdditionalZombieType("Krasny Soldat", "nz_zombie_boss_krasny", {
+}) 
+nzRound:AddAdditionalZombieType("Hellhounds (Cold War)", "nz_zombie_boss_dog_fire", {
+}) 
 --------------
 nzRound:AddAdditionalZombieType("Sire", "nz_zombie_special_sire", {
 }) 
@@ -1819,9 +1884,21 @@ nzRound:AddAdditionalZombieType("Avogadro", "nz_zombie_boss_avogadro", {
 })   
 
 
---------------
+-------------- 
 
 function nzRound:GetSpecialType(id)
+if id == "Fury" then
+	return "nz_zombie_special_fury"
+	end
+	if id == "Tempest" then
+	return "nz_zombie_special_tempest"
+	end
+	if id == "Krasny Soldat" then
+	return "nz_zombie_boss_krasny"
+	end
+	if id == "Hellhounds (Cold War)" then
+	return "nz_zombie_boss_dog_fire"
+	end
 	if id == "Panzer (Der Eisendrache)" then
 	return "nz_zombie_boss_panzer_bo3"
 	end

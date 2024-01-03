@@ -34,7 +34,7 @@ ENT.AttackDamage = 90
 ENT.Models = {
 	{Model = "models/wavy/wavy_enemies/hulk/l4d1/hulk.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/wavy/wavy_enemies/hulk/l4d2/hulk.mdl", Skin = 0, Bodygroups = {0,0}},
-	--{Model = "models/wavy/wavy_enemies/hulk/l4d_dlc3/hulk_dlc3.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/wavy/wavy_enemies/hulk/l4d_dlc3/hulk_dlc3.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/wavy/wavy_enemies/hulk/l4d_ml/hulk_l4d1_ml.mdl", Skin = 3, Bodygroups = {0,0}},
 }
 

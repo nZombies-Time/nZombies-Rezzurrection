@@ -38,48 +38,70 @@ ENT.ElectrocutionSequences = {
 	"nz_dog_stun_in",
 }
 
-ENT.AttackSounds = {
-	"nz_moo/zombies/vox/_hellhound/attack/attack_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_05.mp3"
-}
-
 local walksounds = {
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_00.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_01.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_02.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_03.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_04.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_06.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/movement/zmb_hellhound_vocals_movement_07.mp3"),
 }
 
 local runsounds = {
-	Sound("nz/hellhound/close/close_00.wav"),
-	Sound("nz/hellhound/close/close_01.wav"),
-	Sound("nz/hellhound/close/close_02.wav"),
-	Sound("nz/hellhound/close/close_03.wav"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_03.mp3"),
+}
+
+ENT.AttackSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_05.mp3"),
 }
 
 ENT.DeathSounds = {
-	"nz_moo/zombies/vox/_hellhound/death/death_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_05.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_06.mp3",
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_06.mp3"),
+}
+
+ENT.SpiritSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_04.mp3"),
 }
 
 ENT.AppearSounds = {
-	"nz_moo/zombies/vox/_hellhound/appear/appear_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_03.mp3"
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_03.mp3"),
+}
+
+ENT.DogStepSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_06.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_07.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_08.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_09.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/step/fly_hellhound_step_10.mp3"),
 }
 
 ENT.SequenceTables = {
@@ -112,8 +134,6 @@ ENT.SequenceTables = {
 function ENT:StatsInitialize()
 	if SERVER then
 		self.Sprinting = false
-		self:SetRunSpeed( 36 )
-		self.loco:SetDesiredSpeed( 36 )
 	end
 	self:SetCollisionBounds(Vector(-13,-13, 0), Vector(13, 13, 45))
 end
@@ -124,13 +144,17 @@ function ENT:OnSpawn()
 	self:SetBlockAttack(true)
 	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 
-	self:EmitSound("nz/hellhound/spawn/prespawn.wav",511,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/pre_spawn.mp3",511,100)
 	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)
 	--ParticleEffect("fx_hellhound_summon",self:GetPos(),self:GetAngles(),nil)
 
 	self:TimeOut(0.85)
 	
-	self:EmitSound("nz/hellhound/spawn/strike.wav",511,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/strikes_00.mp3",511,100)
+
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/spn_flux_l.mp3",100,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/spn_flux_r.mp3",100,100)
+
 	ParticleEffectAttach("ins_skybox_lightning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	
 	self:SetMaterial("")
@@ -138,11 +162,16 @@ function ENT:OnSpawn()
 	self:SetBlockAttack(false)
 	self:CollideWhenPossible()
 	self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 511, math.random(85, 105), 1, 2)
+
+	self:SetRunSpeed( 36 )
+	self.loco:SetDesiredSpeed( 36 )
 end
 
 function ENT:PerformDeath(dmgInfo)
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 	if IsValid(self) then
+		self:EmitSound(self.SpiritSounds[math.random(#self.SpiritSounds)], 511, math.random(95, 105), 1, 2)
+
 		ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
 		self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
 		self:Remove()
@@ -157,7 +186,7 @@ function ENT:AI()
 			self:SetRunSpeed( 71 )
 			self.loco:SetDesiredSpeed( 71 )
 			self:SpeedChanged()
-			ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+			self:Flames(true)
 		end
 	end
 end
@@ -184,6 +213,6 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 		self.TraversalAnim = false
 	end
 	if e == "dog_step" then
-		self:EmitSound("nz_moo/zombies/vox/_hellhound/step/step_0"..math.random(0,9)..".mp3", 65, math.random(95,105))
+		self:EmitSound(self.DogStepSounds[math.random(#self.DogStepSounds)], 65, math.random(95,105))
 	end
 end

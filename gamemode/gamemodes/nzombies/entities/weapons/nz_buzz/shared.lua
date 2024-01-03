@@ -47,7 +47,7 @@ SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
 sound.Add({
 	['name'] = "Bushwacker.Attack",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/buzz/chainsaw_strike_00.wav" },
+	['sound'] = { "weapons/melee/buzz/chainsaw_strike_00.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
@@ -67,7 +67,7 @@ sound.Add({
 function SWEP:Deploy()
 	self:SendWeaponAnim(ACT_VM_DRAW)
 	self.HolsterTime = CurTime() + 1.5
-	self:EmitSound("weapons/nzr/buzz/chainsaw_firstraise.wav")
+	self:EmitSound("weapons/melee/buzz/chainsaw_firstraise.wav")
 end
 SWEP.Primary.Attacks = {
 	{

@@ -132,6 +132,8 @@ function ENT:OnSpawn()
 
 		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
 		self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
+		--print("what the fuck garry")
+		--self:EmitSound("BUM.ogg",511)
 
 		self:SetSpecialAnimation(true)
 		self:SetIsBusy(true)
@@ -155,11 +157,13 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 	self:EmitSound("enemies/specials/ticker/step"..math.random(1,4)..".ogg", 65, math.random(95,105))
 	end
 	if e == "tkr_rob" then
+	
 	if IsValid(self) and self:GetTarget():GetPos():Distance( self:GetPos()) < 125 then
 	guygettingrobbed = self:GetTarget()
 	guygettingrobbed:Freeze(true)
 	self:FleeTarget(999)
 	local wep = guygettingrobbed:GetActiveWeapon():GetClass()
+	self:EmitSound("BUM.ogg",511)
 	if math.random(1,100) == 21 then
 	self:EmitSound("BUM.ogg",511)
 	end

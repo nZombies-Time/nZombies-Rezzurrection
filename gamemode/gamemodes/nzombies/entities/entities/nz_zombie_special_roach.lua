@@ -3,24 +3,16 @@ AddCSLuaFile()
 ENT.Base = "nz_zombiebase_moo"
 ENT.Type = "nextbot"
 ENT.Category = "Brainz"
-ENT.Author = "Lolle/Moo"
+ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-	self:NetworkVar("Bool", 3, "WaterBuff")
-end
-
+--ROACH FROM NEW YORK 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = false
 ENT.IsMooSpecial = true
-
-ENT.TraversalCheckRange = 40
 
 ENT.Models = {
 	{Model = "models/specials/radroach.mdl", Skin = 0, Bodygroups = {0,0}},
@@ -37,39 +29,19 @@ ENT.BarricadeTearSequences = {
 	--Leave this empty if you don't intend on having a special enemy use tear anims.
 }
 
+local SpawnSequences = {"h2hattackright_jump"}
+
 local AttackSequences = {
 	{seq = "h2hattackleft_jump", dmgtimes = {0.3}},
 	{seq = "h2hattackright_jump", dmgtimes = {0.3}},
 }
 
 local JumpSequences = {
-	{seq = "h2hattackright_jump", speed = 15, time = 2.5},
+	{seq = "h2hattackright_jump"},
 }
 
 local walksounds = {
-	
-}
 
-
-ENT.ActStages = {
-	[1] = {
-		act = ACT_WALK,
-		minspeed = 0,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[2] = {
-		act = ACT_RUN,
-		minspeed = 75,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
-	[3] = {
-		act = ACT_SPRINT,
-		minspeed = 145,
-		attackanims = AttackSequences,
-		barricadejumps = JumpSequences,
-	},
 }
 
 ENT.IdleSequence = "mtidle"
@@ -78,23 +50,25 @@ ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
 			MovementSequence = {
-				"mtforward",
+				"mtforward"
 			},
+			SpawnSequence = {SpawnSequences},
 			AttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 225, Sequences = {
+	{Threshold = 189, Sequences = {
 		{
 			MovementSequence = {
 				"mtfastforward",
 			},
+			SpawnSequence = {SpawnSequences},
 			AttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
 			PassiveSounds = {walksounds},
 		},
-	}},
+	}}
 }
 
 ENT.AttackHitSounds = {
@@ -104,13 +78,6 @@ ENT.AttackHitSounds = {
 	"nz/zombies/attack/player_hit_3.wav",
 	"nz/zombies/attack/player_hit_4.wav",
 	"nz/zombies/attack/player_hit_5.wav"
-}
-
-ENT.PainSounds = {
-	"nz/zombies/death/nz_flesh_impact_1.wav",
-	"nz/zombies/death/nz_flesh_impact_2.wav",
-	"nz/zombies/death/nz_flesh_impact_3.wav",
-	"nz/zombies/death/nz_flesh_impact_4.wav"
 }
 
 ENT.DeathSounds = {
@@ -127,7 +94,7 @@ ENT.AttackSounds = {
 
 ENT.BehindSoundDistance = 200 -- When the zombie is within 200 units of a player, play these sounds instead
 ENT.BehindSounds = {
-	Sound("enemies/specials/roach/npc_roach_attack_01.mp3"),
+Sound("enemies/specials/roach/npc_roach_attack_01.mp3"),
 	Sound("enemies/specials/roach/npc_roach_attack_03.mp3"),
 }
 
@@ -135,44 +102,85 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self:SetMooSpecial(true)
 		if nzRound:GetNumber() == -1 then
-			self:SetRunSpeed( math.random(20, 105) )
+			self:SetRunSpeed( math.random(100, 300) )
 			self:SetHealth( math.random(100, 1500) )
 		else
 			local speeds = nzRound:GetZombieSpeeds()
 			if speeds then
-				self:SetRunSpeed(  math.min( 333 , nzMisc.WeightedRandom(speeds)) )
+				self:SetRunSpeed( nzMisc.WeightedRandom(speeds) )
 			else
-				self:SetRunSpeed( 100 )
+				self:SetRunSpeed( 300 )
 			end
-			self:SetHealth( nzRound:GetZombieHealth()/2 or 75 )
+			self:SetHealth( nzRound:GetZombieHealth() or 75 )
 		end
-	end
-end
 
-function ENT:SpecialInit()
-	if CLIENT then
+		self.Exploded = false
+
 	end
 end
 
 function ENT:OnSpawn()
-	if self:GetRunSpeed() > 300 then -- rOACH FAST
-		timer.Simple(engine.TickInterval(), function()
-			print("WE GOT A RUNNER")
-			self:SetRunSpeed(300)
-			self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-		end)
-	end
-	timer.Simple(engine.TickInterval(), function()
-		if IsValid(self) then
-			self:EmitSound("enemies/specials/roach/npc_roach_attack_0"..math.random(3)..".mp3", 100, math.random(95, 105), 1, 2)
-			ParticleEffect("bo3_zombie_spawn",self:LocalToWorld(Vector(0,-0,0)),Angle(0,0,0),nil)
-			if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
+	local spawn
+	local types = {
+		["nz_spawn_zombie_normal"] = true,
+		["nz_spawn_zombie_special"] = true,
+		["nz_spawn_zombie_extra1"] = true,
+		["nz_spawn_zombie_extra2"] = true,
+		["nz_spawn_zombie_extra3"] = true,
+		["nz_spawn_zombie_extra4"] = true,
+	}
+	for k,v in pairs(ents.FindInSphere(self:GetPos(), 10)) do
+		if types[v:GetClass()] then
+			if !v:GetMasterSpawn() then
+				spawn = v
+			end
 		end
-	end)
+	end
+	local SpawnMatSound = {
+		[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
+		[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
+		[MAT_SLOSH] = "nz_moo/zombies/spawn/mud/pfx_zm_spawn_mud_00.mp3",
+		[0] = "nz_moo/zombies/spawn/default/pfx_zm_spawn_default_00.mp3",
+	}
+	SpawnMatSound[MAT_GRASS] = SpawnMatSound[MAT_DIRT]
+	SpawnMatSound[MAT_SAND] = SpawnMatSound[MAT_DIRT]
+
+	local norm = (self:GetPos()):GetNormalized()
+	local tr = util.QuickTrace(self:GetPos(), norm*10, self)
+
+	if IsValid(self) then ParticleEffectAttach("novagas_trail", 4, self, 2) end
+	self:EmitSound("enemies/specials/roach/npc_roach_attack_0"..math.random(3)..".mp3", 100, math.random(95, 105), 1, 2)
+
+	if IsValid(spawn) and spawn:GetSpawnType() == 1 then
+		if IsValid(self) then
+			self:EmitSound("nz_moo/effects/teleport_in_00.mp3", 100)
+			if IsValid(self) then ParticleEffect("panzer_spawn_tp", self:GetPos() + Vector(0,0,20), Angle(0,0,0), self) end
+		end
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+		self:CollideWhenPossible()
+	else
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+
+		self:SetSpecialAnimation(true)
+		self:SetIsBusy(true)
+		local seq = self:SelectSpawnSequence()
+
+		if tr.Hit then
+			local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+			self:EmitSound(finalsound)
+		end
+		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
+
+		if seq then
+			self:PlaySequenceAndMove(seq, {gravity = true})
+			self:SetSpecialAnimation(false)
+			self:SetIsBusy(false)
+			self:CollideWhenPossible()
+		end
+	end
 end
 
-
---[[ CUSTOM/MODIFIED THINGS FROM BASE HERE ]]--
 
 function ENT:PerformDeath(dmgInfo)
 	if dmgInfo:GetDamageType() == DMG_REMOVENORAGDOLL then self:Remove(dmgInfo) end
@@ -224,34 +232,30 @@ function ENT:DoDeathAnimation(seq) -- Modified death function to have a chance o
 	end)
 end
 
-function ENT:PlayAttackAndWait( name, speed )
-
-	local len = self:SetSequence( name )
-	speed = speed or 1
-
-	self:ResetSequenceInfo()
-	self:SetCycle( 0 )
-	self:SetPlaybackRate( speed )
-
-	local endtime = CurTime() + len / speed
-
-	while ( true ) do
-
-		if ( endtime < CurTime() ) then
-			if !self:GetStop() then
-				self:StartActivity( ACT_WALK )
-				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-			end
-			return
-		end
-		if self:IsValidTarget( self:GetTarget() ) then
-			self.loco:FaceTowards( self:GetTarget():GetPos() )
-		end
-
-		coroutine.yield()
-
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "melee" then
+		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+		--self:DoAttackDamage()
 	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "melee_whoosh" then
+		self:EmitSound("nz_moo/zombies/fly/attack/whoosh/zmb_attack_med_0"..math.random(0,2)..".mp3", 75, math.random(95,105))
+	end
+	if e == "roach_crawl" then
+		self:EmitSound("nz_moo/zombies/footsteps/crawl/crawl_0"..math.random(0,3)..".mp3", 65, math.random(95,105))
+	end
+end
 
+if SERVER then
+	function ENT:OnTakeDamage(dmginfo)
+		if (dmginfo:GetDamageType() == DMG_DISSOLVE and dmginfo:GetDamage() >= self:Health() and self:Health() > 0) then
+			self:DissolveEffect()
+		end
+
+		self:SetLastHurt(CurTime())
+	end
 end
 
 function ENT:IsValidTarget( ent )

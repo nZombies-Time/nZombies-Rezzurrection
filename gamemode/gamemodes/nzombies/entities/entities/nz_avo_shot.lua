@@ -12,7 +12,7 @@ end
 
 function ENT:Initialize()
 	if SERVER then
-		self:SetModel("models/weapons/w_eq_fraggrenade.mdl") -- Change later
+		self:SetModel("models/dav0r/hoverball.mdl")
 		self:SetNoDraw(true)
 		ParticleEffectAttach("bo3_mangler_pulse",PATTACH_ABSORIGIN_FOLLOW,self,0)
 		ParticleEffectAttach("bo3_mangler_blast",PATTACH_ABSORIGIN,self,0)
@@ -36,7 +36,7 @@ function ENT:Launch(dir)
 end
 
 function ENT:StartTouch(ent)
-	if !ent:IsPlayer() and ent.IsMooZombie then return end
+	if !ent:IsWorld() and (!ent:IsPlayer() or ent.IsMooZombie) then return end
 
     local dmg = 90
 

@@ -9,7 +9,7 @@ ENT.Contact = "No fuck off"
 function ENT:Initialize()
     if SERVER then
         self:SetModel("models/weapons/w_eq_fraggrenade.mdl")
-        ParticleEffectAttach("bo3_mangler_pulse",PATTACH_ABSORIGIN_FOLLOW,self,0)
+        ParticleEffectAttach("bo3_panzer_elec_nade",PATTACH_ABSORIGIN_FOLLOW,self,0)
         self:SetNoDraw(false)
         self:SetModelScale(1.25)
         self:PhysicsInit(SOLID_VPHYSICS)

@@ -46,12 +46,12 @@ ENT.BarricadeTearSequences = {
 ENT.IdleSequence = "nz_t9_plague_idle"
 
 ENT.AttackSounds = {
-	"nz_moo/zombies/vox/_hellhound/attack/attack_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_05.mp3"
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/attack/zmb_hellhound_vocals_attack_05.mp3"),
 }
 
 local walksounds = {
@@ -69,23 +69,23 @@ local runsounds = {
 }
 
 ENT.DeathSounds = {
-	"nz_moo/zombies/vox/_gasdog/death/plaguehound_death_01.mp3",
-	"nz_moo/zombies/vox/_gasdog/death/plaguehound_death_02.mp3",
-	"nz_moo/zombies/vox/_gasdog/death/plaguehound_death_03.mp3",
-	"nz_moo/zombies/vox/_gasdog/death/plaguehound_death_04.mp3",
+	Sound("nz_moo/zombies/vox/_gasdog/death/plaguehound_death_01.mp3"),
+	Sound("nz_moo/zombies/vox/_gasdog/death/plaguehound_death_02.mp3"),
+	Sound("nz_moo/zombies/vox/_gasdog/death/plaguehound_death_03.mp3"),
+	Sound("nz_moo/zombies/vox/_gasdog/death/plaguehound_death_04.mp3"),
 }
 
 ENT.AppearSounds = {
-	"nz_moo/zombies/vox/_hellhound/appear/appear_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_03.mp3"
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/spawn/zmb_hellhound_spawn_03.mp3"),
 }
 
 ENT.BiteSounds = {
-	"nz_moo/zombies/vox/_hellhound/bite/bite_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/bite/bite_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/bite/bite_02.mp3",
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/bite/zmb_hellhound_vocals_bite_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/bite/zmb_hellhound_vocals_bite_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/_zhd/bite/zmb_hellhound_vocals_bite_02.mp3"),
 }
 
 ENT.SequenceTables = {
@@ -123,9 +123,6 @@ function ENT:StatsInitialize()
 
 		self.SpawnProtection = true -- Zero Health Zombies tend to be created right as they spawn.
 		self.SpawnProtectionTime = CurTime() + 1 -- So this is an experiment to see if negating any damage they take for a second will stop this.
-
-		self:SetRunSpeed( 71 )
-		self.loco:SetDesiredSpeed( 71 )
 	end
 	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 55))
 end
@@ -152,20 +149,26 @@ function ENT:OnSpawn()
 	self:CollideWhenPossible()
 	self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 511, math.random(85, 105), 1, 2)
 
-	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
+	
+	self:SetRunSpeed( 71 )
+	self.loco:SetDesiredSpeed( 71 )
 end
 
 function ENT:PostAdditionalZombieStuff()
-	if IsValid(self:GetTarget()) and self:GetTarget():IsPlayer() and !self:IsAttackBlocked() then
-		if !self:TargetInRange(150) then return end
+	local target = self:GetTarget()
+
+	if IsValid(target) and target:IsPlayer() and !self:IsAttackBlocked() then
+		if !self:TargetInRange(175) then return end
 		if CurTime() > self.LastLunge then
 			-- Lunge does more damage than a normal attack.
 			self:TempBehaveThread(function(self)
+				self:FaceTowards(target:GetPos())
+
 				self:SetSpecialAnimation(true)
-				self:PlaySequenceAndMove("nz_t9_plague_lunge_attack", 1, self.FaceEnemy)
+				self:PlaySequenceAndMove("nz_t9_plague_lunge_attack", 1)
 				self:SetSpecialAnimation(false)	
 			end)
-			self.LastLunge = CurTime() + 5
+			self.LastLunge = CurTime() + 3
 		end
 	end
 end 

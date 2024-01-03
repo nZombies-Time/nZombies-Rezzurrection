@@ -235,8 +235,6 @@ function ENT:OnZombieDeath(dmgInfo)
 	self:ResetSequence(seq)
 	self:SetCycle(0)
 
-self:EmitSound("bo1_overhaul/son/amb1.mp3")
-
 	timer.Simple(dur, function()
 		if IsValid(self) then
 			

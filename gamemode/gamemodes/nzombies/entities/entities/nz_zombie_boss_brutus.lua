@@ -1,7 +1,7 @@
 AddCSLuaFile()
 
 ENT.Base = "nz_zombiebase_moo"
-ENT.PrintName = "Panzer Soldat(BO3)"
+ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
@@ -293,6 +293,7 @@ function ENT:StatsInitialize()
 		self.PerkDestruction = false
 		self.BoxDestruction = false
 		self.BarricadeDestruction = false
+		self.EntDestruction = false
 
 		self.NextAI = 0
 		self.DestructionCoolDown = CurTime() + 10
@@ -343,33 +344,51 @@ function ENT:AI()
 	if !self:Alive() then return end
 	if CurTime() > self.NextAI then
 		if !self.GeneralDestruction then
-			local roll = math.random(2)
+			local roll = math.random(4)
 			if roll == 1 then
-				for k,v in pairs(ents.FindByClass("perk_machine")) do
+				for k,v in nzLevel.GetVultureArray() do //cheeky innit?
+					if not IsValid(v) then continue end
+					if v:GetClass() ~= "perk_machine" then continue end
+
 					local d = self:GetRangeTo(v)
-					if IsValid(v) then
-						self.GeneralDestruction = true
-						if d < 350 then
-							if self:IsEntBlocked(v) then self.GeneralDestruction = false return end
-							if v:IsOn() and !v:GetBrutusLocked() then
-								self.PerkDestruction = true
-							else
-								self.GeneralDestruction = false
-							end
+					self.GeneralDestruction = true
+					if d < 350 then
+						if v:IsOn() and !v:GetBrutusLocked() then
+							self.PerkDestruction = true
 						else
 							self.GeneralDestruction = false
 						end
+					else
+						self.GeneralDestruction = false
 					end
 				end
 			elseif roll == 2 then
-				for k,v in pairs(ents.FindByClass("random_box")) do
+				for k,v in nzLevel.GetVultureArray() do
+					if not IsValid(v) then continue end
+					if v:GetClass() ~= "random_box" then continue end
+
 					local d = self:GetRangeTo(v)
-					if IsValid(v) then
+					self.GeneralDestruction = true
+					if d < 350 then
+						if v:GetActivated() and !v:GetOpen() and !v.Moving then
+							self.BoxDestruction = true
+						else
+							self.GeneralDestruction = false
+						end
+					else
+						self.GeneralDestruction = false
+					end
+				end
+			elseif roll == 3 then
+				for k,v in nzLevel.GetBrutusEntityArray() do //ents with a specific bool
+					if not IsValid(v) or v:GetNoDraw() then continue end
+
+					if v.BrutusDestructable then
+						local d = self:GetRangeTo(v)
 						self.GeneralDestruction = true
 						if d < 350 then
-							if self:IsEntBlocked(v) then self.GeneralDestruction = false return end
-							if v:GetActivated() and !v:GetOpen() and !v.Moving then
-								self.BoxDestruction = true
+							if !v:GetBrutusLocked() then
+								self.EntDestruction = true
 							else
 								self.GeneralDestruction = false
 							end
@@ -429,7 +448,8 @@ function ENT:OnRemove() end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
-	if self.PerkDestruction then return IsValid(ent) and ent:GetClass() == "perk_machine" end
+	if self.EntDestruction then return IsValid(ent) and ent.BrutusDestructable and !ent:GetBrutusLocked() end
+	if self.PerkDestruction then return IsValid(ent) and ent:GetClass() == "perk_machine" and !ent:GetBrutusLocked() end
 	if self.BoxDestruction then return IsValid(ent) and ent:GetClass() == "random_box" end
 	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
@@ -483,6 +503,7 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 		local perk = self:GetTarget()
 		if IsValid(perk) then
 			perk:OnBrutusLocked()
+			self.EntDestruction = false
 			self.PerkDestruction = false
 			self.GeneralDestruction = false
 			self:EmitSound("nz_moo/zombies/vox/_cellbreaker/lock.mp3",100)
@@ -533,6 +554,8 @@ function ENT:Attack( data )
 			attacktbl = self.LockBoxSequences
 		elseif self.BarricadeDestruction then
 			attacktbl = self.BreakBarricadeSequences
+		elseif self.EntDestruction then
+			attacktbl = self.LockPerkSequences
 		end
 
 		if self:GetTarget():GetVelocity():LengthSqr() < 175 and self.Target:IsPlayer() and !self.IsTurned then

@@ -11,13 +11,21 @@ if SERVER then
 	AddCSLuaFile()
 end
 
+if CLIENT then
+    function ENT:Draw()
+        self:DrawModel()
+    end
+end
+
 function ENT:Initialize()
 	self:SetModel( "models/moo/_codz_ports/s2/zombie/moo_codz_s2_bmb_bomb.mdl" )
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetCollisionGroup(COLLISION_GROUP_DEBRIS_TRIGGER)
-    self:GetPhysicsObject():SetMaterial("metal")
+    --self:GetPhysicsObject():SetMaterial("metal")
 
-    self:EmitSound("physics/metal/metal_box_impact_bullet"..math.random(1,3)..".wav",100,math.random(95, 105))
+    --self:EmitSound("physics/metal/metal_box_impact_bullet"..math.random(1,3)..".wav",100,math.random(95, 105))
+    self.RemoveTime = 0
+    self.Dropped = false
 end
 
 function ENT:OnTakeDamage( dmginfo )
@@ -25,7 +33,7 @@ function ENT:OnTakeDamage( dmginfo )
 		self.markedExplode = true
 
         suicide = suicide or true
-        local dmg = 50
+        local dmg = 175
 
         local attacker = dmginfo:GetAttacker()
         local inflictor = dmginfo:GetInflictor()
@@ -45,6 +53,7 @@ function ENT:OnTakeDamage( dmginfo )
                     if v == self then continue end
                     if v:Health() <= 0 then continue end
                     if v.NZBossType then continue end
+                    if v.IsMooBossZombie then continue end
                     tr.endpos = v:WorldSpaceCenter()
                     local tr1 = util.TraceLine(tr)
                     if tr1.HitWorld then continue end
@@ -53,7 +62,7 @@ function ENT:OnTakeDamage( dmginfo )
                     zexpdamage:SetAttacker(attacker)
                     zexpdamage:SetInflictor(inflictor)
                     zexpdamage:SetDamageType(DMG_BLAST)
-                    zexpdamage:SetDamage(v:Health() + 666)
+                    zexpdamage:SetDamage(10000)
                     zexpdamage:SetDamageForce(v:GetUp()*5000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
 
                     if v:IsNPC() or v:IsNextBot() then
@@ -63,7 +72,7 @@ function ENT:OnTakeDamage( dmginfo )
                     local expdamage = DamageInfo()
                     expdamage:SetAttacker(attacker)
                     expdamage:SetInflictor(inflictor)
-                    expdamage:SetDamageType(DMG_BLAST)
+                    expdamage:SetDamageType(DMG_GENERIC)
 
                     local distfac = pos:Distance(v:WorldSpaceCenter())
                     distfac = 1 - math.Clamp((distfac/200), 0, 1)
@@ -92,10 +101,13 @@ end
 
 function ENT:PhysicsCollide(data, physobj) end
 
-function ENT:Think() end
+function ENT:StartSelfDestruct()
+    self.RemoveTime = CurTime() + 30
+    self.Dropped = true
+end
 
-if CLIENT then
-    function ENT:Draw()
-    	self:DrawModel()
+function ENT:Think() 
+    if CurTime() > self.RemoveTime and self.Dropped then
+        self:TakeDamage(100, self, self)
     end
 end

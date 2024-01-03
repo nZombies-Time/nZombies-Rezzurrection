@@ -1,6 +1,6 @@
 SWEP.Base = "tfa_melee_base"
 SWEP.Category = "nZombies Knives"
-SWEP.PrintName = "CS 1.6 Knife"
+SWEP.PrintName = "CS  Knife"
 SWEP.Author		= "Laby" --Author Tooltip
 SWEP.ViewModel ="models/weapons/v_knife_t.mdl"
 SWEP.WorldModel = "models/weapons/w_knife_t.mdl" 

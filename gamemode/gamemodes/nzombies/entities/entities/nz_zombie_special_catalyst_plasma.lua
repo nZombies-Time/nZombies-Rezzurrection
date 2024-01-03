@@ -532,14 +532,6 @@ function ENT:Attack( data )
 				self:PlaySound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2) 
 			end
 		end
-		for k,v in pairs(data.attackseq.dmgtimes) do
-			self:TimedEvent( v, function()
-        		ParticleEffect("exploder_boom",self:GetPos(),self:GetAngles(),nil)
-        		self:EmitSound("nz_moo/zombies/vox/_mutated/attack/fire/explosion.mp3", 100, math.random(95, 105))
-
-				self:Explode(125)
-			end)
-		end
 	end
 
 	self:TimedEvent(data.attackdur, function()
@@ -548,6 +540,14 @@ function ENT:Attack( data )
 	end)
 
 	self:PlayAttackAndWait(data.attackseq.seq, 1)
+	if  self:GetCrawler() then
+			print("penis")
+			else
+			ParticleEffect("exploder_boom",self:GetPos(),self:GetAngles(),nil)
+        		self:EmitSound("nz_moo/zombies/vox/_mutated/attack/fire/explosion.mp3", 100, math.random(95, 105))
+				self:Explode(125,true)
+		end
+	
 end
 
 function ENT:PlayAttackAndWait( name, speed )
@@ -581,7 +581,7 @@ end
 
 if SERVER then
 	function ENT:PostDeath(dmginfo)
-		self:Explode(125, false)
+		--self:Explode(125, false)
 	end
 
 	function ENT:PerformDeath(dmginfo)

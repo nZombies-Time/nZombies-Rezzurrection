@@ -79,15 +79,15 @@ ENT.SequenceTables = {
 }
 
 ENT.AttackSounds = {
-	"enemies/bosses/margwa/vox/vox_attack_01.ogg",
-	"enemies/bosses/margwa/vox/vox_attack_02.ogg",
-	"enemies/bosses/margwa/vox/vox_attack_03.ogg",
+	Sound("enemies/bosses/margwa/vox/vox_attack_01.ogg"),
+	Sound("enemies/bosses/margwa/vox/vox_attack_02.ogg"),
+	Sound("enemies/bosses/margwa/vox/vox_attack_03.ogg"),
 }
 
 ENT.DeathSounds = {
-	"enemies/bosses/margwa/vox/vox_death_01.ogg",
-	"enemies/bosses/margwa/vox/vox_death_02.ogg",
-	"enemies/bosses/margwa/vox/vox_death_03.ogg",
+	Sound("enemies/bosses/margwa/vox/vox_death_01.ogg"),
+	Sound("enemies/bosses/margwa/vox/vox_death_02.ogg"),
+	Sound("enemies/bosses/margwa/vox/vox_death_03.ogg"),
 }
 
 
@@ -110,9 +110,9 @@ function ENT:StatsInitialize()
 			end
 		end
 
-		self.MidHeadHP = self:Health() / 3
-		self.LeftHeadHP = self:Health() / 3
-		self.RightHeadHP = self:Health() / 3
+		self.MidHeadHP = self:Health() / 4
+		self.LeftHeadHP = self:Health() / 4
+		self.RightHeadHP = self:Health() / 4
 
 		self.MidHead = true
 		self.LeftHead = true
@@ -148,7 +148,7 @@ function ENT:OnSpawn()
 	self:SetBodygroup(2,0)
 	self:SetBodygroup(3,0)
 
-	self:SetCollisionBounds(Vector(-38,-38, 0), Vector(38, 38, 99))
+	self:SetCollisionBounds(Vector(-40,-40, 0), Vector(40, 40, 100))
 	--self:SetModelScale(0.9,0.00001)
 
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
@@ -262,7 +262,7 @@ function ENT:OnInjured(dmginfo)
 
 	local righthead = self:GetBonePosition(self:LookupBone("j_head_ri"))
 
-	if hitpos:DistToSqr(middlehead) < 29.25^2 and self.MidHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(middlehead) < 29.26^2 and self.MidHead and CurTime() > self.IFrames then
 		if self.MidHeadHP > 0 then
 			self.MidHeadHP = self.MidHeadHP - damage
 		else
@@ -293,7 +293,7 @@ function ENT:OnInjured(dmginfo)
 			end)
 		end
 	end
-	if hitpos:DistToSqr(lefthead) < 29.25^2 and self.LeftHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(lefthead) < 29.26^2 and self.LeftHead and CurTime() > self.IFrames then
 		if self.LeftHeadHP > 0 then
 			self.LeftHeadHP = self.LeftHeadHP - damage
 		else
@@ -324,7 +324,7 @@ function ENT:OnInjured(dmginfo)
 			end)
 		end
 	end
-	if hitpos:DistToSqr(righthead) < 29.25^2 and self.RightHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(righthead) < 29.26^2 and self.RightHead and CurTime() > self.IFrames then
 		if self.RightHeadHP > 0 then
 			self.RightHeadHP = self.RightHeadHP - damage
 		else
@@ -484,7 +484,7 @@ if SERVER then
 					filter = self
 				})
 				if !tr1.HitWorld then
-					self:SetCollisionBounds(Vector(-38,-38, 0), Vector(38, 38, 99))
+					self:SetCollisionBounds(Vector(-40,-40, 0), Vector(40, 40, 100))
 				end
 			end
 

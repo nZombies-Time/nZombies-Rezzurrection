@@ -5,8 +5,15 @@ ENT.PrintName = "Bomber Zombie"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
+function ENT:InitDataTables()
+	self:NetworkVar("Entity", 5, "BoomDevice")
+end
+
 function ENT:Draw()
 	self:DrawModel()
+	if GetConVar( "nz_zombie_debug" ):GetBool() then
+		render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+	end
 end
 
 if CLIENT then return end
@@ -20,6 +27,10 @@ ENT.AttackRange = 80
 ENT.AttackDamage = 35
 ENT.CrawlerForce = 1500
 ENT.GibForce = 150
+
+ENT.MinSoundPitch = 95
+ENT.MaxSoundPitch = 105
+ENT.SoundVolume = 125
 
 ENT.TraversalCheckRange = 40
 
@@ -51,42 +62,42 @@ local WalkAttackSequences = {
 }
 
 local walksounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_05.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev1_05.mp3"),
 
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_05.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev2_05.mp3"),
 
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_05.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev3_05.mp3"),
 
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_05.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_growl_lev4_05.mp3"),
 }
 
 local runsounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_charge_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_charge_10.mp3"),
 }
 
 ENT.IdleSequence = "nz_s2_bmb_idle_v1"
@@ -164,121 +175,165 @@ ENT.UnawareNoBombSequences = {
 }
 
 ENT.DeathSounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_death_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_death_10.mp3"),
 }
 
 ENT.AttackSounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_10.mp3"),
 
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_melee_hit_snarl_10.mp3"),
 }
 
 ENT.BonkSounds = {
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_07.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zmb_bomber_hit_head_07.mp3"),
 }
 
 ENT.TauntSounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_10.mp3",
-}
-
-ENT.StepSounds = {
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_02.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_03.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_04.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_05.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_06.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_07.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_08.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_09.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_10.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_11.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_12.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_13.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_14.mp3",
-
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_01.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_02.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_03.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_04.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_05.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_06.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_07.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_08.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_09.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_10.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_11.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_12.mp3",
-	"nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_13.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_taunt_10.mp3"),
 }
 
 ENT.PainSounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_pain_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_pain_10.mp3"),
 }
 
 ENT.SpawnSounds = {
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_spawn_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_freezer_spawn_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_01.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_02.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_03.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_04.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_05.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_06.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_07.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_08.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_09.mp3",
-	"nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_10.mp3",
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_spawn_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_freezer_spawn_01.mp3"),
+
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_01.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_02.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_03.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_04.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_05.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_06.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_07.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_08.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_09.mp3"),
+	Sound("nz_moo/zombies/vox/_bmb/zvox_bmb_snarl_10.mp3"),
+}
+
+ENT.CustomWalkFootstepsSounds = {
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_13.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_14.mp3"),
+
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_01.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_13.mp3"),
+}
+
+ENT.CustomRunFootstepsSounds = {
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_13.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_left_14.mp3"),
+
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_01.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/s2/zmb_fs_default_walk_right_13.mp3"),
+}
+
+ENT.CustomAttackImpactSounds = {
+	Sound("nz_moo/zombies/plr_impact/_t4/melee_hit_00.mp3"),
+	Sound("nz_moo/zombies/plr_impact/_t4/melee_hit_01.mp3"),
+	Sound("nz_moo/zombies/plr_impact/_t4/melee_hit_02.mp3"),
+	Sound("nz_moo/zombies/plr_impact/_t4/melee_hit_03.mp3"),
+}
+
+ENT.CustomMeleeWhooshSounds = {
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_00.mp3"),
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_01.mp3"),
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_02.mp3"),
 }
 
 ENT.BehindSoundDistance = 200 -- When the zombie is within 200 units of a player, play these sounds instead
@@ -306,12 +361,16 @@ function ENT:StatsInitialize()
 		self.BombCharge = false
 
 		self.KAMIKAZE = false
+		self.KABOOM = false
+		self.KAMIKAZETIME = CurTime() + 2
 
 		self.LostBomb = false
 
+		--self.BombDrop = CurTime() + 7 -- Simply used for testing which forces the bomber to drop his bomb after a set amount of time.
+
 		if math.random(1000) == 1 then
 			self.Treasure = true
-			self:SetHealth( nzRound:GetZombieHealth() + 5000 or 5000 )
+			self:SetHealth( nzRound:GetZombieHealth() * 4 or 5000 )
 		else
 			self.Treasure = false
 		end
@@ -320,17 +379,16 @@ function ENT:StatsInitialize()
 
 		self.Injury = "none"
 
-		self.ChangeSpeed = false
-
-		self:SetCollisionBounds(Vector(-17,-17, 0), Vector(17, 17, 96))
-		self:SetBodygroup(0,0)
+		self:SetCollisionBounds(Vector(-17,-17, 0), Vector(17, 17, 78))
 
 		if self.Treasure then
 			self:SetSkin(1)
 			self:SetRunSpeed(71)
+			self:SetBodygroup(0,0)
 		else
 			self:SetSkin(0)
 			self:SetRunSpeed(1)
+			self:SetBodygroup(0,1)
 		end
 	end
 end
@@ -365,6 +423,10 @@ function ENT:OnSpawn()
 	self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
 	self:PlaySound(self.SpawnSounds[math.random(#self.SpawnSounds)],95, math.random(95, 105), 1, 2)
 
+	if !self.Treasure then
+		self:CreateBomb()
+	end
+
 	self:SetSpecialAnimation(true)
 	local seq = self:SelectSpawnSequence()
 	if seq then
@@ -376,7 +438,15 @@ function ENT:OnSpawn()
 end
 
 function ENT:PerformDeath(dmginfo)
+		
+	self.Dying = true
+
+	local damagetype = dmginfo:GetDamageType()
+
+	self:PostDeath(dmginfo)
+
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+
 	if self.Treasure then
 		local attacker = dmginfo:GetAttacker()
 		if attacker:IsPlayer() then
@@ -389,12 +459,21 @@ function ENT:PerformDeath(dmginfo)
 	else
 		self:SetBodygroup(0,1)
 	end
-	if self.DeathRagdollForce == 0 or dmginfo:GetDamageType() == DMG_REMOVENORAGDOLL or self:GetSpecialAnimation() then
-		self:Remove(dmginfo)
+
+	if IsValid(self:GetBoomDevice()) and !self.Treasure then
 		self:DropBomb()
+	end
+
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
+	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathRagdollForce == 0 or self:GetSpecialAnimation() then
+		self:BecomeRagdoll(dmginfo)
 	elseif dmginfo:GetDamageType() == DMG_SHOCK then
 		self:DoDeathAnimation(self.SparkySequences[math.random(#self.SparkySequences)])
-		self:DropBomb()
 	else
 		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
 	end
@@ -408,32 +487,21 @@ function ENT:PostTookDamage(dmginfo)
 		if self:GibForceTest(hitforce) and hitgroup == HITGROUP_STOMACH and !self.ManIsMad and self:Alive() then
 			if self.Injury ~= "none" then return end
 			if self.Treasure then return end
+			if !IsValid(self:GetBoomDevice()) then return end
+
+			self:DropBomb()
 
 			self.Injury = "back"
-			self.ChangeSpeed = true
 			self.Cooldown = CurTime() + 3
-		end
-		if self:CrawlerForceTest(hitforce) and hitgroup == HITGROUP_GEAR and self:Alive() then
-			if self.Injury ~= "none" then return end
-			if self.Treasure then return end
-
-			self.Injury = "bomb"
-			self.LostBomb = true
-			self:Explode(100)
 		end
 	end
 end
 
 function ENT:OnTargetInAttackRange()
-	if !self:GetBlockAttack() and !self.BombCharge and !self.Treasure then
+	if self.IsMooBossZombie and !self:GetBlockAttack() or self.IsTurned or self.Target:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and !self:GetBlockAttack() and !self.Treasure and self.LostBomb and !nzPowerUps:IsPowerupActive("timewarp") then
 		self:Attack()
-	elseif self.BombCharge then
-		ParticleEffect("bo3_annihilator_blood", self:WorldSpaceCenter(), Angle(0,0,0), nil)
-		self.KAMIKAZE = true
-		self:Explode(90)
-		self:TimeOut(0.25)
 	else
-		self:TimeOut(0.1)
+		self:TimeOut(0.15)
 	end
 end
 
@@ -471,24 +539,19 @@ function ENT:AdditionalZombieStuff()
 		self:SetRunSpeed(100)
 		self:SpeedChanged()
 	end
-	if self.ChangeSpeed then
-		self:TimeOut(0)
-		self.ChangeSpeed = false
-		self.BombCharge = false
+
+	if !IsValid(self:GetBoomDevice()) and !self.ManIsMad then
+		self.ManIsMad = true
+
 		self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85, 105), 1, 2)
-		self:PlaySequenceAndMove("nz_s2_bmb_bomb_drop")
+		self:DoSpecialAnimation("nz_s2_bmb_bomb_drop")
 		self:SetRunSpeed(100)
 		self:SpeedChanged()
-		self.ManIsMad = true
-		self.LostBomb = true
 	end
-	if self:TargetInRange(275) then
-		if self.ManIsMad then return end
-		if self.Treasure then return end
+	if self:TargetInRange(350) and !self.ManIsMad and !self.Treasure then
 		if self:GetRunSpeed() < 100 then
 			self:SetRunSpeed(100)
 			self:SpeedChanged()
-			self.BombCharge = true
 		end
 	else
 		if self.ManIsMad then return end
@@ -496,8 +559,13 @@ function ENT:AdditionalZombieStuff()
 		if self:GetRunSpeed() > 100 then
 			self:SetRunSpeed(1)
 			self:SpeedChanged()
-			self.BombCharge = false
 		end
+	end
+	if self:TargetInRange(150) and IsValid(self:GetBoomDevice()) and !self.Treasure and !self:IsAttackBlocked() then
+		self.KAMIKAZE = true
+	else
+		self.KAMIKAZE = false
+		self.KAMIKAZETIME = CurTime() + 1
 	end
 end
 
@@ -512,7 +580,7 @@ function ENT:ResetMovementSequence()
 		self:ResetSequence(self.MovementSequence)
 		self.CurrentSeq = self.MovementSequence
 	end
-	if self.UpdateSeq ~= self.CurrentSeq then -- Moo Mark 4/19/23: Finally got a system where the speed actively updates when the movement sequence set is changed.
+	if self:GetSequenceGroundSpeed(self:GetSequence()) ~= self:GetRunSpeed() or self.UpdateSeq ~= self.CurrentSeq then -- Moo Mark 4/19/23: Finally got a system where the speed actively updates when the movement sequence set is changed.
 		--print("update")
 		self.UpdateSeq = self.CurrentSeq
 		self:UpdateMovementSpeed()
@@ -533,31 +601,117 @@ function ENT:PerformIdle()
 	end
 end
 
-function ENT:DropBomb()
-	if self.KAMIKAZE then return end
-	if self.LostBomb then return end
+function ENT:CreateBomb() -- 12/8/23: Bomb is now an entity thats actually attachted to the bomber himself, instead of using a bodygroup.
 	if self.Treasure then return end
-	self:SetBodygroup(0,1)
+
 	local bomb = ents.Create("nz_bomb")
-	bomb:SetPos(self:EyePos())
+	local chestpos = self:GetBonePosition(self:LookupBone("tag_weapon_chest"))
+
+	bomb:SetPos(chestpos)
 	bomb:SetAngles(self:GetAngles())
+	bomb:SetParent(self, 5)
+
+	self:SetBoomDevice(bomb)
 	bomb:Spawn()
 end
 
-function ENT:HandleAnimEvent(a,b,c,d,e)
-	if e == "melee" then
-		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
-		self:DoAttackDamage()
+function ENT:DropBomb()
+	if !IsValid(self) then return end
+	if self.LostBomb then return end
+
+	self.LostBomb = true
+
+	self:EmitSound("physics/metal/metal_box_impact_bullet"..math.random(1,3)..".wav",100,math.random(95, 105))
+
+	local bomb = self:GetBoomDevice()
+	local bmbphys = bomb:GetPhysicsObject()
+
+	local chestpos = self:GetBonePosition(self:LookupBone("tag_weapon_chest"))
+
+	bomb:SetParent(nil)
+	self:SetBoomDevice(nil)
+
+	bomb:StartSelfDestruct()
+
+	if IsValid(bmbphys) then
+		bomb:PhysWake()
+		bomb:SetPos(chestpos)
+		bomb:SetAngles(self:GetAngles())
 	end
-	if e == "s2_gen_step" then
-		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 60, math.random(95, 105))
+end
+
+function ENT:OnThink()
+	--[[if CurTime() > self.BombDrop then
+		if !self.LostBomb then
+			self:DropBomb()
+		end
+	end]]
+	if IsValid(self:GetBoomDevice()) and self.KAMIKAZE and CurTime() > self.KAMIKAZETIME and !self.KABOOM then
+		self.KABOOM = true
+
+		local bomb = self:GetBoomDevice()
+		if IsValid(bomb) then
+			local dmg = DamageInfo()
+			dmg:SetAttacker(self)
+			dmg:SetInflictor(self)
+			dmg:SetDamage(1)
+			dmg:SetDamageType(DMG_GENERIC)
+
+			bomb:TakeDamageInfo(dmg)
+		end
+	end
+end
+
+function ENT:HandleAnimEvent(a,b,c,d,e)
+	if e == "step_right_small" or e == "step_left_small" or e == "step_right_large" or e == "step_left_large" then
+		if self.loco:GetVelocity():Length2D() >= 75 then
+			if self.CustomRunFootstepsSounds then
+				self:EmitSound(self.CustomRunFootstepsSounds[math.random(#self.CustomRunFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalRunFootstepsSounds[math.random(#self.NormalRunFootstepsSounds)], 65)
+			end
+		else
+			if self.CustomWalkFootstepsSounds then
+				self:EmitSound(self.CustomWalkFootstepsSounds[math.random(#self.CustomWalkFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalWalkFootstepsSounds[math.random(#self.NormalWalkFootstepsSounds)], 65)
+			end
+
+		end
+	end
+	if e == "crawl_hand" then
+		if self.CustomCrawlImpactSounds then
+			self:EmitSound(self.CustomCrawlImpactSounds[math.random(#self.CustomCrawlImpactSounds)], 70)
+		else
+			self:EmitSound(self.CrawlImpactSounds[math.random(#self.CrawlImpactSounds)], 70)
+		end
+	end
+	if e == "melee_whoosh" then
+		if self.CustomMeleeWhooshSounds then
+			self:EmitSound(self.CustomMeleeWhooshSounds[math.random(#self.CustomMeleeWhooshSounds)], 80)
+		else
+			self:EmitSound(self.MeleeWhooshSounds[math.random(#self.MeleeWhooshSounds)], 80)
+		end
+	end
+	if e == "melee" or e == "melee_heavy" then
+		if self:BomberBuff() and self.GasAttack then
+			self:EmitSound(self.GasAttack[math.random(#self.GasAttack)], 100, math.random(95, 105), 1, 2)
+		else
+			if self.AttackSounds then
+				self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+			end
+		end
+		if e == "melee_heavy" then
+			self.HeavyAttack = true
+		end
+		self:DoAttackDamage()
 	end
 	if e == "bmb_bonk" then
 		self:EmitSound(self.BonkSounds[math.random(#self.BonkSounds)], 80, math.random(95, 105))
 	end
-	if e == "bomb_spawn" then
+	--[[if e == "bomb_spawn" then
 		self:DropBomb()
-	end
+	end]]
 	if e == "death_ragdoll" then
 		self:BecomeRagdoll(DamageInfo())
 	end

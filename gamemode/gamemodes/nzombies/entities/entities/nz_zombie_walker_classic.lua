@@ -19,7 +19,7 @@ ENT.Models = {
 local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}
 local spawnrun = {"nz_spawn_ground_v1_run"}
 local spawnfast = {"nz_spawn_ground_climbout_fast"}
-local spawnsuperfast = {"nz_spawn_ground_quickrise_v1", "nz_spawn_ground_quickrise_v2", "nz_spawn_ground_quickrise_v3"}
+local spawnsuperfast = {"nz_ent_ground_01", "nz_ent_ground_02"}
 
 ENT.DeathSequences = {
 	"nz_death_1",
@@ -38,6 +38,9 @@ ENT.DeathSequences = {
 	"nz_death_f_11",
 	"nz_death_f_12",
 	"nz_death_f_13",
+	"nz_death_fallback",
+	"nz_l4d_death_running_11a",
+	"nz_l4d_death_running_11g",
 }
 
 ENT.CrawlDeathSequences = {
@@ -82,22 +85,41 @@ local SlowClimbUp96 = {
 	"nz_traverse_climbup96"
 }
 local SlowClimbUp128 = {
-	"nz_traverse_climbup128"
+	"nz_traverse_climbup128",
+	"nz_l4d_traverse_climbup132_01",
+	"nz_l4d_traverse_climbup132_02",
+	"nz_l4d_traverse_climbup132_03",
 }
 local SlowClimbUp160 = {
-	"nz_traverse_climbup160"
+	"nz_traverse_climbup160",
+	"nz_l4d_traverse_climbup156_01",
+	"nz_l4d_traverse_climbup156_02",
+	"nz_l4d_traverse_climbup156_03",
 }
 local FastClimbUp36 = {
-	"nz_traverse_fast_climbup36"
+	"nz_traverse_fast_climbup36",
+	"nz_l4d_traverse_climbup36_01",
+	"nz_l4d_traverse_climbup36_02",
+	"nz_l4d_traverse_climbup36_03",
 }
 local FastClimbUp48 = {
-	"nz_traverse_fast_climbup48"
+	"nz_traverse_fast_climbup48",
+	"nz_l4d_traverse_climbup48_01",
+	"nz_l4d_traverse_climbup48_02",
+	"nz_l4d_traverse_climbup48_03",
+	"nz_l4d_traverse_climbup48_04",
 }
 local FastClimbUp72 = {
-	"nz_traverse_fast_climbup72"
+	"nz_traverse_fast_climbup72",
+	"nz_l4d_traverse_climbup72_01",
+	"nz_l4d_traverse_climbup72_02",
+	"nz_l4d_traverse_climbup72_03",
 }
 local FastClimbUp96 = {
-	"nz_traverse_fast_climbup96"
+	"nz_traverse_fast_climbup96",
+	"nz_l4d_traverse_climbup96_01",
+	"nz_l4d_traverse_climbup96_02",
+	"nz_l4d_traverse_climbup96_03",
 }
 local ClimbUp200 = {
 	"nz_traverse_climbup200"
@@ -107,11 +129,13 @@ local AttackSequences = {
 	{seq = "nz_attack_stand_ad_1"},
 	{seq = "nz_attack_stand_au_1"},
 	{seq = "nz_legacy_attack_v3"},
+	{seq = "nz_legacy_attack_v6"},
 	{seq = "nz_legacy_attack_v4"},
 	{seq = "nz_legacy_attack_v11"},
+	{seq = "nz_legacy_attack_v12"},
+	{seq = "nz_legacy_attack_superwindmill"},
 	{seq = "nz_fwd_ad_attack_v1"},
 	{seq = "nz_fwd_ad_attack_v2"},
-	{seq = "nz_legacy_attack_superwindmill"},
 	{seq = "nz_t8_attack_stand_larm_1"},
 	{seq = "nz_t8_attack_stand_larm_2"},
 	{seq = "nz_t8_attack_stand_larm_3"},
@@ -175,6 +199,7 @@ local JumpSequences = {
 
 local RunJumpSequences = {
 	{seq = "nz_barricade_run_1"},
+	{seq = "nz_l4d_mantle_over_36"},
 }
 
 local SprintJumpSequences = {
@@ -249,11 +274,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -318,11 +351,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -390,11 +431,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -460,11 +509,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -492,15 +549,14 @@ ENT.SequenceTables = {
 				"nz_legacy_sprint_v4",
 				"nz_legacy_sprint_v5",
 				--"nz_legacy_jap_run_v3",
-				"nz_sprint_ad1",
-				"nz_sprint_ad2",
-				--"nz_sprint_ad3",
-				--"nz_sprint_ad4",
-				"nz_sprint_ad5",
-				"nz_sprint_ad21",
-				"nz_sprint_ad22",
-				"nz_sprint_ad23",
-				"nz_sprint_ad24",
+				"nz_t9_base_sprint_ad_v01",
+				"nz_t9_base_sprint_ad_v02",
+				"nz_t9_base_sprint_ad_v05",
+				"nz_t9_base_sprint_ad_v21",
+				"nz_t9_base_sprint_ad_v22",
+				"nz_t9_base_sprint_ad_v23",
+				"nz_sprint_ad3",
+				"nz_sprint_ad4",
 				"nz_fast_sprint_v1",
 				"nz_fast_sprint_v2",
 			},
@@ -523,11 +579,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -553,14 +617,14 @@ ENT.SequenceTables = {
 				"nz_legacy_sprint_v4",
 				"nz_legacy_sprint_v5",
 				--"nz_legacy_jap_run_v3",
-				"nz_sprint_au1",
-				"nz_sprint_au2",
-				--"nz_sprint_au3",
-				--"nz_sprint_au4",
-				"nz_sprint_au20",
-				"nz_sprint_au21",
-				"nz_sprint_au22",
-				"nz_sprint_au25",
+				"nz_t9_base_sprint_au_v01",
+				"nz_t9_base_sprint_au_v02",
+				"nz_t9_base_sprint_au_v20",
+				"nz_t9_base_sprint_au_v21",
+				"nz_t9_base_sprint_au_v22",
+				"nz_t9_base_sprint_au_v25",
+				"nz_sprint_au3",
+				"nz_sprint_au4",
 				"nz_fast_sprint_v1",
 				"nz_fast_sprint_v2",
 			},
@@ -583,11 +647,19 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -604,6 +676,9 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
+				"nz_l4d_run_05",
+				"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v9",
 				"nz_supersprint_ad1",
 				"nz_supersprint_ad2",
 				"nz_supersprint_ad3",
@@ -634,11 +709,21 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -661,6 +746,9 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnsuperfast},
 			MovementSequence = {
+				"nz_l4d_run_05",
+				"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v9",
 				"nz_supersprint_au1",
 				"nz_supersprint_au2",
 				"nz_supersprint_au3",
@@ -689,11 +777,21 @@ ENT.SequenceTables = {
 				"nz_crawl_v2",
 				"nz_crawl_v5",
 				"nz_crawl_sprint_v1",
+				"nz_crawl_on_hands",
+				"nz_crawl_on_hands_c",
 			},
 			FireMovementSequence = {
 				"nz_firestaff_walk_v1",
 				"nz_firestaff_walk_v2",
 				"nz_firestaff_walk_v3",
+			},
+			TurnedMovementSequence = {
+				--"nz_pb_zombie_sprint_v6",
+				--"nz_pb_zombie_sprint_v7",
+				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
+				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -794,6 +892,48 @@ ENT.BehindSounds = {
 	Sound("nz_moo/zombies/vox/_classic/behind/behind_04.mp3"),
 }
 
+ENT.CustomWalkFootstepsSounds = {
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_00.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_01.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_13.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_14.mp3"),
+}
+
+ENT.CustomRunFootstepsSounds = {
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_00.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_01.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_02.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_03.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_04.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_05.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_06.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_07.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_08.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_09.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_10.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_11.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_12.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_13.mp3"),
+	Sound("nz_moo/zombies/footsteps/_original/_extended/step_14.mp3"),
+}
+
+ENT.CustomMeleeWhooshSounds = {
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_00.mp3"),
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_01.mp3"),
+	Sound("nz_moo/zombies/fly/attack/whoosh/_og/swing_02.mp3"),
+}
+
 function ENT:StatsInitialize()
 	if SERVER then
 		if nzRound:GetNumber() == -1 then
@@ -815,13 +955,12 @@ function ENT:SpecialInit()
 	if CLIENT then
 	end
 end
+function ENT:OnSpawn(animation, grav, dirt)
+	animation = animation or self:SelectSpawnSequence()
+	grav = grav
+	dirt = dirt
 
-function ENT:OnSpawn()
-	local nav = navmesh.GetNavArea(self:GetPos(), 50)
-	if IsValid(nav) and nav:HasAttributes(NAV_MESH_NO_JUMP) then
-		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
-		self:CollideWhenPossible()
-	else
+	if dirt then
 		local SpawnMatSound = {
 			[MAT_DIRT] = "nz_moo/zombies/spawn/dirt/pfx_zm_spawn_dirt_0"..math.random(0,1)..".mp3",
 			[MAT_SNOW] = "nz_moo/zombies/spawn/snow/pfx_zm_spawn_snow_0"..math.random(0,1)..".mp3",
@@ -834,43 +973,24 @@ function ENT:OnSpawn()
 		local norm = (self:GetPos()):GetNormalized()
 		local tr = util.QuickTrace(self:GetPos(), norm*10, self)
 
-		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
+		if tr.Hit then
+			local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
+			self:EmitSound(finalsound)
+		end
 
-		--ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-		--self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
-	
+		ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
+		self:EmitSound("nz_moo/zombies/spawn/_generic/dirt/dirt_0"..math.random(0,2)..".mp3",100,math.random(95,105))
+	end
+
+	if animation then
+		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 		self:SetSpecialAnimation(true)
 		self:SetIsBusy(true)
-		local seq = self:SelectSpawnSequence()
 
+		self:PlaySequenceAndMove(animation, {gravity = grav})
 
-		local navtypes = {
-			[NAV_MESH_OBSTACLE_TOP] = true,
-			[NAV_MESH_DONT_HIDE] = true,
-		}
-
-
-		if IsValid(nav) and nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) then
-			seq = self.UndercroftSequences[math.random(#self.UndercroftSequences)]
-		elseif IsValid(nav) and nav:HasAttributes(NAV_MESH_DONT_HIDE) then
-			seq = "nz_moo_wall_emerge_quick"
-		else
-			if tr.Hit then
-				local finalsound = SpawnMatSound[tr.MatType] or SpawnMatSound[0]
-				self:EmitSound(finalsound)
-			end
-			ParticleEffect("bo3_zombie_spawn",self:GetPos()+Vector(0,0,1),self:GetAngles(),self)
-			self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
-		end
-		if seq then
-			if IsValid(nav) and (nav:HasAttributes(NAV_MESH_OBSTACLE_TOP) or nav:HasAttributes(NAV_MESH_DONT_HIDE)) then
-				self:PlaySequenceAndMove(seq, {gravity = false})
-			else
-				self:PlaySequenceAndMove(seq, {gravity = true})
-			end
-			self:SetSpecialAnimation(false)
-			self:SetIsBusy(false)
-			self:CollideWhenPossible()
-		end
+		self:SetSpecialAnimation(false)
+		self:SetIsBusy(false)
+		self:CollideWhenPossible()
 	end
 end

@@ -47,43 +47,43 @@ SWEP.Offset = { --Procedural world model animation, defaulted for CS:S purposes.
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.Swing1",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/swing_hard_1.wav" },
+	['sound'] = { "weapons/melee/zwei/swing_hard_1.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.Swing2",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/swing_hard_2.wav" },
+	['sound'] = { "weapons/melee/zwei/swing_hard_2.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.Swing3",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/swing_hard_3.wav" },
+	['sound'] = { "weapons/melee/zwei/swing_hard_3.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.Swing4",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/swing_hard_4.wav" },
+	['sound'] = { "weapons/melee/zwei/swing_hard_4.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.HitFlesh2",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/hitflesh_2.wav" },
+	['sound'] = { "weapons/melee/zwei/hitflesh_2.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.HitFlesh3",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/hitflesh_3.wav" },
+	['sound'] = { "weapons/melee/zwei/hitflesh_3.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
 	['name'] = "TFA_KF2_ZWEIHANDER.HitFlesh1",
 	['channel'] = CHAN_STATIC,
-	['sound'] = { "weapons/nzr/zwei/hitflesh_1.wav" },
+	['sound'] = { "weapons/melee/zwei/hitflesh_1.ogg" },
 	['pitch'] = {100,100}
 })
 sound.Add({
@@ -99,7 +99,7 @@ function SWEP:Deploy()
 	self.HolsterTime = CurTime() + 2.5
 	timer.Simple(1, function()
 		if IsValid(self) then
-			self:EmitSound("weapons/nzr/zwei/unsheath_fast_"..math.random(1,2)..".wav")
+			self:EmitSound("weapons/melee/zwei/unsheath_fast_"..math.random(1,2)..".ogg")
 		end
 	end)
 end

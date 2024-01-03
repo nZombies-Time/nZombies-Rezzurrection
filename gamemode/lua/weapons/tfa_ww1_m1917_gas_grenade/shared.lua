@@ -1,5 +1,5 @@
 -- Variables that are used on both client and server
-SWEP.Category				= "TFA World War I"
+SWEP.Category				= "nZombies"
 SWEP.Author					= "The Master MLG"
 SWEP.Manufacturer = "Russian Empire" --Gun Manufactrer (e.g. Hoeckler and Koch )
 SWEP.Contact				= ""

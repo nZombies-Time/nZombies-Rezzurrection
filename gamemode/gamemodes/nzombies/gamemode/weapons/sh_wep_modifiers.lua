@@ -100,7 +100,7 @@ function wepmeta:ApplyNZModifier(modifier, blocknetwork)
 		end
 
 		if !self.NZModifiers then self.NZModifiers = {} end
-		if modifier != "repap" and modifier != "equip" then self.NZModifiers[modifier] = RecursiveDifferenceCheck(oldversion, self:GetTable()) end //hehe killyourself
+		if modifier != "repap" and modifier != "equip" then self.NZModifiers[modifier] = RecursiveDifferenceCheck(oldversion,self:GetTable()) end 
 	else
 		print("Tried to apply invalid modifier "..modifier.." to weapon "..tostring(self))
 	end

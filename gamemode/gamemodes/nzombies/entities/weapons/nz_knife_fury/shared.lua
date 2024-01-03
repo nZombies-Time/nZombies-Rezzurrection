@@ -58,11 +58,11 @@ SWEP.Primary.Attacks = {
 		["delay"] = 6 / 30, --Delay
 		['snd_delay'] = 5 / 30,
 		['spr'] = true, --Allow attack while sprinting?
-		['snd'] = "Weapon_BO3_KATANA.Swing", -- Sound ID
+		['snd'] = "Weapon_BO3_ZMBOWIE.Swing", -- Sound ID
 		["viewpunch"] = Angle(1.5, 2.5, 0), --viewpunch angle
 		["end"] = 0.8, --time before next attack
 		["hull"] = 1, --Hullsize
-		['hitflesh'] = "Weapon_BO3_KATANA.Hit_Flesh",
+		['hitflesh'] = "TFA_KF2_ZWEIHANDER.HitFlesh2",
 		['hitworld'] ="Weapon_BO3_AXE.Hit"
 	},
 	{
@@ -75,11 +75,11 @@ SWEP.Primary.Attacks = {
 		["delay"] = 6 / 30, --Delay
 		['snd_delay'] = 5 / 30,
 		['spr'] = true, --Allow attack while sprinting?
-		['snd'] = "Weapon_BO3_KATANA.Swing", -- Sound ID
+		['snd'] = "Weapon_BO3_ZMBOWIE.Swing", -- Sound ID
 		["viewpunch"] = Angle(0, 0, 0), --viewpunch angle
 		["end"] = 1.1, --time before next attack
 		["hull"] = 1, --Hullsize
-		['hitflesh'] = "Weapon_BO3_KATANA.Hit_Flesh",
+		['hitflesh'] = "TFA_KF2_ZWEIHANDER.HitFlesh1",
 		['hitworld'] ="Weapon_BO3_AXE.Hit"
 	}
 }

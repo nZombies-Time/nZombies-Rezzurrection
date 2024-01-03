@@ -34,7 +34,7 @@ function ENT:Draw() //Runs every frame
 end
 
 function ENT:DrawEyeGlow()
-	local eyeglow =  Material("nz_moo/sprites/moo_glow1")
+	local eyeglow =  Material("nz/zlight")
 	local eyeColor = Color(255,50,0)
 	local latt = self:LookupAttachment("lefteye")
 	local ratt = self:LookupAttachment("righteye")
@@ -50,8 +50,8 @@ function ENT:DrawEyeGlow()
 
 	if lefteyepos and righteyepos then
 		render.SetMaterial(eyeglow)
-		render.DrawSprite(lefteyepos, 4, 4, eyeColor)
-		render.DrawSprite(righteyepos, 4, 4, eyeColor)
+		render.DrawSprite(lefteyepos, 5, 5, eyeColor)
+		render.DrawSprite(righteyepos, 5, 5, eyeColor)
 	end
 end
 
@@ -86,7 +86,7 @@ ENT.BarricadeTearSequences = {
 	"nz_legacy_door_tear_right",
 }
 
-local spawnfast = {"nz_spawn_ground_climbout_fast"}
+local spawnfast = {"nz_ent_ground_01", "nz_ent_ground_02"}
 
 local JumpSequences = {
 	{seq = "nz_barricade_trav_walk_1"},
@@ -183,6 +183,8 @@ ENT.SequenceTables = {
 				"nz_napalm_walk_01",
 				"nz_napalm_walk_02",
 				"nz_napalm_walk_03",
+				"nz_s1_zom_core_walk_2",
+				"nz_s1_zom_core_walk_4",
 			},
 			BlackholeMovementSequence = {
 				"nz_blackhole_1",
@@ -203,11 +205,45 @@ ENT.SequenceTables = {
 			PassiveSounds = {walksounds},
 		},
 	}},
-	{Threshold = 70, Sequences = {
+	{Threshold = 36, Sequences = {
 		{
 			SpawnSequence = {spawnfast},
 			MovementSequence = {
-				"nz_supersprint_au12"
+				"nz_legacy_run_v1",
+				"nz_legacy_jap_run_v1",
+				"nz_legacy_jap_run_v2",
+				"nz_fast_sprint_v1",
+			},
+			BlackholeMovementSequence = {
+				"nz_blackhole_1",
+				"nz_blackhole_2",
+				"nz_blackhole_3",
+			},
+			AttackSequences = {AttackSequences},
+			JumpSequences = {JumpSequences},
+
+			Climb36 = {SlowClimbUp36},
+			Climb48 = {SlowClimbUp48},
+			Climb72 = {SlowClimbUp72},
+			Climb96 = {SlowClimbUp96},
+			Climb120 = {SlowClimbUp128},
+			Climb160 = {SlowClimbUp160},
+			Climb200 = {ClimbUp200},
+
+			PassiveSounds = {walksounds},
+		},
+	}},
+	{Threshold = 71, Sequences = {
+		{
+			SpawnSequence = {spawnfast},
+			MovementSequence = {
+				"nz_l4d_run_04",
+				"nz_l4d_run_05",
+				"nz_s1_zom_core_run_1",
+				"nz_s1_zom_core_sprint_4",
+				"nz_l4d_crouchrun",
+				"nz_sprint_ad1",
+				"nz_sprint_au2",
 			},
 			BlackholeMovementSequence = {
 				"nz_blackhole_1",
@@ -258,6 +294,27 @@ ENT.SpawnVoxSounds = {
 	"nz_moo/zombies/vox/_napalm/spawn/evt_napalm_zombie_spawn_vocals_02.mp3",
 }
 
+ENT.FootstepsSounds = {
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_00.mp3",
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_01.mp3",
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_02.mp3",
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_03.mp3",
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_04.mp3",
+	"nz_moo/zombies/vox/_napalm/step/fly_step_napalm_close_05.mp3"
+}
+
+ENT.SWTFootstepsSounds = {
+	"nz_moo/zombies/vox/_mutated/step/fire/step_00.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_01.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_02.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_03.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_04.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_05.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_06.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_07.mp3",
+	"nz_moo/zombies/vox/_mutated/step/fire/step_08.mp3"
+}
+
 ENT.BehindSoundDistance = 200 -- When the zombie is within 200 units of a player, play these sounds instead
 ENT.BehindSounds = {
 	Sound("nz_moo/zombies/vox/_napalm/behind/zmb_napalm_zombies_vocals_behind_00.mp3"),
@@ -288,14 +345,16 @@ function ENT:StatsInitialize()
 
 		self:SetBodygroup(0,0)
 
-		self.Cooldown = CurTime() + 7 -- Won't be allowed to explode right after spawning, so they'll attack normally until then.
+		self.Cooldown = CurTime() + 3 -- Won't be allowed to explode right after spawning, so they'll attack normally until then.
 		self.CanExplode = false
 		self.Suicide = false
+		self.Sprint = false
+        self:Flames(true)
 	end
 end
 
 function ENT:OnSpawn()
-	--self:PlaySound(self.SpawnSounds[math.random(#self.SpawnSounds)], 511, math.random(85, 105))
+	self:PlaySound(self.SpawnSounds[math.random(#self.SpawnSounds)], 577, math.random(85, 105))
 	self:PlaySound(self.SpawnVoxSounds[math.random(#self.SpawnVoxSounds)], 100, math.random(85, 105), 1, 2)
 	self:EmitSound("nz_moo/zombies/vox/_napalm/evt_napalm_zombie_loop.wav", 75, math.random(95, 105), 1, 3)
 
@@ -318,9 +377,7 @@ function ENT:OnSpawn()
 
 	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 	ParticleEffect("doom_hellunit_spawn_medium",self:GetPos(),self:GetAngles(),self)
-	ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
-
-	self:EmitSound("nz/zombies/spawn/zm_spawn_dirt"..math.random(1,2)..".wav",80,math.random(95,105))
+	--ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	
 	self:SetSpecialAnimation(true)
 	local seq = self:SelectSpawnSequence()
@@ -332,9 +389,34 @@ function ENT:OnSpawn()
 end
 
 function ENT:PerformDeath(dmginfo)
-	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		
+	self.Dying = true
+
+	local damagetype = dmginfo:GetDamageType()
+
+	self:PostDeath(dmginfo)
+
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
+	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathRagdollForce == 0 or self:GetSpecialAnimation() then
+		if self.DeathSounds then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		end
+		self:BecomeRagdoll(dmginfo)
+	else
+		if self.DeathSounds then
+			self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
+		end
+		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+	end
+end
+
+function ENT:PostDeath(dmginfo) 
 	self:StopSound("nz_moo/zombies/vox/_napalm/evt_napalm_zombie_loop.wav")
-	self:DoDeathAnimation(self.RagdollDeathSequences[math.random(#self.RagdollDeathSequences)])
 	if !self.Suicide then
 		self:NapalmDeathExplosion()
 	end
@@ -358,9 +440,14 @@ function ENT:PostAdditionalZombieStuff()
 	if CurTime() > self.Cooldown and !self.CanExplode then
 		self.CanExplode = true
 	end
-	if self:TargetInRange(100) and !self:IsAttackBlocked() and self.CanExplode and !self.IsTurned then
+	if self:TargetInRange(100) and !self:IsAttackBlocked() and self:IsFacingTarget() and self.CanExplode and !self.IsTurned then
 		self.Suicide = true
 		self:DoSpecialAnimation(self.ExplodeAttackSequences[math.random(#self.ExplodeAttackSequences)])
+	end
+	if self:Health() < self:GetMaxHealth() / 2 and !self.Sprint then
+		self.Sprint = true
+		self:SetRunSpeed(71)
+		self:SpeedChanged()
 	end
 end
 
@@ -368,7 +455,7 @@ function ENT:OnTargetInAttackRange()
 	if !self:GetBlockAttack() and !self.CanExplode or self.IsTurned then
 		self:Attack()
 	else
-		self:TimeOut(2)
+		self:TimeOut(1)
 	end
 end
 
@@ -388,26 +475,81 @@ function ENT:NapalmDeathExplosion()
         entParticle:Spawn()
         entParticle:Activate()
         entParticle:Fire("kill","",20)
-        local vaporizer = ents.Create("point_hurt") -- Point Hurt is Laby's favorite breakfast, lunch, and dinner... HE LOVES!!! POINT_HURT!!!
-        if !vaporizer:IsValid() then return end
-        vaporizer:SetKeyValue("Damage", 22)
-        vaporizer:SetKeyValue("DamageRadius", 150)
-        vaporizer:SetKeyValue("DamageType",DMG_BURN)
-        vaporizer:SetPos(self:GetPos())
-        vaporizer:SetOwner(self)
-        vaporizer:Spawn()
-        vaporizer:Fire("TurnOn","",0)
-        vaporizer:Fire("kill","",20)
+
+        local firepit = ents.Create("napalm_firepit")
+        firepit:SetPos(self:WorldSpaceCenter())
+		firepit:SetAngles(Angle(0,0,0))
+        firepit:Spawn()
 
 		self:Explode(200, false)
-		--self:Remove() -- Goodbye
 	end
 end
 
-function ENT:HandleAnimEvent(a,b,c,d,e)
-	if e == "melee" then
-		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "step_right_small" then
+		self:EmitSound(self.FootstepsSounds[math.random(#self.FootstepsSounds)], 85)
+		self:EmitSound(self.SWTFootstepsSounds[math.random(#self.SWTFootstepsSounds)], 70)
+		ParticleEffectAttach("bo3_napalm_fs",PATTACH_POINT,self,12)
+	end
+	if e == "step_left_small" then
+		self:EmitSound(self.FootstepsSounds[math.random(#self.FootstepsSounds)], 85)
+		self:EmitSound(self.SWTFootstepsSounds[math.random(#self.SWTFootstepsSounds)], 70)
+		ParticleEffectAttach("bo3_napalm_fs",PATTACH_POINT,self,11)
+	end
+	if e == "step_right_large" then
+		self:EmitSound(self.FootstepsSounds[math.random(#self.FootstepsSounds)], 85)
+		self:EmitSound(self.SWTFootstepsSounds[math.random(#self.SWTFootstepsSounds)], 70)
+		ParticleEffectAttach("bo3_napalm_fs",PATTACH_POINT,self,12)
+	end
+	if e == "step_left_large" then
+		self:EmitSound(self.FootstepsSounds[math.random(#self.FootstepsSounds)], 85)
+		self:EmitSound(self.SWTFootstepsSounds[math.random(#self.SWTFootstepsSounds)], 70)
+		ParticleEffectAttach("bo3_napalm_fs",PATTACH_POINT,self,11)
+	end
+	if e == "crawl_hand" then
+		if self.CustomCrawlImpactSounds then
+			self:EmitSound(self.CrawlImpactSounds[math.random(#self.CrawlImpactSounds)], 70)
+		else
+			self:EmitSound("CoDZ_Zombie.StepCrawl")
+		end
+	end
+	if e == "melee" or e == "melee_heavy" then
+		if self:BomberBuff() and self.GasAttack then
+			self:EmitSound(self.GasAttack[math.random(#self.GasAttack)], 100, math.random(95, 105), 1, 2)
+		else
+			if self.AttackSounds then
+				self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+			end
+		end
+		if e == "melee_heavy" then
+			self.HeavyAttack = true
+		end
 		self:DoAttackDamage()
+	end
+	if e == "base_ranged_rip" then
+		ParticleEffectAttach("ins_blood_dismember_limb", 4, self, 5)
+		self:EmitSound("nz_moo/zombies/gibs/gib_0"..math.random(0,3)..".mp3", 100, math.random(95,105))
+		self:EmitSound("nz_moo/zombies/gibs/head/head_explosion_0"..math.random(4)..".mp3", 65, math.random(95,105))
+	end
+	if e == "base_ranged_throw" then
+		self:EmitSound("nz_moo/zombies/fly/attack/whoosh/zmb_attack_med_0"..math.random(0,2)..".mp3", 95)
+
+		local larmfx_tag = self:LookupBone("j_wrist_le")
+
+		self.Guts = ents.Create("nz_gib")
+		self.Guts:SetPos(self:GetBonePosition(larmfx_tag))
+		self.Guts:Spawn()
+
+		local phys = self.Guts:GetPhysicsObject()
+		local target = self:GetTarget()
+		local movementdir
+		if IsValid(phys) and IsValid(target) then
+			--[[if target:IsPlayer() then
+				movementdir = target:GetVelocity():Normalize()
+				print(movementdir)
+			end]]
+			phys:SetVelocity(self.Guts:getvel(target:EyePos() - Vector(0,0,7), self:EyePos(), 0.95))
+		end
 	end
 	if e == "death_ragdoll" then
 		self:BecomeRagdoll(DamageInfo())
@@ -420,6 +562,114 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		--print("finishtraverse")
 		self.TraversalAnim = false
 	end
+
+	-- WW2 Zobies	
+	if e == "s2_gen_step" then
+		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 60, math.random(95, 105))
+	end
+	if e == "s2_taunt_vox" then
+		self:EmitSound(self.TauntSounds[math.random(#self.TauntSounds)],95, math.random(95, 105), 1, 2)
+	end
+
+	-- Taunt Sounds, theres alot of these
+
+	if e == "generic_taunt" then
+		if self.TauntSounds then
+			self:EmitSound(self.TauntSounds[math.random(#self.TauntSounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "special_taunt" then
+		if self.CustomSpecialTauntSounds then
+			self:EmitSound(self.CustomSpecialTauntSounds[math.random(#self.CustomSpecialTauntSounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound("nz_moo/zombies/vox/_classic/taunt/spec_taunt.mp3", 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v1" then
+		if self.CustomTauntAnimV1Sounds then
+			self:EmitSound(self.CustomTauntAnimV1Sounds[math.random(#self.CustomTauntAnimV1Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV1Sounds[math.random(#self.TauntAnimV1Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v2" then
+		if self.CustomTauntAnimV2Sounds then
+			self:EmitSound(self.CustomTauntAnimV2Sounds[math.random(#self.CustomTauntAnimV2Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV2Sounds[math.random(#self.TauntAnimV2Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v3" then
+		if self.CustomTauntAnimV2Sounds then
+			self:EmitSound(self.CustomTauntAnimV3Sounds[math.random(#self.CustomTauntAnimV3Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV3Sounds[math.random(#self.TauntAnimV3Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v4" then
+		if self.CustomTauntAnimV4Sounds then
+			self:EmitSound(self.CustomTauntAnimV4Sounds[math.random(#self.CustomTauntAnimV4Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV4Sounds[math.random(#self.TauntAnimV4Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v5" then
+		if self.CustomTauntAnimV5Sounds then
+			self:EmitSound(self.CustomTauntAnimV5Sounds[math.random(#self.CustomTauntAnimV5Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV5Sounds[math.random(#self.TauntAnimV5Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v6" then
+		if self.CustomTauntAnimV6Sounds then
+			self:EmitSound(self.CustomTauntAnimV6Sounds[math.random(#self.CustomTauntAnimV6Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV6Sounds[math.random(#self.TauntAnimV6Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v7" then
+		if self.CustomTauntAnimV7Sounds then
+			self:EmitSound(self.CustomTauntAnimV7Sounds[math.random(#self.CustomTauntAnimV7Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV7Sounds[math.random(#self.TauntAnimV7Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v8" then
+		if self.CustomTauntAnimV8Sounds then
+			self:EmitSound(self.CustomTauntAnimV8Sounds[math.random(#self.CustomTauntAnimV8Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV8Sounds[math.random(#self.TauntAnimV8Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "anim_taunt_v9" then
+		if self.CustomTauntAnimV9Sounds then
+			self:EmitSound(self.CustomTauntAnimV9Sounds[math.random(#self.CustomTauntAnimV9Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound(self.TauntAnimV9Sounds[math.random(#self.TauntAnimV9Sounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+
 	if e == "napalm_charge" then
 		self:EmitSound("nz_moo/zombies/vox/_napalm/explosion/evt_napalm_charge.mp3", 100)
 	end
@@ -427,6 +677,7 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		self:NapalmDeathExplosion()
 	end
 end
+
 
 function ENT:PostTookDamage(dmginfo)
 	if self:Health() < 100 then

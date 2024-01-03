@@ -46,48 +46,69 @@ ENT.ElectrocutionSequences = {
 	"nz_dog_tesla_death_e",
 }
 
-ENT.AttackSounds = {
-	"nz_moo/zombies/vox/_hellhound/attack/attack_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/attack/attack_05.mp3"
-}
-
 local walksounds = {
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_00.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_01.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_02.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_03.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_04.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_05.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_06.mp3"),
-	Sound("nz_moo/zombies/vox/_hellhound/movement/movement_07.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_06.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_07.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_08.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_09.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_10.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/move/move_11.mp3"),
 }
 
 local runsounds = {
-	Sound("nz/hellhound/close/close_00.wav"),
-	Sound("nz/hellhound/close/close_01.wav"),
-	Sound("nz/hellhound/close/close_02.wav"),
-	Sound("nz/hellhound/close/close_03.wav"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/close/close_03.mp3"),
+}
+
+ENT.AttackSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/attack/attack_06.mp3"),
 }
 
 ENT.DeathSounds = {
-	"nz_moo/zombies/vox/_hellhound/death/death_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_03.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_04.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_05.mp3",
-	"nz_moo/zombies/vox/_hellhound/death/death_06.mp3",
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/vox/death/death_06.mp3"),
+}
+
+ENT.SpiritSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/exp_bo3/spirit/exp_hellhound_spirit_04.mp3"),
 }
 
 ENT.AppearSounds = {
-	"nz_moo/zombies/vox/_hellhound/appear/appear_00.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_01.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_02.mp3",
-	"nz_moo/zombies/vox/_hellhound/appear/appear_03.mp3"
+	Sound("nz_moo/zombies/vox/_devildog/spawn/spawn_01.mp3"),
+}
+
+ENT.DogStepSounds = {
+	Sound("nz_moo/zombies/vox/_devildog/step/step_00.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_01.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_02.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_03.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_04.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_05.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_06.mp3"),
+	Sound("nz_moo/zombies/vox/_devildog/step/step_07.mp3"),
 }
 
 ENT.SequenceTables = {
@@ -130,8 +151,6 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self.Sprinting = false
 		self.IgnitedFoxy = false
-		self:SetRunSpeed( 36 )
-		self.loco:SetDesiredSpeed( 36 )
 	end
 	self:SetCollisionBounds(Vector(-13,-13, 0), Vector(13, 13, 45))
 end
@@ -142,13 +161,17 @@ function ENT:OnSpawn()
 	self:SetBlockAttack(true)
 	self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 
-	self:EmitSound("nz/hellhound/spawn/prespawn.wav",511,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/pre_spawn.mp3",511,100)
 	ParticleEffect("hound_summon",self:GetPos(),self:GetAngles(),nil)
 	--ParticleEffect("fx_hellhound_summon",self:GetPos(),self:GetAngles(),nil)
 
 	self:TimeOut(0.85)
 	
-	self:EmitSound("nz/hellhound/spawn/strike.wav",511,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/strikes_00.mp3",511,100)
+
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/spn_flux_l.mp3",100,100)
+	self:EmitSound("nz_moo/zombies/vox/_devildog/spawn/spn_flux_r.mp3",100,100)
+
 	ParticleEffectAttach("ins_skybox_lightning",PATTACH_ABSORIGIN_FOLLOW,self,0)
 	
 	self:SetMaterial("")
@@ -157,7 +180,8 @@ function ENT:OnSpawn()
 	self:CollideWhenPossible()
 	self:EmitSound(self.AppearSounds[math.random(#self.AppearSounds)], 511, math.random(85, 105), 1, 2)
 
-	nzRound:SetNextSpawnTime(CurTime() + 3) -- This one spawning delays others by 3 seconds
+	self:SetRunSpeed( 36 )
+	self.loco:SetDesiredSpeed( 36 )
 end
 
 function ENT:PerformDeath(dmgInfo)
@@ -187,6 +211,8 @@ function ENT:DoDeathAnimation(seq)
 	self.BehaveThread = coroutine.create(function()
 		self:PlaySequenceAndWait(seq)
 		if IsValid(self) then
+			self:EmitSound(self.SpiritSounds[math.random(#self.SpiritSounds)], 511, math.random(95, 105), 1, 2)
+			
 			if self.IgnitedFoxy then
 				ParticleEffect("hound_explosion",self:GetPos(),self:GetAngles(),self)
 				self:Explode( math.random( 25, 50 )) -- Doggy goes Kaboom! Since they explode on death theres no need for them to play death anims.
@@ -199,7 +225,7 @@ function ENT:DoDeathAnimation(seq)
 end
 
 
-function ENT:OnPathTimeOut()
+function ENT:AI()
 	local distToTarget = self:GetPos():Distance(self:GetTargetPosition())
 	if IsValid(self:GetTarget()) then
 		if not self.Sprinting and distToTarget < 750 then
@@ -208,7 +234,7 @@ function ENT:OnPathTimeOut()
 			self:SetRunSpeed( 71 )
 			self.loco:SetDesiredSpeed( 71 )
 			self:SpeedChanged()
-			ParticleEffectAttach("firestaff_victim_burning",PATTACH_ABSORIGIN_FOLLOW,self,0)
+			self:Flames(true)
 		end
 	end
 end
@@ -247,4 +273,25 @@ end
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
 	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
+end
+
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "melee" then
+		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+		self:DoAttackDamage()
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+	if e == "dog_step" then
+		self:EmitSound(self.DogStepSounds[math.random(#self.DogStepSounds)], 75, math.random(95,105))
+	end
 end
