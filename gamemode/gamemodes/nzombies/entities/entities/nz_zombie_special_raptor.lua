@@ -112,9 +112,12 @@ ENT.SequenceTables = {
 function ENT:StatsInitialize()
 	if SERVER then
 		self.Sprinting = false
-		--local speeds = nzRound:GetZombieCoDSpeeds()
-		--self.loco:SetDesiredSpeed( nzMisc.WeightedRandom(speeds) + math.random(30,50) )
+			local speeds = nzRound:GetZombieCoDSpeeds()
+		if speeds then
+		self.loco:SetDesiredSpeed( nzMisc.WeightedRandom(speeds) + math.random(30,50) )\
+		else
 		self.loco:SetDesiredSpeed( 200)
+		end
 	end
 	self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 40))
 end

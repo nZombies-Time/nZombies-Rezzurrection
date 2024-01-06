@@ -2084,6 +2084,78 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+		["nz_zombie_special_dog_fire"] = {
+		Valid = true,
+		SpecialSpawn = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+		["nz_zombie_special_fury"] = {
+		Valid = true,
+		SpecialSpawn = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
+		["nz_zombie_special_tempest"] = {
+		Valid = true,
+		SpecialSpawn = true,
+		ScaleDMG = function(zombie, hitgroup, dmginfo)
+		end,
+		OnHit = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				attacker:GivePoints(10)
+			end
+		end,
+		OnKilled = function(zombie, dmginfo, hitgroup)
+			local attacker = dmginfo:GetAttacker()
+			if attacker:IsPlayer() and attacker:GetNotDowned() then
+				if dmginfo:GetDamageType() == DMG_CLUB then
+					attacker:GivePoints(130)
+				elseif hitgroup == HITGROUP_HEAD then
+					attacker:GivePoints(100)
+				else
+					attacker:GivePoints(50)
+				end
+			end
+		end
+	},
 		["nz_zombie_special_ticker"] = {
 		Valid = true,
 		SpecialSpawn = true,
@@ -2252,6 +2324,7 @@ nzConfig.ValidEnemies = {
 			end
 		end
 	},
+	
 		["nz_zombie_walker_former"] = {
 		Valid = true,
 		SpecialSpawn = true,

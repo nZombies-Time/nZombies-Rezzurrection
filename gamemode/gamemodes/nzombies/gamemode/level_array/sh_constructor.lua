@@ -12,6 +12,7 @@ nzLevel.BarricadeCache = {}
 nzLevel.JumpTravCache = {}
 nzLevel.TargetCache = {}
 nzLevel.HudEntityCache = {}
+nzLevel.BrutusEntityCache = {}
 
 nzLevel.PSpawnCache = {}
 nzLevel.ZSpawnCache = {}
@@ -56,6 +57,7 @@ hook.Add("OnEntityCreated", "nzLevel.Iterator", function(ent)
 	local class = ent:GetClass()
 
 	timer.Simple(engine.TickInterval(), function()
+		if not IsValid(ent) then return end
 		if (ent.TurnOff and ent.TurnOn) then
 			table.insert(nzLevel.ToggleCache, ent)
 		end
@@ -65,15 +67,17 @@ hook.Add("OnEntityCreated", "nzLevel.Iterator", function(ent)
 		if ent.bIsShield then
 			table.insert(nzLevel.ShieldCache, ent)
 		end
-	end)
-
-	if ent:IsValidZombie() then
-		if ent.NZBossType or string_find(class, "zombie_boss") then
-			table.insert(nzLevel.ZBossCache, ent)
-		else
-			table.insert(nzLevel.ZombieCache, ent)
+		if ent.BrutusDestructable then
+			table.insert(nzLevel.BrutusEntityCache, ent)
 		end
-	end
+		if ent:IsValidZombie() then
+			if ent.NZBossType or string.find(class, "zombie_boss") then
+				table.insert(nzLevel.ZBossCache, ent)
+			else
+				table.insert(nzLevel.ZombieCache, ent)
+			end
+		end
+	end)
 
 	if barricadeclasses[class] then
 		table.insert(nzLevel.BarricadeCache, ent)
@@ -125,8 +129,17 @@ hook.Add("EntityRemoved", "nzLevel.Iterator", function(ent)
 		end
 	end
 
+	if ent.BrutusDestructable then
+		for i = 1, #nzLevel.BrutusEntityCache do
+			if nzLevel.BrutusEntityCache[i] == ent then
+				table.remove(nzLevel.BrutusEntityCache, i)
+				break
+			end
+		end
+	end
+
 	if ent:IsValidZombie() then
-		if ent.NZBossType or string_find(class, "zombie_boss") then
+		if ent.NZBossType or string.find(class, "zombie_boss") then
 			for i = 1, #nzLevel.ZBossCache do
 				if nzLevel.ZBossCache[i] == ent then
 					table.remove(nzLevel.ZBossCache, i)
@@ -316,4 +329,8 @@ end
 
 function nzLevel.GetHudEntityArray()
 	return inext, nzLevel.HudEntityCache, 0
+end
+
+function nzLevel.GetBrutusEntityArray()
+	return inext, nzLevel.BrutusEntityCache, 0
 end

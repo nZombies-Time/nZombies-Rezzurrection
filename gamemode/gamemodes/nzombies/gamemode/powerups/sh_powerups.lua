@@ -115,7 +115,7 @@ if SERVER then
 			if not specific then
 				for k, v in pairs(self.Data) do
 					if k ~= "maxammo" and nzRound:IsSpecial() then continue end -- Only allow max ammos on special rounds.
-
+					if k == "bloodmoney" then continue end -- WHO ARE YOU?!
 					if k == "zombieblood" and #player.GetAllPlaying() <= 1 then continue end
 					if k == "deathmachine" and player.GetCount() <= 1 and (not Entity(1):HasPerk('revive')) then continue end
 					if k == "firesale" and !nzPowerUps:GetBoxMoved() then continue end
@@ -485,7 +485,7 @@ nzPowerUps:NewPowerUp("deathmachine", {
 	end,
 })
 
---Blood Money
+--Bonus Points
 nzPowerUps:NewPowerUp("bonuspoints", {
     name = "Bonus Points",
     model = "models/powerups/w_zmoney.mdl",
@@ -504,21 +504,21 @@ nzPowerUps:NewPowerUp("bonuspoints", {
     end),
 })
 
---Perk Bottle
---[[nzPowerUps:NewPowerUp("bottle", {
-    name = "Perk Bottle",
-    model = "models/powerups/w_perkbottle.mdl",
-    global = true,
-    angle = Angle(0,0,0),
-    scale = 1,
-    chance = 3,
-    duration = 0,
-    announcement = "",
-    func = (function(self, ply)
-    	local P = GetConVar("nz_difficulty_perks_max"):GetInt()
-        GetConVar("nz_difficulty_perks_max"):SetInt(P+1)
-    end),
-})]]
+--Blood Money
+  nzPowerUps:NewPowerUp("bloodmoney", {
+                name = "Blood Money",
+                model = "models/powerups/w_zmoney.mdl",
+                global = false,
+                angle = Angle(0,0,0),
+                scale = 1,
+                chance = 0,
+                duration = 0,
+                natural = false,
+                announcement = 0,
+                func = (function(self, ply)
+                    ply:GivePoints(math.random(1,6)*50)
+                end),
+})
 
 -- Perk Bottle(The one that actually gives you a perk)
 nzPowerUps:NewPowerUp("bottle", {
@@ -530,7 +530,7 @@ nzPowerUps:NewPowerUp("bottle", {
     chance = 0,
     duration = 0,
 	natural = false,
-    announcement = "",
+    announcement = 0,
     func = (function(self, ply)
 		net.Start("nzPowerUps.PickupHud")
 			net.WriteString("Free Perk!")
