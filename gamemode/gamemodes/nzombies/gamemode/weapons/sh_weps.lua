@@ -118,6 +118,14 @@ function wepMeta:IsTFA()
 	return false
 end
 
+function wepMeta:IsCSO() -- CSO has a perfix of tfa, so using IsTFA() and IsCSO() at the same time is redundant.
+	if string.sub(self:GetClass(), 1, 7) == "tfa_cso_" then -- This is enough to detect CSO
+		return true
+	end
+
+	return false
+end
+
 function wepMeta:CanRerollPaP()
 	return (self.OnRePaP or (self.Attachments and ((self:IsCW2() and CustomizableWeaponry) or self:IsTFA()) or self:IsFAS2()))
 end
