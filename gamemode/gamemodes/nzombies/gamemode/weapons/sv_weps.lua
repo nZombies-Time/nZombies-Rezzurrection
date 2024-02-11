@@ -29,6 +29,9 @@ function GetPriorityWeaponSlot(ply)
 	end
 	-- If we didn't return before (all slots taken), check the activeweapon
 	local activewep = ply:GetActiveWeapon()
+	
+	if activewep:IsCSO() then activewep = ply:GetInternalVariable("m_hLastWeapon") end -- In CSO, it should be the last active weapon instead of the active weapon
+	
 	local id = activewep:GetNWInt("SwitchSlot")
 	-- Only replace it if it has an ID (default is 0)
 	if id > 0 then
