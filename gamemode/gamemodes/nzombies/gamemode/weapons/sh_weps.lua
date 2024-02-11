@@ -119,7 +119,7 @@ function wepMeta:IsTFA()
 end
 
 function wepMeta:IsCSO() -- CSO has a perfix of tfa, so using IsTFA() and IsCSO() at the same time is redundant.
-	if string.sub(self:GetClass(), 1, 7) == "tfa_cso_" then -- This is enough to detect CSO
+	if string.sub(self:GetClass(), 1, 8) == "tfa_cso_" then -- This is enough to detect CSO
 		return true
 	end
 
