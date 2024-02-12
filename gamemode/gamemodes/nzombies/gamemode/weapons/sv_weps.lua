@@ -8,7 +8,7 @@ hook.Add("PlayerSpawn", "RemoveCW2Attachments", function(ply)
 	end
 end)
 
-function GetPriorityWeaponSlot(ply)
+function GetPriorityWeaponSlot(ply, wep)
 	-- Create some variables to use
 	local maxnum = ply:HasPerk("mulekick") and 3 or 2
 	local tbl = {}
@@ -29,6 +29,10 @@ function GetPriorityWeaponSlot(ply)
 	end
 	-- If we didn't return before (all slots taken), check the activeweapon
 	local activewep = ply:GetActiveWeapon()
+	if activewep == wep then -- If the added weapon is active, the last active weapon should be checked.
+		local lastactivewep = ply:GetInternalVariable("m_hLastWeapon")
+		activewep = lastactivewep
+	end
 	local id = activewep:GetNWInt("SwitchSlot")
 	-- Only replace it if it has an ID (default is 0)
 	if id > 0 then
@@ -48,7 +52,7 @@ local function OnWeaponAdded( wep )
 		if not IsValid(ply) then return end
 
 		if !nzRound:InState( ROUND_CREATE ) then
-			local slot, exists = GetPriorityWeaponSlot(ply)
+			local slot, exists = GetPriorityWeaponSlot(ply, wep) -- Pass arguments to check added weapons.
 			if IsValid(exists) then ply:StripWeapon(exists:GetClass()) end
 
 			wep:SetNWInt("SwitchSlot", slot)
