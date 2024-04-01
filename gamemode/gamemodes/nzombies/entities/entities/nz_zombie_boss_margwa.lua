@@ -40,13 +40,14 @@ local JumpSequences = {
 }
 
 local walksounds = {
-	Sound("enemies/bosses/margwa/vox/vox_ambient_01.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_02.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_03.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_04.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_05.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_06.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_ambient_07.ogg"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_03.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_04.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_05.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_06.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/ambient/vox_ambient_07.mp3"),
 }
 
 ENT.IdleSequence = "nz_margwa_idle"
@@ -79,17 +80,56 @@ ENT.SequenceTables = {
 }
 
 ENT.AttackSounds = {
-	Sound("enemies/bosses/margwa/vox/vox_attack_01.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_attack_02.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_attack_03.ogg"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack/vox_attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack/vox_attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack/vox_attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack/vox_attack_03.mp3"),
+}
+
+ENT.AttackRaiseSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack_warn/vox_attack_raise_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack_warn/vox_attack_raise_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack_warn/vox_attack_raise_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/attack_warn/vox_attack_raise_03.mp3"),
+}
+
+ENT.PainSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/vox/pain/vox_pain_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/pain/vox_pain_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/pain/vox_pain_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/pain/vox_pain_03.mp3"),
 }
 
 ENT.DeathSounds = {
-	Sound("enemies/bosses/margwa/vox/vox_death_01.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_death_02.ogg"),
-	Sound("enemies/bosses/margwa/vox/vox_death_03.ogg"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/death/vox_death_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/death/vox_death_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/death/vox_death_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/vox/death/vox_death_03.mp3"),
 }
 
+ENT.StompSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/step/step_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_03.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_04.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_05.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_06.mp3"),
+}
+
+ENT.HeadExploSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_0.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_1.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_2.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_3.mp3"),
+}
+
+ENT.WhipAttackSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/whip_attack/whip_attack_0.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/whip_attack/whip_attack_1.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/whip_attack/whip_attack_2.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/whip_attack/whip_attack_3.mp3"),
+}
 
 ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, play these sounds instead
 
@@ -110,9 +150,9 @@ function ENT:StatsInitialize()
 			end
 		end
 
-		self.MidHeadHP = self:Health() / 4
-		self.LeftHeadHP = self:Health() / 4
-		self.RightHeadHP = self:Health() / 4
+		self.MidHeadHP = self:Health() / 10
+		self.LeftHeadHP = self:Health() / 10
+		self.RightHeadHP = self:Health() / 10
 
 		self.MidHead = true
 		self.LeftHead = true
@@ -148,16 +188,17 @@ function ENT:OnSpawn()
 	self:SetBodygroup(2,0)
 	self:SetBodygroup(3,0)
 
-	self:SetCollisionBounds(Vector(-40,-40, 0), Vector(40, 40, 100))
-	--self:SetModelScale(0.9,0.00001)
-
+	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+	self:SetSurroundingBounds(Vector(-50, -50, 0), Vector(50, 50, 100))
+		
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	self:SetInvulnerable(true)
 	self:SetSpecialAnimation(true)
 
 	self:SetNoDraw(true)
 
-	self:EmitSound("enemies/bosses/margwa/spawn.ogg",511)
+	self:EmitSound("nz_moo/zombies/vox/_margwa/spawn/spawn.mp3",511)
+	self:EmitSound("nz_moo/zombies/vox/_margwa/spawn/spawn_2d.mp3",511)
 	ParticleEffect("hcea_hunter_shade_cannon_explode_flash",self:GetPos(),self:GetAngles(),nil)
 	self:TimeOut(2.85)
 
@@ -176,14 +217,14 @@ end
 
 function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
 	if e == "swipe_whoosh" then
-		self:EmitSound("enemies/bosses/margwa/whip_attack_"..math.random(3)..".ogg", 80, math.random(95,105))
+		self:EmitSound(self.WhipAttackSounds[math.random(#self.WhipAttackSounds)], 80, math.random(95,105))
 	end
 	if e == "slam_whoosh" then
-		self:EmitSound("enemies/bosses/margwa/vox/vox_attack_raise_0"..math.random(3)..".ogg", 80, math.random(95,105))
+		self:EmitSound(self.AttackRaiseSounds[math.random(#self.AttackRaiseSounds)], 80, math.random(95,105))
 	end
 	if e == "slam_hit" then
-		self:EmitSound("enemies/bosses/margwa/slam_attack_close.ogg", 100)
-		self:EmitSound("enemies/bosses/margwa/slam_attack_far.ogg", 511)
+		self:EmitSound("nz_moo/zombies/vox/_margwa/slam_attack/slam_attack_close.mp3", 100)
+		self:EmitSound("nz_moo/zombies/vox/_margwa/slam_attack/slam_attack_far.mp3", 511)
 		ParticleEffect("bo3_margwa_slam",self:GetPos(),self:GetAngles(),nil)
 		util.ScreenShake(self:GetPos(),100000,500000,0.4,2000)
 		
@@ -207,13 +248,13 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 		self.TraversalAnim = false
 	end
 	if e == "lstep" then
-		self:EmitSound("enemies/bosses/margwa/step_0"..math.random(6)..".ogg",80,math.random(95,100))
+		self:EmitSound(self.StompSounds[math.random(#self.StompSounds)],80,math.random(95,100))
 		--self:EmitSound("nz_moo/zombies/vox/_cellbreaker/fly/keys/rattle_0"..math.random(0,4)..".mp3",80,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("shdw_margwa_footstep",PATTACH_POINT,self,5)
 	end
 	if e == "rstep" then
-		self:EmitSound("enemies/bosses/margwa/step_0"..math.random(6)..".ogg",80,math.random(95,100))
+		self:EmitSound(self.StompSounds[math.random(#self.StompSounds)],80,math.random(95,100))
 		--self:EmitSound("nz_moo/zombies/vox/_cellbreaker/fly/keys/rattle_0"..math.random(0,4)..".mp3",80,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("shdw_margwa_footstep",PATTACH_POINT,self,6)
@@ -262,7 +303,7 @@ function ENT:OnInjured(dmginfo)
 
 	local righthead = self:GetBonePosition(self:LookupBone("j_head_ri"))
 
-	if hitpos:DistToSqr(middlehead) < 29.26^2 and self.MidHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(middlehead) < 31^2 and self.MidHead and CurTime() > self.IFrames then
 		if self.MidHeadHP > 0 then
 			self.MidHeadHP = self.MidHeadHP - damage
 		else
@@ -272,8 +313,8 @@ function ENT:OnInjured(dmginfo)
 			self.HeadCount = self.HeadCount + 1
 			self:SetBodygroup(2,1)
     		ParticleEffectAttach("hcea_hunter_shade_cannon_explode_ergy_fbl_trcr_ball_smk", 4, self, 2)
-    		self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
-    		self:EmitSound("enemies/bosses/margwa/vox/vox_pain_0"..math.random(1,3)..".ogg", 100, math.random(85,105))
+    		self:EmitSound(self.HeadExploSounds[math.random(#self.HeadExploSounds)], 511)
+    		self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85,105))
 
     		if IsValid(attacker) then
     			attacker:GivePoints(500)
@@ -293,7 +334,7 @@ function ENT:OnInjured(dmginfo)
 			end)
 		end
 	end
-	if hitpos:DistToSqr(lefthead) < 29.26^2 and self.LeftHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(lefthead) < 31^2 and self.LeftHead and CurTime() > self.IFrames then
 		if self.LeftHeadHP > 0 then
 			self.LeftHeadHP = self.LeftHeadHP - damage
 		else
@@ -303,8 +344,8 @@ function ENT:OnInjured(dmginfo)
 			self.HeadCount = self.HeadCount + 1
 			self:SetBodygroup(1,1)
     		ParticleEffectAttach("hcea_hunter_shade_cannon_explode_ergy_fbl_trcr_ball_smk", 4, self, 3)
-    		self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
-    		self:EmitSound("enemies/bosses/margwa/vox/vox_pain_0"..math.random(1,3)..".ogg", 100, math.random(85,105))
+    		self:EmitSound(self.HeadExploSounds[math.random(#self.HeadExploSounds)], 511)
+    		self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85,105))
 
     		if IsValid(attacker) then
     			attacker:GivePoints(500)
@@ -324,7 +365,7 @@ function ENT:OnInjured(dmginfo)
 			end)
 		end
 	end
-	if hitpos:DistToSqr(righthead) < 29.26^2 and self.RightHead and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(righthead) < 31^2 and self.RightHead and CurTime() > self.IFrames then
 		if self.RightHeadHP > 0 then
 			self.RightHeadHP = self.RightHeadHP - damage
 		else
@@ -334,8 +375,8 @@ function ENT:OnInjured(dmginfo)
 			self.HeadCount = self.HeadCount + 1
 			self:SetBodygroup(3,1)
     		ParticleEffectAttach("hcea_hunter_shade_cannon_explode_ergy_fbl_trcr_ball_smk", 4, self, 4)
-    		self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
-    		self:EmitSound("enemies/bosses/margwa/vox/vox_pain_0"..math.random(1,3)..".ogg", 100, math.random(85,105))
+    		self:EmitSound(self.HeadExploSounds[math.random(#self.HeadExploSounds)], 511)
+    		self:EmitSound(self.PainSounds[math.random(#self.PainSounds)], 100, math.random(85,105))
 
     		if IsValid(attacker) then
     			attacker:GivePoints(500)
@@ -372,6 +413,8 @@ end
 
 function ENT:AI()
 	local target = self:GetTarget()
+
+	-- TELEPORT
 	if IsValid(target) and target:IsPlayer() then
 		if !self:TargetInRange(1500) then
 			local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
@@ -413,112 +456,24 @@ function ENT:AI()
 			end)
 		end
 	end
+
+	-- ENRAGE
 	if self.LostAHead and !self.GainSpeed then
 		self.GainSpeed = true
 		self:SetRunSpeed(71)
 		self:SpeedChanged()
 	end
-end
 
-if SERVER then
-	-- Collide When Possible
-	local collidedelay = 0.25
-	local bloat = Vector(5,5,0)
-	function ENT:Think()
-		if (self:IsAllowedToMove() and !self:GetCrawler() and self.loco:GetVelocity():Length2D() >= 125 and self.SameSquare and !self:GetIsBusy() or self:IsAllowedToMove() and self:GetAttacking() ) then -- Moo Mark
-        	self.loco:SetVelocity(self:GetForward() * self:GetRunSpeed())
-        end
-		if self.DoCollideWhenPossible then
-			if not self.NextCollideCheck or self.NextCollideCheck < CurTime() then
-				local mins,maxs = self:GetCollisionBounds()
-				local tr = util_tracehull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					filter = self,
-					mask = MASK_NPCSOLID,
-					mins = mins - bloat,
-					maxs = maxs + bloat,
-					ignoreworld = true
-				})
-
-				local b = tr.Entity
-				if !IsValid(b) then 
-					self:SetSolidMask(MASK_NPCSOLID)
-					self:SetCollisionGroup(COLLISION_GROUP_INTERACTIVE_DEBRIS)
-					self.DoCollideWhenPossible = nil
-					self.NextCollideCheck = nil
-				else
-					self.NextCollideCheck = CurTime() + collidedelay
-				end
-			end
-		end
-
-
-        if CurTime() > self.SpawnProtectionTime and self.SpawnProtection then
-        	self.SpawnProtection = false
-        	--print("Can be hurt")
-        end
-        
-		self:StuckPrevention()
-		self:ZombieStatusEffects()
-
-		if not self.NextSound or self.NextSound < CurTime() then
-			self:Sound()
-		end
-
-		self:DebugThink()
-		self:OnThink()
-	end
-	function ENT:StuckPrevention()
-		if !self:GetIsBusy() and !self:GetSpecialAnimation() and !self:GetAttacking() and self:GetLastPostionSave() + 0.25 < CurTime() then
-			if self:GetPos():DistToSqr( self:GetStuckAt() ) < 75 then
-				self:SetStuckCounter( self:GetStuckCounter() + 1)
-				--print(self:GetStuckCounter())
-			else
-				self:SetStuckCounter( 0 )
-				local tr1 = util_tracehull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = Vector(38, 38, 99) + bloat,
-					mins = Vector(-38,-38, 0) - bloat,
-					filter = self
-				})
-				if !tr1.HitWorld then
-					self:SetCollisionBounds(Vector(-40,-40, 0), Vector(40, 40, 100))
-				end
-			end
-
-			if self:GetStuckCounter() >= 2 then
-
-				self:SetCollisionBounds(Vector(-20,-20, 0), Vector(20, 20, 85))
-
-				local tr = util_tracehull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = self:OBBMaxs() + bloat,
-					mins = self:OBBMins() - bloat,
-					filter = self
-				})
-				if !tr.HitWorld then
-				end
-				if self:GetStuckCounter() > 25 then
-					if self.NZBossType then
-						local spawnpoints = {}
-						for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
-							if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
-								table.insert(spawnpoints, v)
-							end
-						end
-						local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
-						self:SetPos(selected:GetPos())
-					else
-						self:RespawnZombie()
+	-- Knock normal zombies aside
+	for k,v in nzLevel.GetZombieArray() do
+		if IsValid(v) and !v:GetSpecialAnimation() and v.IsMooZombie and !v.Non3arcZombie and !v.IsMooSpecial and v ~= self then
+			if self:GetRangeTo( v:GetPos() ) < 9^2 then	
+				if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() then
+					if v.PainSequences then
+						v:DoSpecialAnimation(v.PainSequences[math.random(#v.PainSequences)], true, true)
 					end
-					self:SetStuckCounter( 0 )
 				end
 			end
-			self:SetLastPostionSave( CurTime() )
-			self:SetStuckAt( self:GetPos() )
 		end
 	end
 end

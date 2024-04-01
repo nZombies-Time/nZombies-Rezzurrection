@@ -7,6 +7,12 @@ ENT.Author = "GhostlyMoo"
 
 --Girly weak ass bitch
 
+function ENT:InitDataTables()
+	self:NetworkVar("Entity", 	5, "CurrentZombie")
+	self:NetworkVar("Entity", 	6, "CurrentPlayer")
+	self:NetworkVar("Bool", 	7, "IsEnraged")
+end
+
 if CLIENT then 
 	local eyeglow =  Material("nz/zlight")
 	function ENT:Draw() //Runs every frame
@@ -17,10 +23,25 @@ if CLIENT then
 		if GetConVar( "nz_zombie_debug" ):GetBool() then
 			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
 		end
+		
+		self:EffectsAndSounds()
+
+		self:HideSelfFromVictim()
+		--self:HideVictimFromClients()
+	end
+
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if self:GetIsEnraged() and (!self.Draw_FX or !IsValid(self.Draw_FX)) then
+				self.Draw_FX = CreateParticleSystem(self, "bo3_thrasher_aura", PATTACH_POINT_FOLLOW, 1)
+			end
+		end
 	end
 
 	function ENT:DrawEyeGlow()
-		local eyeColor = Color(255, 25, 0, 255)
+		local eyeColor = Color(255, 100, 0, 255)
 		local latt = self:LookupAttachment("lefteye")
 		local ratt = self:LookupAttachment("righteye")
 
@@ -42,6 +63,43 @@ if CLIENT then
 			render.DrawSprite(righteyepos, 6, 6, eyeColor)
 		end
 	end
+
+	function ENT:HideSelfFromVictim()
+		-- Get the Thrasher's player and the client.
+
+		local currentply = self:GetCurrentPlayer()
+		local ply = LocalPlayer()
+
+		-- If they are equal, hide the thrasher from the client(victim)
+		if self:Alive() and IsValid(currentply) and IsValid(ply) then
+			if currentply:IsPlayer() and currentply == ply then
+				self:SetNoDraw(true)
+			else
+				self:SetNoDraw(false)
+			end
+		else
+			self:SetNoDraw(false)
+		end
+	end
+
+	--[[function ENT:HideVictimFromClients()
+		local currentply = self:GetCurrentPlayer()
+		local ply = LocalPlayer()
+		if IsValid(self) then
+			if IsValid(currentply) and IsValid(ply) then
+				if currentply:IsPlayer() and (currentply ~= ply or currentply == ply) then
+					currentply:SetNoDraw(true)
+				else
+					currentply:SetNoDraw(false)
+				end
+			end
+		else
+			if IsValid(currentply) then
+				currentply:SetNoDraw(false)
+			end
+		end
+	end]]
+
 	return 
 end -- Client doesn't really need anything beyond the basics
 
@@ -121,6 +179,10 @@ ENT.SequenceTables = {
 	}}
 }
 
+ENT.ZombieLandSequences = {
+	"nz_thrasher_jump_land",
+}
+
 ENT.CustomMantleOver48 = {
 	"nz_thrasher_mantle_over_48"
 }
@@ -183,6 +245,23 @@ ENT.BiteSounds = {
 	Sound("nz_moo/zombies/vox/_thrasher/bite/bite_04.mp3"),
 }
 
+ENT.StompSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/step/step_00.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_01.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_02.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_03.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_04.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_05.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/step/step_06.mp3"),
+}
+
+ENT.SporeExplodeSounds = {
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_0.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_1.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_2.mp3"),
+	Sound("nz_moo/zombies/vox/_margwa/head_explo/margwa_head_explo_3.mp3"),
+}
+
 function ENT:StatsInitialize()
 	if SERVER then
 		local count = #player.GetAllPlaying()
@@ -200,9 +279,10 @@ function ENT:StatsInitialize()
 			end
 		end
 		
-		-- Instead of being random, it will now always be 10 to 20 seconds before a Thrasher becomes enraged.
-		self.EnrageTime = CurTime() + math.random(10, 20)
+		-- Instead of being random, it will now always be 15 to 30 seconds before a Thrasher becomes enraged.
+		self.EnrageTime = CurTime() + math.random(15, 30)
 		self.Enraged = false
+		self:SetIsEnraged(false)
 
 		self.TeleportCooldown = CurTime() + 1
 
@@ -210,9 +290,15 @@ function ENT:StatsInitialize()
 		self.ChestSpore = true
 		self.BackSpore = true
 
-		self.LegSporeHp = self:Health() / 4
-		self.ChestSporeHp = self:Health() / 4
-		self.BackSporeHp = self:Health() / 4
+		self.LegSporeHp = self:Health() / 10
+		self.ChestSporeHp = self:Health() / 10
+		self.BackSporeHp = self:Health() / 10
+
+		self:SetCurrentZombie(nil)
+		self:SetCurrentPlayer(nil)
+
+		self.Acting = false
+		self.ActTime = CurTime() + 1
 
 		self.SporeCount = 0
 		self.RegenCooldown = CurTime() + 5
@@ -221,14 +307,17 @@ function ENT:StatsInitialize()
 
 		self:SetRunSpeed( 60 )
 		self.loco:SetDesiredSpeed( 60 )
-		self:SetCollisionBounds(Vector(-18,-18, 0), Vector(18, 18, 95))
 	end
 end
 
 function ENT:OnSpawn()
-
+	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+	self:SetSurroundingBounds(Vector(-26, -26, 0), Vector(26, 26, 75))
+	
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	self:EmitSound(self.SpawnSounds[math.random(#self.SpawnSounds)],577)
+
+	self:CreateVinesIn()
 
 	self:SetSpecialAnimation(true)
 	local seq = self:SelectSpawnSequence()
@@ -257,16 +346,53 @@ function ENT:AI()
 	-- ENRAGE
 	if !self.Enraged and CurTime() > self.EnrageTime then
 		self.Enraged = true
+		self:SetIsEnraged(true)
 
 		self:EmitSound("enemies/bosses/thrasher/vox/spawn_0"..math.random(1,2)..".ogg",677)
 		self:EmitSound("nz_moo/zombies/vox/_thrasher/enrage_imp_00.mp3",577)
 		ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,60)),Angle(0,0,0),nil)	
-		ParticleEffectAttach("bo3_thrasher_aura", 5, self, 1)
 		
 		self:DoSpecialAnimation("nz_thrasher_enrage")
 		self:SetRunSpeed(150)
 		self:SpeedChanged()
 	end
+
+
+	-- ABDUCTION
+	for k,v in pairs(player.GetAll()) do
+		
+		if #player.GetAllPlaying() <= 1 then return end
+
+		if IsValid(v) and !v:GetNotDowned() and !IsValid(self:GetCurrentPlayer()) and !v:NZIsThrasherVictim() and math.random(3) == 1 then
+			
+			self:SetTarget(v)
+
+			if !self:TargetInRange(450) then return end
+
+			local pos = v:GetPos()
+
+			self:ResetMovementSequence()
+			self:MoveToPos(pos, {
+				lookahead = 1,
+				tolerance = 75,
+				draw = false,
+				repath = 3,
+				maxage = 5,
+			})
+
+			self:FaceTowards(v:GetPos())
+			self:DoSpecialAnimation("nz_thrasher_eat", 1)
+			if IsValid(self) and self:Alive() then
+				if !v:GetNotDowned() and !v:NZIsThrasherVictim() then
+					--v:Kill()
+					v:SetCollisionGroup(COLLISION_GROUP_IN_VEHICLE)
+					self:SetCurrentPlayer(v)
+					v.ThrasherParent = self
+				end
+			end
+		end
+	end
+
 
 	-- TELEPORT
 	if IsValid(self.Target) and !self:TargetInRange(750) and CurTime() > self.TeleportCooldown then
@@ -275,12 +401,15 @@ function ENT:AI()
 		local target = self.Target
 		local pos = self:FindSpotBehindPlayer(target:GetPos(), 10)
 
+		self:CreateVinesOut()
 		self:PlaySequenceAndWait("nz_thrasher_teleport_out")
 		self:SetSpecialAnimation(true)
+
 
 		self:SetPos( pos )
 		self:FaceTowards(self.Target)
 
+		self:CreateVinesIn()
 		self:PlaySequenceAndWait("nz_thrasher_teleport_in")
 		self:SetSpecialAnimation(false)
 		self:CollideWhenPossible()
@@ -296,27 +425,34 @@ function ENT:AI()
 					local seq = "nz_thrasher_eat_z_b"
 					if self:SequenceHasSpace(seq) then
 						if !IsValid(v) then return end
-						
+
 						self.RegenCooldown = CurTime() + 10
 
 						self:TimeOut(0.25)
 
 						self.Regen = true
-						v:SetStop(true)
 
-						debugoverlay.Sphere(pos, 50, 5, Color( 255, 255, 255 ), false)
+						self:SetCurrentZombie(v)
 
 						self:TempBehaveThread(function(self)
+							if !IsValid(self:GetCurrentZombie()) then return end
+							local zomb = self:GetCurrentZombie()
+
 							self:SetSpecialAnimation(true)
-							self:FaceTowards(v:GetPos())
 							self:SetIsBusy(true)
 							self.TraversalAnim = true
-							local pos = self:WorldSpaceCenter() + self:GetRight() * -6 + self:GetForward() * 70
+							self.Acting = true
+							local pos = self:GetPos() + self:GetRight() * -6 + self:GetForward() * 70
 
-							v:SetPos(pos)
-							v:SetAngles(self:GetAngles())
+							debugoverlay.Sphere(pos, 50, 5, Color( 255, 255, 255 ), false)
 
-							v:DoSpecialAnimation("nz_zombie_eaten_by_thrasher_f")
+							--zomb:ApproachPosAndWait(pos, 13)
+							zomb:SetPos(pos)
+							zomb:SetAngles(self:GetAngles())
+
+							self:FaceTowards(zomb:GetPos())
+
+							zomb:DoSpecialAnimation("nz_zombie_eaten_by_thrasher_f", false, false, false)
 							self:PlaySequenceAndMove(seq, 1)
 
 							self:RegenSpore()
@@ -324,6 +460,7 @@ function ENT:AI()
 							self:SetSpecialAnimation(false)
 							self:SetIsBusy(false)
 							self.TraversalAnim = false
+							self.Acting = false
 						end)
 					end
 				end
@@ -331,26 +468,48 @@ function ENT:AI()
 		end
 	end
 
-	for k,v in pairs(player.GetAll()) do
-		if k <= 1 then return end
-		if !v:GetNotDowned() and math.random(5) == 5 then
-			self:TempBehaveThread(function(self)
-				self:PlaySequenceAndMove("nz_thrasher_enrage")
-				self:PlaySequenceAndMove("nz_thrasher_teleport_out")
-
-				self:SetTarget(v)
-				local pos = self:FindSpotBehindPlayer(v:GetPos(), 10)
-				self:SetPos(pos)
-				self:FaceTowards(v:GetPos())
-				self:PlaySequenceAndMove("nz_thrasher_teleport_in")
-				self:PlaySequenceAndMove("nz_thrasher_eat")
-				if IsValid(self) and self:Alive() then
-					if !v:GetNotDowned() then
-						v:Kill()
+	-- Knock normal zombies aside
+	for k,v in nzLevel.GetZombieArray() do
+		if IsValid(v) and !v:GetSpecialAnimation() and v.IsMooZombie and !v.Non3arcZombie and !v.IsMooSpecial and v ~= self then
+			if self:GetRangeTo( v:GetPos() ) < 7^2 then	
+				if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() and self:GetRunSpeed() > 36 then
+					if v.PainSequences then
+						v:DoSpecialAnimation(v.PainSequences[math.random(#v.PainSequences)], true, true)
 					end
 				end
-			end)
+			end
 		end
+	end
+
+	-- Wander
+	--[[if IsValid(self:GetCurrentPlayer()) then
+		self:ResetMovementSequence()
+		self:MoveToPos(self:GetPos() + Vector(math.random(-512, 512), math.random(-512, 512), 0), {
+			repath = 3,
+			maxage = 5
+		})
+	end]]
+end
+
+function ENT:OnThink()
+	local victim = self:GetCurrentPlayer()
+
+	if CurTime() > self.ActTime then
+		if self.Acting and !IsValid(self:GetCurrentZombie()) then
+			self.Acting = false
+			self:SetCurrentZombie(nil)
+			self:TimeOut(1)
+		end
+		self.ActTime = CurTime() + 1
+	end
+
+	if IsValid(victim) and victim:Alive() then
+		victim:NZThrasherVictim(0.5, victim)
+		--victim:SetPos(self:EyePos()) -- This is by far the worst thing I've ever done.
+		--victim:SetPos(LerpVector( 0.15, victim:GetPos(), self:EyePos() ))
+	elseif IsValid(victim) and !victim:Alive() then
+		victim:SetParent(nil)
+		self:SetCurrentPlayer(nil)
 	end
 end
 
@@ -358,19 +517,19 @@ function ENT:RegenSpore()
 	self.SporeCount = self.SporeCount - 1
 	if !self.LegSpore then
 		self.LegSpore = true
-		self.LegSporeHp = 3500 / 4
+		self.LegSporeHp = 3500 / 10
 		self:ManipulateBoneScale(self:LookupBone("tag_spore_leg"), Vector(1,1,1))
 		return
 	end
 	if !self.ChestSpore then
 		self.ChestSpore = true
-		self.ChestSporeHp = 3500 / 4
+		self.ChestSporeHp = 3500 / 10
 		self:ManipulateBoneScale(self:LookupBone("tag_spore_chest"), Vector(1,1,1))
 		return
 	end
 	if !self.BackSpore then
 		self.BackSpore = true
-		self.BackSporeHp = 3500 / 4
+		self.BackSporeHp = 3500 / 10
 		self:ManipulateBoneScale(self:LookupBone("tag_spore_back"), Vector(1,1,1))
 		return
 	end
@@ -395,7 +554,7 @@ function ENT:OnInjured(dmginfo)
 	local back = self:LookupBone("tag_spore_back")
 	local backpos = self:GetBonePosition(back)
 
-	if hitpos:DistToSqr(legpos) < 15^2 and self.LegSpore and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(legpos) < 20^2 and self.LegSpore and CurTime() > self.IFrames then
 		if self.LegSporeHp > 0 then
 			self.LegSporeHp = self.LegSporeHp - damage
 		else
@@ -405,7 +564,7 @@ function ENT:OnInjured(dmginfo)
 			self.SporeCount = self.SporeCount + 1
 
 			self:ManipulateBoneScale(leg, Vector(0.00001,0.00001,0.00001))
-			self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
+			self:EmitSound(self.SporeExplodeSounds[math.random(#self.SporeExplodeSounds)], 511)
 
     		if IsValid(attacker) then
     			attacker:GivePoints(50)
@@ -426,7 +585,7 @@ function ENT:OnInjured(dmginfo)
 		end
 	end
 
-	if hitpos:DistToSqr(chestpos) < 15^2 and self.ChestSpore and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(chestpos) < 20^2 and self.ChestSpore and CurTime() > self.IFrames then
 		if self.ChestSporeHp > 0 then
 			self.ChestSporeHp = self.ChestSporeHp - damage
 		else
@@ -437,7 +596,7 @@ function ENT:OnInjured(dmginfo)
 
 			self:ManipulateBoneScale(chest, Vector(0.00001,0.00001,0.00001))
 			ParticleEffect("bo3_thrasher_blood",chestpos, Angle(0,0,0), nil)
-			self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
+			self:EmitSound(self.SporeExplodeSounds[math.random(#self.SporeExplodeSounds)], 511)
 
     		if IsValid(attacker) then
     			attacker:GivePoints(50)
@@ -458,7 +617,7 @@ function ENT:OnInjured(dmginfo)
 		end
 	end
 
-	if hitpos:DistToSqr(backpos) < 15^2 and self.BackSpore and CurTime() > self.IFrames then
+	if hitpos:DistToSqr(backpos) < 20^2 and self.BackSpore and CurTime() > self.IFrames then
 		if self.BackSporeHp > 0 then
 			self.BackSporeHp = self.BackSporeHp - damage
 		else
@@ -469,7 +628,7 @@ function ENT:OnInjured(dmginfo)
 
 			self:ManipulateBoneScale(back, Vector(0.00001,0.00001,0.00001))
 			ParticleEffect("bo3_thrasher_blood",backpos, Angle(0,0,0), nil)
-			self:EmitSound("enemies/bosses/margwa/margwa_head_explo_"..math.random(3)..".ogg", 511)
+			self:EmitSound(self.SporeExplodeSounds[math.random(#self.SporeExplodeSounds)], 511)
 
     		if IsValid(attacker) then
     			attacker:GivePoints(50)
@@ -490,6 +649,10 @@ function ENT:OnInjured(dmginfo)
 		end
 	end
 
+	if !self.Enraged and math.random(100) < 25 then -- Have a chance of becoming enraged from just being shot.
+		self.EnrageTime = 0
+	end
+
 	dmginfo:ScaleDamage(0.25)
 
 end
@@ -499,14 +662,38 @@ function ENT:IsValidTarget( ent )
 	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 
+function ENT:CreateVinesIn()
+	if !IsValid(self) then return end
+	
+	local vines = ents.Create("nz_ent_fx_thrasher_vines")
+	vines:SetPos(self:GetPos())
+	vines:SetAngles(self:GetAngles())
+
+	vines:Spawn()
+
+	vines:VinesIn() 
+end
+
+function ENT:CreateVinesOut()
+
+	local vines = ents.Create("nz_ent_fx_thrasher_vines")
+	vines:SetPos(self:GetPos())
+	vines:SetAngles(self:GetAngles())
+
+	vines:Spawn()
+	
+	vines:VinesOut()
+end
 
 function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
 	if e == "step_right_small" or e == "step_left_small" then
-		self:EmitSound("enemies/bosses/margwa/step_0"..math.random(6)..".ogg",80,math.random(95,100))
+		self:EmitSound(self.StompSounds[math.random(#self.StompSounds)], 80, math.random(95,105))
+		self:EmitSound("nz_moo/zombies/vox/_thrasher/fall_swt/fall_swt_0"..math.random(0,6)..".mp3", 80)
 		util.ScreenShake(self:GetPos(),1,1,0.2,450)
 	end
 	if e == "step_right_large" or e == "step_left_large" then
-		self:EmitSound("enemies/bosses/margwa/step_0"..math.random(6)..".ogg",80,math.random(95,100))
+		self:EmitSound(self.StompSounds[math.random(#self.StompSounds)], 80, math.random(95,105))
+		self:EmitSound("nz_moo/zombies/vox/_thrasher/fall_swt/fall_swt_0"..math.random(0,6)..".mp3", 80)
 		util.ScreenShake(self:GetPos(),1,1,0.2,450)
 	end
 	if e == "melee" or e == "melee_heavy" then
@@ -564,6 +751,7 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 	end
 	if e == "thrasher_explode" then
 		if IsValid(self) then
+
 			ParticleEffect("bo3_margwa_death",self:LocalToWorld(Vector(0,0,0)),Angle(0,0,0),nil)
 			self:Remove()
 		end
@@ -575,5 +763,14 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 	if e == "finish_traverse" then
 		--print("finishtraverse")
 		self.TraversalAnim = false
+	end
+end
+
+function ENT:OnRemove()
+	if IsValid(self:GetCurrentPlayer()) then
+		local ply = self:GetCurrentPlayer()
+		ply:SetParent(nil)
+		ply:SetNoDraw(false)
+		ply:SetCollisionGroup(COLLISION_GROUP_PLAYER)
 	end
 end

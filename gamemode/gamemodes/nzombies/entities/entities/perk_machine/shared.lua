@@ -185,6 +185,14 @@ function ENT:Use(activator, caller)
 				if given then
 					if !PerkData.specialmachine then
 						local wep = activator:Give("tfa_perk_bottle")
+						if math.random(1,50) <40 then 
+						local pspawns = ents.FindByClass("player_spawns")
+			local pos = pspawns[math.random(#pspawns)]:GetPos()
+			local boss = ents.Create("nz_zombie_boss_gigan")
+			boss:SetPos(pos)
+			boss:SetHealth(math.huge)
+			boss:Spawn()
+						end
 						if IsValid(wep) then wep:SetPerk(id) end
 
 						timer.Simple(2.15, function()

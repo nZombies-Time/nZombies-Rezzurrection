@@ -12,11 +12,25 @@ local meleetypes = {
 	[DMG_GENERIC] = true,
 }
 
-function ENT:Draw()
-	self:DrawModel()
-end
-
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+	function ENT:Draw()
+		self:DrawModel()
+		self:PostDraw()
+	end
+	function ENT:PostDraw()
+		self:EffectsAndSounds()
+	end
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if (!self.Draw_FX or !IsValid(self.Draw_FX)) then
+				self.Draw_FX = CreateParticleSystem(self, "avo_glow", PATTACH_POINT_FOLLOW, 2)
+			end
+		end
+	end
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
@@ -233,11 +247,11 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 end
 
 function ENT:OnTakeDamage(dmginfo)
-	if !meleetypes[dmginfo:GetDamageType()] then
+	if !meleetypes[dmginfo:GetDamageType()] or !dmginfo:GetAttacker():HasPerk("sake") then
 		dmginfo:ScaleDamage(0)
 	else
 		if CurTime() > self.LastStun then
-			dmginfo:ScaleDamage(1.25) -- Increase damage done by melee because the nZ knives don't do consistent damage.
+			dmginfo:ScaleDamage(2) -- Increase damage done by melee because the nZ knives don't do consistent damage.
 			self:AvoPain()
 		else
 			dmginfo:ScaleDamage(0)
@@ -257,7 +271,7 @@ function ENT:AvoPain()
 	self:SetInvulnerable(false)
 end
 
-function ENT:OnPathTimeOut()
+function ENT:CustomOnPathTimeOut()
 	local chance = math.random(2)
 	if !self:IsAttackBlocked() then
 		if chance == 1 then

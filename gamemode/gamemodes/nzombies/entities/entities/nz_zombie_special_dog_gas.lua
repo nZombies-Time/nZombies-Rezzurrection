@@ -8,6 +8,19 @@ ENT.Author = "GhostlyMoo"
 if CLIENT then
 	function ENT:Draw() //Runs every frame
 		self:DrawModel()
+		self:PostDraw()
+	end
+	function ENT:PostDraw()
+		self:EffectsAndSounds()
+	end
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if (!self.Draw_FX or !IsValid(self.Draw_FX)) then
+				self.Draw_FX = CreateParticleSystem(self, "novagas_trail", PATTACH_POINT_FOLLOW, 2)
+			end
+		end
 	end
 end
 
@@ -124,7 +137,8 @@ function ENT:StatsInitialize()
 		self.SpawnProtection = true -- Zero Health Zombies tend to be created right as they spawn.
 		self.SpawnProtectionTime = CurTime() + 1 -- So this is an experiment to see if negating any damage they take for a second will stop this.
 	end
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 55))
+	self:SetCollisionBounds(Vector(-9,-9, 0), Vector(9, 9, 72))
+	self:SetSurroundingBounds(Vector(-20, -20, 0), Vector(20, 20, 72))
 end
 
 function ENT:OnSpawn()

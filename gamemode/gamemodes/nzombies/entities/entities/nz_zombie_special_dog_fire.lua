@@ -7,7 +7,9 @@ ENT.Author = "GhostlyMoo"
 
 if CLIENT then return end -- Client doesn't really need anything beyond the basics
 
-ENT.Eye = Material("models/moo/codz/t9_zombies/hellhound/mtl_c_t9_hellhound_eyes.vmt")
+ENT.EyeColorTable = {
+	[0] = Material("models/moo/codz/t9_zombies/hellhound/mtl_c_t9_hellhound_eyes.vmt"),
+}
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
@@ -188,7 +190,8 @@ function ENT:StatsInitialize()
 		self.SpawnProtection = true -- Zero Health Zombies tend to be created right as they spawn.
 		self.SpawnProtectionTime = CurTime() + 1 -- So this is an experiment to see if negating any damage they take for a second will stop this.
 	end
-	self:SetCollisionBounds(Vector(-16,-16, 0), Vector(16, 16, 55))
+	self:SetCollisionBounds(Vector(-9,-9, 0), Vector(9, 9, 72))
+	self:SetSurroundingBounds(Vector(-20, -20, 0), Vector(20, 20, 72))
 end
 
 function ENT:OnSpawn()

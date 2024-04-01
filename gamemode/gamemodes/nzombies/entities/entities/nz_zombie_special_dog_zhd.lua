@@ -135,7 +135,8 @@ function ENT:StatsInitialize()
 	if SERVER then
 		self.Sprinting = false
 	end
-	self:SetCollisionBounds(Vector(-13,-13, 0), Vector(13, 13, 45))
+	self:SetCollisionBounds(Vector(-9,-9, 0), Vector(9, 9, 72))
+	self:SetSurroundingBounds(Vector(-20, -20, 0), Vector(20, 20, 72))
 end
 
 function ENT:OnSpawn()

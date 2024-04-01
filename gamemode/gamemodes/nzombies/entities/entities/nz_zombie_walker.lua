@@ -6,20 +6,24 @@ ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+	ENT.EyeColorTable = {
+		[0] = Material("models/moo/codz/t7_honorguard/mtl_c_zom_dlchd_zombie_eyes.vmt"),
+		[1] = Material("models/moo/codz/t8_zombies/common/mtl_c_t8_zmb_eyes.vmt"),
+	}
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = true
-
-ENT.Eye = Material("models/moo/codz/t7_honorguard/mtl_c_zom_dlchd_zombie_eyes.vmt")
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_honorguard.mdl", Skin = 1, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_sumpf_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
 	{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_sumpf_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
-	--{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_chaos_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
+	{Model = "models/moo/_codz_ports/t7/honorguard/moo_codz_t7_chaos_honorguard.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 local spawnslow = {"nz_spawn_ground_v1", "nz_spawn_ground_ad_v2", "nz_spawn_ground_v2", "nz_spawn_ground_v2_altb"}
@@ -179,6 +183,12 @@ local StinkyRunAttackSequences = {
 	{seq = "nz_run_ad_attack_v2"},
 	{seq = "nz_run_ad_attack_v3"},
 	{seq = "nz_run_ad_attack_v4"},
+
+	-- The REAL Bad Attack Anims
+	{seq = "nz_legacy_run_attack_v1"},
+	{seq = "nz_legacy_run_attack_v2"},
+	{seq = "nz_legacy_run_attack_v3"},
+	{seq = "nz_legacy_run_attack_v4"},
 }
 
 local SprintAttackSequences = {
@@ -1013,33 +1023,33 @@ ENT.NukeDeathSounds = {
 }
 
 ENT.AttackSounds = {
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_00.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_01.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_02.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_03.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_04.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_05.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_06.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_07.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_1/attack_08.mp3",
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_07.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_1/attack_08.mp3"),
 
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_00.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_01.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_02.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_03.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_04.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_05.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_06.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_2/attack_07.mp3",
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_2/attack_07.mp3"),
 
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_00.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_01.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_02.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_03.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_04.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_05.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_06.mp3",
-	"nz_moo/zombies/vox/_zhd/attack/series_3/attack_07.mp3"
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_00.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_01.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_02.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_03.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_04.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_05.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_06.mp3"),
+	Sound("nz_moo/zombies/vox/_zhd/attack/series_3/attack_07.mp3")
 }
 
 ENT.CrawlerSounds = {
@@ -1123,7 +1133,7 @@ function ENT:OnSpawn(animation, grav, dirt)
 		self:SolidMaskDuringEvent(MASK_PLAYERSOLID)
 		self:SetSpecialAnimation(true)
 		self:SetIsBusy(true)
-
+		
 		self:PlaySequenceAndMove(animation, {gravity = grav})
 
 		self:SetSpecialAnimation(false)

@@ -293,30 +293,28 @@ nzRound:AddFontType("Default NZR", "nz_zombie_walker", {})
 
 nzRound.BoxSkinData = nzRound.BoxSkinData or {}
 function nzRound:AddBoxType(id, class)
-	if SERVER then
-		if class then
-			local data = {}
-			-- Which entity to spawn
-			data.class = class
-			nzRound.BoxSkinData[id] = data
-		else
-			nzRound.BoxSkinData[id] = nil -- Remove it if no valid class was added
-		end
-	else
-		-- Clients only need it for the dropdown, no need to actually know the data and such
-		nzRound.BoxSkinData[id] = class
-	end
+    if SERVER then
+        if class then
+            local data = {}
+            -- Which entity to spawn
+            data.class = class
+            nzRound.BoxSkinData[id] = data
+        else
+            nzRound.BoxSkinData[id] = nil -- Remove it if no valid class was added
+        end
+    else
+        -- Clients only need it for the dropdown, no need to actually know the data and such
+        nzRound.BoxSkinData[id] = class
+    end
 end
 
-nzRound:AddBoxType("Original", "", {}) 
-nzRound:AddBoxType("Mob of the Dead", "", {}) 
-nzRound:AddBoxType("Origins", "", {}) 
-nzRound:AddBoxType("Dead Space", "", {}) 
-nzRound:AddBoxType("Call of Duty: WW2", "", {}) 
-nzRound:AddBoxType("Chaos", "", {}) 
-nzRound:AddBoxType("DOOM", "", {}) 
-nzRound:AddBoxType("Resident Evil", "", {}) 
-nzRound:AddBoxType("Shadows of Evil", "", {}) 
+nzRound:AddBoxType("Original",             "", {}) 
+nzRound:AddBoxType("Black Ops 3",         "", {}) 
+nzRound:AddBoxType("Black Ops 3(Quiet Cosmos)", "", {}) 
+nzRound:AddBoxType("Mob of the Dead",     "", {}) 
+nzRound:AddBoxType("Nacht Der Untoten", "", {}) 
+nzRound:AddBoxType("Verruckt",             "", {})
+nzRound:AddBoxType("UGX Coffin",         "", {})
 
 nzRound.HudSelectData = nzRound.HudSelectData or {}
 function nzRound:AddHUDType(id, class)
@@ -541,6 +539,32 @@ function nzRound:AddZombieType(id, class)
 	end
 end
 
+nzRound:AddZombieType("Armored Zombies", "nz_zombie_walker_armoredheavy", {
+}) 
+nzRound:AddZombieType("ReDead", "nz_zombie_walker_blud", {
+}) 
+nzRound:AddZombieType("BOCW", "nz_zombie_walker_gold", {
+}) 
+nzRound:AddZombieType("VANGRIDDY", "nz_zombie_walker_griddy", {
+}) 
+nzRound:AddZombieType("Haus", "nz_zombie_walker_haus", {
+}) 
+nzRound:AddZombieType("IX", "nz_zombie_walker_ix", {
+}) 
+nzRound:AddZombieType("Leviathan", "nz_zombie_walker_leviathan", {
+}) 
+nzRound:AddZombieType("Origins (Classic)", "nz_zombie_walker_origins_classic", {
+}) 
+nzRound:AddZombieType("Templar (Classic)", "nz_zombie_walker_origins_templar_classic", {
+}) 
+nzRound:AddZombieType("Nacht Der Untoten", "nz_zombie_walker_prototype", {
+}) 
+nzRound:AddZombieType("Shi no Numa (Classic)", "nz_zombie_walker_sumpf_classic", {
+}) 
+nzRound:AddZombieType("WW2 (3arc)", "nz_zombie_walker_ww2_3arc", {
+}) 
+nzRound:AddZombieType("Kino der Toten (Chronicles)", "nz_zombie_walker", {
+}) 
 nzRound:AddZombieType("Kino der Toten (Chronicles)", "nz_zombie_walker", {
 }) 
 nzRound:AddZombieType("Kino der Toten", "nz_zombie_walker_kino", {
@@ -620,8 +644,43 @@ nzRound:AddZombieType("Xenomorph", "nz_zombie_walker_xeno", {
 nzRound:AddZombieType("Necromorph", "nz_zombie_walker_necromorph", {
 }) 
 
-
 function nzRound:GetZombieType(id)
+if id == "Armored Zombies" then
+	return "nz_zombie_walker_armoredheavy"
+	end
+	if id == "ReDead" then
+	return "nz_zombie_walker_blud"
+	end
+	if id == "VANGRIDDY" then
+	return "nz_zombie_walker_griddy"
+	end
+	if id == "BOCW" then
+	return "nz_zombie_walker_gold"
+	end
+	if id == "Haus" then
+	return "nz_zombie_walker_haus"
+	end
+	if id == "IX" then
+	return "nz_zombie_walker_ix"
+	end
+		if id == "Leviathan" then
+	return "nz_zombie_walker_leviathan"
+	end
+		if id == "Origins (Classic)" then
+	return "nz_zombie_walker_origins_classic"
+	end
+		if id == "Templar (Classic)" then
+	return "nz_zombie_walker_origins_templar_classic"
+	end
+		if id == "Nacht Der Untoten" then
+	return "nz_zombie_walker_prototype"
+	end
+		if id == "Shi no Numa (Classic)" then
+	return "nz_zombie_walker_sumpf_classic"
+	end
+		if id == "WW2 (3arc)" then
+	return "nz_zombie_walker_ww2_3arc"
+	end
 	if id == "Dead of the Night" then
 	return "nz_zombie_walker_mansion"
 	end
@@ -990,6 +1049,25 @@ nzRound:AddSpecialRoundType("Plasma Catalyst", {
 	local hp = 100
 	for i=1,nzRound:GetNumber() do 
 	hp = hp* 1.2
+								end 
+		dog:SetHealth(hp)
+	end
+end) -- No round func or end func
+
+nzRound:AddSpecialRoundType("Sizzler", {
+	specialTypes = {
+		["nz_zombie_special_siz"] = {chance = 100}
+	},
+	specialDelayMod = function() return math.Clamp(2 - #player.GetAllPlaying()*0.5, 0.5, 2) end, -- Dynamically change spawn speed depending on player count
+	specialCountMod = function() return nzRound:GetNumber() * #player.GetAllPlaying() end, -- Modify the count
+}, function(dog) -- We want to modify health
+	local round = nzRound:GetNumber()
+	if round == -1 then
+		dog:SetHealth(math.random(120, 1200))
+	else
+	local hp = 105
+	for i=1,nzRound:GetNumber() do 
+	hp = hp* 1.3
 								end 
 		dog:SetHealth(hp)
 	end

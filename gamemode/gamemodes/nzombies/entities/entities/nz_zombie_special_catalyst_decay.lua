@@ -7,16 +7,33 @@ ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-function ENT:DrawEyeGlow()
-	-- No eye glow
-end
-
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then
+	function ENT:Draw()
+		self:DrawModel()
+		self:PostDraw()
+	end
+	function ENT:PostDraw()
+		self:EffectsAndSounds()
+	end
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if (!self.Draw_FX or !self.Draw_FX:IsValid()) then
+				self.Draw_FX = CreateParticleSystem(self, "novagas_trail", PATTACH_POINT_FOLLOW, 2)
+			end
+		end
+	end
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
-ENT.IsMooZombie = true
 ENT.RedEyes = false
 ENT.IsCatalyst = true
+
+ENT.IsMooZombie = true
+ENT.IsMooSpecial = true
+ENT.MooSpecialZombie = true -- They're a Special Zombie, but is still close enough to a normal zombie to be able to do normal zombie things.
 
 ENT.Models = {
 	{Model = "models/moo/_codz_ports/t8/catalysts/moo_codz_t8_decay_catalyst.mdl", Skin = 0, Bodygroups = {0,0}},

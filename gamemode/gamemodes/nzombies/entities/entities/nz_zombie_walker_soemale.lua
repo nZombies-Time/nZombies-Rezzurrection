@@ -6,7 +6,13 @@ ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+	ENT.EyeColorTable = {
+		[0] = Material("models/moo/codz/t7_giant/mtl_c_zom_der_zombie_head1u.vmt"),
+		[1] = Material("models/moo/codz/t7_giant/mtl_char_ger_zombie_eyes.vmt"),
+	}
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
@@ -192,6 +198,12 @@ local StinkyRunAttackSequences = {
 	{seq = "nz_run_ad_attack_v2"},
 	{seq = "nz_run_ad_attack_v3"},
 	{seq = "nz_run_ad_attack_v4"},
+
+	-- The REAL Bad Attack Anims
+	{seq = "nz_legacy_run_attack_v1"},
+	{seq = "nz_legacy_run_attack_v2"},
+	{seq = "nz_legacy_run_attack_v3"},
+	{seq = "nz_legacy_run_attack_v4"},
 }
 
 local SprintAttackSequences = {
@@ -307,6 +319,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -383,6 +406,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -463,6 +497,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -541,6 +586,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -610,6 +666,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -677,6 +744,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -746,6 +824,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v9",
 				"nz_l4d_run_03",
 				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -812,6 +901,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 				"nz_l4d_run_03",
 				"nz_l4d_run_04",
 			},
@@ -904,6 +1004,12 @@ ENT.AttackSounds = {
 	"nz_moo/zombies/vox/_classic/attack/attack_13.mp3",
 	"nz_moo/zombies/vox/_classic/attack/attack_14.mp3",
 	"nz_moo/zombies/vox/_classic/attack/attack_15.mp3"
+}
+
+ENT.CustomAttackImpactSounds = {
+	Sound("nz_moo/zombies/plr_impact/_t6/swipe_00.mp3"),
+	Sound("nz_moo/zombies/plr_impact/_t6/swipe_01.mp3"),
+	Sound("nz_moo/zombies/plr_impact/_t6/swipe_04.mp3"),
 }
 
 ENT.BehindSoundDistance = 200 -- When the zombie is within 200 units of a player, play these sounds instead

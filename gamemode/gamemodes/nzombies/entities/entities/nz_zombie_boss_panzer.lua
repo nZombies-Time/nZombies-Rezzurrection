@@ -5,21 +5,14 @@ ENT.PrintName = "Panzer Soldat(Origins)"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-	self:NetworkVar("Bool", 3, "WaterBuff")
-	self:NetworkVar("Bool", 4, "Helmet")
-	self:NetworkVar("Bool", 5, "BomberBuff")
-
-	if self.InitDataTables then self:InitDataTables() end
+function ENT:InitDataTables()
+	self:NetworkVar("Bool", 5, "Helmet")
 end
 
 function ENT:ComedyGrab()
 	if CLIENT then return end
 	if !self.TheComedy then return end
-	self:EmitSound("nz_moo/zombies/vox/_mechz/claw/comedy/comedy_0"..math.random(2)..".mp3", 511)
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/claw/comedy/comedy_0"..math.random(1,2)..".mp3", 511)
 end
 
 function ENT:FinishGrab()
@@ -33,74 +26,88 @@ end
 
 AccessorFunc( ENT, "fLastToast", "LastToast", FORCE_NUMBER)
 
-function ENT:Draw()
-	self:DrawModel()
+if CLIENT then 
+	function ENT:Draw()
+		self:DrawModel()
 
-	if self.RedEyes and self:Alive() and !self:GetDecapitated() then
-		self:DrawEyeGlow() 
+		if self.RedEyes and self:Alive() and !self:GetDecapitated() then
+			self:DrawEyeGlow() 
+		end
+		if self:GetHelmet() then
+			self:FacePlateLamp()
+		end
+			
+		self:EffectsAndSounds()
+
+		if GetConVar( "nz_zombie_debug" ):GetBool() then
+			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+		end
 	end
-	if self:GetHelmet() then
-		self:FacePlateLamp()
+
+	function ENT:DrawEyeGlow()
+		local eyeglow = Material("nz/zlight")
+		local eyeColor = Color(255, 150, 50, 255)
+		local latt = self:LookupAttachment("lefteye")
+		local ratt = self:LookupAttachment("righteye")
+
+		if latt == nil then return end
+		if ratt == nil then return end
+
+		local leye = self:GetAttachment(latt)
+		local reye = self:GetAttachment(ratt)
+
+		if leye == nil then return end
+		if reye == nil then return end
+
+		local righteyepos = leye.Pos + leye.Ang:Forward()*1.5
+		local lefteyepos = reye.Pos + reye.Ang:Forward()*1.5
+
+		if lefteyepos and righteyepos then
+			render.SetMaterial(eyeglow)
+			render.DrawSprite(lefteyepos, 6, 6, eyeColor)
+			render.DrawSprite(righteyepos, 6, 6, eyeColor)
+		end
 	end
+
+	function ENT:FacePlateLamp()
+
+		local lightglow = Material( "sprites/physg_glow1_noz" )
+		local lightyellow = Color( 255, 255, 200, 200 )
+		local bone = self:GetAttachment(self:LookupAttachment("tag_headlamp_fx"))
+		local pos, ang = bone.Pos, bone.Ang	
+		local lightglow = Material( "sprites/physg_glow1_noz" )
+		local lightyellow = Color( 255, 255, 200, 200 )
+		local finalpos = pos
+
+		cam.Start3D2D(finalpos, ang, 1)
+			surface.SetAlphaMultiplier(1)
+			surface.SetMaterial(lightglow)
+			surface.SetDrawColor(lightyellow)
+			surface.DrawTexturedRect(-25,-10,100,20)
+		cam.End3D2D()
 		
-	if GetConVar( "nz_zombie_debug" ):GetBool() then
-		render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+		ang:RotateAroundAxis(ang:Forward(),90)
+
+		cam.Start3D2D(finalpos, ang, 1)
+			surface.SetAlphaMultiplier(1)
+			surface.SetMaterial(lightglow)
+			surface.SetDrawColor(lightyellow)
+			surface.DrawTexturedRect(-25,-10,100,20)
+		cam.End3D2D()
 	end
-end
 
-function ENT:DrawEyeGlow()
-	local eyeglow = Material("nz/zlight")
-	local eyeColor = Color(255, 150, 50, 255)
-	local latt = self:LookupAttachment("lefteye")
-	local ratt = self:LookupAttachment("righteye")
-
-	if latt == nil then return end
-	if ratt == nil then return end
-
-	local leye = self:GetAttachment(latt)
-	local reye = self:GetAttachment(ratt)
-
-	if leye == nil then return end
-	if reye == nil then return end
-
-	local righteyepos = leye.Pos + leye.Ang:Forward()*1.5
-	local lefteyepos = reye.Pos + reye.Ang:Forward()*1.5
-
-	if lefteyepos and righteyepos then
-		render.SetMaterial(eyeglow)
-		render.DrawSprite(lefteyepos, 6, 6, eyeColor)
-		render.DrawSprite(righteyepos, 6, 6, eyeColor)
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if !self.Draw_FX or !IsValid(self.Draw_FX) then -- PVS will no longer eat the particle effect.
+				self.Draw_FX = CreateParticleSystem(self, "doom_rev_missile_trail_smoke", PATTACH_POINT_FOLLOW, 2)
+			end
+		end
 	end
+
+	return 
 end
-
-function ENT:FacePlateLamp()
-
-	local lightglow = Material( "sprites/physg_glow1_noz" )
-	local lightyellow = Color( 255, 255, 200, 200 )
-	local bone = self:GetAttachment(self:LookupAttachment("tag_headlamp_fx"))
-	local pos, ang = bone.Pos, bone.Ang	
-	local lightglow = Material( "sprites/physg_glow1_noz" )
-	local lightyellow = Color( 255, 255, 200, 200 )
-	local finalpos = pos
-
-	cam.Start3D2D(finalpos, ang, 1)
-		surface.SetAlphaMultiplier(1)
-		surface.SetMaterial(lightglow)
-		surface.SetDrawColor(lightyellow)
-		surface.DrawTexturedRect(-25,-10,100,20)
-	cam.End3D2D()
-	
-	ang:RotateAroundAxis(ang:Forward(),90)
-
-	cam.Start3D2D(finalpos, ang, 1)
-		surface.SetAlphaMultiplier(1)
-		surface.SetMaterial(lightglow)
-		surface.SetDrawColor(lightyellow)
-		surface.DrawTexturedRect(-25,-10,100,20)
-	cam.End3D2D()
-end
-
-if CLIENT then return end
 
 
 local util_traceline = util.TraceLine
@@ -121,7 +128,7 @@ ENT.Models = {
 	{Model = "models/moo/_codz_ports/t7/tomb/moo_codz_t7_tomb_mechz.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-local spawn = {"nz_soldat_arrive"}
+local spawn = {"nz_soldat_arrive_fast"}
 
 ENT.DeathSequences = {
 	"nz_soldat_death_1",
@@ -152,24 +159,11 @@ local ClimbUp96 = {
 }
 
 local walksounds = {
-	Sound("enemies/bosses/newpanzer/vox/ambient_01.ogg"),
-	Sound("enemies/bosses/newpanzer/vox/ambient_02.ogg"),
-	Sound("enemies/bosses/newpanzer/vox/ambient_03.ogg"),
-	Sound("enemies/bosses/newpanzer/vox/ambient_04.ogg")
-}
-
-ENT.AttackSounds = {
-	"enemies/bosses/newpanzer/vox/swing_01.ogg",
-	"enemies/bosses/newpanzer/vox/swing_02.ogg",
-	"enemies/bosses/newpanzer/vox/swing_03.ogg",
-	"enemies/bosses/newpanzer/vox/swing_04.ogg",
-}
-
-ENT.DeathSounds = {
-	"enemies/bosses/newpanzer/vox/death_00.ogg",
-	"nz_moo/zombies/vox/_mechz/death_nh/death_nh_00.mp3",
-	"nz_moo/zombies/vox/_mechz/death_nh/death_nh_01.mp3",
-	"nz_moo/zombies/vox/_mechz/death_nh/death_nh_02.mp3",
+	Sound("nz_moo/zombies/vox/_mechz/vox/ambient/ambient_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/ambient/ambient_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/ambient/ambient_02.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/ambient/ambient_03.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/ambient/ambient_04.mp3"),
 }
 
 ENT.IdleSequence = "nz_soldat_idle"
@@ -204,6 +198,10 @@ ENT.NormalJumpUp128Quick = {
 
 ENT.NormalJumpDown128 = {
 	"nz_soldat_jump_down_128",
+}
+
+ENT.ZombieLandSequences = {
+	"nz_soldat_jump_land",
 }
 
 ENT.SequenceTables = {
@@ -267,6 +265,63 @@ ENT.SequenceTables = {
 			PassiveSounds = {walksounds},
 		},
 	}}
+}
+
+ENT.AttackSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/vox/swing/swing_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/swing/swing_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/swing/swing_02.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/swing/swing_03.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/swing/swing_04.mp3"),
+}
+
+ENT.AttackWhooshSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/v2/melee_a.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/v2/melee_b.mp3"),
+}
+
+ENT.ClawFireSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/v2/claw/fire/fire_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/v2/claw/fire/fire_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/v2/claw/fire/fire_02.mp3"),
+}
+
+ENT.LandSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/v2/land/land_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/v2/land/land_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/v2/land/land_02.mp3"),
+}
+
+ENT.PainSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/vox/pain/pain_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/pain/pain_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/pain/pain_02.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/pain/pain_03.mp3"),
+}
+
+ENT.AngrySounds = {
+	Sound("nz_moo/zombies/vox/_mechz/vox/angry_nh/angry_nh_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/angry_nh/angry_nh_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/angry_nh/angry_nh_02.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/angry_nh/angry_nh_03.mp3"),
+}
+
+ENT.DeathSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/vox/death_nh/death_nh_00.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/death_nh/death_nh_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/vox/death_nh/death_nh_02.mp3"),
+}
+
+ENT.StepSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/step/anim_decepticon_lg_run_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/step/anim_decepticon_lg_run_02.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/step/anim_decepticon_lg_run_03.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/step/anim_decepticon_lg_run_04.mp3"),
+}
+
+ENT.ServoSounds = {
+	Sound("nz_moo/zombies/vox/_mechz/servo/anim_ratc_srvo_01.mp3"),
+	Sound("nz_moo/zombies/vox/_mechz/servo/anim_ratc_srvo_02.mp3"),
 }
 
 function ENT:StatsInitialize()
@@ -334,7 +389,9 @@ function ENT:StatsInitialize()
 		self:SetStop(false)
 		self.CanCancelAttack = true
 
-		self:SetCollisionBounds(Vector(-21,-21, 0), Vector(21, 21, 90))
+		self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+		self:SetSurroundingBounds(Vector(-45, -45, 0), Vector(45, 45, 100))
+	
 		self:SetRunSpeed( 36 )
 	end
 end
@@ -343,16 +400,43 @@ function ENT:OnSpawn()
 	local seq = self:SelectSpawnSequence()
 	local _, dur = self:LookupSequence(seq)
 
+	debugoverlay.BoxAngles(self:GetPos() + self:GetUp() * 75, Vector(-5,-5,0), Vector(5,5,750), self:GetAngles(), 3, Color( 255, 255, 255, 10))
+
+	local tr = util.TraceHull({
+		start = self:GetPos(),
+		endpos = self:GetPos(),
+		filter = self,
+		mask = MASK_NPCSOLID,
+		ignoreworld = false,
+		mins = min,
+		maxs = Vector(5,5,750),
+	})
+
+	if tr.Hit then 
+		seq = "nz_soldat_arrive_tomb_short" 
+		self.HitRoof = true
+	end
+
 	self:SolidMaskDuringEvent(MASK_SOLID_BRUSHONLY)
 	self:SetInvulnerable(true)
 	self:SetSpecialAnimation(true)
 
+	self:SetNoDraw(true)
+
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/incoming_alarm.mp3",511)
 	self:SetBodygroup(1,0)
 
-	self:EmitSound("nz/panzer/mech_alarm.wav",511)
-	self:EmitSound("enemies/bosses/newpanzer/mechz_entrance.ogg",100,100)
+	self:TimeOut(2)
 
-	ParticleEffectAttach("doom_rev_missile_trail_smoke",PATTACH_POINT_FOLLOW,self,2)
+	self:SetNoDraw(false)
+
+	if self.HitRoof then
+		local effectData = EffectData()
+		effectData:SetOrigin( self:GetPos() + Vector(0, 0, 80)  )
+		effectData:SetMagnitude( 5 )
+		effectData:SetEntity(nil)
+		util.Effect("panzer_spawn_tp", effectData) -- Express Portal to their destination.
+	end
 
 	if seq then
 		self:PlaySequenceAndWait(seq)
@@ -362,10 +446,19 @@ function ENT:OnSpawn()
 	end
 end
 
+function ENT:OnGameOver() 
+	if !self.yousuck then
+		self.yousuck = true
+		self:DoSpecialAnimation("nz_soldat_com_summon")
+	end
+end
+
 function ENT:PerformDeath(dmgInfo)
 	self:StopToasting()
 	if IsValid(self.Claw) then self.Claw:Remove() end
-	self:EmitSound("enemies/bosses/newpanzer/rise.ogg",100, math.random(85, 105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/death/rise.mp3", 100, math.random(85,105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/death/killshot.mp3", 100, math.random(85,105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/vox/death/death_00.mp3", 100, math.random(85,105))
 
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 	self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
@@ -382,7 +475,7 @@ function ENT:OnTargetInAttackRange()
 		if !self:GetBlockAttack() then
 			self:Attack()
 		else
-			self:TimeOut(1)
+			self:TimeOut(0.25)
 		end
 	end
 end
@@ -394,7 +487,7 @@ function ENT:AI()
 		if !self:Alive() or self:GetIsBusy() then return end -- Not allowed to do anything.
 
 		-- FLAMETHROWER
-		if !self:GetSpecialAnimation() and !self:IsAttackBlocked() and self:TargetInRange(250) then
+		if !self:GetSpecialAnimation() and !self:IsAttackBlocked() and self:TargetInRange(250) and !self:TargetInRange(self.AttackRange) then
 			if self.Jetpacking then return end
 			if self.UsingGlowstick then return end
 			if self.DisallowFlamethrower then return end
@@ -429,12 +522,18 @@ function ENT:AI()
 						start = self:EyePos(),
 						endpos = self.Target:EyePos(),
 						filter = self,
-						ignoreworld = true,
+						ignoreworld = false,
 					})
 					local b = tr.Entity
 
 					debugoverlay.Line(self:EyePos(), self.Target:EyePos(), 5, Color( 255, 255, 255 ), false)
 			
+					if tr.HitWorld then 
+						self.UsingClaw = false
+						self:SetSpecialAnimation(false)
+						return 
+					end
+
 					if IsValid(self.Target) then
 						self.Claw = ents.Create("nz_panzer_claw")
 						self.Claw:SetPos(shootpos)
@@ -446,11 +545,11 @@ function ENT:AI()
 
 				local comedyday = os.date("%d-%m") == "01-04"
 				if math.random(100) == 1 or comedyday then
-					self:EmitSound("nz_moo/zombies/vox/_mechz/claw/comedy/fire.mp3", 100, math.random(85, 105))
+					self:EmitSound("nz_moo/zombies/vox/_mechz/v2/claw/comedy/fire.mp3", 100, math.random(85, 105))
 					self.AutoStopComedy = CurTime() + 2.5
 					self.TheComedy = true
 				else
-					self:EmitSound("nz_moo/zombies/vox/_mechz/claw/fire.mp3", 100, math.random(85, 105))
+					self:EmitSound(self.ClawFireSounds[math.random(#self.ClawFireSounds)], 100, math.random(85, 105))
 					self.TheComedy = false
 				end
 
@@ -507,7 +606,7 @@ function ENT:OnThink()
 		self:FinishGrab()
 	end
 	if !self.UsingFlamethrower then
-		self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+		self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 	end
 	if self.TheComedy and self.WaitForClaw and CurTime() > self.AutoStopComedy then
 		self.TheComedy = false
@@ -594,8 +693,8 @@ function ENT:StartToasting()
 
 		if not leftthetoasteron then
 			ParticleEffectAttach("asw_mnb_flamethrower",PATTACH_POINT_FOLLOW,self,5)
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/start.mp3",95, math.random(85, 105))
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/loop.wav",100, 100)
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/start.mp3",95, math.random(85, 105))
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav",100, 100)
 			leftthetoasteron = true
 		end
 
@@ -637,8 +736,8 @@ function ENT:StopToasting()
 	if self.UsingFlamethrower then
 		--print("I'm no longer Nintoasting.")
 		if leftthetoasteron then
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/end.mp3",100, math.random(85, 105))
-			self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/end.mp3",100, math.random(85, 105))
+			self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 			leftthetoasteron = false
 		end
 		self.UsingFlamethrower = false
@@ -648,7 +747,7 @@ end
 
 function ENT:OnRemove()
 	self:StopSound(self.JetpackSnd)
-	self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+	self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 	if IsValid(self.Claw) then self.Claw:Remove() end
 	if IsValid(self.ClawGlow) then self.ClawGlow:Remove() end
 	self:StopToasting()
@@ -672,22 +771,24 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 	end
 
 	if e == "mech_melee_whoosh" then
-		self:EmitSound("enemies/bosses/newpanzer/melee_a.ogg",80)
+		self:EmitSound(self.AttackWhooshSounds[math.random(#self.AttackWhooshSounds)], 100, math.random(85, 105))
 	end
 	if e == "mech_stomp_le" then
-		self:EmitSound("enemies/bosses/newpanzer/anim_decepticon_lg_run_0"..math.random(1,4)..".ogg",80,math.random(95,100))
-		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 80, math.random(95, 100))
+		self:EmitSound(self.ServoSounds[math.random(#self.ServoSounds)], 70, math.random(95, 100))
+		--self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,13)
 	end
 	if e == "mech_stomp_ri" then
-		self:EmitSound("enemies/bosses/newpanzer/anim_decepticon_lg_run_0"..math.random(1,4)..".ogg",80,math.random(95,100))
-		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 80, math.random(95, 100))
+		self:EmitSound(self.ServoSounds[math.random(#self.ServoSounds)], 70, math.random(95, 100))
+		--self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,14)
 	end
 	if e == "mech_land" then
-		self:EmitSound("enemies/bosses/newpanzer/land_0"..math.random(0,2)..".ogg",80,math.random(95,100))
+		self:EmitSound(self.LandSounds[math.random(#self.LandSounds)], 80, math.random(95, 100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 	end
 	if e == "mech_jetflames_start" then
@@ -698,12 +799,42 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		self:StopParticles()
 	end
 	if e == "mech_yell" then
-		self:EmitSound("enemies/bosses/newpanzer/vox/angry_nh_0"..math.random(3)..".ogg", 95, math.random(95,105))
+		self:EmitSound(self.AngrySounds[math.random(#self.AngrySounds)], 95, math.random(95, 105))
+	end
+	if e == "mech_arrive_in" then
+		self:EmitSound("nz_moo/zombies/vox/_mechz/v2/jump_in_118.mp3",100,100)
+	end
+	if e == "mech_alarm" then
+		self:EmitSound("nz_moo/zombies/vox/_mechz/vox/alarm_2.mp3", 90, math.random(95, 105))
+	end
+	if e == "mech_spawn_land" then
+		for i = 1, 3 do
+			ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,1)
+		end
+
+		-- Knock normal zombies aside
+		for k,v in nzLevel.GetZombieArray() do
+			if IsValid(v) and !v:GetSpecialAnimation() and v.IsMooZombie and !v.Non3arcZombie and !v.IsMooSpecial and v ~= self then
+				if self:GetRangeTo( v:GetPos() ) < 10^2 then	
+					if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() and self:GetRunSpeed() > 36 then
+						if v.PainSequences then
+							v:DoSpecialAnimation(v.PainSequences[math.random(#v.PainSequences)], true, true)
+						end
+					end
+				end
+			end
+		end
 	end
 end
 
 function ENT:IsValidTarget( ent )
 	if not ent then return false end
+	
+	-- Turned Zombie Targetting
+	if self.IsTurned then
+		return IsValid(ent) and ent:GetTargetPriority() == TARGET_PRIORITY_MONSTERINTERACT and ent:IsValidZombie() and !ent.IsTurned and !ent.IsMooBossZombie and ent:Alive() 
+	end
+	
 	return IsValid(ent) and ent:GetTargetPriority() ~= TARGET_PRIORITY_NONE and ent:GetTargetPriority() ~= TARGET_PRIORITY_MONSTERINTERACT and ent:GetTargetPriority() ~= TARGET_PRIORITY_SPECIAL and ent:GetTargetPriority() ~= TARGET_PRIORITY_FUNNY
 end
 

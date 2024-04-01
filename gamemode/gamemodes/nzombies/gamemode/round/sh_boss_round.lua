@@ -902,49 +902,78 @@ nzRound:AddBossType("Patriarch", "nz_zombie_boss_patriarch", {
 	end,
 })
 
-
--- Some have their health calculated in their lua file, not here.
-
-nzRound:AddBossType("Krasny Soldat", "nz_zombie_boss_krasny", {
-    specialspawn = false,
-    health = 700,
-    scale = 500,
-    dmgmul = 0.75,
-	amountatonce = 2,
+nzRound:AddBossType("Gigan", "nz_zombie_boss_gigan", {
+	specialspawn = true,
+	health = 900,
+	scale = 1400,
+	dmgmul = 1,
+	amountatonce = 1,
 	initalrnd = 8,
 	intermission = 4,
 	perplayer = 1,
-    initfunc = function()
-    end,
-    spawnfunc = function(self)
-		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_pyromech/spawn.mp3')")
-    end,
-    deathfunc = function(self, killer, dmginfo, hitgroup)
-        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-            attacker:GivePoints(150) -- Give killer 500 points if not downed
-        end
-    end,
-})
-
-nzRound:AddBossType("Mangler", "nz_zombie_boss_mangler", {
-	specialspawn = false,
-	health = 3500,
-	scale = 1,
-	dmgmul = 1,
-	amountatonce = 2,
-	initalrnd = 12,
-	intermission = 2,
-	perplayer = 2,
 	initfunc = function()
 	end,
 	spawnfunc = function(self)
-		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_raz/_t9/spawn.mp3')")
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
 	end,
 	deathfunc = function(self, killer, dmginfo, hitgroup)
 		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
 			attacker:GivePoints(150) -- Give killer 500 points if not downed
 		end
 	end,
+})
+
+
+nzRound:AddBossType("Hedora", "nz_zombie_boss_smelly", {
+	specialspawn = true,
+	health = 500,
+	scale = 1200,
+	dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 12,
+	intermission = 4,
+	perplayer = 1,
+	initfunc = function()
+	end,
+	spawnfunc = function(self)
+		local data = nzRound:GetBossData(self.NZBossType)
+		local count = #player.GetAllPlaying()
+
+		self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+		self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+	end,
+	deathfunc = function(self, killer, dmginfo, hitgroup)
+		if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+			attacker:GivePoints(150) -- Give killer 500 points if not downed
+		end
+	end,
+})
+
+-- Some have their health calculated in their lua file, not here.
+
+nzRound:AddBossType("Mangler", "nz_zombie_boss_mangler", {
+    specialspawn = false,
+    health = 3500,
+    scale = 1,
+    dmgmul = 1,
+    amountatonce = 2,
+    initalrnd = 12,
+    intermission = 2,
+    perplayer = 2,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+        BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_raz/_t9/spawn.mp3')")
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
 })
 
 nzRound:AddBossType("George Romero", "nz_zombie_boss_romero", {
@@ -1011,25 +1040,18 @@ nzRound:AddBossType("Avogadro", "nz_zombie_boss_avogadro", {
 		end
 	end,
 })
-nzRound:AddBossType("Brenner", "nz_zombie_boss_fireman", {
+nzRound:AddBossType("Adolf", "nz_zombie_boss_hillturr", {
     specialspawn = false,
-    health = 675,
-    scale = 495,
-    dmgmul = 0.85,
-	amountatonce = 2,
-	initalrnd = 8,
-	intermission = 4,
+    health = 25000,
+    scale = 1,
+    dmgmul = 1,
+	amountatonce = 1,
+	initalrnd = 2,
+	intermission = 1,
 	perplayer = 1,
     initfunc = function()
     end,
     spawnfunc = function(self)
-		BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_fireman/zvox_fir_intro_roar.mp3')")
-
-        local data = nzRound:GetBossData(self.NZBossType)
-        local count = #player.GetAllPlaying()
-
-        self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-        self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
     end,
     deathfunc = function(self, killer, dmginfo, hitgroup)
         if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
@@ -1037,6 +1059,69 @@ nzRound:AddBossType("Brenner", "nz_zombie_boss_fireman", {
         end
     end,
 })
+nzRound:AddBossType("Brenner", "nz_zombie_boss_fireman", {
+    specialspawn = false,
+    health = 675,
+    scale = 495,
+    dmgmul = 0.85,
+    amountatonce = 2,
+    initalrnd = 10,
+    intermission = 3,
+    perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+        BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_fireman/zvox_fir_intro_roar.mp3')")
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+nzRound:AddBossType("Krasny Soldat", "nz_zombie_boss_krasny", {
+    specialspawn = false,
+    health = 700,
+    scale = 500,
+    dmgmul = 0.75,
+    amountatonce = 2,
+    initalrnd = 8,
+    intermission = 4,
+    perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+        BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_pyromech/spawn.mp3')")
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+
+nzRound:AddBossType("Mangler Juggernaut", "nz_zombie_boss_raz_juggernaut", {
+    specialspawn = false,
+    health = 3500,
+    scale = 1,
+    dmgmul = 1,
+    amountatonce = 2,
+    initalrnd = 12,
+    intermission = 3,
+    perplayer = 1,
+    initfunc = function()
+    end,
+    spawnfunc = function(self)
+        BroadcastLua("surface.PlaySound('nz_moo/zombies/vox/_raz/_t9/spawn.mp3')")
+    end,
+    deathfunc = function(self, killer, dmginfo, hitgroup)
+        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
+            attacker:GivePoints(150) -- Give killer 500 points if not downed
+        end
+    end,
+})
+
+
 nzRound:AddBossType("Meuchler", "nz_zombie_boss_assassin", {
 	specialspawn = false,
 	health = 3000,
@@ -1062,30 +1147,6 @@ nzRound:AddBossType("Meuchler", "nz_zombie_boss_assassin", {
 	end,
 })
 
-nzRound:AddBossType("Adolf", "nz_zombie_boss_hillturr", {
-    specialspawn = false,
-    health = 25000,
-    scale = 1,
-    dmgmul = 1,
-	amountatonce = 1,
-	initalrnd = 2,
-	intermission = 1,
-	perplayer = 1,
-    initfunc = function()
-    end,
-    spawnfunc = function(self)
-        local data = nzRound:GetBossData(self.NZBossType)
-        local count = #player.GetAllPlaying()
-
-        self:SetHealth(data.scale + (data.health * count))
-        self:SetMaxHealth(data.scale + (data.health * count))
-    end,
-    deathfunc = function(self, killer, dmginfo, hitgroup)
-        if IsValid(attacker) and attacker:IsPlayer() and attacker:GetNotDowned() then
-            attacker:GivePoints(150) -- Give killer 500 points if not downed
-        end
-    end,
-})
 nzRound:AddBossType("Panzer", "nz_zombie_boss_panzer", {
     specialspawn = false,
     health = 700,

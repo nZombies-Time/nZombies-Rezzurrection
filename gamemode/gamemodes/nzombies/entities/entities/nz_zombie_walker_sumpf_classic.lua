@@ -6,7 +6,12 @@ ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 ENT.Spawnable = true
 
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+	ENT.EyeColorTable = {
+		[0] = Material("models/moo/codz/t4_zombies/common/mtl_char_ger_nazizombie_eyes.vmt"),
+	}
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
@@ -172,6 +177,12 @@ local StinkyRunAttackSequences = {
 	{seq = "nz_run_ad_attack_v2"},
 	{seq = "nz_run_ad_attack_v3"},
 	{seq = "nz_run_ad_attack_v4"},
+
+	-- The REAL Bad Attack Anims
+	{seq = "nz_legacy_run_attack_v1"},
+	{seq = "nz_legacy_run_attack_v2"},
+	{seq = "nz_legacy_run_attack_v3"},
+	{seq = "nz_legacy_run_attack_v4"},
 }
 
 local SprintAttackSequences = {
@@ -244,6 +255,8 @@ local runsounds = {
 	Sound("nz_moo/zombies/vox/_classic/sprint/sprint_08.mp3"),
 }
 
+ENT.IdleSequence = "nz_bo3_idle_v1_delta"
+
 -- This is a very large and messy looking table... But it gets the job done.
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
@@ -304,6 +317,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -381,6 +405,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {WalkAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -461,6 +496,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -539,6 +585,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {RunAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -609,6 +666,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -631,11 +699,11 @@ ENT.SequenceTables = {
 		{
 			SpawnSequence = {spawnfast},
 			MovementSequence = {
-				--"nz_legacy_sprint_v4",
 				"nz_legacy_sprint_v5",
 				"nz_legacy_jap_run_v3",
+				"nz_bo3_zombie_sprint_v2",
 				"nz_t9_base_sprint_au_v01",
-				"nz_t9_base_sprint_au_v02",
+				--"nz_t9_base_sprint_au_v02",
 				"nz_t9_base_sprint_au_v20",
 				"nz_t9_base_sprint_au_v21",
 				"nz_t9_base_sprint_au_v22",
@@ -677,6 +745,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
 			AttackSequences = {SprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -749,6 +828,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v9",
 				"nz_l4d_run_03",
 				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
 			},
 			AttackSequences = {SuperSprintAttackSequences},
 			StandAttackSequences = {AttackSequences},
@@ -815,6 +905,17 @@ ENT.SequenceTables = {
 				--"nz_pb_zombie_sprint_v7",
 				"nz_pb_zombie_sprint_v8", -- The Tranzit Sprinter one.
 				--"nz_pb_zombie_sprint_v9",
+				"nz_l4d_run_03",
+				"nz_l4d_run_04",
+				
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v02",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v04",
+				"nz_t9_base_player_sprint_v05",
+				"nz_t9_base_player_sprint_v06",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 				"nz_l4d_run_03",
 				"nz_l4d_run_04",
 			},

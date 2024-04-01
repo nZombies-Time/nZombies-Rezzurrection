@@ -219,9 +219,12 @@ function ENT:OnSpawn()
 			self:StartActivity( ACT_WALK )
 			self:EmitSound("enemies/specials/bot/incoming/incoming_land.wav",100)
 			self:EmitSound("enemies/specials/bot/incoming/incoming_unwrap.wav",100)
+			
 				self.loco:SetDesiredSpeed( self:GetRunSpeed() )
 				self:SetSpecialAnimation(false)
 				self:SetBlockAttack(false)
+				PrintTable( self:GetMaterials())
+				 
 		end)
 		self:PlaySequenceAndWait(seq)
 	end
@@ -417,7 +420,7 @@ function ENT:StopFlames()
 end
 
 function ENT:OnThink()
-
+self:SetSubMaterial( 0,"shit")
 end
 
 function ENT:GrabPlayer(ply)

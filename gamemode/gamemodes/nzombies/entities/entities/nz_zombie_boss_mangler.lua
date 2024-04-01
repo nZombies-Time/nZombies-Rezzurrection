@@ -362,13 +362,13 @@ function ENT:StatsInitialize()
 
 		self.NextShoot = CurTime() + 3
 		self.ArmCannon = true
-		self.ArmCannonHP = math.Clamp(self:GetMaxHealth() / 4, 250, 1500)
+		self.ArmCannonHP = math.Clamp(self:GetMaxHealth() / 8, 250, 1500)
 
 		self.Helmet = true
-		self.HelmetHP = math.Clamp(self:GetMaxHealth() / 5, 250, 1000)
+		self.HelmetHP = math.Clamp(self:GetMaxHealth() / 8, 250, 1000)
 
 		self.Chest = true
-		self.ChestHP = math.Clamp(self:GetMaxHealth() / 5, 250, 1000)
+		self.ChestHP = math.Clamp(self:GetMaxHealth() / 8, 250, 1000)
 
 		self.ShouldEnrage = false
 		self.Enraged = false
@@ -389,8 +389,9 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-	self:SetCollisionBounds(Vector(-22,-22, 0), Vector(22, 22, 80))
-
+	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+	self:SetSurroundingBounds(Vector(-45, -45, 0), Vector(45, 45, 80))
+	
 	local effectData = EffectData()
 	effectData:SetOrigin( self:GetPos() + Vector(0, 0, 50)  )
 	effectData:SetMagnitude( 1 )
@@ -413,7 +414,11 @@ function ENT:AI()
 				self.NextShoot = CurTime() + math.random(7,10)
 
 				self:SetSpecialAnimation(true)
+
+				self.UsingArmCannon = true
 				self:PlaySequenceAndMove(self.ShootSequences[math.random(#self.ShootSequences)], 1, self.FaceEnemy)
+				
+				self.UsingArmCannon = false
 				self:StopParticles()
 				self:SetSpecialAnimation(false)
 			end)
@@ -556,7 +561,7 @@ function ENT:Explode(dmg)
     end
 end
 
-function ENT:OnTakeDamage(dmginfo)
+function ENT:OnInjured(dmginfo)
 	local attacker = dmginfo:GetAttacker()
 	local inflictor = dmginfo:GetInflictor()
 
@@ -614,7 +619,7 @@ function ENT:OnTakeDamage(dmginfo)
 		end
 	end
 
-	if (hitpos:DistToSqr(armpos) < 20^2) then
+	if (hitpos:DistToSqr(armpos) < 25^2) then
 		if self.ArmCannon and self.ArmCannonHP > 0 then
 			self.ArmCannonHP = self.ArmCannonHP - damage
 		elseif self.ArmCannon and self.ArmCannonHP <= 0 then
@@ -697,7 +702,7 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 	end
 	if e == "raz_shoot" then
 		self:EmitSound(self.ArmCannonShootSounds[math.random(#self.ArmCannonShootSounds)], 90)
-		ParticleEffectAttach("bo3_mangler_blast", PATTACH_POINT_FOLLOW, self, 13)
+		ParticleEffectAttach("cw_mangler_blast", PATTACH_POINT_FOLLOW, self, 13)
 
 		self:Retarget()
 

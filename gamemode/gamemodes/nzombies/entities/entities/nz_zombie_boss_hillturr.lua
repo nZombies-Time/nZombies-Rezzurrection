@@ -5,41 +5,161 @@ ENT.PrintName = "Don't tell him about Hillturr"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo and (Seth Norris Originally)"
 
-AccessorFunc( ENT, "fMaldoTimer", "MaldoTimer", FORCE_NUMBER)
+function ENT:InitDataTables()
+	self:NetworkVar("Bool", 5, "IsIdle")
+	self:NetworkVar("Bool", 6, "IsEnraged")
+end
 
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+	local eyeglow =  Material("nz/zlight")
+	function ENT:Draw() //Runs every frame
+		self:DrawModel()
+		if self:Alive() then
+			self:DrawEyeGlow()
+		end
+
+		self:EffectsAndSounds()
+
+		if self:Alive() then
+			local elight = DynamicLight( self:EntIndex(), true )
+			if ( elight ) then
+				local bone = self:LookupBone("j_spineupper")
+				local pos = self:GetBonePosition(bone)
+				pos = pos 
+				elight.pos = pos
+				elight.r = 0
+				elight.g = 75
+				elight.b = 255
+				elight.brightness = 8
+				elight.Decay = 1000
+				elight.Size = 40
+				elight.DieTime = CurTime() + 1
+				elight.style = 0
+				elight.noworld = true
+			end
+		end
+
+		if GetConVar( "nz_zombie_debug" ):GetBool() then
+			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
+		end
+	end
+
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if !self.Draw_FX or !IsValid(self.Draw_FX) then -- PVS will no longer eat the particle effect.
+				self.Draw_FX = CreateParticleSystem(self, "adorabolf_aura", PATTACH_POINT_FOLLOW, 1)
+			end
+
+			-- Ambient looping sounds.
+			if self:GetIsIdle() and !self:GetIsEnraged() and (!self.IdleAmbience or !IsValid(self.IdleAmbience)) then
+				self.IdleAmbience = "nz_moo/zombies/vox/_hilter/adolf_hitler_loop.wav"
+
+				if self.EnragedAmbience or IsValid(self.EnragedAmbience) then
+					self:StopSound(self.EnragedAmbience)
+					self.EnragedAmbience = nil
+					if self.SelectedRageAmb or IsValid(self.SelectedRageAmb) then
+						self.SelectedRageAmb = false
+					end
+				end
+				self:EmitSound(self.IdleAmbience, 70, math.random(95, 105), 1, 3)
+			end
+			if !self:GetIsIdle() and self:GetIsEnraged() and (!self.EnragedAmbience or !IsValid(self.EnragedAmbience)) then
+				if !self.SelectedRageAmb then
+					self.SelectedRageAmb = true
+					self.EnragedAmbience = "nz_moo/zombies/vox/_hilter/the_chase_"..math.random(1,2)..".wav"
+				end
+				if self.IdleAmbience or IsValid(self.IdleAmbience) then
+					self:StopSound(self.IdleAmbience)
+					self.IdleAmbience = nil
+				end
+				self:EmitSound(self.EnragedAmbience, 80, math.random(95, 105), 1, 3)
+			end
+		else
+			if self.IdleAmbience or self.IdleAmbience:IsValid() then
+				self:StopSound(self.IdleAmbience)
+				self.IdleAmbience = nil
+			end
+			if self.EnragedAmbience or self.EnragedAmbience:IsValid() then
+				self:StopSound(self.EnragedAmbience)
+				self.EnragedAmbience = nil
+			end
+		end
+	end
+
+	function ENT:DrawEyeGlow()
+		local eyeColor = Color(200,255,255)
+
+		local latt = self:LookupAttachment("lefteye")
+		local ratt = self:LookupAttachment("righteye")
+
+		if latt == nil then return end
+		if ratt == nil then return end
+
+		local leye = self:GetAttachment(latt)
+		local reye = self:GetAttachment(ratt)
+
+		if leye == nil then return end
+		if reye == nil then return end
+
+		local righteyepos = leye.Pos + leye.Ang:Forward()*0.49
+		local lefteyepos = reye.Pos + reye.Ang:Forward()*0.49
+
+		if lefteyepos and righteyepos then
+			render.SetMaterial(eyeglow)
+			render.DrawSprite(lefteyepos, 6, 6, eyeColor)
+			render.DrawSprite(righteyepos, 6, 6, eyeColor)
+		end
+	end
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.SpeedBasedSequences = true
 ENT.IsMooZombie = true
 ENT.RedEyes = false
 ENT.IsMooSpecial = true
+ENT.MooSpecialZombie = true
+ENT.IsMooBossZombie = true
 
-ENT.AttackRange = 100
+ENT.AttackRange = 120
 
 ENT.TraversalCheckRange = 40
 
 ENT.Models = {
-	{Model = "models/moo/_codz_ports/sethnorris/moo_sethnorris_adolphin_hilter.mdl", Skin = 0, Bodygroups = {0,0}},
-}
-
-ENT.BarricadeTearSequences = {
-	"nz_adolf_tear_high",
-	"nz_adolf_tear_low",
-	"nz_adolf_tear_left",
-	"nz_adolf_tear_right",
+	{Model = "models/moo/_codz_ports/t7/_custommaps/returntoherrenhaus/moo_sethnorris_t7_adorabolf.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
 ENT.DeathSequences = {
-	"nz_adolf_death"
+	"nz_napalm_death_01",
+	"nz_napalm_death_02",
+	"nz_napalm_death_03",
+}
+
+ENT.SuperTauntSequences = {
+	"nz_legacy_taunt_v11",
+	"nz_legacy_taunt_v11",
 }
 
 local AttackSequences = {
-	{seq = "nz_adolf_groundslam", dmgtimes = {1.25}},
+	{seq = "nz_napalm_attack_01"},
+	{seq = "nz_napalm_attack_02"},
+	{seq = "nz_napalm_attack_03"},
+}
+
+local RunAttackSequences = {
+	{seq = "nz_adorabolf_slam"},
 }
 
 local JumpSequences = {
-	{seq = "nz_adolf_traverse_v1", speed = 25, time = 3},
-	{seq = "nz_adolf_traverse_v2", speed = 25, time = 3}
+	{seq = "nz_barricade_trav_walk_1"},
+	{seq = "nz_barricade_trav_walk_2"},
+	{seq = "nz_barricade_trav_walk_3"},
+}
+
+local SprintJumpSequences = {
+	{seq = "nz_barricade_sprint_1"},
+	{seq = "nz_barricade_sprint_2"},
 }
 
 local walksounds = {
@@ -55,15 +175,17 @@ local walksounds = {
 	Sound("nz_moo/zombies/vox/_hilter/vox/adorabolf_ambient_09.mp3"),
 }
 
-ENT.IdleSequence = "nz_adolf_idle"
+local runsounds = {
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+}
 
 ENT.SequenceTables = {
 	{Threshold = 0, Sequences = {
 		{
 			MovementSequence = {
-				"nz_adolf_walk_v1",
-				"nz_adolf_walk_v2",
-				"nz_adolf_walk_v3",
+				"nz_napalm_walk_01",
+				"nz_napalm_walk_02",
+				"nz_napalm_walk_03",
 			},
 			AttackSequences = {AttackSequences},
 			JumpSequences = {JumpSequences},
@@ -73,18 +195,37 @@ ENT.SequenceTables = {
 	{Threshold = 71, Sequences = {
 		{
 			MovementSequence = {
-				"nz_adolf_sprint_v1",
-				"nz_adolf_sprint_v2",
+				"nz_sonic_run_01",
+				"nz_sonic_run_02",
+				"nz_sonic_run_03",
+				"nz_t9_base_player_sprint_v01",
+				"nz_t9_base_player_sprint_v03",
+				"nz_t9_base_player_sprint_v07",
+				"nz_t9_base_player_sprint_v08",
 			},
-			AttackSequences = {AttackSequences},
-			JumpSequences = {JumpSequences},
-			PassiveSounds = {walksounds},
+			AttackSequences = {RunAttackSequences},
+			JumpSequences = {SprintJumpSequences},
+			PassiveSounds = {runsounds},
 		},
 	}}
 }
 
 ENT.DeathSounds = {
 	"nz_moo/zombies/vox/mute_00.wav"
+}
+
+ENT.CustomSpecialTauntSounds = {
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+}
+
+ENT.TauntSounds = {
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
+	Sound("nz_moo/zombies/vox/mute_00.wav"),
 }
 
 ENT.BehindSoundDistance = 0 -- When the zombie is within 200 units of a player, play these sounds instead
@@ -94,22 +235,31 @@ ENT.BehindSounds = {
 
 function ENT:StatsInitialize()
 	if SERVER then
-		local data = nzRound:GetBossData(self.NZBossType)
 		local count = #player.GetAllPlaying()
 
 		if nzRound:InState( ROUND_CREATE ) then
-			self:SetHealth(12000)
-			self:SetMaxHealth(12000)
+			self:SetHealth(5000)
+			self:SetMaxHealth(5000)
 		else
-			self:SetHealth(nzRound:GetNumber() * data.scale + (data.health * count))
-			self:SetMaxHealth(nzRound:GetNumber() * data.scale + (data.health * count))
+			if nzRound:InState( ROUND_PROG ) then
+				self:SetHealth(math.Clamp(nzRound:GetNumber() * 500 + (97500 * count), 97500, 500000 * count))
+				self:SetMaxHealth(math.Clamp(nzRound:GetNumber() * 500 + (97500 * count), 97500, 500000 * count))
+			else
+				self:SetHealth(5000)
+				self:SetMaxHealth(5000)	
+			end
 		end
 
-		self:SetRunSpeed(36)
+		self:SetRunSpeed(1)
 
-		self:SetMaldoTimer(CurTime())
+		self:SetTargetCheckRange(60000) -- Much like George, Hillturr will know your location 24/7.
+
+		self.MaldTime = CurTime()
 		self.Malding = false
 		beginmald = false
+
+		self:SetIsIdle(true)
+		self:SetIsEnraged(false)
 	end
 end
 
@@ -119,33 +269,51 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
+	self:SetBodygroup(0,0)
 	self:EmitSound("nz/hellhound/spawn/strike.wav", 511, math.random(95, 105))
-	self:EmitSound("nz_moo/zombies/vox/_hilter/adolf_hitler_loop.wav", 70, math.random(95, 105), 1, 3)
 	ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
-	ParticleEffectAttach("splat_gas_blue", PATTACH_POINT_FOLLOW, self, 1)
-	ParticleEffectAttach("sporecarrier_glow", PATTACH_POINT_FOLLOW, self, 2)
-	ParticleEffectAttach("ds3_dw_mist", PATTACH_POINT_FOLLOW, self, 9)
 end
 
-function ENT:PerformDeath(dmgInfo)
+function ENT:PerformDeath(dmginfo)
+
+	self.Dying = true
+
+	local damagetype = dmginfo:GetDamageType()
+
+	self:PostDeath(dmginfo)
+
+	if damagetype == DMG_MISSILEDEFENSE or damagetype == DMG_ENERGYBEAM then
+		self:BecomeRagdoll(dmginfo) -- Only Thundergun and Wavegun Ragdolls constantly.
+	end
+	if damagetype == DMG_REMOVENORAGDOLL then
+		self:Remove(dmginfo)
+	end
+	if self.DeathRagdollForce == 0 or self:GetSpecialAnimation() then
+		self:BecomeRagdoll(dmginfo)
+	else
+		self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
+	end
+
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
-	self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
-	self:StopSound("nz_moo/zombies/vox/_hilter/adolf_hitler_loop.wav")
-	self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_1.wav")
-	self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_2.wav")
+
+	self:SetBodygroup(0,1) -- Lost his drip
+	self:StopSound(self.IdleMusic)
+	self:StopSound(self.RageMusic)
 
 	ParticleEffect("ds3_boss_dissolve",self:LocalToWorld(Vector(0,0,10)),Angle(0,0,0),nil)
 	ParticleEffect("fo3_mirelurk_charge",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
 	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_pop.mp3", 511, math.random(95, 105))
 	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
-	--self:Explode(0)
-	--self:Remove(dmgInfo)
+
+	if !nzRound:InState(ROUND_CREATE) then
+		nzPowerUps:SpawnPowerUp(self:GetPos(), "bottle")
+	end
 end
 
 function ENT:OnRemove()
-	self:StopSound("nz_moo/zombies/vox/_hilter/adolf_hitler_loop.wav")
 	self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_1.wav")
 	self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_2.wav")
+	self:StopSound("nz_moo/zombies/vox/_hilter/adolf_hitler_loop.wav")
 end
 
 function ENT:IsValidTarget( ent )
@@ -154,236 +322,238 @@ function ENT:IsValidTarget( ent )
 	-- Won't go for special targets (Monkeys), but still MAX, ALWAYS and so on
 end
 
-function ENT:OnThink()
-	if self:TargetInAttackRange() then
-		if SERVER then
-		end
+function ENT:AI()
+	if self.Malding and beginmald then
+
+		beginmald = false
+
+		--self:StopSound(self.IdleMusic)
+
+		self:SetSpecialAnimation(true)
+		self:PlaySequenceAndMove("nz_adorabolf_enrage",1)
+		self:SetSpecialAnimation(false)
+
+		self:SetRunSpeed(71)
+		self:SpeedChanged()
+
+		self:SetIsEnraged(true)
+		self:SetIsIdle(false)
+
+		self.MaldTime = CurTime() + 35
 	end
-end
 
-if SERVER then
-	function ENT:GetFleeDestination(target) -- Get the place where we are fleeing to, added by: Ethorbit
-		return self:GetPos() + (self:GetPos() - target:GetPos()):GetNormalized() * (self.FleeDistance or 300)
-	end
+	if CurTime() > self.MaldTime and self.Malding then
+		self.Malding = false
 
-	function ENT:RunBehaviour()
+		self:SetIsEnraged(false)
+		self:SetIsIdle(true)
 
-		self:Retarget()
-		self:SpawnZombie()
+		self:SetRunSpeed(1)
+		self:SpeedChanged()
 
-		while (true) do
+		--self:StopSound(self.RageMusic)
+		--self:EmitSound(self.IdleMusic, 70, math.random(95, 105), 1, 3)
 
-			if self.EventMask and not self.DoCollideWhenPossible then
-				self:SetSolidMask(MASK_NPCSOLID)
-			end
-			if !self:GetStop() and self:GetFleeing() then -- Admittedly this was rushed, I took no time to understand how this can be achieved with nextbot pathing so I just made a short navmesh algorithm for fleeing. Sorry. Created by Ethorbit.
-				self:SetTimedOut(false)
-
-				local target = self:GetTarget()
-				if IsValid(target) then
-					self:SetLastFlee(CurTime())
-					self:ResetMovementSequence() -- They'll comically slide away if this isn't here.
-					self:MoveToPos(self:GetFleeDestination(target), {lookahead = 0, maxage = 3})
-					self:SetLastFlee(CurTime())
-				end
-			end
-			if !self:GetFleeing() and !self:GetStop() and CurTime() > self:GetLastFlee() + 2 then
-				self:SetTimedOut(false)
-				local ct = CurTime()
-				if ct >= self.NextRetarget then
-					local oldtarget = self.Target
-					self:Retarget() --The overall process of looking for targets is handled much like how it is in nZu. While it may not save much fps in solo... Turns out this can vastly help the performance of multiplayer games.
-				end
-				if not self:HasTarget() and not self:IsValidTarget(self:GetTarget()) then
-					self:OnNoTarget()
-				else
-					local path = self:ChaseTarget()
-					if path == "failed" then
-						self:SetTargetUnreachable(true)
-					end
-					if path == "ok" then
-						if self:TargetInAttackRange() then
-							self:OnTargetInAttackRange()
-						else
-							self:TimeOut(0.1)
-						end
-					elseif path == "timeout" then --asume pathing timedout, maybe we are stuck maybe we are blocked by barricades
-						self:SetTargetUnreachable(true)
-						self:OnPathTimeOut()
-					else
-						self:TimeOut(2)
-					end
-				end
-			else
-				self:TimeOut(2)
-			end
-			if self.Malding and beginmald then
-				beginmald = false
-				self:EmitSound("nz_moo/zombies/vox/_hilter/vox/mald/hitler_angry.mp3", 511, math.random(95,105))
-				self:PlayAttackAndWait("nz_adolf_enrage")
-
-				self:EmitSound("nz_moo/zombies/vox/_hilter/the_chase_"..math.random(1,2)..".wav", 80, math.random(95,105))
-
-				self:SetRunSpeed(71)
-				self:SpeedChanged()
-				self:SetMaldoTimer(CurTime())
-			end
-			if self.Malding then
-				if self:GetMaldoTimer() + 35 < CurTime() then
-					--print("fuck")
-					self:SetRunSpeed(36)
-					self:SpeedChanged()
-
-					self.Malding = false
-
-					self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_1.wav")
-					self:StopSound("nz_moo/zombies/vox/_hilter/the_chase_2.wav")
-				end
-			end
-			if not self.NextSound or self.NextSound < CurTime() and not self:GetAttacking() and self:Alive() and not self.Malding then
-				self:Sound() -- Moo Mark 12/7/22: Moved this out of the THINK function since I thought it was a little stupid.
-			end
-		end
-	end
-end
-
-function ENT:Explode(dmg, suicide)
-    for k, v in pairs(ents.FindInSphere(self:GetPos(), 250)) do
-        if not v:IsWorld() and v:IsSolid() then
-            v:SetVelocity(((v:GetPos() - self:GetPos()):GetNormalized()*175) + v:GetUp()*225)
-            
-            if v:IsValidZombie() then
-                local damage = DamageInfo()
-                damage:SetAttacker(self)
-                damage:SetDamageType(DMG_MISSILEDEFENSE)
-                damage:SetDamage(v:Health() + 666)
-                damage:SetDamageForce(v:GetUp()*22000 + (v:GetPos() - self:GetPos()):GetNormalized() * 10000)
-                damage:SetDamagePosition(v:EyePos())
-                v:TakeDamageInfo(damage)
-            end
-
-            if v:IsPlayer() then
-            	v:SetGroundEntity(nil)
-                v:ViewPunch(Angle(-25,math.random(-10, 10),0))
-            end
-        end
-    end
-	ParticleEffect("fo3_mirelurk_charge",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
-	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_pop.mp3", 511, math.random(95, 105))
-	self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
-    if suicide then self:TakeDamage(self:Health() + 666, self, self) end
-end
-
--- A standard attack you can use it or create something fancy yourself
-function ENT:Attack( data )
-
-	self:SetLastAttack(CurTime())
-
-	data = data or {}
-	
-	data.attackseq = data.attackseq
-	if !data.attackseq then
-		
-		local attacktbl = self.AttackSequences
-		local target = type(attacktbl) == "table" and attacktbl[math.random(#attacktbl)] or attacktbl
-		
-		if type(target) == "table" then
-			local id, dur = self:LookupSequenceAct(target.seq)
-			if !target.dmgtimes then
-			data.attackseq = {seq = id, dmgtimes =  {0.5} }
-			else
-			data.attackseq = {seq = id, dmgtimes = target.dmgtimes }
-			end
-			data.attackdur = dur
-		elseif target then -- It is a string or ACT
-			local id, dur = self:LookupSequenceAct(attacktbl)
-			data.attackseq = {seq = id, dmgtimes = {dur/2}}
-			data.attackdur = dur
-		else
-			local id, dur = self:LookupSequence("swing")
-			data.attackseq = {seq = id, dmgtimes = {1}}
-			data.attackdur = dur
-		end
-	end
-	
-	self:SetAttacking( true )
-	if IsValid(self:GetTarget()) and self:GetTarget():Health() and self:GetTarget():Health() > 0 then -- Doesn't matter if its a player... If the zombie is targetting it, they probably wanna attack it.
-		for k,v in pairs(data.attackseq.dmgtimes) do
-			self:TimedEvent( v, function()
-				ParticleEffectAttach("doom_wraith_teleport_ground",PATTACH_POINT_FOLLOW,self,1)
-				self:EmitSound( "nz_moo/zombies/vox/_hilter/adorabolf_hit.mp3", 511, math.random(95,105))
-				if !self:GetStop() and self:IsValidTarget( self:GetTarget() ) and self:TargetInRange( self:GetAttackRange() + 10 ) then
-					local dmgInfo = DamageInfo()
-					dmgInfo:SetAttacker( self )
-					dmgInfo:SetDamage( 99 )
-					dmgInfo:SetDamageType( DMG_SLASH )
-					dmgInfo:SetDamageForce( (self:GetTarget():GetPos() - self:GetPos()) * 7 + Vector( 0, 0, 16 ) )
-					self:GetTarget():TakeDamageInfo(dmgInfo)
-					if !IsValid(self:GetTarget()) then return end
-
-					if self:GetTarget():IsPlayer() then
-						self:EmitSound("nz_moo/zombies/vox/_hilter/vox/mald/sieg_heil.mp3", SNDLVL_TALKING, math.random(95, 105))
-						self:GetTarget():ViewPunch( VectorRand():Angle() * 0.025 )
-						ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
-						if self:GetTarget():GetPerks() then -- Hold it right there ma'am I'LL BE TAKING THAT!!!
-							perks = self:GetTarget():GetPerks()
-							if not table.IsEmpty(perks) then
-								perkLost = perks[math.random(1, #perks)]
-								self:GetTarget():RemovePerk(perkLost, true)
-							else
-							end
-						end
-					end
-
-				end
-			end)
-		end
-	end
-	
-	self:TimedEvent(data.attackdur, function()
-		self:SetAttacking(false)
-		self:SetLastAttack(CurTime())
-	end)
-
-	self:PlayAttackAndWait(data.attackseq.seq, 1)
-end
-
-function ENT:PlayAttackAndWait( name, speed )
-
-	local len = self:SetSequence( name )
-	speed = speed or 1
-
-	self:ResetSequenceInfo()
-	self:SetCycle( 0 )
-	self:SetPlaybackRate( speed )
-
-	local endtime = CurTime() + len / speed
-
-	while ( true ) do
-
-		if ( endtime < CurTime() ) then
-			if !self:GetStop() then
-				self:StartActivity( ACT_WALK )
-				if !self:GetCrawler() then
-					self.loco:SetDesiredSpeed( self:GetRunSpeed() )
-				end
-			end
-			return
-		end
-		if self:IsValidTarget( self:GetTarget() ) then
-			self.loco:FaceTowards( self:GetTarget():GetPos() )
-		end
-		coroutine.yield()
+		self:SetSpecialAnimation(true)
+		self:PlaySequenceAndMove("nz_sonic_attack_01",1)
+		self:SetSpecialAnimation(false)
 	end
 end
 
 function ENT:OnTakeDamage(dmginfo)
-	if SERVER then
-		if self:Health() > 0 and not self.Malding then
+	local attacker = dmginfo:GetAttacker()
+	if IsValid(attacker) and attacker:IsPlayer() then
+		if self:Health() > 0 and !self.Malding then
 			self.Malding = true
 			beginmald = true
 		end
+	end
+	dmginfo:ScaleDamage(0.075)
+end
 
-		self:SetLastHurt(CurTime())
+function ENT:Explode(dmg, suicide)
+	for k, v in pairs(ents.FindInSphere(self:GetPos(), 120)) do    
+		if v:IsPlayer() and v:Alive() and v:GetNotDowned() then
+			
+			local points = v:GetPoints()
+			local possibleamount = {250,500,750,1250,1750}
+			local take = possibleamount[math.random(#possibleamount)]
+			if (points - take) <= 0 then
+				v:SetPoints(0) -- Obviously you don't wanna go in debt... But you will be broke.
+			else
+				v:TakePoints(take,true)
+			end
+
+			if self.Malding then
+				dmg = v:Health() + 10
+			else
+				if v:Health() < 50 then
+					dmg = v:Health() + 10
+				else
+					dmg = v:Health() - 1
+				end
+			end
+			v:TakeDamage(dmg)
+		end
+		if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() then
+			if v.SparkyAnim then
+				v:DoSpecialAnimation(v.SparkyAnim, true, true)
+				if !v:GetWaterBuff() then
+					v:SetHealth( nzRound:GetZombieHealth() * 3 )
+            		v:SetWaterBuff(true)
+            		if v:GetRunSpeed() <= 145 then
+            			v:SetRunSpeed(155)
+            			v:SpeedChanged()
+
+            			if v.ElecSounds then	
+							v:PlaySound(v.ElecSounds[math.random(#v.ElecSounds)], 90, math.random(85, 105), 1, 2)
+						end
+            		end
+				end
+			end
+		end
+	end
+
+	if self.Malding then
+		ParticleEffect("adorabolf_explode",self:LocalToWorld(Vector(0,0,2)),Angle(0,0,0),nil)
+		self:EmitSound("nz_moo/zombies/vox/_hilter/adorabolf_hit.mp3",511, math.random(98,102))
+	else
+		ParticleEffect("adorabolf_explode",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
+		ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
+		self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_pop.mp3", 511, math.random(95, 105))
+		self:EmitSound("nz_moo/zombies/vox/_astro/death/astro_flux.mp3", 511, math.random(95, 105))
+		self:EmitSound("nz_moo/zombies/vox/_hilter/hitler_attack.mp3",511, math.random(98,102))
+	end
+
+	if suicide then self:TakeDamage(self:Health() + 666, self, self) end
+end
+
+function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how sad I am that I didn't know about this sooner.
+	if e == "step_left_small" or e == "step_left_large" then
+		ParticleEffectAttach("adorabolf_step",PATTACH_POINT,self,11)
+		if self.loco:GetVelocity():Length2D() >= 75 then
+			if self.CustomRunFootstepsSounds then
+				self:EmitSound(self.CustomRunFootstepsSounds[math.random(#self.CustomRunFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalRunFootstepsSounds[math.random(#self.NormalRunFootstepsSounds)], 65)
+			end
+		else
+			if self.CustomWalkFootstepsSounds then
+				self:EmitSound(self.CustomWalkFootstepsSounds[math.random(#self.CustomWalkFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalWalkFootstepsSounds[math.random(#self.NormalWalkFootstepsSounds)], 65)
+			end
+		end
+	end
+	if e == "step_right_small" or e == "step_right_large" then
+		ParticleEffectAttach("adorabolf_step",PATTACH_POINT,self,12)
+		if self.loco:GetVelocity():Length2D() >= 75 then
+			if self.CustomRunFootstepsSounds then
+				self:EmitSound(self.CustomRunFootstepsSounds[math.random(#self.CustomRunFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalRunFootstepsSounds[math.random(#self.NormalRunFootstepsSounds)], 65)
+			end
+		else
+			if self.CustomWalkFootstepsSounds then
+				self:EmitSound(self.CustomWalkFootstepsSounds[math.random(#self.CustomWalkFootstepsSounds)], 65)
+			else
+				self:EmitSound(self.NormalWalkFootstepsSounds[math.random(#self.NormalWalkFootstepsSounds)], 65)
+			end
+
+		end
+	end
+	if e == "melee_whoosh" then
+		if self.CustomMeleeWhooshSounds then
+			self:EmitSound(self.CustomMeleeWhooshSounds[math.random(#self.CustomMeleeWhooshSounds)], 80)
+		else
+			self:EmitSound(self.MeleeWhooshSounds[math.random(#self.MeleeWhooshSounds)], 80)
+		end
+	end
+	if e == "melee" or e == "melee_heavy" then
+		if self:BomberBuff() and self.GasAttack then
+			self:EmitSound(self.GasAttack[math.random(#self.GasAttack)], 100, math.random(95, 105), 1, 2)
+		else
+			if self.AttackSounds then
+				self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
+			end
+		end
+		if e == "melee_heavy" then
+			self.HeavyAttack = true
+		end
+		self:DoAttackDamage()
+	end
+
+	if e == "adorabolf_enrage" then
+		self.NextSound = CurTime() + 7
+		self:EmitSound("nz_moo/zombies/vox/_hilter/vox/mald/hitler_angry.mp3",511,math.random(97, 103),1,2)	
+	end
+
+	if e == "napalm_explode" or e == "adorabolf_slam" then
+		if !self.Dying then
+			self:Explode(100,false)
+		end
+	end
+
+	if e == "base_ranged_rip" then
+		ParticleEffectAttach("ins_blood_dismember_limb", 4, self, 5)
+		self:EmitSound("nz_moo/zombies/gibs/gib_0"..math.random(0,3)..".mp3", 100, math.random(95,105))
+		self:EmitSound("nz_moo/zombies/gibs/head/_og/zombie_head_0"..math.random(0,2)..".mp3", 65, math.random(95,105))
+	end
+	if e == "base_ranged_throw" then
+		self:EmitSound("nz_moo/zombies/fly/attack/whoosh/zmb_attack_med_0"..math.random(0,2)..".mp3", 95)
+
+		local larmfx_tag = self:LookupBone("j_wrist_le")
+
+		self.Guts = ents.Create("nz_gib")
+		self.Guts:SetPos(self:GetBonePosition(larmfx_tag))
+		self.Guts:Spawn()
+
+		local phys = self.Guts:GetPhysicsObject()
+		local target = self:GetTarget()
+		local movementdir
+		if IsValid(phys) and IsValid(target) then
+			--[[if target:IsPlayer() then
+				movementdir = target:GetVelocity():Normalize()
+				print(movementdir)
+			end]]
+			phys:SetVelocity(self.Guts:getvel(target:EyePos() - Vector(0,0,7), self:EyePos(), 0.95))
+		end
+	end
+	if e == "pull_plank" then
+		if IsValid(self) and self:Alive() then
+			if IsValid(self.BarricadePlankPull) and IsValid(self.Barricade) then
+				self.Barricade:RemovePlank(self.BarricadePlankPull)
+			end
+		end
+	end
+	if e == "death_ragdoll" then
+		self:BecomeRagdoll(DamageInfo())
+	end
+	if e == "start_traverse" then
+		--print("starttraverse")
+		self.TraversalAnim = true
+	end
+	if e == "finish_traverse" then
+		--print("finishtraverse")
+		self.TraversalAnim = false
+	end
+	if e == "remove_zombie" then
+		self:Remove()
+	end
+
+	if e == "generic_taunt" then
+		if self.TauntSounds then
+			self:EmitSound(self.TauntSounds[math.random(#self.TauntSounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
+	end
+	if e == "special_taunt" then
+		if self.CustomSpecialTauntSounds then
+			self:EmitSound(self.CustomSpecialTauntSounds[math.random(#self.CustomSpecialTauntSounds)], 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		else
+			self:EmitSound("nz_moo/zombies/vox/_classic/taunt/spec_taunt.mp3", 100, math.random(85, 105), 1, 2)
+			self.NextSound = CurTime() + self.SoundDelayMax
+		end
 	end
 end

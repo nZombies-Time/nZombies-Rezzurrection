@@ -186,6 +186,12 @@ local StinkyRunAttackSequences = {
 	{seq = "nz_run_ad_attack_v2"},
 	{seq = "nz_run_ad_attack_v3"},
 	{seq = "nz_run_ad_attack_v4"},
+
+	-- The REAL Bad Attack Anims
+	{seq = "nz_legacy_run_attack_v1"},
+	{seq = "nz_legacy_run_attack_v2"},
+	{seq = "nz_legacy_run_attack_v3"},
+	{seq = "nz_legacy_run_attack_v4"},
 }
 
 local SprintAttackSequences = {

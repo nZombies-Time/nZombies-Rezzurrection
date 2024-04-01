@@ -24,6 +24,8 @@ if CLIENT then
 			self:DrawLight()
 		end
 
+		self:EffectsAndSounds()
+
 		if GetConVar( "nz_zombie_debug" ):GetBool() then
 			render.DrawWireframeBox(self:GetPos(), Angle(0,0,0), self:OBBMins(), self:OBBMaxs(), Color(255,0,0), true)
 		end
@@ -64,6 +66,16 @@ if CLIENT then
 		render.DrawSprite(lightpos, 75, 75, color)
 	end
 
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if !self.Draw_FX or !IsValid(self.Draw_FX) then -- PVS will no longer eat the particle effect.
+				self.Draw_FX = CreateParticleSystem(self, "doom_rev_missile_trail_smoke", PATTACH_POINT_FOLLOW, 2)
+			end
+		end
+	end
+
 	return 
 end
 
@@ -84,7 +96,7 @@ ENT.Models = {
 	{Model = "models/moo/_codz_ports/t9/gold/moo_codz_t9_pyro_mechz.mdl", Skin = 0, Bodygroups = {0,0}},
 }
 
-local spawn = {"nz_soldat_arrive"}
+local spawn = {"nz_soldat_arrive_fast"}
 
 ENT.DeathSequences = {
 	"nz_soldat_death_1",
@@ -183,6 +195,10 @@ ENT.NormalJumpUp128Quick = {
 
 ENT.NormalJumpDown128 = {
 	"nz_soldat_jump_down_128",
+}
+
+ENT.ZombieLandSequences = {
+	"nz_soldat_jump_land",
 }
 
 ENT.SequenceTables = {
@@ -426,7 +442,10 @@ function ENT:StatsInitialize()
 		self.LastFireBomb = CurTime() + 3
 		self:SetMooSpecial(true)
 		self:SetHelmet(true)
-		self:SetCollisionBounds(Vector(-22,-22, 0), Vector(22, 22, 90))
+
+		self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+		self:SetSurroundingBounds(Vector(-45, -45, 0), Vector(45, 45, 100))
+	
 		self:SetRunSpeed( 36 )
 	end
 end
@@ -439,8 +458,31 @@ function ENT:OnSpawn()
 	self:SetSpecialAnimation(true)
 
 	self:EmitSound("nz_moo/zombies/vox/_pyromech/spawn.mp3",511)
-	self:EmitSound("enemies/bosses/newpanzer/mechz_entrance.ogg",100,100)
 
+	debugoverlay.BoxAngles(self:GetPos() + self:GetUp() * 75, Vector(-5,-5,0), Vector(5,5,750), self:GetAngles(), 3, Color( 255, 255, 255, 10))
+
+	local tr = util.TraceHull({
+		start = self:GetPos(),
+		endpos = self:GetPos(),
+		filter = self,
+		mask = MASK_NPCSOLID,
+		ignoreworld = false,
+		mins = min,
+		maxs = Vector(5,5,750),
+	})
+
+	if tr.Hit then 
+		seq = "nz_soldat_arrive_tomb_short" 
+		self.HitRoof = true
+	end
+
+	if self.HitRoof then
+		local effectData = EffectData()
+		effectData:SetOrigin( self:GetPos() + Vector(0, 0, 80)  )
+		effectData:SetMagnitude( 5 )
+		effectData:SetEntity(nil)
+		util.Effect("panzer_spawn_tp", effectData) -- Express Portal to their destination.
+	end
 
 	if seq then
 		self:PlaySequenceAndWait(seq)
@@ -566,8 +608,17 @@ function ENT:AI()
 	end
 end
 
+function ENT:OnGameOver() 
+	if !self.yousuck then
+		self.yousuck = true
+		self:DoSpecialAnimation("nz_soldat_com_summon")
+	end
+end
+
 function ENT:PerformDeath(dmgInfo)
-	self:EmitSound("enemies/bosses/newpanzer/rise.ogg",100, math.random(85, 105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/death/rise.mp3", 100, math.random(85,105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/v2/death/killshot.mp3", 100, math.random(85,105))
+	self:EmitSound("nz_moo/zombies/vox/_mechz/vox/death/death_00.mp3", 100, math.random(85,105))
 
 	self:PlaySound(self.DeathSounds[math.random(#self.DeathSounds)], 90, math.random(85, 105), 1, 2)
 	self:DoDeathAnimation(self.DeathSequences[math.random(#self.DeathSequences)])
@@ -669,8 +720,8 @@ function ENT:StartToasting()
 
 		if not leftthetoasteron then
 			ParticleEffectAttach("asw_mnb_flamethrower",PATTACH_POINT_FOLLOW,self,5)
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/start.mp3",95, math.random(85, 105))
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/loop.wav",100, 100)
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/start.mp3",95, math.random(85, 105))
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav",100, 100)
 			leftthetoasteron = true
 		end
 
@@ -712,8 +763,8 @@ function ENT:StopToasting()
 	if self.UsingFlamethrower then
 		--print("I'm no longer Nintoasting.")
 		if leftthetoasteron then
-			self:EmitSound("nz_moo/zombies/vox/_mechz/flame/end.mp3",100, math.random(85, 105))
-			self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+			self:EmitSound("nz_moo/zombies/vox/_mechz/v2/flame/end.mp3",100, math.random(85, 105))
+			self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 			leftthetoasteron = false
 		end
 		self.UsingFlamethrower = false
@@ -748,7 +799,7 @@ function ENT:JetPackJump()
 	self:FaceTowards(target)	
 	self.loco:Jump()
 
-    self:TimedEvent( 0.2, function() self.loco:SetVelocity(((target:GetPos() + target:OBBCenter()) - (self:GetPos() + self:OBBCenter())):GetNormal() * self:GetRangeTo(target:GetPos()) + self:GetUp() * math.Clamp(self:GetRangeTo(target:GetPos()), 235, 595)) end)
+    self:TimedEvent( 0.2, function() self.loco:SetVelocity(((target:GetPos() + target:OBBCenter()) - (self:GetPos() + self:OBBCenter())):GetNormalized() * self:GetRangeTo(target:GetPos()) + self:GetUp() * math.Clamp(self:GetRangeTo(target:GetPos()), 235, 595)) end)
 end
 
 function ENT:JetPackLand()
@@ -774,7 +825,7 @@ function ENT:JetPackLand()
 	end)
 end
 
-function ENT:OnLandOnGroundZombie() 
+function ENT:OnLandOnGroundCustom() 
 	if self.Lunging then
 		self:JetPackLand()
 	end
@@ -797,7 +848,7 @@ function ENT:OnThink()
 		self:StartToasting()
 	end
 	if !self.UsingFlamethrower then
-		self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+		self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 	end
 	if self:GetAttacking() or self:GetSpecialAnimation() or self:GetIsBusy() then
 		self:StopToasting()
@@ -806,7 +857,7 @@ end
 
 function ENT:OnRemove()
 	self:StopSound(self.JetpackSnd)
-	self:StopSound("nz_moo/zombies/vox/_mechz/flame/loop.wav")
+	self:StopSound("nz_moo/zombies/vox/_mechz/v2/flame/loop.wav")
 	self:StopToasting()
 end
 
@@ -832,19 +883,24 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 	end
 	if e == "mech_stomp_le" then
 		self:EmitSound(self.RunFootstepSounds[math.random(#self.RunFootstepSounds)],75,math.random(95,100))
-		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		--self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,13)
 	end
 	if e == "mech_stomp_ri" then
 		self:EmitSound(self.RunFootstepSounds[math.random(#self.RunFootstepSounds)],75,math.random(95,100))
-		self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
+		--self:EmitSound("nz/panzer/servo/mech_servo_0"..math.random(0,1)..".wav",65,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
 		ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,14)
 	end
 	if e == "mech_land" then
 		self:EmitSound(self.MechLandSounds[math.random(#self.MechLandSounds)],80,math.random(95,100))
 		util.ScreenShake(self:GetPos(),100000,500000,0.2,1000)
+		
+		for i = 1, 3 do
+			ParticleEffectAttach("panzer_land_dust",PATTACH_POINT,self,1)
+		end
+
 	end
 	if e == "mech_jetflames_start" then
 		ParticleEffectAttach("bo3_panzer_engine",PATTACH_POINT_FOLLOW,self,4)
@@ -857,6 +913,26 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		self:EmitSound(self.RageSounds[math.random(#self.RageSounds)], 95, math.random(95,105))
 		self.NextSound = CurTime() + 5
 	end
+	if e == "mech_arrive_in" then
+		self:EmitSound("nz_moo/zombies/vox/_mechz/v2/jump_in_118.mp3",100,100)
+	end
+	if e == "mech_alarm" then
+		self:EmitSound("nz_moo/zombies/vox/_mechz/vox/alarm_2.mp3", 90, math.random(95, 105))
+	end
+	if e == "mech_spawn_land" then
+		-- Knock normal zombies aside
+		for k,v in nzLevel.GetZombieArray() do
+			if IsValid(v) and !v:GetSpecialAnimation() and v.IsMooZombie and !v.Non3arcZombie and !v.IsMooSpecial and v ~= self then
+				if self:GetRangeTo( v:GetPos() ) < 10^2 then	
+					if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() and self:GetRunSpeed() > 36 then
+						if v.PainSequences then
+							v:DoSpecialAnimation(v.PainSequences[math.random(#v.PainSequences)], true, true)
+						end
+					end
+				end
+			end
+		end
+	end
 end
 
 function ENT:IsValidTarget( ent )
@@ -865,62 +941,3 @@ function ENT:IsValidTarget( ent )
 end
 
 function ENT:HasHelmet() return self:GetHelmet() end
-
-
-if SERVER then
-	-- Collide When Possible
-	local collidedelay = 0.25
-	local bloat = Vector(5,5,0)
-	function ENT:StuckPrevention() -- Version of the stuck Prevention code for enemies with big collision boxes.(Shrinks their Obb when stuck.)
-		if !self:GetIsBusy() and !self:GetSpecialAnimation() and !self:GetAttacking() and self:GetLastPostionSave() + 0.75 < CurTime() then
-			if self:GetPos():DistToSqr( self:GetStuckAt() ) < 75 then
-				self:SetStuckCounter( self:GetStuckCounter() + 1)
-				--print(self:GetStuckCounter())
-			else
-				self:SetStuckCounter( 0 )
-				local tr1 = util_tracehull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = Vector(22, 22, 90) + bloat,
-					mins = Vector(-22,-22, 0) - bloat,
-					filter = self
-				})
-				if !tr1.HitWorld then
-					self:SetCollisionBounds(Vector(-22,-22, 0), Vector(22, 22, 90))
-				end
-			end
-
-			if self:GetStuckCounter() >= 2 then
-
-				self:SetCollisionBounds(Vector(-19,-19, 0), Vector(19, 19, 87))
-
-				local tr = util_tracehull({
-					start = self:GetPos(),
-					endpos = self:GetPos(),
-					maxs = self:OBBMaxs() + bloat,
-					mins = self:OBBMins() - bloat,
-					filter = self
-				})
-				if !tr.HitWorld then
-				end
-				if self:GetStuckCounter() > 25 then
-					if self.NZBossType then
-						local spawnpoints = {}
-						for k,v in pairs(ents.FindByClass("nz_spawn_zombie_special")) do -- Find and add all valid spawnpoints that are opened and not blocked
-							if (v.link == nil or nzDoors:IsLinkOpened( v.link )) and v:IsSuitable() then
-								table.insert(spawnpoints, v)
-							end
-						end
-						local selected = spawnpoints[math.random(#spawnpoints)] -- Pick a random one
-						self:SetPos(selected:GetPos())
-					else
-						self:RespawnZombie()
-					end
-					self:SetStuckCounter( 0 )
-				end
-			end
-			self:SetLastPostionSave( CurTime() )
-			self:SetStuckAt( self:GetPos() )
-		end
-	end
-end

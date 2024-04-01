@@ -5,7 +5,26 @@ ENT.PrintName = "Astronaut(Assdonut) or THE CYCLOPS"
 ENT.Category = "Brainz"
 ENT.Author = "Laby and GhostlyMoo"
 
-if CLIENT then return end -- Client doesn't really need anything beyond the basics
+if CLIENT then 
+
+	function ENT:PostDraw()
+		self:EffectsAndSounds()
+	end
+
+	function ENT:EffectsAndSounds()
+		if self:Alive() then
+			-- Credit: FlamingFox for Code and fighting the PVS monster -- 
+			if !IsValid(self) then return end
+			if !self.Draw_FX or !IsValid(self.Draw_FX) then
+				self.Draw_FX = "nz_moo/zombies/vox/_astro/breath.wav"
+
+				self:EmitSound(self.Draw_FX, 75, math.random(95, 105), 1, 3)
+			end
+		end
+	end
+
+	return 
+end -- Client doesn't really need anything beyond the basics
 
 ENT.RedEyes = false
 ENT.SpeedBasedSequences = true
@@ -152,8 +171,7 @@ function ENT:SpecialInit()
 end
 
 function ENT:OnSpawn()
-	--self:EmitSound("nz_moo/zombies/vox/_astro/spawn_flux.mp3", 511, math.random(95, 105))
-	self:EmitSound("nz_moo/zombies/vox/_astro/breath.wav", 75, math.random(95, 105), 1, 3)
+	self:EmitSound("nz_moo/zombies/vox/_astro/spawn_flux.mp3", 511, math.random(95, 105))
 	ParticleEffect("bo3_astronaut_pulse",self:LocalToWorld(Vector(0,0,50)),Angle(0,0,0),nil)
 end
 
@@ -185,66 +203,9 @@ if SERVER then
 	function ENT:GetFleeDestination(target) -- Get the place where we are fleeing to, added by: Ethorbit
 		return self:GetPos() + (self:GetPos() - target:GetPos()):GetNormalized() * (self.FleeDistance or 300)
 	end
-
-	function ENT:RunBehaviour()
-
-		self:Retarget()
-		self:SpawnZombie()
-
-		while (true) do
-
-			if self.EventMask and not self.DoCollideWhenPossible then
-				self:SetSolidMask(MASK_NPCSOLID)
-			end
-			if !self:GetStop() and self:GetFleeing() then -- Admittedly this was rushed, I took no time to understand how this can be achieved with nextbot pathing so I just made a short navmesh algorithm for fleeing. Sorry. Created by Ethorbit.
-				self:SetTimedOut(false)
-
-				local target = self:GetTarget()
-				if IsValid(target) then
-					self:SetLastFlee(CurTime())
-					self:ResetMovementSequence() -- They'll comically slide away if this isn't here.
-					self:MoveToPos(self:GetFleeDestination(target), {lookahead = 0, maxage = 3})
-					self:SetLastFlee(CurTime())
-				end
-			end
-			if !self:GetFleeing() and !self:GetStop() and CurTime() > self:GetLastFlee() + 2 then
-				self:SetTimedOut(false)
-				local ct = CurTime()
-				if ct >= self.NextRetarget then
-					local oldtarget = self.Target
-					self:Retarget() --The overall process of looking for targets is handled much like how it is in nZu. While it may not save much fps in solo... Turns out this can vastly help the performance of multiplayer games.
-				end
-				if not self:HasTarget() and not self:IsValidTarget(self:GetTarget()) then
-					self:OnNoTarget()
-				else
-					local path = self:ChaseTarget()
-					if path == "failed" then
-						self:SetTargetUnreachable(true)
-					end
-					if path == "ok" then
-						if self:TargetInAttackRange() then
-							self:AstroGrab()
-						else
-							self:TimeOut(0.1)
-						end
-					elseif path == "timeout" then --asume pathing timedout, maybe we are stuck maybe we are blocked by barricades
-						self:SetTargetUnreachable(true)
-						self:OnPathTimeOut()
-					else
-						self:TimeOut(2)
-					end
-				end
-			else
-				self:TimeOut(2)
-			end
-			if not self.NextSound or self.NextSound < CurTime() and not self:GetAttacking() and self:Alive() then
-				self:Sound() -- Moo Mark 12/7/22: Moved this out of the THINK function since I thought it was a little stupid.
-			end
-		end
-	end
 end
 
-function ENT:AstroGrab()
+function ENT:Attack()
 	--print("Give me your assets.")
 	if IsValid(self:GetTarget()) and self:GetTarget():IsPlayer() then
 		if malding then
@@ -337,6 +298,7 @@ function ENT:ZombieStatusEffects()
 		self.LastStatusUpdate = CurTime() + 0.25
 	end
 end
+
 ENT.AstroDanceSounds = {
 	Sound("nz_moo/effects/aats/turned/drip.mp3"),
 }
@@ -412,111 +374,11 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 		--print("finishtraverse")
 		self.TraversalAnim = false
 	end
-
-	-- WW2 Zobies	
-	if e == "s2_gen_step" then
-		self:EmitSound(self.StepSounds[math.random(#self.StepSounds)], 60, math.random(95, 105))
-	end
-	if e == "s2_taunt_vox" then
-		self:EmitSound(self.TauntSounds[math.random(#self.TauntSounds)],95, math.random(95, 105), 1, 2)
-	end
-
-	-- Taunt Sounds, theres alot of these
-
-	if e == "generic_taunt" then
-		if self.TauntSounds then
-			self:EmitSound(self.TauntSounds[math.random(#self.TauntSounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "special_taunt" then
-		if self.CustomSpecialTauntSounds then
-			self:EmitSound(self.CustomSpecialTauntSounds[math.random(#self.CustomSpecialTauntSounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound("nz_moo/zombies/vox/_classic/taunt/spec_taunt.mp3", 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v1" then
-		if self.CustomTauntAnimV1Sounds then
-			self:EmitSound(self.CustomTauntAnimV1Sounds[math.random(#self.CustomTauntAnimV1Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV1Sounds[math.random(#self.TauntAnimV1Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v2" then
-		if self.CustomTauntAnimV2Sounds then
-			self:EmitSound(self.CustomTauntAnimV2Sounds[math.random(#self.CustomTauntAnimV2Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV2Sounds[math.random(#self.TauntAnimV2Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v3" then
-		if self.CustomTauntAnimV2Sounds then
-			self:EmitSound(self.CustomTauntAnimV3Sounds[math.random(#self.CustomTauntAnimV3Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV3Sounds[math.random(#self.TauntAnimV3Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v4" then
-		if self.CustomTauntAnimV4Sounds then
-			self:EmitSound(self.CustomTauntAnimV4Sounds[math.random(#self.CustomTauntAnimV4Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV4Sounds[math.random(#self.TauntAnimV4Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v5" then
-		if self.CustomTauntAnimV5Sounds then
-			self:EmitSound(self.CustomTauntAnimV5Sounds[math.random(#self.CustomTauntAnimV5Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV5Sounds[math.random(#self.TauntAnimV5Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v6" then
-		if self.CustomTauntAnimV6Sounds then
-			self:EmitSound(self.CustomTauntAnimV6Sounds[math.random(#self.CustomTauntAnimV6Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV6Sounds[math.random(#self.TauntAnimV6Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v7" then
-		if self.CustomTauntAnimV7Sounds then
-			self:EmitSound(self.CustomTauntAnimV7Sounds[math.random(#self.CustomTauntAnimV7Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV7Sounds[math.random(#self.TauntAnimV7Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v8" then
-		if self.CustomTauntAnimV8Sounds then
-			self:EmitSound(self.CustomTauntAnimV8Sounds[math.random(#self.CustomTauntAnimV8Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV8Sounds[math.random(#self.TauntAnimV8Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		end
-	end
-	if e == "anim_taunt_v9" then
-		if self.CustomTauntAnimV9Sounds then
-			self:EmitSound(self.CustomTauntAnimV9Sounds[math.random(#self.CustomTauntAnimV9Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
-		else
-			self:EmitSound(self.TauntAnimV9Sounds[math.random(#self.TauntAnimV9Sounds)], 100, math.random(85, 105), 1, 2)
-			self.NextSound = CurTime() + self.SoundDelayMax
+	if e == "pull_plank" then
+		if IsValid(self) and self:Alive() then
+			if IsValid(self.BarricadePlankPull) and IsValid(self.Barricade) then
+				self.Barricade:RemovePlank(self.BarricadePlankPull)
+			end
 		end
 	end
 

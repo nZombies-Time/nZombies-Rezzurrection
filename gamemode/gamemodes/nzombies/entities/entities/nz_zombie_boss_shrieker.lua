@@ -378,6 +378,13 @@ function ENT:HandleAnimEvent(a,b,c,d,e)
 		self:EmitSound(self.AttackSounds[math.random(#self.AttackSounds)], 100, math.random(85, 105), 1, 2)
 		self:DoAttackDamage()
 	end
+	if e == "pull_plank" then
+		if IsValid(self) and self:Alive() then
+			if IsValid(self.BarricadePlankPull) and IsValid(self.Barricade) then
+				self.Barricade:RemovePlank(self.BarricadePlankPull)
+			end
+		end
+	end
 	if e == "death_ragdoll" then
 		self:BecomeRagdoll(DamageInfo())
 	end

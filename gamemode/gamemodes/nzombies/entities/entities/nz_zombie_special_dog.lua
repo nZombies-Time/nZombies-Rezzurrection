@@ -152,7 +152,8 @@ function ENT:StatsInitialize()
 		self.Sprinting = false
 		self.IgnitedFoxy = false
 	end
-	self:SetCollisionBounds(Vector(-13,-13, 0), Vector(13, 13, 45))
+	self:SetCollisionBounds(Vector(-9,-9, 0), Vector(9, 9, 72))
+	self:SetSurroundingBounds(Vector(-20, -20, 0), Vector(20, 20, 72))
 end
 
 function ENT:OnSpawn()
@@ -226,8 +227,8 @@ end
 
 
 function ENT:AI()
-	local distToTarget = self:GetPos():Distance(self:GetTargetPosition())
 	if IsValid(self:GetTarget()) then
+		local distToTarget = self:GetPos():Distance(self:GetTargetPosition())
 		if not self.Sprinting and distToTarget < 750 then
 			self.Sprinting = true
 			self.IgnitedFoxy = true
