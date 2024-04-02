@@ -5,15 +5,8 @@ ENT.PrintName = "Brutus"
 ENT.Category = "Brainz"
 ENT.Author = "GhostlyMoo"
 
-function ENT:SetupDataTables()
-	self:NetworkVar("Bool", 0, "Decapitated")
-	self:NetworkVar("Bool", 1, "Alive")
-	self:NetworkVar("Bool", 2, "MooSpecial")
-	self:NetworkVar("Bool", 3, "WaterBuff")
-	self:NetworkVar("Bool", 4, "Helmet")
-	self:NetworkVar("Bool", 5, "BomberBuff")
-
-	if self.InitDataTables then self:InitDataTables() end
+function ENT:InitDataTables()
+	self:NetworkVar("Bool", 5, "Helmet")
 end
 
 function ENT:Draw()
@@ -298,7 +291,6 @@ function ENT:StatsInitialize()
 		self.NextAI = 0
 		self.DestructionCoolDown = CurTime() + 10
 
-		self:SetCollisionBounds(Vector(-17,-17, 0), Vector(17, 17, 85))
 		self:SetRunSpeed( 36 )
 		self:SetBodygroup(2,0)
 		self:SetBodygroup(3,0)
@@ -306,6 +298,9 @@ function ENT:StatsInitialize()
 end
 
 function ENT:OnSpawn()
+	self:SetCollisionBounds(Vector(-14,-14, 0), Vector(14, 14, 72))
+	self:SetSurroundingBounds(Vector(-30, -30, 0), Vector(30, 30, 80))
+
 	self:SetNoDraw(true)
 	self:SetInvulnerable(true)
 	self:SetBlockAttack(true)
@@ -485,8 +480,21 @@ function ENT:HandleAnimEvent(a,b,c,d,e) -- Moo Mark 4/14/23: You don't know how 
 		ParticleEffect("driese_tp_arrival_ambient",self:LocalToWorld(Vector(60,-30,0)),Angle(0,0,0),nil)
 		util.ScreenShake(self:GetPos(),10000,5000,1,1000)
 		self:DoAttackDamage()
+
 		if target:IsPlayer() and self:TargetInRange(115) then
 			target:NZSonicBlind(3)
+		end
+
+		for k,v in nzLevel.GetZombieArray() do
+			if IsValid(v) and !v:GetSpecialAnimation() and v.IsMooZombie and !v.Non3arcZombie and !v.IsMooSpecial and v ~= self then
+				if self:GetRangeTo( v:GetPos() ) < 10^2 then	
+					if v.IsMooZombie and !v.IsMooSpecial and !v:GetSpecialAnimation() then
+						if v.PainSequences then
+							v:DoSpecialAnimation(v.PainSequences[math.random(#v.PainSequences)], true, true)
+						end
+					end
+				end
+			end
 		end
 	end
 	--[[if e == "board_smash" then
