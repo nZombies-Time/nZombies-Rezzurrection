@@ -19,27 +19,23 @@ function nzRandomBox.Spawn(exclude, first)
 		local pos = rand:GetPos()
 		local ang = rand:GetAngles()
 		
-		 -- new
-        local BoxType = nzMapping.Settings.boxtype
-        if (BoxType == "Original" or BoxType == nil) then
-            box:SetPos( pos + ang:Up()*10 + ang:Right()*7 )
-        else
-            box:SetPos(pos)
-        end
+		if (nzMapping.Settings.boxtype == "Original" or nzMapping.Settings.boxtype == "Black Ops 3"  or nzMapping.Settings.boxtype == "Black Ops 3(Quiet Cosmos)") then
+			box:SetPos( pos + ang:Up()*10 + ang:Right()*7 )
+		else
+			box:SetPos( pos + ang:Right()*7 )
+		end
+		
 		box:SetAngles( ang )
 		box:Spawn()
-		--box:PhysicsInit( SOLID_VPHYSICS )
 		box.SpawnPoint = rand
 		rand.Box = box
 		
 		rand:SetBodygroup(1,1)
-		if (nzMapping.Settings.boxtype =="Resident Evil" or nzMapping.Settings.boxtype =="Call of Duty: WW2" or nzMapping.Settings.boxtype =="DOOM" or nzMapping.Settings.boxtype =="Chaos" ) then
-			rand:SetModelScale(0, 0 )
-			end
-		
+
 		local phys = box:GetPhysicsObject()
 		if phys:IsValid() then
 			phys:EnableMotion(false)
+			phys:Sleep()
 		end
 	else
 		print("No random box spawns have been set.")
@@ -58,8 +54,53 @@ end
 
 function nzRandomBox.DecideWep(ply)
 
-	local teddychance = math.random(1, 15)
-	if teddychance <= 1 and !nzPowerUps:IsPowerupActive("firesale") and table.Count(ents.FindByClass("random_box_spawns")) > 1 then
+	-- A copy of how 3arc did Teddybear chances in BO1 and most likely W@W.
+
+	local random = math.random(100)
+	local minuses = 4
+
+	local chanceofjoker = 0
+
+	if nzRandomBox:GetBoxUses() < minuses or nzPowerUps:IsPowerupActive("firesale") then
+		chanceofjoker = -1 -- No teddy if the box was only used 3 times, or if theres a Firesale active.
+	else
+		chanceofjoker = nzRandomBox:GetBoxUses() + 20
+
+		if !nzPowerUps:GetBoxMoved() and nzRandomBox:GetBoxUses() >= 8 then
+			chanceofjoker = 100 -- Force Teddy after 8 uses.
+		end
+
+		if nzRandomBox:GetBoxUses() >= 4 and nzRandomBox:GetBoxUses() <= 8 then
+			if random < 15 then -- 15% Chance of Teddy
+				chanceofjoker = 100
+			else
+				chanceofjoker = -1
+			end
+		end
+
+		if nzPowerUps:GetBoxMoved() then
+			if nzRandomBox:GetBoxUses() >= 8 and nzRandomBox:GetBoxUses() <= 13 then
+				if random < 30 then -- 30% Chance of Teddy
+					chanceofjoker = 100
+				else
+					chanceofjoker = -1
+				end
+			end
+
+			if nzRandomBox:GetBoxUses() >= 13 then
+				if random < 50 then -- 50% Chance of Teddy
+					chanceofjoker = 100
+				else
+					chanceofjoker = -1
+				end
+			end
+		end
+	end
+
+	print("Total Box Spins: "..nzRandomBox:GetBoxUses().."")
+	print("Joker Chance: "..chanceofjoker.."")
+
+	if chanceofjoker > random and table.Count(ents.FindByClass("random_box_spawns")) > 1 then
 		return hook.Call("OnPlayerBuyBox", nil, ply, "nz_box_teddy") or "nz_box_teddy"
 	end
 
@@ -117,41 +158,26 @@ function nzRandomBox.DecideWep(ply)
 
 	local gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
 	local wep = weapons.Get(gun)
-	local upgrade = ""
-	local upgrade2 =  ""
-	if wep.NZPaPReplacement then
-		local upgrade  = wep.NZPaPReplacement
-		local wep2 =  weapons.Get( wep.NZPaPReplacement)
-		if  wep2.NZPaPReplacement then
-		local upgrade2 = wep2.NZPaPReplacement
-		else
-		end
-		else
-		end
-	print(gun)
+
 	local badRoll = false
-	if  ply:HasWeapon( gun ) or ply:HasWeapon(upgrade) or ply:HasWeapon(upgrade2) then
-	badRoll = true
+
+	print(gun)
+
+	if ply:HasWeapon(gun) then
+		badRoll = true
 	end
+
 	while(badRoll) do
-	gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
-	wep = weapons.Get(gun)
-	upgrade = wep.NZPaPReplacement
-	wep2 = weapons.Get(upgrade)
-	upgrade2 = wep2.NZPaPReplacement
-	if  !ply:HasWeapon( gun ) and  !ply:HasWeapon( upgrade )and !ply:HasWeapon( upgrade2 ) then
-	badRoll = false
+		gun = nzMisc.WeightedRandom(guns) -- Randomly decide by weight
+		wep = weapons.Get(gun)
+		if !ply:HasWeapon(gun) then
+			badRoll = false
+		end
 	end
+
+	if ply:HasWeapon(gun) then
+		gun = hook.Call("OnPlayerBuyBox", nil, ply, gun) or gun
 	end
-	if  ply:HasWeapon( gun ) or ply:HasWeapon(upgrade) or ply:HasWeapon(upgrade2) then
-	print("we did it")
-	gun = nzMisc.WeightedRandom( guns ) -- Randomly decide by weight
-	wep = weapons.Get(gun)
-	upgrade = wep.NZPaPReplacement
-	wep2 = weapons.Get(upgrade)
-	upgrade2 = wep2.NZPaPReplacement
-	else
-	gun = hook.Call("OnPlayerBuyBox", nil, ply, gun) or gun
-	end
+	
 	return gun
 end
