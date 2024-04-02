@@ -17,19 +17,20 @@ function ENT:SetupDataTables()
 	self:NetworkVar( "Int", 1, "BoardType" )
 	self:NetworkVar( "Int", 2, "Prop" )
 	self:NetworkVar( "Int", 3, "JumpType" )
+    self:NetworkVar("String", 0, "InitialTarget")
 end
 
 -- What positions the barricade can possibly use
 ENT.BarricadeTearPositions = {
 	Front = {
-		Vector(-50,0,0),
-		--Vector(-55,35,0),
-		--Vector(-55,-35,0),
+		Vector(-31,0,0),
+		Vector(-31,28,0),
+		Vector(-31,-28,0),
 	},
 	Back = {
-		Vector(50,0,0),
-		--Vector(55,35,0),
-		--Vector(55,-35,0),
+		Vector(31,0,0),
+		Vector(31,28,0),
+		Vector(31,-28,0),
 	}
 }
 
@@ -63,10 +64,10 @@ end
 function ENT:ReserveAvailableTearPosition(z)
 	local tbl = (z:GetPos() - self:GetPos()):Dot(self:GetAngles():Forward()) < 0 and self.m_tReservedSpots.Front or self.m_tReservedSpots.Back
 	for k,v in pairs(tbl) do
-		--if not IsValid(v) or v == z then -- Commented out until further notice.
+		if not IsValid(v) or v == z then
 			tbl[k] = z
 			return k
-		--end
+		end
 	end
 end
 
@@ -109,6 +110,22 @@ function ENT:FullRepair()
 	end
 end
 
+function ENT:FullBreak()
+	if !self:GetHasPlanks() then return end
+	self.NextPlank = CurTime() + 4
+	self.ZombieUsing = nil
+	for i=1, 6 do
+		timer.Simple(i * 0.1, function()
+			if IsValid(self) then
+				local plank = self:GetCurrentPlank()
+				if IsValid(plank) then
+					self:RemovePlank(plank)
+				end
+			end
+		end)
+	end
+end
+
 function ENT:AddPlank(plank)
 	if !self:GetHasPlanks() then return end
 	if self:GetNumPlanks() < 6 then
@@ -120,7 +137,7 @@ end
 function ENT:GetCurrentPlank()
 	local tbl = {}
 	for k,v in pairs(self.Planks) do
-		if !IsValid(self.ZombieUsing) and !v.Torn then
+		if !IsValid(self.ZombieUsing) and !IsValid(v.ZombieUsing) and !v.Torn then
 			table.insert(tbl, v)
 		end
 	end
@@ -140,6 +157,7 @@ end
 function ENT:BeginPlankPull(ent)
 	local plank = self:GetCurrentPlank()
 	if IsValid(plank) then
+		plank.ZombieUsing = ent
 		return plank
 	end
 end
@@ -150,6 +168,7 @@ function ENT:RemovePlank(plank)
 	local sequence, duration = plank:LookupSequence("o_zombie_board_"..plank:GetFlags().."_pull")
 	plank:ResetSequence(sequence)
 	plank.Torn = true
+	plank.ZombieUsing = nil
 
 	timer.Simple(duration, function()
 		if IsValid(self) and IsValid(plank) then
@@ -168,7 +187,7 @@ end
 
 function ENT:ResetPlanks(nosoundoverride)
 	for i=1, table.Count(self.Planks) do
-	local plank = self:GetCurrentPlank()
+		local plank = self:GetCurrentPlank()
 		if IsValid(plank) then
 			self:RemovePlank(plank)
 		end
@@ -230,10 +249,10 @@ function ENT:SpawnPlank()
 	local plank = self:GetBoardType() == 1 and ents.Create("breakable_entry_plank") or self:GetBoardType() == 2 and ents.Create("breakable_entry_bar") or self:GetBoardType() == 3 and ents.Create("breakable_entry_ventslat")
 	plank:SetParent(self)
 	if self:GetBoardType() == 1 then
-		plank:SetLocalPos( Vector(32,0,31))
+		plank:SetLocalPos( Vector(32,0,29))
 		plank:SetLocalAngles( Angle(0,180,0))
 	elseif self:GetBoardType() == 2 or self:GetBoardType() == 3 then
-		plank:SetLocalPos( Vector(32,0,31))
+		plank:SetLocalPos( Vector(32,0,29))
 		plank:SetLocalAngles( Angle(0,90,0))
 	end
 	plank:Spawn()
