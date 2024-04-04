@@ -1562,7 +1562,8 @@ if SERVER then
 	function ENT:ZCTInit()
 
 		-- [[ Zombie Chicken Taco(ZCT) ]] --
-		--if nzMapping.Settings.zct == 1 then
+		local notyet =0
+		if notyet == 3 then
 			if !self.SetZCTacoZombie then
 				if self.IsMooSpecial or self.IsMooBossZombie or self.NZBossType then return end
 
