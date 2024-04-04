@@ -1732,7 +1732,7 @@ if SERVER then
 				end
 
 			end
-		--end
+		end
 	end
 
 	function ENT:ZCTAbilities()
